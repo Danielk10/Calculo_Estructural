@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_import"
+        android:title="Importar .inp"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_export"
+        android:title="Exportar Reporte (.txt)"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_export_pdf"
+        android:title="Exportar Reporte (PDF)"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_export_all"
+        android:title="Exportar Todo (.zip)"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_docs"
+        android:title="Manual CalculiX"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_reset"
+        android:title="Reiniciar Binarios"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about"
+        android:title="Acerca de"
+        app:showAsAction="never" />
+</menu>

@@ -1,0 +1,110 @@
+package com.diamon.civil.test;
+
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.diamon.civil.ui.MainActivity;
+import com.diamon.civil.R;
+
+import com.google.android.material.navigation.NavigationView;
+
+public class AutoTester {
+    private static final String TAG = "AutoTester";
+
+    public static void run(final MainActivity activity) {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            Log.d(TAG, "Starting automatic tests...");
+            Toast.makeText(activity, "Running Automatic Tests...", Toast.LENGTH_SHORT).show();
+            
+            try {
+                // Check library status
+                checkLibraryStatus();
+
+                // Test 1: Structural Analysis Module
+                runStructuralTest(activity);
+                
+                // Delay between tests
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    try {
+                        // Test 2: 3D Solid / Basic Analysis Module
+                        run3DSolidTest(activity);
+                    } catch (Throwable t) {
+                        Log.e(TAG, "FATAL ERROR in 3D Solid Test: " + t.getMessage(), t);
+                    }
+                }, 10000); // Increased delay to 10s
+                
+            } catch (Throwable t) {
+                Log.e(TAG, "FATAL ERROR in Structural Test: " + t.getMessage(), t);
+            }
+            
+        }, 3000); // 3 seconds delay
+    }
+
+    private static void checkLibraryStatus() {
+        String[] libs = {"c++_shared", "openblas", "gmsh", "calculoestructural", "TKPrim", "TKMath", "TKernel"};
+        for (String lib : libs) {
+            try {
+                System.loadLibrary(lib);
+                Log.d(TAG, "Library loaded successfully: " + lib);
+            } catch (UnsatisfiedLinkError e) {
+                Log.e(TAG, "Library FAILED to load: " + lib + " - " + e.getMessage());
+            }
+        }
+    }
+
+    private static void runStructuralTest(MainActivity activity) {
+        Log.d(TAG, "Testing Structural Module...");
+        activity.runOnUiThread(() -> {
+            // Switch to structural module via NavigationView
+            NavigationView navView = activity.findViewById(R.id.nav_view);
+            if (navView != null) {
+                activity.onNavigationItemSelected(navView.getMenu().findItem(R.id.nav_structural));
+            }
+            
+            // Populate data for a simple beam
+            String nodes = "1, 0.0, 0.0, 0.0\n2, 5.0, 0.0, 0.0";
+            String elements = "1, 1, 2";
+            
+            android.widget.EditText etNodes = activity.findViewById(com.diamon.civil.R.id.etNodes);
+            android.widget.EditText etElements = activity.findViewById(com.diamon.civil.R.id.etElements);
+            android.widget.Button btnSolve = activity.findViewById(com.diamon.civil.R.id.btnSolveStructural);
+            
+            if (etNodes != null) etNodes.setText(nodes);
+            if (etElements != null) etElements.setText(elements);
+            
+            Log.d(TAG, "Clicking Solve Structural...");
+            if (btnSolve != null) btnSolve.performClick();
+        });
+    }
+
+    private static void run3DSolidTest(MainActivity activity) {
+        Log.d(TAG, "Testing 3D Solid / Basic Module...");
+        activity.runOnUiThread(() -> {
+            // Switch to 3D Solid module via NavigationView
+            NavigationView navView = activity.findViewById(R.id.nav_view);
+            if (navView != null) {
+                activity.onNavigationItemSelected(navView.getMenu().findItem(R.id.nav_3d_solid));
+            }
+            
+            // Set parameters
+            android.widget.EditText etLength = activity.findViewById(com.diamon.civil.R.id.etLength);
+            android.widget.EditText etSection = activity.findViewById(com.diamon.civil.R.id.etSection);
+            android.widget.EditText etModulus = activity.findViewById(com.diamon.civil.R.id.etModulus);
+            android.widget.EditText etDensity = activity.findViewById(com.diamon.civil.R.id.etDensity);
+            android.widget.EditText etLoad = activity.findViewById(com.diamon.civil.R.id.etLoad);
+            android.widget.Button btnRun = activity.findViewById(com.diamon.civil.R.id.btnRunAnalysis);
+
+            if (etLength != null) etLength.setText("5.0");
+            if (etSection != null) etSection.setText("300x500");
+            if (etModulus != null) etModulus.setText("210000");
+            if (etDensity != null) etDensity.setText("7850");
+            if (etLoad != null) etLoad.setText("-100");
+            
+            Log.d(TAG, "Clicking Run Analysis...");
+            if (btnRun != null) btnRun.performClick();
+        });
+    }
+}
+

@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Acero A36",
+    "E": 200000.0,
+    "nu": 0.3,
+    "rho": 7850.0,
+    "yield_strength": 250.0
+  },
+  {
+    "name": "Aluminio 6061-T6",
+    "E": 68900.0,
+    "nu": 0.33,
+    "rho": 2700.0,
+    "yield_strength": 276.0
+  },
+  {
+    "name": "Concreto 25MPa",
+    "E": 23500.0,
+    "nu": 0.2,
+    "rho": 2400.0,
+    "f_c": 25.0
+  },
+  {
+    "name": "Titanio Ti-6Al-4V",
+    "E": 113800.0,
+    "nu": 0.34,
+    "rho": 4430.0,
+    "yield_strength": 880.0
+  }
+]

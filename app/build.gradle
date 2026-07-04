@@ -1,0 +1,72 @@
+plugins {
+    alias(libs.plugins.android.application)
+    id 'org.jetbrains.kotlin.plugin.compose'
+}
+
+android {
+    // Redirigir la carpeta build a /tmp
+    project.layout.buildDirectory.set(file("/tmp/calculoestructural_build"))
+
+    namespace 'com.diamon.civil'
+    compileSdk 37
+
+    buildToolsVersion '37.0.0'
+
+    defaultConfig {
+        applicationId "com.diamon.civil"
+        minSdk 24
+        targetSdk 37
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ndkVersion "30.0.14904198"
+        ndk {
+            abiFilters "arm64-v8a"
+        }
+    }
+
+    buildTypes {
+        release {
+            optimization {
+                enable false
+            }
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '4.1.2'
+        }
+    }
+    buildFeatures {
+        viewBinding true
+        compose true
+    }
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+        doNotStrip "**/*.so"
+    }
+}
+
+dependencies {
+    implementation platform(libs.compose.bom)
+    implementation libs.compose.ui
+    implementation libs.compose.material3
+    implementation libs.compose.ui.tooling.preview
+
+    implementation libs.appcompat
+    implementation libs.constraintlayout
+    implementation libs.material
+    implementation libs.sceneview
+    implementation libs.itext7.core
+    testImplementation libs.junit
+    androidTestImplementation libs.espresso.core
+    androidTestImplementation libs.ext.junit
+}

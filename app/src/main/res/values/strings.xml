@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Structural Analysis FEA Advanced</string>
+    <string name="analysis_config_title">Advanced Analysis Configuration</string>
+    <string name="geometry_header">STRUCTURAL GEOMETRY</string>
+    <string name="material_header">MATERIAL PROPERTIES</string>
+    <string name="loads_header">LOADING &amp; BOUNDARY CONDITIONS</string>
+    <string name="results_header">SIMULATION RESULTS</string>
+    
+    <string-array name="material_options">
+        <item>Acero (S235) - 210 GPa</item>
+        <item>Concreto (C25) - 30 GPa</item>
+        <item>Madera (C24) - 11 GPa</item>
+        <item>Aluminio (6061) - 69 GPa</item>
+        <item>Personalizado...</item>
+    </string-array>
+
+    <string-array name="analysis_modes">
+        <item>Estático Lineal</item>
+        <item>Frecuencias Naturales (Modal)</item>
+    </string-array>
+
+    <string-array name="support_options">
+        <item>Empotrado (Fixed)</item>
+        <item>Apoyo Simple (Pinned)</item>
+        <item>Doble Empotramiento (Fixed-Fixed)</item>
+    </string-array>
+</resources>
