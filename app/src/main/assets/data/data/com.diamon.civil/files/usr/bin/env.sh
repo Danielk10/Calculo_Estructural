@@ -20,7 +20,7 @@ fi
 
 # ----- Define path to 3rdparty products -----
 if [ "${THIRDPARTY_DIR}" == "" ]; then
-  export THIRDPARTY_DIR="/data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr"
+  export THIRDPARTY_DIR="/data/data/com.diamon.civil/files/usr"
 fi
 
 # ----- Read script arguments -----
