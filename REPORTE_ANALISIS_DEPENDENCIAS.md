@@ -1,7 +1,7 @@
 # Reporte de Dependencias
 
 ### DRAWEXE
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libTKDraw.so. | Externa | Sí |
 | libTKMesh.so. | Externa | Sí |
@@ -17,12 +17,12 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### DRAWEXE-8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libTKDraw.so. | Externa | Sí |
 | libTKMesh.so. | Externa | Sí |
@@ -38,26 +38,26 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### ccx
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libopenblas.so | Externa | Sí |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
-| libdl.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
+| libdl.so | Sistema Android | No |
 
 ### gmsh
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libgmsh.so.5.0 | Externa | Sí |
 | libgmp.so | Externa | Sí |
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libz.so.1 | Externa | Sí |
+| libz.so.1 | Sistema Android | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -86,15 +86,34 @@
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
-| libdl.so | Sistema | No |
+| libdl.so | Sistema Android | No |
 | libc++_shared.so | Externa | Sí |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
+
+### libEGL.so.1
+| Dependencia | Clasificación | Presente en carpeta? |
+|---|---|---|
+| libGLdispatch.so.0 | Externa | Sí |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
+
+### libGLESv2.so.2
+| Dependencia | Clasificación | Presente en carpeta? |
+|---|---|---|
+| libGLdispatch.so.0 | Externa | Sí |
+| libc.so | Sistema Android | No |
+
+### libGLdispatch.so.0
+| Dependencia | Clasificación | Presente en carpeta? |
+|---|---|---|
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBO.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKPrim.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
@@ -106,13 +125,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBO.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKPrim.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
@@ -124,13 +143,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBO.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKPrim.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
@@ -142,52 +161,52 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBRep.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKGeomBase.so. | Externa | Sí |
 | libTKG3d.so. | Externa | Sí |
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBRep.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKGeomBase.so. | Externa | Sí |
 | libTKG3d.so. | Externa | Sí |
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBRep.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKGeomBase.so. | Externa | Sí |
 | libTKG3d.so. | Externa | Sí |
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBin.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKBinL.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -204,13 +223,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBin.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKBinL.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -227,13 +246,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBin.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKBinL.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -250,46 +269,46 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBinL.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBinL.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBinL.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBinTObj.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTObj.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKBinL.so. | Externa | Sí |
@@ -297,13 +316,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBinTObj.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTObj.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKBinL.so. | Externa | Sí |
@@ -311,13 +330,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBinTObj.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTObj.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKBinL.so. | Externa | Sí |
@@ -325,13 +344,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBinXCAF.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXCAF.so. | Externa | Sí |
 | libTKBin.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -355,13 +374,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBinXCAF.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXCAF.so. | Externa | Sí |
 | libTKBin.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -385,13 +404,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBinXCAF.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXCAF.so. | Externa | Sí |
 | libTKBin.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -415,13 +434,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBool.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBO.so. | Externa | Sí |
 | libTKPrim.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
@@ -434,13 +453,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBool.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBO.so. | Externa | Sí |
 | libTKPrim.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
@@ -453,13 +472,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKBool.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBO.so. | Externa | Sí |
 | libTKPrim.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
@@ -472,13 +491,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKCAF.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKLCAF.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
@@ -493,13 +512,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKCAF.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKLCAF.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
@@ -514,13 +533,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKCAF.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKLCAF.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
@@ -535,40 +554,40 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKCDF.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKCDF.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKCDF.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDCAF.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKVCAF.so. | Externa | Sí |
 | libTKViewerTest.so. | Externa | Sí |
 | libTKStd.so. | Externa | Sí |
@@ -603,13 +622,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDCAF.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKVCAF.so. | Externa | Sí |
 | libTKViewerTest.so. | Externa | Sí |
 | libTKStd.so. | Externa | Sí |
@@ -644,13 +663,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDCAF.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKVCAF.so. | Externa | Sí |
 | libTKViewerTest.so. | Externa | Sí |
 | libTKStd.so. | Externa | Sí |
@@ -685,13 +704,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDE.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBRep.so. | Externa | Sí |
 | libTKGeomBase.so. | Externa | Sí |
 | libTKG3d.so. | Externa | Sí |
@@ -699,13 +718,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDE.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBRep.so. | Externa | Sí |
 | libTKGeomBase.so. | Externa | Sí |
 | libTKG3d.so. | Externa | Sí |
@@ -713,13 +732,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDE.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBRep.so. | Externa | Sí |
 | libTKGeomBase.so. | Externa | Sí |
 | libTKG3d.so. | Externa | Sí |
@@ -727,13 +746,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDECascade.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBinTObj.so. | Externa | Sí |
 | libTKBinXCAF.so. | Externa | Sí |
 | libTKStd.so. | Externa | Sí |
@@ -767,13 +786,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDECascade.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBinTObj.so. | Externa | Sí |
 | libTKBinXCAF.so. | Externa | Sí |
 | libTKStd.so. | Externa | Sí |
@@ -807,13 +826,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDECascade.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBinTObj.so. | Externa | Sí |
 | libTKBinXCAF.so. | Externa | Sí |
 | libTKStd.so. | Externa | Sí |
@@ -847,13 +866,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEIGES.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXSBase.so. | Externa | Sí |
 | libTKBool.so. | Externa | Sí |
@@ -878,13 +897,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEIGES.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXSBase.so. | Externa | Sí |
 | libTKBool.so. | Externa | Sí |
@@ -909,13 +928,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEIGES.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXSBase.so. | Externa | Sí |
 | libTKBool.so. | Externa | Sí |
@@ -940,13 +959,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEOBJ.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -970,13 +989,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEOBJ.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -1000,13 +1019,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEOBJ.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -1030,13 +1049,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEPLY.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -1060,13 +1079,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEPLY.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -1090,13 +1109,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEPLY.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -1120,13 +1139,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDESTEP.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKXSBase.so. | Externa | Sí |
@@ -1150,13 +1169,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDESTEP.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKXSBase.so. | Externa | Sí |
@@ -1180,13 +1199,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDESTEP.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKXSBase.so. | Externa | Sí |
@@ -1210,13 +1229,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDESTL.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -1239,13 +1258,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDESTL.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -1268,13 +1287,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDESTL.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -1297,13 +1316,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEVRML.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKXSBase.so. | Externa | Sí |
@@ -1328,13 +1347,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEVRML.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKXSBase.so. | Externa | Sí |
@@ -1359,13 +1378,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDEVRML.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKXSBase.so. | Externa | Sí |
@@ -1390,19 +1409,19 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKDraw.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMesh.so. | Externa | Sí |
 | libTKService.so. | Externa | Sí |
 | libTKHLR.so. | Externa | Sí |
 | libtcl8.6.so | Externa | Sí |
 | libtk8.6.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
@@ -1413,18 +1432,18 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
+| libdl.so | Sistema Android | No |
 
 ### libTKDraw.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMesh.so. | Externa | Sí |
 | libTKService.so. | Externa | Sí |
 | libTKHLR.so. | Externa | Sí |
 | libtcl8.6.so | Externa | Sí |
 | libtk8.6.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
@@ -1435,18 +1454,18 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
+| libdl.so | Sistema Android | No |
 
 ### libTKDraw.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMesh.so. | Externa | Sí |
 | libTKService.so. | Externa | Sí |
 | libTKHLR.so. | Externa | Sí |
 | libtcl8.6.so | Externa | Sí |
 | libtk8.6.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
@@ -1457,39 +1476,39 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
+| libdl.so | Sistema Android | No |
 
 ### libTKExpress.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKExpress.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKExpress.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKFeat.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBool.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
 | libTKPrim.so. | Externa | Sí |
@@ -1503,13 +1522,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKFeat.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBool.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
 | libTKPrim.so. | Externa | Sí |
@@ -1523,13 +1542,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKFeat.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBool.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
 | libTKPrim.so. | Externa | Sí |
@@ -1543,13 +1562,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKFillet.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBool.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
@@ -1563,13 +1582,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKFillet.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBool.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
@@ -1583,13 +1602,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKFillet.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBool.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
@@ -1603,76 +1622,76 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKG2d.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKG2d.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKG2d.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKG3d.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKG3d.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKG3d.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKGeomAlgo.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBRep.so. | Externa | Sí |
 | libTKGeomBase.so. | Externa | Sí |
 | libTKG3d.so. | Externa | Sí |
@@ -1680,13 +1699,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKGeomAlgo.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBRep.so. | Externa | Sí |
 | libTKGeomBase.so. | Externa | Sí |
 | libTKG3d.so. | Externa | Sí |
@@ -1694,13 +1713,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKGeomAlgo.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKBRep.so. | Externa | Sí |
 | libTKGeomBase.so. | Externa | Sí |
 | libTKG3d.so. | Externa | Sí |
@@ -1708,49 +1727,49 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKGeomBase.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKG3d.so. | Externa | Sí |
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKGeomBase.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKG3d.so. | Externa | Sí |
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKGeomBase.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKG3d.so. | Externa | Sí |
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKHLR.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -1760,13 +1779,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKHLR.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -1776,13 +1795,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKHLR.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -1792,13 +1811,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKHelix.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -1808,13 +1827,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKHelix.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -1824,13 +1843,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKHelix.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -1840,70 +1859,70 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKLCAF.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKLCAF.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKLCAF.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKMath.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKMath.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKMath.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKMesh.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
@@ -1914,13 +1933,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKMesh.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
@@ -1931,13 +1950,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKMesh.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
@@ -1948,13 +1967,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKMeshVS.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKV3d.so. | Externa | Sí |
 | libTKService.so. | Externa | Sí |
 | libTKMesh.so. | Externa | Sí |
@@ -1969,13 +1988,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKMeshVS.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKV3d.so. | Externa | Sí |
 | libTKService.so. | Externa | Sí |
 | libTKMesh.so. | Externa | Sí |
@@ -1990,13 +2009,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKMeshVS.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKV3d.so. | Externa | Sí |
 | libTKService.so. | Externa | Sí |
 | libTKMesh.so. | Externa | Sí |
@@ -2011,13 +2030,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKOffset.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKFillet.so. | Externa | Sí |
 | libTKBool.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -2032,13 +2051,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKOffset.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKFillet.so. | Externa | Sí |
 | libTKBool.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -2053,13 +2072,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKOffset.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKFillet.so. | Externa | Sí |
 | libTKBool.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -2074,59 +2093,59 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKOpenGles.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKService.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libfreetype.so | Externa | Sí |
-| libEGL.so.1 | Externa | No |
-| libGLESv2.so.2 | Externa | No |
+| libEGL.so.1 | Externa | Sí |
+| libGLESv2.so.2 | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKOpenGles.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKService.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libfreetype.so | Externa | Sí |
-| libEGL.so.1 | Externa | No |
-| libGLESv2.so.2 | Externa | No |
+| libEGL.so.1 | Externa | Sí |
+| libGLESv2.so.2 | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKOpenGles.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKService.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libfreetype.so | Externa | Sí |
-| libEGL.so.1 | Externa | No |
-| libGLESv2.so.2 | Externa | No |
+| libEGL.so.1 | Externa | Sí |
+| libGLESv2.so.2 | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKOpenGlesTest.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKOpenGles.so. | Externa | Sí |
 | libTKViewerTest.so. | Externa | Sí |
-| libEGL.so.1 | Externa | No |
-| libGLESv2.so.2 | Externa | No |
+| libEGL.so.1 | Externa | Sí |
+| libGLESv2.so.2 | Externa | Sí |
 | libTKTopTest.so. | Externa | Sí |
 | libTKDraw.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
@@ -2150,17 +2169,17 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKOpenGlesTest.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKOpenGles.so. | Externa | Sí |
 | libTKViewerTest.so. | Externa | Sí |
-| libEGL.so.1 | Externa | No |
-| libGLESv2.so.2 | Externa | No |
+| libEGL.so.1 | Externa | Sí |
+| libGLESv2.so.2 | Externa | Sí |
 | libTKTopTest.so. | Externa | Sí |
 | libTKDraw.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
@@ -2184,17 +2203,17 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKOpenGlesTest.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKOpenGles.so. | Externa | Sí |
 | libTKViewerTest.so. | Externa | Sí |
-| libEGL.so.1 | Externa | No |
-| libGLESv2.so.2 | Externa | No |
+| libEGL.so.1 | Externa | Sí |
+| libGLESv2.so.2 | Externa | Sí |
 | libTKTopTest.so. | Externa | Sí |
 | libTKDraw.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
@@ -2218,13 +2237,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKPrim.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -2234,13 +2253,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKPrim.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -2250,13 +2269,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKPrim.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -2266,13 +2285,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKQADraw.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEIGES.so. | Externa | Sí |
 | libTKBinXCAF.so. | Externa | Sí |
 | libTKDESTEP.so. | Externa | Sí |
@@ -2319,13 +2338,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKQADraw.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEIGES.so. | Externa | Sí |
 | libTKBinXCAF.so. | Externa | Sí |
 | libTKDESTEP.so. | Externa | Sí |
@@ -2372,13 +2391,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKQADraw.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEIGES.so. | Externa | Sí |
 | libTKBinXCAF.so. | Externa | Sí |
 | libTKDESTEP.so. | Externa | Sí |
@@ -2425,13 +2444,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKRWMesh.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXCAF.so. | Externa | Sí |
 | libTKDE.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -2454,13 +2473,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKRWMesh.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXCAF.so. | Externa | Sí |
 | libTKDE.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -2483,13 +2502,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKRWMesh.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXCAF.so. | Externa | Sí |
 | libTKDE.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -2512,49 +2531,49 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKService.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libfreeimage.so.3 | Externa | Sí |
 | libfreetype.so | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKService.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libfreeimage.so.3 | Externa | Sí |
 | libfreetype.so | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKService.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libfreeimage.so.3 | Externa | Sí |
 | libfreetype.so | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKShHealing.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -2564,13 +2583,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKShHealing.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -2580,13 +2599,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKShHealing.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
@@ -2596,13 +2615,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKStd.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKStdL.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -2619,13 +2638,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKStd.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKStdL.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -2642,13 +2661,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKStd.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKStdL.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -2665,82 +2684,82 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKStdL.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKStdL.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKStdL.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTObj.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTObj.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTObj.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTObjDRAW.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDCAF.so. | Externa | Sí |
 | libTKBinTObj.so. | Externa | Sí |
 | libTKXmlTObj.so. | Externa | Sí |
@@ -2779,13 +2798,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTObjDRAW.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDCAF.so. | Externa | Sí |
 | libTKBinTObj.so. | Externa | Sí |
 | libTKXmlTObj.so. | Externa | Sí |
@@ -2824,13 +2843,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTObjDRAW.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDCAF.so. | Externa | Sí |
 | libTKBinTObj.so. | Externa | Sí |
 | libTKXmlTObj.so. | Externa | Sí |
@@ -2869,13 +2888,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTopAlgo.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
 | libTKGeomBase.so. | Externa | Sí |
@@ -2884,13 +2903,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTopAlgo.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
 | libTKGeomBase.so. | Externa | Sí |
@@ -2899,13 +2918,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTopAlgo.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKGeomAlgo.so. | Externa | Sí |
 | libTKBRep.so. | Externa | Sí |
 | libTKGeomBase.so. | Externa | Sí |
@@ -2914,13 +2933,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTopTest.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDraw.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
 | libTKOffset.so. | Externa | Sí |
@@ -2943,13 +2962,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTopTest.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDraw.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
 | libTKOffset.so. | Externa | Sí |
@@ -2972,13 +2991,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKTopTest.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDraw.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
 | libTKOffset.so. | Externa | Sí |
@@ -3001,13 +3020,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKV3d.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKService.so. | Externa | Sí |
 | libTKMesh.so. | Externa | Sí |
 | libTKHLR.so. | Externa | Sí |
@@ -3022,13 +3041,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKV3d.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKService.so. | Externa | Sí |
 | libTKMesh.so. | Externa | Sí |
 | libTKHLR.so. | Externa | Sí |
@@ -3043,13 +3062,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKV3d.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKService.so. | Externa | Sí |
 | libTKMesh.so. | Externa | Sí |
 | libTKHLR.so. | Externa | Sí |
@@ -3064,13 +3083,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKVCAF.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
@@ -3090,13 +3109,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKVCAF.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
@@ -3116,13 +3135,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKVCAF.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
@@ -3142,13 +3161,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKViewerTest.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopTest.so. | Externa | Sí |
 | libTKOffset.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
@@ -3174,13 +3193,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKViewerTest.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopTest.so. | Externa | Sí |
 | libTKOffset.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
@@ -3206,13 +3225,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKViewerTest.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTopTest.so. | Externa | Sí |
 | libTKOffset.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
@@ -3238,13 +3257,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXCAF.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKVCAF.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
 | libTKService.so. | Externa | Sí |
@@ -3265,13 +3284,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXCAF.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKVCAF.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
 | libTKService.so. | Externa | Sí |
@@ -3292,13 +3311,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXCAF.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKVCAF.so. | Externa | Sí |
 | libTKV3d.so. | Externa | Sí |
 | libTKService.so. | Externa | Sí |
@@ -3319,13 +3338,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXDEDRAW.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKDCAF.so. | Externa | Sí |
@@ -3368,13 +3387,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXDEDRAW.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKDCAF.so. | Externa | Sí |
@@ -3417,13 +3436,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXDEDRAW.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDE.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKDCAF.so. | Externa | Sí |
@@ -3466,13 +3485,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXMesh.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMesh.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
@@ -3484,13 +3503,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXMesh.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMesh.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
@@ -3502,13 +3521,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXMesh.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMesh.so. | Externa | Sí |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
@@ -3520,13 +3539,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSBase.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
@@ -3537,13 +3556,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSBase.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
@@ -3554,13 +3573,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSBase.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKShHealing.so. | Externa | Sí |
 | libTKTopAlgo.so. | Externa | Sí |
 | libTKGeomAlgo.so. | Externa | Sí |
@@ -3571,13 +3590,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAW.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXSBase.so. | Externa | Sí |
 | libTKMeshVS.so. | Externa | Sí |
 | libTKDCAF.so. | Externa | Sí |
@@ -3616,13 +3635,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAW.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXSBase.so. | Externa | Sí |
 | libTKMeshVS.so. | Externa | Sí |
 | libTKDCAF.so. | Externa | Sí |
@@ -3661,13 +3680,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAW.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXSBase.so. | Externa | Sí |
 | libTKMeshVS.so. | Externa | Sí |
 | libTKDCAF.so. | Externa | Sí |
@@ -3706,13 +3725,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWDE.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKDECascade.so. | Externa | Sí |
 | libTKDE.so. | Externa | Sí |
@@ -3760,13 +3779,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWDE.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKDECascade.so. | Externa | Sí |
 | libTKDE.so. | Externa | Sí |
@@ -3814,13 +3833,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWDE.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKDECascade.so. | Externa | Sí |
 | libTKDE.so. | Externa | Sí |
@@ -3868,13 +3887,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWIGES.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEIGES.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKDE.so. | Externa | Sí |
@@ -3916,13 +3935,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWIGES.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEIGES.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKDE.so. | Externa | Sí |
@@ -3964,13 +3983,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWIGES.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEIGES.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKDE.so. | Externa | Sí |
@@ -4012,13 +4031,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWOBJ.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEOBJ.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKRWMesh.so. | Externa | Sí |
@@ -4061,13 +4080,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWOBJ.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEOBJ.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKRWMesh.so. | Externa | Sí |
@@ -4110,13 +4129,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWOBJ.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEOBJ.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKRWMesh.so. | Externa | Sí |
@@ -4159,13 +4178,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWPLY.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEPLY.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKRWMesh.so. | Externa | Sí |
@@ -4208,13 +4227,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWPLY.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEPLY.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKRWMesh.so. | Externa | Sí |
@@ -4257,13 +4276,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWPLY.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEPLY.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKRWMesh.so. | Externa | Sí |
@@ -4306,13 +4325,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWSTEP.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKDESTEP.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
@@ -4355,13 +4374,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWSTEP.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKDESTEP.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
@@ -4404,13 +4423,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWSTEP.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKDESTEP.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
@@ -4453,13 +4472,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWSTL.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKDESTL.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
@@ -4502,13 +4521,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWSTL.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKDESTL.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
@@ -4551,13 +4570,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWSTL.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKRWMesh.so. | Externa | Sí |
 | libTKDESTL.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
@@ -4600,13 +4619,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWVRML.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEVRML.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKRWMesh.so. | Externa | Sí |
@@ -4649,13 +4668,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWVRML.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEVRML.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKRWMesh.so. | Externa | Sí |
@@ -4698,13 +4717,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXSDRAWVRML.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKDEVRML.so. | Externa | Sí |
 | libTKXSDRAW.so. | Externa | Sí |
 | libTKRWMesh.so. | Externa | Sí |
@@ -4747,13 +4766,13 @@
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXml.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKXmlL.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -4770,13 +4789,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXml.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKXmlL.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -4793,13 +4812,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXml.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKCAF.so. | Externa | Sí |
 | libTKXmlL.so. | Externa | Sí |
 | libTKBO.so. | Externa | Sí |
@@ -4816,49 +4835,49 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXmlL.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXmlL.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXmlL.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKMath.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXmlTObj.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTObj.so. | Externa | Sí |
 | libTKXmlL.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
@@ -4866,13 +4885,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXmlTObj.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTObj.so. | Externa | Sí |
 | libTKXmlL.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
@@ -4880,13 +4899,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXmlTObj.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKTObj.so. | Externa | Sí |
 | libTKXmlL.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
@@ -4894,13 +4913,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXmlXCAF.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXCAF.so. | Externa | Sí |
 | libTKXml.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -4924,13 +4943,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXmlXCAF.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXCAF.so. | Externa | Sí |
 | libTKXml.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -4954,13 +4973,13 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKXmlXCAF.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 | libTKXCAF.so. | Externa | Sí |
 | libTKXml.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -4984,162 +5003,162 @@
 | libTKCDF.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libTKernel.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
-| liblog.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
+| liblog.so | Sistema Android | No |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
+| libdl.so | Sistema Android | No |
 
 ### libTKernel.so.
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
-| liblog.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
+| liblog.so | Sistema Android | No |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
+| libdl.so | Sistema Android | No |
 
 ### libTKernel.so.8.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
-| liblog.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
+| liblog.so | Sistema Android | No |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
+| libdl.so | Sistema Android | No |
 
 ### libX11.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 | libxcb.so | Externa | Sí |
 | libandroid-support.so | Externa | Sí |
-| libdl.so | Sistema | No |
+| libdl.so | Sistema Android | No |
 
 ### libXau.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libXdmcp.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libXext.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libX11.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libXft.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libfontconfig.so | Externa | Sí |
 | libfreetype.so | Externa | Sí |
 | libXrender.so | Externa | Sí |
 | libX11.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libXrender.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libX11.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libXss.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libX11.so | Externa | Sí |
 | libXext.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libandroid-support.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libbrotlicommon.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libbrotlidec.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libbrotlicommon.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libbz2.so.1.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libc++_shared.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libc.so | Sistema | No |
-| libm.so | Sistema | No |
-| libdl.so | Sistema | No |
+| libc.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
+| libdl.so | Sistema Android | No |
 
 ### libexpat.so.1
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libfontconfig.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libfreetype.so | Externa | Sí |
 | libexpat.so.1 | Externa | Sí |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libfreeimage.so.3
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libc++_shared.so | Externa | Sí |
-| libm.so | Sistema | No |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libfreetype.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libz.so.1 | Externa | Sí |
+| libz.so.1 | Sistema Android | Sí |
 | libbz2.so.1.0 | Externa | Sí |
 | libpng16.so | Externa | Sí |
 | libbrotlidec.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libfreetype.so.6
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libz.so.1 | Externa | Sí |
+| libz.so.1 | Sistema Android | Sí |
 | libbz2.so.1.0 | Externa | Sí |
 | libpng16.so | Externa | Sí |
 | libbrotlidec.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libgmp.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libgmsh.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libgmp.so | Externa | Sí |
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libz.so.1 | Externa | Sí |
+| libz.so.1 | Sistema Android | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -5168,18 +5187,18 @@
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
-| libdl.so | Sistema | No |
+| libdl.so | Sistema Android | No |
 | libc++_shared.so | Externa | Sí |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libgmsh.so.5.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libgmp.so | Externa | Sí |
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libz.so.1 | Externa | Sí |
+| libz.so.1 | Sistema Android | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -5208,18 +5227,18 @@
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
-| libdl.so | Sistema | No |
+| libdl.so | Sistema Android | No |
 | libc++_shared.so | Externa | Sí |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libgmsh.so.5.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libgmp.so | Externa | Sí |
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libz.so.1 | Externa | Sí |
+| libz.so.1 | Sistema Android | Sí |
 | libTKXCAF.so. | Externa | Sí |
 | libTKLCAF.so. | Externa | Sí |
 | libTKVCAF.so. | Externa | Sí |
@@ -5248,317 +5267,317 @@
 | libTKG2d.so. | Externa | Sí |
 | libTKMath.so. | Externa | Sí |
 | libTKernel.so. | Externa | Sí |
-| libdl.so | Sistema | No |
+| libdl.so | Sistema Android | No |
 | libc++_shared.so | Externa | Sí |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libhdf5.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
-| libdl.so | Sistema | No |
-| libz.so.1 | Externa | Sí |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libdl.so | Sistema Android | No |
+| libz.so.1 | Sistema Android | Sí |
+| libc.so | Sistema Android | No |
 
 ### libhdf5.so.1000
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
-| libdl.so | Sistema | No |
-| libz.so.1 | Externa | Sí |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libdl.so | Sistema Android | No |
+| libz.so.1 | Sistema Android | Sí |
+| libc.so | Sistema Android | No |
 
 ### libhdf5.so.1000.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
-| libdl.so | Sistema | No |
-| libz.so.1 | Externa | Sí |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libdl.so | Sistema Android | No |
+| libz.so.1 | Sistema Android | Sí |
+| libc.so | Sistema Android | No |
 
 ### libhdf5_hl.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libhdf5_hl.so.1000
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libhdf5_hl.so.1000.0.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmed.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedfwrap.so.14 | Externa | Sí |
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmed.so.14
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedfwrap.so.14 | Externa | Sí |
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmed.so.14.0.1
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedfwrap.so.14 | Externa | Sí |
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmedC.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libhdf5.so.1000 | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmedC.so.14
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libhdf5.so.1000 | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmedC.so.14.0.1
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libhdf5.so.1000 | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmedfwrap.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmedfwrap.so.14
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmedfwrap.so.14.0.1
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmedimport.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmedimport.so.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libmedimport.so.0.4.3
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libopenblas.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libopenblas.so.0
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libopenblasp-r0.3.33.dev.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libm.so | Sistema | No |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libm.so | Sistema Android | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libpng16.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libz.so.1 | Externa | Sí |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libz.so.1 | Sistema Android | Sí |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### libtcl8.6.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libdl.so | Sistema | No |
-| libz.so.1 | Externa | Sí |
-| libc.so | Sistema | No |
-| libm.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libz.so.1 | Sistema Android | Sí |
+| libc.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
 
 ### libtk8.6.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 | libXft.so | Externa | Sí |
 | libfontconfig.so | Externa | Sí |
 | libX11.so | Externa | Sí |
 | libXss.so | Externa | Sí |
-| libm.so | Sistema | No |
+| libm.so | Sistema Android | No |
 
 ### libxcb.so
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libXau.so | Externa | Sí |
 | libXdmcp.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libz.so.1
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### libz.so.1.3.2
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 
 ### mdump2
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### mdump3
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### mdump4
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### medconforme
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
-| libdl.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### medimport
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libmedimport.so.0 | Externa | Sí |
 | libmedC.so.14 | Externa | Sí |
 | libhdf5.so.1000 | Externa | Sí |
 | libc++_shared.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libm.so | Sistema | No |
-| libc.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
+| libc.so | Sistema Android | No |
 
 ### tclsh
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libtcl8.6.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libz.so.1 | Externa | Sí |
-| libc.so | Sistema | No |
-| libm.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libz.so.1 | Sistema Android | Sí |
+| libc.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
 
 ### tclsh8.6
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libtcl8.6.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libz.so.1 | Externa | Sí |
-| libc.so | Sistema | No |
-| libm.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libz.so.1 | Sistema Android | Sí |
+| libc.so | Sistema Android | No |
+| libm.so | Sistema Android | No |
 
 ### wish
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libtk8.6.so | Externa | Sí |
 | libtcl8.6.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 | libXft.so | Externa | Sí |
 | libfontconfig.so | Externa | Sí |
 | libfreetype.so | Externa | Sí |
 | libX11.so | Externa | Sí |
 | libXss.so | Externa | Sí |
 | libXext.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libz.so.1 | Externa | Sí |
-| libm.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libz.so.1 | Sistema Android | Sí |
+| libm.so | Sistema Android | No |
 
 ### wish8.6
-| Dep | Class | InFolder |
+| Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
 | libtk8.6.so | Externa | Sí |
 | libtcl8.6.so | Externa | Sí |
-| libc.so | Sistema | No |
+| libc.so | Sistema Android | No |
 | libXft.so | Externa | Sí |
 | libfontconfig.so | Externa | Sí |
 | libfreetype.so | Externa | Sí |
 | libX11.so | Externa | Sí |
 | libXss.so | Externa | Sí |
 | libXext.so | Externa | Sí |
-| libdl.so | Sistema | No |
-| libz.so.1 | Externa | Sí |
-| libm.so | Sistema | No |
+| libdl.so | Sistema Android | No |
+| libz.so.1 | Sistema Android | Sí |
+| libm.so | Sistema Android | No |
 
