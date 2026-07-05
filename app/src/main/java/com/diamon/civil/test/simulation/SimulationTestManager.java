@@ -62,7 +62,10 @@ public class SimulationTestManager {
             pb.redirectErrorStream(true);
 
             Map<String, String> env = pb.environment();
+            // Mirror the terminal environment
             env.put("LD_LIBRARY_PATH", workDir.getAbsolutePath() + "/usr/lib:" + nativeLibDir.getAbsolutePath());
+            env.put("PATH", workDir.getAbsolutePath() + "/usr/bin:" + System.getenv("PATH"));
+            env.put("OMP_NUM_THREADS", "4");
             
             Process process = pb.start();
             StringBuilder output = new StringBuilder();
