@@ -50,7 +50,7 @@ public class SimulationTestManager {
                 "-i", workDir.getAbsolutePath() + "/cantilever"));
 
             // 4. Parsear resultados (.frd)
-            File frdFile = new File(workDir, "cantilever_hueco.frd");
+            File frdFile = new File(workDir, "cantilever.frd");
             if (frdFile.exists()) {
                 report.append("\n=== RESUMEN FINAL DE RESULTADOS (Parser Java) ===\n");
                 report.append(FrdParser.parseAndSummarize(frdFile));
