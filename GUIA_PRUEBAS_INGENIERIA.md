@@ -43,5 +43,21 @@ Una vez generada la malla (.inp), puedes correr el análisis de tensiones.
     *   Escribe: `ccx cilindro_hueco` (sin el .inp) o simplemente selecciona el archivo si la interfaz lo permite.
     *   **Resultado esperado:** CalculiX procesará la matriz de rigidez de la geometría con el hueco esférico.
 
+## 4. Prueba de Automatización de Simulación (Standalone)
+
+Esta prueba verifica que el flujo completo de simulación (Geometría -> Malla -> CalculiX) puede ser ejecutado mediante scripts internos sin intervención manual de la UI.
+
+### Pasos en la Aplicación:
+
+1.  **Abrir el Terminal:** Dirígete a la pestaña de terminal/consola en la app.
+2.  **Ejecutar la Simulación Standalone:**
+    *   Escribe el comando: `run-sim-test`
+    *   **Resultado esperado:**
+        *   La terminal mostrará `=== Iniciando Simulacion Standalone ===` y `OK: cantilever.geo generado`.
+        *   Se generarán automáticamente los archivos necesarios para la simulación en la raíz de la app.
+3.  **Verificar los archivos:**
+    *   Escribe `ls` y asegúrate de que los archivos `cantilever.geo` y otros archivos de simulación estén presentes.
+
 ---
 **Nota Técnica:** Todas las librerías (`libgmp`, `libfreetype`, `libTK*`, etc.) se cargan automáticamente gracias al sistema de enlaces simbólicos dinámicos implementado en `AssetHelper.java`.
+
