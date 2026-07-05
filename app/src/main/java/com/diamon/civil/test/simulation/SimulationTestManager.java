@@ -45,6 +45,15 @@ public class SimulationTestManager {
             report.append(executeBinary(ccx.getAbsolutePath(), workDir, nativeLibDir, 
                 "-i", workDir.getAbsolutePath() + "/cantilever_hueco"));
 
+            // 4. Parsear resultados (.frd)
+            File frdFile = new File(workDir, "cantilever_hueco.frd");
+            if (frdFile.exists()) {
+                report.append("\n=== RESUMEN FINAL DE RESULTADOS (Parser Java) ===\n");
+                report.append(FrdParser.parseAndSummarize(frdFile));
+            } else {
+                report.append("\nADVERTENCIA: No se generó archivo .frd.\n");
+            }
+
             return report.toString();
         } catch (Exception e) {
             return "ERROR: " + e.getMessage();
