@@ -39,6 +39,9 @@ Este documento unifica toda la auditoría técnica del proyecto Android principa
 *   **`FaceSelector.java`**: Lógica para implementar picking (selección táctil) de caras en el visor 3D.
 *   **`AssetHelper.java`**: Utilidades para leer recursos desde la carpeta `assets/`.
 
+### 1.5. Pruebas (`.../test`)
+*   **Paquete de Pruebas Internas**: Contiene clases dedicadas para la validación interna de los motores de cálculo, parseo de inputs y consistencia de datos antes de la integración con UI.
+
 ---
 
 ## 2. Código Fuente Nativo C++ (`/app/src/main/cpp/`)
@@ -50,11 +53,16 @@ Este documento unifica toda la auditoría técnica del proyecto Android principa
 *   **`frd_converter.cpp`**: Conversor de resultados FRD (formato binario de CalculiX) a GLB para visualización 3D.
 *   **`OcctBooleanJNI.cpp`**: Mapeo JNI para operaciones booleanas geométricas basadas en OpenCASCADE.
 *   **`OcctPrimitivesJNI.cpp`**: Mapeo JNI para creación de primitivas OCCT (cubos, esferas, etc.).
-*   **`json.hpp`, `stb_image.*`, `tiny_gltf.h`**: Librerías externas auxiliares.
+*   **Librerías/Headers Auxiliares**: Incluye una amplia gama de librerías en `/app/src/main/cpp/include/` (HDF5, MED, TCL, TK, entre otras) para soportar la funcionalidad extendida de los motores de simulación.
 
 ---
 
-## 3. Recursos de UI (XML - `/app/src/main/res/`)
+## 3. Dependencias Nativas (`/app/src/main/jniLibs/`)
+*   El proyecto contiene un conjunto extensivo de bibliotecas nativas compiladas (`.so`) para `arm64-v8a` que soportan la integración de CalculiX, OpenCASCADE, Gmsh y sus dependencias (HDF5, MED, etc.).
+
+---
+
+## 4. Recursos de UI (XML - `/app/src/main/res/`)
 
 *   **Layouts/Menús**: `activity_main.xml` (main), `nav_header.xml` (drawer), `drawer_menu.xml`, `main_menu.xml`.
 *   **Estilos/Recursos**: `edit_text_border.xml`, `themes.xml` (claro/oscuro), `strings.xml`, `colors.xml`.
@@ -62,7 +70,7 @@ Este documento unifica toda la auditoría técnica del proyecto Android principa
 
 ---
 
-## 4. Trazabilidad: Código Fuente vs. Plan de Implementación
+## 5. Trazabilidad: Código Fuente vs. Plan de Implementación
 
 | Componente | Propósito | Ítem Plan |
 | :--- | :--- | :--- |
@@ -91,3 +99,4 @@ Este documento unifica toda la auditoría técnica del proyecto Android principa
 | `frd_converter.cpp` | Conversión FRD -> GLB. | **A1** |
 | `OcctBooleanJNI.cpp` | Booleanas OCCT. | **C2** |
 | `OcctPrimitivesJNI.cpp` | Primitivas OCCT. | **C1** |
+| `test/*` | Validaciones internas. | **V1** |
