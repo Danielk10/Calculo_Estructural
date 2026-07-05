@@ -38,6 +38,7 @@ Este documento unifica toda la auditoría técnica del proyecto Android principa
 ### 1.4. Utilitarios (`.../util`)
 *   **`FaceSelector.java`**: Lógica para implementar picking (selección táctil) de caras en el visor 3D.
 *   **`AssetHelper.java`**: Utilidades para leer recursos desde la carpeta `assets/`.
+*   **`NativeLoader.java`**: Gestor centralizado para la carga de bibliotecas nativas (.so); implementa un mapeo de nombres para asegurar que las dependencias (como OpenCASCADE, OpenBLAS, Gmsh) sean cargadas correctamente bajo sus nombres físicos esperados por el sistema Android.
 
 ### 1.5. Pruebas (`.../test`)
 *   **`AutoTester.java`**: Automatiza pruebas de integración desde la UI; simula interacciones de usuario en `MainActivity` para validar el flujo completo de los módulos Structural y 3D Solid.
