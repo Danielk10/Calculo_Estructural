@@ -1,5 +1,6 @@
 package com.diamon.civil.engine;
 
+import com.diamon.civil.test.simulation.SimulationTestManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -37,10 +38,12 @@ public class TerminalCommandExecutor {
                 return getRelativePath(currentDir);
             case "test-gmsh":
                 return runGmshBooleanTest();
+            case "run-sim-test":
+                return SimulationTestManager.runTest(rootDir, new File(System.getProperty("java.library.path")));
             case "gmsh":
                 return null; // Delegate to binary executor in MainActivity
             case "help":
-                return "Available Commands: ls, mkdir, rm, cd, pwd, test-gmsh, gmsh, clear, help\nOr enter an .inp job name to run CalculiX.";
+                return "Available Commands: ls, mkdir, rm, cd, pwd, test-gmsh, gmsh, run-sim-test, clear, help\nOr enter an .inp job name to run CalculiX.";
             default:
                 return null; // Delegate
         }
