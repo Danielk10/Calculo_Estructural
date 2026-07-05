@@ -170,8 +170,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setupNavigation();
         setupUI();
         checkAndLoadAssets();
-        
-        AutoTester.run(this);
     }
 
     private void setupNavigation() {
@@ -1002,7 +1000,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void checkAndLoadAssets() {
         if (assetHelper.areAssetsExtracted()) {
             binding.layoutLoading.setVisibility(View.GONE);
-            executor.execute(() -> assetHelper.ensureRuntimeReady());
+            executor.execute(() -> {
+                assetHelper.ensureRuntimeReady();
+                runOnUiThread(() -> AutoTester.run(this));
+            });
         } else {
             binding.layoutLoading.setVisibility(View.VISIBLE);
             binding.tvLoadingText.setText("Deploying FEM Core Engine...");
@@ -1010,7 +1011,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 boolean success = assetHelper.ensureRuntimeReady();
                 runOnUiThread(() -> {
                     binding.layoutLoading.setVisibility(View.GONE);
-                    if (!success) Toast.makeText(this, "Engine Failure", Toast.LENGTH_LONG).show();
+                    if (!success) {
+                        Toast.makeText(this, "Engine Failure", Toast.LENGTH_LONG).show();
+                    } else {
+                        AutoTester.run(this);
+                    }
                 });
             });
         }
