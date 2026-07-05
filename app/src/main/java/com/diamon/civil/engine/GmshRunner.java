@@ -118,14 +118,13 @@ public class GmshRunner {
         }
     }
 
-    /** Find gmsh binary: first check usr/bin/gmsh, then jniLibs as libgmsh_bin.so */
+    /** Find gmsh binary: prioritize the symlink in usr/bin created by AssetHelper */
     private File findGmshBinary() {
+        // El AssetHelper crea un enlace simbólico en usr/bin/gmsh que apunta a libgmsh.so
         File usrBin = new File(workDir, "usr/bin/gmsh");
         if (usrBin.exists()) return usrBin;
 
-        File libBin = new File(nativeLibDir, "libgmsh_bin.so");
-        if (libBin.exists()) return libBin;
-
+        // Fallback al nombre físico en jniLibs
         File libGmsh = new File(nativeLibDir, "libgmsh.so");
         if (libGmsh.exists()) return libGmsh;
 

@@ -1,25 +1,27 @@
 package com.diamon.civil.engine;
 
+import com.diamon.civil.util.NativeLoader;
+
 public class NativeFeaCore {
     static {
-        System.loadLibrary("c++_shared");
+        NativeLoader.loadLibrary("c++_shared");
         try {
-            System.loadLibrary("TKernel");
-            System.loadLibrary("TKMath");
-            System.loadLibrary("TKG2d");
-            System.loadLibrary("TKG3d");
-            System.loadLibrary("TKGeomBase");
-            System.loadLibrary("TKBRep");
-            System.loadLibrary("TKTopAlgo");
-            System.loadLibrary("TKBO");
-            System.loadLibrary("TKBool");
-            System.loadLibrary("TKPrim");
-        } catch (UnsatisfiedLinkError e) {
-            // Some OCCT libs might be bundled or named differently
+            NativeLoader.loadLibrary("TKernel");
+            NativeLoader.loadLibrary("TKMath");
+            NativeLoader.loadLibrary("TKG2d");
+            NativeLoader.loadLibrary("TKG3d");
+            NativeLoader.loadLibrary("TKGeomBase");
+            NativeLoader.loadLibrary("TKBRep");
+            NativeLoader.loadLibrary("TKTopAlgo");
+            NativeLoader.loadLibrary("TKBO");
+            NativeLoader.loadLibrary("TKBool");
+            NativeLoader.loadLibrary("TKPrim");
+        } catch (Exception e) {
+            // Ignorar errores si algunas no son críticas para el inicio
         }
-        System.loadLibrary("openblas");
-        System.loadLibrary("gmsh");
-        System.loadLibrary("calculoestructural");
+        NativeLoader.loadLibrary("openblas");
+        NativeLoader.loadLibrary("gmsh");
+        NativeLoader.loadLibrary("calculoestructural");
     }
 
     // Lifecycle

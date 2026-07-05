@@ -2,30 +2,11 @@
 # documentation: https://d.android.com/studio/projects/add-native-code.html.
 # For more examples on how to use CMake, see https://github.com/android/ndk-samples.
 
-# Sets the minimum CMake version required for this project.
 cmake_minimum_required(VERSION 4.1.2)
 
-# Declares the project name. The project name can be accessed via ${ PROJECT_NAME},
-# Since this is the top level CMakeLists.txt, the project name is also accessible
-# with ${CMAKE_PROJECT_NAME} (both CMake variables are in-sync within the top level
-# build script scope).
 project("calculoestructural")
 
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds them for you.
-# Gradle automatically packages shared libraries with your APK.
-#
-# In this top level CMakeLists.txt, ${CMAKE_PROJECT_NAME} is used to define
-# the target library name; in the sub-module's CMakeLists.txt, ${PROJECT_NAME}
-# is preferred for the same purpose.
-#
-# In order to load a library into your app from Java/Kotlin, you must call
-# System.loadLibrary() and pass the name of the library defined here;
-# for GameActivity/NativeActivity derived applications, the same library name must be
-# used in the AndroidManifest.xml file.
 add_library(${CMAKE_PROJECT_NAME} SHARED
-        # List C/C++ source files with relative paths to this CMakeLists.txt.
         native-lib.cpp
         AnalysisModel.cpp
         frd_converter.cpp
@@ -35,34 +16,35 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         OcctBooleanJNI.cpp)
 
 # Include directories
+# Note: In Android, headers should be provided via a standard directory. 
+# Re-mapping to a standard location inside jniLibs or a dedicated include folder.
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE 
         include
-        ${CMAKE_SOURCE_DIR}/../assets/data/data/com.diamon.civil/files/usr/include/opencascade)
+        ${CMAKE_SOURCE_DIR}/include/opencascade)
 
 # Define location of prebuilt OCCT libraries
 set(OCCT_LIBS_DIR ${CMAKE_SOURCE_DIR}/../jniLibs/${ANDROID_ABI})
 
-# Helper function to import OCCT libraries
-function(import_occt_lib LIB_NAME)
+# Helper function to import OCCT libraries with NORMALIZED NAMES
+function(import_occt_lib LIB_NAME PHYSICAL_NAME)
     add_library(${LIB_NAME} SHARED IMPORTED)
-    set_target_properties(${LIB_NAME} PROPERTIES IMPORTED_LOCATION ${OCCT_LIBS_DIR}/lib${LIB_NAME}.so)
+    set_target_properties(${LIB_NAME} PROPERTIES IMPORTED_LOCATION ${OCCT_LIBS_DIR}/lib${PHYSICAL_NAME}.so)
 endfunction()
 
-# Import required OCCT modules
-import_occt_lib(TKPrim)
-import_occt_lib(TKTopAlgo)
-import_occt_lib(TKBO)
-import_occt_lib(TKBool)
-import_occt_lib(TKBRep)
-import_occt_lib(TKMath)
-import_occt_lib(TKernel)
-import_occt_lib(TKGeomBase)
-import_occt_lib(TKG3d)
-import_occt_lib(TKG2d)
+# Import required OCCT modules using physical names defined in DOCUMENTACION_RENOMBRADO_BINARIOS.md
+import_occt_lib(TKPrim TKPrim)
+import_occt_lib(TKTopAlgo TKTopAlgo)
+import_occt_lib(TKBO TKBO)
+import_occt_lib(TKBool TKBool)
+import_occt_lib(TKBRep TKBRep)
+import_occt_lib(TKMath TKMath)
+import_occt_lib(TKernel TKernel)
+import_occt_lib(TKGeomBase TKGeomBase)
+import_occt_lib(TKG3d TKG3d)
+import_occt_lib(TKG2d TKG2d)
 
 # Specifies libraries CMake should link to your target library.
 target_link_libraries(${CMAKE_PROJECT_NAME}
-        # List libraries link to the target library
         android
         log
         TKPrim

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.diamon.civil.util.NativeLoader;
+
 public class CalculixExecutor {
     private static final String TAG = "CalculixExecutor";
     private final File workDir;
@@ -23,7 +25,7 @@ public class CalculixExecutor {
         // Ensure dependencies are loaded via NativeFeaCore's static block
         // and try to load our own native part if needed
         try {
-            System.loadLibrary("calculoestructural");
+            NativeLoader.loadLibrary("calculoestructural");
         } catch (Throwable t) {
             android.util.Log.e(TAG, "Failed to load native library: calculoestructural", t);
         }
@@ -40,12 +42,12 @@ public class CalculixExecutor {
     }
 
     public String executeBinary(String binaryName, String... args) {
+        // El AssetHelper crea un enlace simbólico en usr/bin/<binaryName> que apunta a lib<binaryName>.so
         File binary = new File(new File(workDir, "usr/bin"), binaryName);
+        
         if (!binary.exists()) {
+            // Fallback al nombre físico normalizado
             binary = new File(nativeLibDir, "lib" + binaryName + ".so");
-            if (!binary.exists() && binaryName.equals("gmsh")) {
-                binary = new File(nativeLibDir, "libgmsh_bin.so");
-            }
         }
         
         if (!binary.exists()) {
