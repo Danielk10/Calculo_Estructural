@@ -40,7 +40,10 @@ Este documento unifica toda la auditoría técnica del proyecto Android principa
 *   **`AssetHelper.java`**: Utilidades para leer recursos desde la carpeta `assets/`.
 
 ### 1.5. Pruebas (`.../test`)
-*   **Paquete de Pruebas Internas**: Contiene clases dedicadas para la validación interna de los motores de cálculo, parseo de inputs y consistencia de datos antes de la integración con UI.
+*   **`AutoTester.java`**: Automatiza pruebas de integración desde la UI; simula interacciones de usuario en `MainActivity` para validar el flujo completo de los módulos Structural y 3D Solid.
+*   **`test/simulation/SimulationTestManager.java`**: Orquestador de pruebas de simulación "headless" (sin UI); gestiona el ciclo completo: generación de geometría, enmallado (Gmsh), ensamblado de input (`InpAssembler`), ejecución del solver (CalculiX) y validación de resultados (`FrdParser`).
+*   **`test/simulation/InpAssembler.java`**: Utilidad para ensamblar archivos `.inp` válidos para CalculiX, incluyendo la definición de sets de nodos (`NFix`, `NLoad`), materiales y secciones, a partir de archivos input crudos.
+*   **`test/simulation/FrdParser.java`**: Parser ligero del formato binario de resultados `.frd` de CalculiX; extrae desplazamientos nodales para validación automatizada de la precisión del solver.
 
 ---
 
