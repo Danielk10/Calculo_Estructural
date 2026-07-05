@@ -35,7 +35,11 @@ public class SimulationTestManager {
             
             report.append("Ejecutando Gmsh...\n");
             report.append(executeBinary(gmsh.getAbsolutePath(), workDir, nativeLibDir, 
-                "cantilever.geo", "-3", "-format", "inp", "-o", workDir.getAbsolutePath() + "/cantilever_hueco.inp"));
+                "cantilever.geo", "-3", "-format", "inp", "-o", workDir.getAbsolutePath() + "/cantilever_raw.inp"));
+
+            // 2.1 Ensamblar archivo final .inp
+            report.append("Ensamblando Input Final...\n");
+            InpAssembler.assemble(workDir, "cantilever");
 
             // 3. Ejecutar CalculiX
             File ccx = new File(nativeLibDir, "libccx.so");
@@ -43,7 +47,7 @@ public class SimulationTestManager {
             
             report.append("\nEjecutando CalculiX...\n");
             report.append(executeBinary(ccx.getAbsolutePath(), workDir, nativeLibDir, 
-                "-i", workDir.getAbsolutePath() + "/cantilever_hueco"));
+                "-i", workDir.getAbsolutePath() + "/cantilever"));
 
             // 4. Parsear resultados (.frd)
             File frdFile = new File(workDir, "cantilever_hueco.frd");
