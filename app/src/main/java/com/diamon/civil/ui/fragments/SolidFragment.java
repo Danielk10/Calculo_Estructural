@@ -147,7 +147,7 @@ public class SolidFragment extends Fragment {
                             cadFile.getAbsolutePath(), "-3", "-format", "inp", "-o", rawInpPath);
                         logger.debug(gmshResult);
 
-                        com.diamon.civil.engine.InpAssembler.assemble(workDir, "job_solid", "Steel", 210000, 0.3, -100.0);
+                        com.diamon.civil.engine.InpAssembler.assemble(workDir, "job_solid", "Steel", 210000, 0.3, -100.0, elementType);
                         
                         logger.info("Step 3: Running CalculiX Solver (ccx)...");
                         String ccxResult = calculixExecutor.executeCalculix("job_solid");

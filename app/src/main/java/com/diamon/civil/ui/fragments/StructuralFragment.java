@@ -160,6 +160,12 @@ public class StructuralFragment extends Fragment {
     }
 
     private String modelToJson(StructuralModel model) {
+        String selection = binding.spinnerStructureType.getSelectedItem().toString();
+        String elementType = "B32"; // Default
+        if (selection.contains("B32")) elementType = "B32";
+        else if (selection.contains("T2D2")) elementType = "T2D2";
+        else if (selection.contains("B31")) elementType = "B31";
+
         StringBuilder sb = new StringBuilder();
         sb.append("{ \"nodes\": [");
         for (int i = 0; i < model.nodes.size(); i++) {
@@ -170,7 +176,8 @@ public class StructuralFragment extends Fragment {
         sb.append("], \"elements\": [");
         for (int i = 0; i < model.elements.size(); i++) {
             StructuralModel.Element e = model.elements.get(i);
-            sb.append(String.format("{\"id\":%d,\"type\":\"B32\",\"nodes\":[%d,%d]}", e.id, e.node1Id, e.node2Id));
+            // Use the selected element type
+            sb.append(String.format("{\"id\":%d,\"type\":\"%s\",\"nodes\":[%d,%d]}", e.id, elementType, e.node1Id, e.node2Id));
             if (i < model.elements.size() - 1) sb.append(",");
         }
         sb.append("], \"materials\": [{\"name\":\"Steel\",\"youngModulus\":210000,\"poissonRatio\":0.3,\"density\":7850}],");

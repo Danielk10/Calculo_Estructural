@@ -8,7 +8,7 @@ import java.util.*;
  * Ported from verified simulation tests to the main engine.
  */
 public class InpAssembler {
-    public static void assemble(File workDir, String inputName, String materialName, double E, double nu, double loadValue) throws IOException {
+    public static void assemble(File workDir, String inputName, String materialName, double E, double nu, double loadValue, String elsetType) throws IOException {
         File rawInp = new File(workDir, inputName + "_raw.inp");
         File cleanInp = new File(workDir, inputName + "_clean.inp");
         File nsetsInp = new File(workDir, "nsets.inp");
@@ -35,7 +35,7 @@ public class InpAssembler {
             writeNodes(pw, loadedNodes);
         }
 
-        // 2. Clean up or prepare main mesh (remove Gmsh specific trailing definitions)
+        // 2. Clean up main mesh (remove Gmsh specific boundary definitions)
         try (PrintWriter pw = new PrintWriter(new FileWriter(cleanInp))) {
             for (String line : lines) {
                 String u = line.trim().toUpperCase();
@@ -53,7 +53,10 @@ public class InpAssembler {
             pw.println("*MATERIAL, NAME=" + materialName.replace(" ", "_"));
             pw.println("*ELASTIC");
             pw.println(E + ", " + nu);
-            pw.println("*SOLID SECTION, ELSET=Steel, MATERIAL=" + materialName.replace(" ", "_"));
+            
+            // Apply section to all elements using the specified type or a general set
+            pw.println("*SOLID SECTION, ELSET=Eall, MATERIAL=" + materialName.replace(" ", "_"));
+            
             pw.println("*STEP");
             pw.println("*STATIC");
             pw.println("*BOUNDARY");
