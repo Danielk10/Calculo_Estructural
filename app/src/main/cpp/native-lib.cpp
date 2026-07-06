@@ -1,6 +1,8 @@
 #include <jni.h>
 #include <string>
 #include <memory>
+#include <fstream>
+#include <sstream>
 #include "AnalysisModel.hpp"
 #include "CalculixRunner.hpp"
 #include "ProjectStore.hpp"
@@ -81,6 +83,44 @@ Java_com_diamon_civil_engine_NativeFeaCore_runCalculix(JNIEnv* env, jobject, jst
     env->ReleaseStringUTFChars(jJobName, jobName);
     
     return env->NewStringUTF(status.output.c_str());
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_diamon_civil_engine_NativeFeaCore_parseDatResults(JNIEnv* env, jobject, jstring jPath) {
+    const char* path = env->GetStringUTFChars(jPath, nullptr);
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        env->ReleaseStringUTFChars(jPath, path);
+        return env->NewStringUTF("Error: Could not open .dat file");
+    }
+
+    std::stringstream ss;
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.find("section forces") != std::string::npos || line.find("moment") != std::string::npos) {
+            ss << line << "\n";
+        }
+    }
+    env->ReleaseStringUTFChars(jPath, path);
+    return env->NewStringUTF(ss.str().c_str());
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_diamon_civil_engine_NativeFeaCore_parseFrdSummary(JNIEnv* env, jobject, jstring jPath) {
+    const char* path = env->GetStringUTFChars(jPath, nullptr);
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        env->ReleaseStringUTFChars(jPath, path);
+        return env->NewStringUTF("Error: Could not open .frd file");
+    }
+
+    std::string line;
+    int nodes = 0;
+    while (std::getline(file, line)) {
+        if (line.substr(0, 3) == " -1") nodes++;
+    }
+    env->ReleaseStringUTFChars(jPath, path);
+    return env->NewStringUTF(("Nodes parsed natively: " + std::to_string(nodes)).c_str());
 }
 
 extern "C" JNIEXPORT jstring JNICALL

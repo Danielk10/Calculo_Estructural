@@ -40,4 +40,8 @@ public class NativeFeaCore {
 
     // Execution
     public native String runCalculix(String workDir, String libDir, String jobName, long ptr);
+
+    // Parsing (Native Implementation)
+    public native String parseDatResults(String datPath);
+    public native String parseFrdSummary(String frdPath);
 }

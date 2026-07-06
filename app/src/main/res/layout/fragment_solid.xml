@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutSolid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+        <com.google.android.material.tabs.TabItem android:text="PARAMETERS" />
+        <com.google.android.material.tabs.TabItem android:text="VIEWER 3D" />
+        <com.google.android.material.tabs.TabItem android:text="SOLVER LOG" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <FrameLayout
+        android:id="@+id/solid_content_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Tab 0: Parameters & CAD -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/layoutSolidParams"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="3D Solid Analysis (OCCT + Gmsh)"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primaryDarkColor"
+                    android:layout_marginBottom="16dp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardElevation="2dp"
+                    app:cardCornerRadius="12dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="CAD GENERATION" android:textStyle="bold" android:textColor="@color/primaryColor" android:layout_marginBottom="12dp"/>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <Button android:id="@+id/btnCreateBox" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="BOX" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                            <Button android:id="@+id/btnCreateCylinder" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="CYL" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                            <Button android:id="@+id/btnCreateSphere" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="SPHERE" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp">
+                            <Button android:id="@+id/btnFuse" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="UNION" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:textSize="10sp"/>
+                            <Button android:id="@+id/btnCut" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="SUBTRACT" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:textSize="10sp"/>
+                            <Button android:id="@+id/btnIntersect" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="INTERSECT" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:textSize="10sp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardElevation="2dp"
+                    app:cardCornerRadius="12dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="FINITE ELEMENT CONFIG" android:textStyle="bold" android:textColor="@color/primaryColor" android:layout_marginBottom="12dp"/>
+                        
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Element Type" android:textSize="12sp" android:layout_marginBottom="4dp"/>
+                        <Spinner
+                            android:id="@+id/spinnerElementType"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:entries="@array/element_types_solid"
+                            android:layout_marginBottom="12dp" />
+
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mesh Density" android:textSize="12sp" android:layout_marginBottom="4dp"/>
+                        <SeekBar
+                            android:id="@+id/seekbarMeshDensity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="4"
+                            android:progress="2"
+                            android:layout_marginBottom="16dp"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Young's Modulus (MPa)"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etSolidModulus"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="numberDecimal"
+                                android:text="210000" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRunSolidAnalysis"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:text="GENERATE MESH &amp; SOLVE"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    android:layout_marginBottom="16dp" />
+
+                <ProgressBar
+                    android:id="@+id/pbSolid"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    android:layout_marginBottom="16dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnExportSolid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="EXPORT RESULTS TO DOWNLOADS"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_marginTop="8dp"
+                    app:icon="@android:drawable/ic_menu_save"
+                    app:cornerRadius="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnImportExternalCad"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="IMPORT EXTERNAL CAD"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:icon="@android:drawable/ic_menu_upload"
+                    app:cornerRadius="12dp"
+                    android:layout_marginBottom="48dp" />
+
+                <!-- Legacy Test Compatibility (Hidden) -->
+                <View android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone">
+                    <EditText android:id="@+id/etLength" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <EditText android:id="@+id/etSection" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <EditText android:id="@+id/etModulus" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <EditText android:id="@+id/etDensity" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <EditText android:id="@+id/etLoad" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <Button android:id="@+id/btnRunAnalysis" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </View>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Tab 1: SceneView Viewer -->
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/solidSceneViewContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <!-- Tab 2: Independent Solver Log -->
+        <LinearLayout
+            android:id="@+id/layoutSolidLog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="#000000"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Solid Solver Log"
+                    android:textColor="#00FF00"
+                    android:textStyle="bold" />
+                <Button
+                    android:id="@+id/btnClearSolidLog"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CLEAR"
+                    android:textColor="#00FF00" />
+                <Button
+                    android:id="@+id/btnCopySolidLog"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="COPY"
+                    android:textColor="#00FF00" />
+            </LinearLayout>
+
+            <ScrollView
+                android:id="@+id/scrollSolidLog"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/tvSolidLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:textColor="#00FF00"
+                    android:textSize="11sp" />
+            </ScrollView>
+        </LinearLayout>
+
+    </FrameLayout>
+</LinearLayout>

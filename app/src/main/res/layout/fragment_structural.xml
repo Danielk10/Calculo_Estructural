@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutStructural"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+        <com.google.android.material.tabs.TabItem android:text="DATA" />
+        <com.google.android.material.tabs.TabItem android:text="GL VIEWER" />
+        <com.google.android.material.tabs.TabItem android:text="LOG" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <FrameLayout
+        android:id="@+id/structural_content_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Tab 0: Input Data -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/layoutStructuralData"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Structural FEA Analysis"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primaryDarkColor"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ANALYSIS CONFIG"
+                            android:textStyle="bold"
+                            android:textColor="@color/primaryColor"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Structure Type" android:textSize="12sp" android:layout_marginBottom="4dp"/>
+                        <Spinner
+                            android:id="@+id/spinnerStructureType"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:entries="@array/structure_types_structural"
+                            android:layout_marginBottom="12dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="NODE COORDINATES"
+                            android:textStyle="bold"
+                            android:textColor="@color/primaryColor"
+                            android:layout_marginBottom="8dp"/>
+
+                        <EditText
+                            android:id="@+id/etNodes"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:hint="id, x, y, z (e.g. 1, 0, 0, 0)"
+                            android:gravity="top"
+                            android:background="@drawable/edit_text_border"
+                            android:padding="8dp"
+                            android:fontFamily="monospace"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ANALYSIS CONFIG"
+                            android:textStyle="bold"
+                            android:textColor="@color/primaryColor"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Structure Type" android:textSize="12sp" android:layout_marginBottom="4dp"/>
+                        <Spinner
+                            android:id="@+id/spinnerStructureType"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:entries="@array/structure_types_structural"
+                            android:layout_marginBottom="12dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ELEMENT CONNECTIVITY"
+                            android:textStyle="bold"
+                            android:textColor="@color/primaryColor"
+                            android:layout_marginBottom="8dp"/>
+
+                        <EditText
+                            android:id="@+id/etElements"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:hint="id, n1, n2 (e.g. 1, 1, 2)"
+                            android:gravity="top"
+                            android:background="@drawable/edit_text_border"
+                            android:padding="8dp"
+                            android:fontFamily="monospace"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSolveStructural"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:text="RUN SOLVER"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    android:layout_marginBottom="16dp"/>
+
+                <ProgressBar
+                    android:id="@+id/pbStructural"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/tvStructuralResultSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="Summary will appear here."
+                    android:background="#F0F0F0"
+                    android:fontFamily="monospace"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnExportStructural"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="EXPORT RESULTS TO DOWNLOADS"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_marginTop="8dp"
+                    app:icon="@android:drawable/ic_menu_save"
+                    app:cornerRadius="8dp" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Tab 1: GL Viewer -->
+        <LinearLayout
+            android:id="@+id/layoutStructuralGL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.diamon.civil.ui.FrameGLSurfaceView
+                android:id="@+id/frameGLView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2" />
+
+            <com.diamon.civil.ui.DiagramView
+                android:id="@+id/diagramView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#FAFAFA" />
+                
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:background="@color/white">
+                <Button android:id="@+id/btnShowBMD" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="BMD" style="@style/Widget.MaterialComponents.Button.TextButton" android:textSize="10sp"/>
+                <Button android:id="@+id/btnShowSFD" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="SFD" style="@style/Widget.MaterialComponents.Button.TextButton" android:textSize="10sp"/>
+                <Button android:id="@+id/btnShowAFD" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="AFD" style="@style/Widget.MaterialComponents.Button.TextButton" android:textSize="10sp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Tab 2: Independent Log -->
+        <LinearLayout
+            android:id="@+id/layoutStructuralLog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="#000000"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Structural Solver Log"
+                    android:textColor="#00FF00"
+                    android:textStyle="bold" />
+                <Button
+                    android:id="@+id/btnClearStructuralLog"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CLEAR"
+                    android:textColor="#00FF00" />
+                <Button
+                    android:id="@+id/btnCopyStructuralLog"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="COPY"
+                    android:textColor="#00FF00" />
+            </LinearLayout>
+
+            <ScrollView
+                android:id="@+id/scrollStructuralLog"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/tvStructuralLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:textColor="#00FF00"
+                    android:textSize="11sp" />
+            </ScrollView>
+        </LinearLayout>
+
+    </FrameLayout>
+</LinearLayout>

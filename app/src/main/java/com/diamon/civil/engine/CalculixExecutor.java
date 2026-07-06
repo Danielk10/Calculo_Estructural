@@ -42,24 +42,24 @@ public class CalculixExecutor {
     }
 
     public String executeBinary(String binaryName, String... args) {
-        // El AssetHelper crea un enlace simbólico en usr/bin/<binaryName> que apunta a lib<binaryName>.so
+        // AssetHelper creates symlinks in usr/bin that point to lib*.so
         File binary = new File(new File(workDir, "usr/bin"), binaryName);
         
         if (!binary.exists()) {
-            // Fallback al nombre físico normalizado
-            binary = new File(nativeLibDir, "lib" + binaryName + ".so");
+            // Fallback to normalized physical name in nativeLibDir
+            String normalizedName = binaryName;
+            if (binaryName.equalsIgnoreCase("gmsh")) normalizedName = "gmsh_v5_0_0"; // Match Documentación
+            binary = new File(nativeLibDir, "lib" + normalizedName + ".so");
         }
         
         if (!binary.exists()) {
-             return "Error: Binary (" + binaryName + ") not found.";
+             return "Error: Binary (" + binaryName + ") not found at " + binary.getAbsolutePath();
         }
 
         List<String> command = new ArrayList<>();
         command.add(binary.getAbsolutePath());
         for (String arg : args) {
-            if (arg != null && !arg.isEmpty()) {
-                command.add(arg);
-            }
+            if (arg != null && !arg.isEmpty()) command.add(arg);
         }
 
         try {
@@ -69,17 +69,16 @@ public class CalculixExecutor {
 
             Map<String, String> env = pb.environment();
             
-            // Configure multi-threading
+            // Mirror verified test environment
             String numCores = String.valueOf(Runtime.getRuntime().availableProcessors());
             env.put("OMP_NUM_THREADS", numCores);
             env.put("CCX_NPROC_EQUATION_SOLVER", numCores);
             
             File usrLib = new File(workDir, "usr/lib");
-            env.put("LD_LIBRARY_PATH", usrLib.getAbsolutePath() + ":" + nativeLibDir.getAbsolutePath());
+            File usrBin = new File(workDir, "usr/bin");
             
-            String path = env.get("PATH");
-            String binPath = new File(workDir, "usr/bin").getAbsolutePath();
-            env.put("PATH", binPath + ":" + nativeLibDir.getAbsolutePath() + (path != null ? ":" + path : ""));
+            env.put("LD_LIBRARY_PATH", usrLib.getAbsolutePath() + ":" + nativeLibDir.getAbsolutePath() + ":" + System.getenv("LD_LIBRARY_PATH"));
+            env.put("PATH", usrBin.getAbsolutePath() + ":" + nativeLibDir.getAbsolutePath() + ":" + System.getenv("PATH"));
 
             Process process = pb.start();
             
@@ -92,19 +91,7 @@ public class CalculixExecutor {
             }
 
             int exitCode = process.waitFor();
-            String result = output.toString().trim();
-            
-            StringBuilder fullLog = new StringBuilder();
-            fullLog.append("> ").append(binaryName);
-            for (String arg : args) fullLog.append(" ").append(arg);
-            fullLog.append("\n");
-            
-            if (!result.isEmpty()) {
-                fullLog.append(result).append("\n");
-            }
-            fullLog.append("Exit Code: ").append(exitCode);
-            
-            return fullLog.toString().trim();
+            return output.toString().trim() + "\nExit Code: " + exitCode;
 
         } catch (Exception e) {
             Log.e(TAG, "Execution Failed: " + e.getMessage());
