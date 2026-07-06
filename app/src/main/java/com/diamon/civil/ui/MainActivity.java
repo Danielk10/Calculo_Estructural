@@ -48,9 +48,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 
 import io.github.sceneview.collision.HitResult;
-import io.github.sceneview.node.ModelNode;
-import io.github.sceneview.node.LightNode;
-import dev.romainguy.kotlin.math.Float3;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -186,6 +183,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupUI() {
+        // Sub-Tabs for Structural Analysis Module
+        binding.tabLayoutStructural.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 0) {
+                    binding.layoutStructural.setVisibility(View.VISIBLE);
+                    binding.containerStructural.setVisibility(View.GONE);
+                } else {
+                    binding.layoutStructural.setVisibility(View.GONE);
+                    binding.containerStructural.setVisibility(View.VISIBLE);
+                    // Forzar render del GL context al hacerse visible
+                    binding.frameGLView.requestRender();
+                }
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
+        });
+
         // Sub-Tabs for 3D Solid Module
         binding.tabLayout3D.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -248,10 +265,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onHit(HitResult hitResult) {
-        if (hitResult != null && hitResult.getNode() instanceof ModelNode) {
+        // hitResult es notificado desde SceneViewBridge.kt cuando el usuario toca el modelo.
+        // El nodo ya no es directamente un ModelNode desde Java; el tap viene del SceneView Kotlin.
+        if (hitResult != null) {
             runOnUiThread(() -> {
                 Toast.makeText(this, "Surface Selected", Toast.LENGTH_SHORT).show();
-                showFaceConditionDialog(1); // Simplified: surface ID 1
+                showFaceConditionDialog(1);
             });
         }
     }
@@ -552,18 +571,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void switchModule(int navId) {
-        binding.layoutStructural.setVisibility(navId == R.id.nav_structural ? View.VISIBLE : View.GONE);
-        binding.containerStructural.setVisibility(navId == R.id.nav_structural ? View.VISIBLE : View.GONE);
-        binding.frameGLView.setVisibility(navId == R.id.nav_structural ? View.VISIBLE : View.GONE);
-        binding.diagramView.setVisibility(navId == R.id.nav_structural ? View.VISIBLE : View.GONE);
+        // Cada módulo tiene su propio contenedor raíz; solo alternamos visibilidad a ese nivel.
+        binding.layout3DStructural.setVisibility(navId == R.id.nav_structural ? View.VISIBLE : View.GONE);
         binding.layout3DSolid.setVisibility(navId == R.id.nav_3d_solid ? View.VISIBLE : View.GONE);
         binding.layoutConsole.setVisibility(navId == R.id.nav_terminal ? View.VISIBLE : View.GONE);
-        
+
+        // Al entrar al módulo Structural, resetear siempre a la pestaña de datos
+        if (navId == R.id.nav_structural) {
+            TabLayout.Tab tab = binding.tabLayoutStructural.getTabAt(0);
+            if (tab != null) tab.select();
+        }
+
         String title = "FEA Suite";
         if (navId == R.id.nav_structural) title = "Structural Analysis";
         else if (navId == R.id.nav_3d_solid) title = "3D Solid Analysis";
         else if (navId == R.id.nav_terminal) title = "Advanced Terminal";
-        
+
         if (binding.toolbar != null) {
             binding.toolbar.setTitle(title);
         }
