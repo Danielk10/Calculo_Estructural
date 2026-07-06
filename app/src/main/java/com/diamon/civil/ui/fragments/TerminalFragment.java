@@ -7,9 +7,11 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import android.widget.Toast;
 import com.diamon.civil.databinding.FragmentTerminalBinding;
 import com.diamon.civil.engine.CalculixExecutor;
 import com.diamon.civil.engine.TerminalCommandExecutor;
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
