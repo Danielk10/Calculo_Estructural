@@ -15,18 +15,15 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/action_export_all"
-        android:title="Exportar Todo (.zip)"
+        android:title="Export Everything (.zip)"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_docs"
-        android:title="Manual CalculiX"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_reset"
-        android:title="Reiniciar Binarios"
+        android:title="CalculiX Manual"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_about"
-        android:title="Acerca de"
+        android:title="About"
         app:showAsAction="never" />
-</menu>
+    </menu>
+

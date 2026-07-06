@@ -47,13 +47,19 @@ public class SolidFragment extends Fragment {
         setupTabs();
         setupButtons();
         
-        SceneViewBridgeKt.setSceneViewContent(binding.solidSceneViewContainer, "models/test_beam.glb", (MainActivity) getActivity());
+        // Safer initialization to prevent crash on entry
+        binding.solidSceneViewContainer.post(() -> {
+            if (isAdded() && binding != null) {
+                SceneViewBridgeKt.setSceneViewContent(binding.solidSceneViewContainer, "models/test_beam.glb", (MainActivity) getActivity());
+            }
+        });
     }
 
     private void setupTabs() {
         binding.tabLayoutSolid.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                if (binding == null) return;
                 binding.layoutSolidParams.setVisibility(tab.getPosition() == 0 ? View.VISIBLE : View.GONE);
                 binding.solidSceneViewContainer.setVisibility(tab.getPosition() == 1 ? View.VISIBLE : View.GONE);
                 binding.layoutSolidLog.setVisibility(tab.getPosition() == 2 ? View.VISIBLE : View.GONE);
@@ -74,19 +80,28 @@ public class SolidFragment extends Fragment {
         binding.btnExportSolid.setOnClickListener(v -> exportResults());
         
         binding.btnClearSolidLog.setOnClickListener(v -> logger.clear());
-        binding.btnCopySolidLog.setOnClickListener(v -> Toast.makeText(getContext(), "Log copied", Toast.LENGTH_SHORT).show());
+        binding.btnCopySolidLog.setOnClickListener(v -> {
+            copyToClipboard(logger.getFullLog());
+        });
+    }
+
+    private void copyToClipboard(String text) {
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+        android.content.ClipData clip = android.content.ClipData.newPlainText("FEA Log", text);
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(getContext(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void exportResults() {
         File workDir = requireContext().getFilesDir();
         File reportFile = new File(workDir, "Solid_Analysis_Report.pdf");
         
-        // Comprehensive PDF report including results and log
-        StringBuilder reportContent = new StringBuilder();
-        reportContent.append("ELEMENT TYPE: ").append(binding.spinnerElementType.getSelectedItem().toString()).append("\n\n");
-        reportContent.append("--- FULL SOLVER LOG ---\n").append(logger.getFullLog());
-
-        com.diamon.civil.engine.ReportGenerator.generateReport(reportFile, "3D Solid Analysis Report (Abacus-style)", reportContent.toString(), null);
+        String logText = logger.getFullLog();
+        if (!logText.isEmpty()) {
+            com.diamon.civil.engine.ReportGenerator.generateReport(reportFile, "3D Solid Analysis Report (Abacus-style)", logText, null);
+        }
 
         File[] files = workDir.listFiles((dir, name) -> name.startsWith("job_solid") || name.endsWith(".brep") || name.endsWith(".msh") || name.equals("Solid_Analysis_Report.pdf"));
         if (files != null && files.length > 0) {
@@ -110,7 +125,9 @@ public class SolidFragment extends Fragment {
 
             if (success) {
                 logger.info("Created primitive: " + type);
-                getActivity().runOnUiThread(() -> Toast.makeText(getContext(), type.toUpperCase() + " created", Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    getActivity().runOnUiThread(() -> Toast.makeText(getContext(), type.toUpperCase() + " created", Toast.LENGTH_SHORT).show());
+                }
             } else {
                 logger.error("Failed to create " + type);
             }
@@ -118,6 +135,11 @@ public class SolidFragment extends Fragment {
     }
 
     private void runFullPipeline() {
+        if (binding.spinnerElementType.getSelectedItem() == null) {
+            Toast.makeText(getContext(), "Please select an element type", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         binding.pbSolid.setVisibility(View.VISIBLE);
         binding.btnRunSolidAnalysis.setEnabled(false);
         String elementType = binding.spinnerElementType.getSelectedItem().toString();
@@ -162,24 +184,30 @@ public class SolidFragment extends Fragment {
                             
                             File glbFile = new File(workDir, "job_solid.glb");
                             if (calculixExecutor.convertFrdToGlb(frdFile.getAbsolutePath(), glbFile.getAbsolutePath())) {
-                                getActivity().runOnUiThread(() -> {
-                                    SceneViewBridgeKt.setSceneViewContent(binding.solidSceneViewContainer, glbFile.getAbsolutePath(), (MainActivity) getActivity());
-                                });
+                                if (isAdded()) {
+                                    getActivity().runOnUiThread(() -> {
+                                        SceneViewBridgeKt.setSceneViewContent(binding.solidSceneViewContainer, glbFile.getAbsolutePath(), (MainActivity) getActivity());
+                                    });
+                                }
                             }
                         }
 
-                        getActivity().runOnUiThread(() -> {
-                            binding.pbSolid.setVisibility(View.GONE);
-                            binding.btnRunSolidAnalysis.setEnabled(true);
-                            Toast.makeText(getContext(), "Simulation Complete", Toast.LENGTH_SHORT).show();
-                        });
+                        if (isAdded()) {
+                            getActivity().runOnUiThread(() -> {
+                                binding.pbSolid.setVisibility(View.GONE);
+                                binding.btnRunSolidAnalysis.setEnabled(true);
+                                Toast.makeText(getContext(), "Simulation Complete", Toast.LENGTH_SHORT).show();
+                            });
+                        }
 
                     } catch (Exception e) {
                         logger.error("Pipeline Failure: " + e.getMessage());
-                        getActivity().runOnUiThread(() -> {
-                            binding.pbSolid.setVisibility(View.GONE);
-                            binding.btnRunSolidAnalysis.setEnabled(true);
-                        });
+                        if (isAdded()) {
+                            getActivity().runOnUiThread(() -> {
+                                binding.pbSolid.setVisibility(View.GONE);
+                                binding.btnRunSolidAnalysis.setEnabled(true);
+                            });
+                        }
                     }
                 });
             }
@@ -187,10 +215,12 @@ public class SolidFragment extends Fragment {
             @Override
             public void onError(String message) {
                 logger.error("Meshing Failed: " + message);
-                getActivity().runOnUiThread(() -> {
-                    binding.pbSolid.setVisibility(View.GONE);
-                    binding.btnRunSolidAnalysis.setEnabled(true);
-                });
+                if (isAdded()) {
+                    getActivity().runOnUiThread(() -> {
+                        binding.pbSolid.setVisibility(View.GONE);
+                        binding.btnRunSolidAnalysis.setEnabled(true);
+                    });
+                }
             }
         });
     }
@@ -198,7 +228,8 @@ public class SolidFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        gmshRunner.shutdown();
+        if (gmshRunner != null) gmshRunner.shutdown();
+        executor.shutdown();
         binding = null;
     }
 }

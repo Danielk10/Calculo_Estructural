@@ -103,6 +103,11 @@ public class StructuralFragment extends Fragment {
     }
 
     private void runAnalysis() {
+        if (binding.spinnerStructureType.getSelectedItem() == null) {
+            Toast.makeText(getContext(), "Please select a structure type", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String nodesStr = binding.etNodes.getText().toString().trim();
         String elementsStr = binding.etElements.getText().toString().trim();
 
@@ -134,25 +139,31 @@ public class StructuralFragment extends Fragment {
                 if (datFile.exists()) {
                     String nativeSummary = core.parseDatResults(datFile.getAbsolutePath());
                     DatParser.ParseResult parseResult = datParser.parse(datFile);
+                    if (isAdded() && binding != null) {
+                        getActivity().runOnUiThread(() -> {
+                            binding.tvStructuralResultSummary.setText("NATIVE SUMMARY:\n" + nativeSummary + "\n\n" + datParser.formatSummary(parseResult));
+                            binding.diagramView.setModelAndResults(model, parseResult);
+                            binding.diagramView.setDiagramType(1);
+                        });
+                    }
+                }
+
+                if (isAdded() && binding != null) {
                     getActivity().runOnUiThread(() -> {
-                        binding.tvStructuralResultSummary.setText("NATIVE SUMMARY:\n" + nativeSummary + "\n\n" + datParser.formatSummary(parseResult));
-                        binding.diagramView.setModelAndResults(model, parseResult);
-                        binding.diagramView.setDiagramType(1);
+                        binding.pbStructural.setVisibility(View.GONE);
+                        binding.btnSolveStructural.setEnabled(true);
+                        Toast.makeText(getContext(), "Analysis Complete", Toast.LENGTH_SHORT).show();
                     });
                 }
 
-                getActivity().runOnUiThread(() -> {
-                    binding.pbStructural.setVisibility(View.GONE);
-                    binding.btnSolveStructural.setEnabled(true);
-                    Toast.makeText(getContext(), "Analysis Complete", Toast.LENGTH_SHORT).show();
-                });
-
             } catch (Exception e) {
                 logger.error(e.getMessage());
-                getActivity().runOnUiThread(() -> {
-                    binding.pbStructural.setVisibility(View.GONE);
-                    binding.btnSolveStructural.setEnabled(true);
-                });
+                if (isAdded() && binding != null) {
+                    getActivity().runOnUiThread(() -> {
+                        binding.pbStructural.setVisibility(View.GONE);
+                        binding.btnSolveStructural.setEnabled(true);
+                    });
+                }
             } finally {
                 if (modelPtr != 0) core.deleteModel(modelPtr);
             }

@@ -39,6 +39,41 @@ public class TerminalFragment extends Fragment {
             sendCommand();
             return true;
         });
+
+        binding.btnCopyLog.setOnClickListener(v -> copyLogToClipboard());
+        binding.btnExportReport.setOnClickListener(v -> exportTerminalReport());
+        binding.tvLog.setOnClickListener(v -> copyLogToClipboard());
+    }
+
+    private void copyLogToClipboard() {
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+        android.content.ClipData clip = android.content.ClipData.newPlainText("FEA Terminal Log", binding.tvLog.getText().toString());
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(getContext(), "Log copied to clipboard", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void exportTerminalReport() {
+        executor.execute(() -> {
+            try {
+                File workDir = requireContext().getFilesDir();
+                File reportFile = new File(workDir, "terminal_report.txt");
+                try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(reportFile))) {
+                    pw.println("FEA CORE TERMINAL SESSION REPORT");
+                    pw.println("Generated: " + new java.util.Date().toString());
+                    pw.println("----------------------------------");
+                    pw.println(binding.tvLog.getText().toString());
+                }
+                
+                com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(requireContext());
+                if (manager.exportToDownloads(reportFile, "Terminal")) {
+                    getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Report exported to Downloads/FEA_Suite/Terminal", Toast.LENGTH_LONG).show());
+                }
+            } catch (Exception e) {
+                getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Export Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private void sendCommand() {

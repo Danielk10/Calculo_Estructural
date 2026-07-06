@@ -121,8 +121,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.action_import) {
             openFilePicker();
             return true;
-        } else if (id == R.id.action_reset) {
-            resetAssets();
+        } else if (id == R.id.action_docs) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.calculix.de/html/ccx.html")));
             return true;
         }
         return super.onOptionsItemSelected(item);
