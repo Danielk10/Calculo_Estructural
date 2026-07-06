@@ -123,37 +123,6 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="ANALYSIS CONFIG"
-                            android:textStyle="bold"
-                            android:textColor="@color/primaryColor"
-                            android:layout_marginBottom="8dp"/>
-
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Structure Type" android:textSize="12sp" android:layout_marginBottom="4dp"/>
-                        <Spinner
-                            android:id="@+id/spinnerStructureType"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:entries="@array/structure_types_structural"
-                            android:layout_marginBottom="12dp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:text="ELEMENT CONNECTIVITY"
                             android:textStyle="bold"
                             android:textColor="@color/primaryColor"
