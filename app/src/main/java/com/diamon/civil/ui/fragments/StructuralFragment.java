@@ -40,7 +40,20 @@ public class StructuralFragment extends Fragment {
         
         final android.content.Context appContext = requireContext().getApplicationContext();
         executor.execute(() -> {
-            calculixExecutor = new CalculixExecutor(appContext);
+            try {
+                NativeFeaCore.loadLibraries();
+                calculixExecutor = new CalculixExecutor(appContext);
+                android.app.Activity activity = getActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(() -> {
+                        if (isAdded() && binding != null) {
+                            logger.info("Structural engine initialized");
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                logger.error("Initialization failed: " + e.getMessage());
+            }
         });
         datParser = new DatParser();
         logger.attachToTextView(binding.tvStructuralLog);

@@ -191,7 +191,20 @@ public class SolidFragment extends Fragment {
 
         binding.pbSolid.setVisibility(View.VISIBLE);
         binding.btnRunSolidAnalysis.setEnabled(false);
-        String elementType = binding.spinnerElementType.getSelectedItem().toString();
+        
+        // Capture ALL UI values on main thread to avoid crashes
+        final String elementType = binding.spinnerElementType.getSelectedItem().toString();
+        final int density = binding.seekbarMeshDensity.getProgress() + 1;
+        final String modulusStr = binding.etSolidModulus.getText().toString().trim();
+        
+        double youngModulusTemp = 210000.0;
+        try {
+            if (!modulusStr.isEmpty()) youngModulusTemp = Double.parseDouble(modulusStr);
+        } catch (NumberFormatException e) {
+            logger.error("Invalid modulus, using default 210GPa");
+        }
+        final double E = youngModulusTemp;
+
         logger.info("Starting Pipeline for: " + elementType);
 
         final File workDir = getContext().getFilesDir();
@@ -205,7 +218,6 @@ public class SolidFragment extends Fragment {
             return;
         }
 
-        int density = binding.seekbarMeshDensity.getProgress() + 1;
         logger.info("Step 1: Generating Mesh with Gmsh (Density: " + density + ")...");
         
         gmshRunner.meshAsync(cadFile, density, new GmshRunner.GmshCallback() {
@@ -225,7 +237,8 @@ public class SolidFragment extends Fragment {
                             cadFile.getAbsolutePath(), "-3", "-format", "inp", "-o", rawInpPath);
                         logger.debug(gmshResult);
 
-                        com.diamon.civil.engine.InpAssembler.assemble(workDir, "job_solid", "Steel", 210000, 0.3, -100.0, elementType);
+                        // Use captured UI values (E, elementType)
+                        com.diamon.civil.engine.InpAssembler.assemble(workDir, "job_solid", "Steel", E, 0.3, -100.0, elementType);
                         
                         logger.info("Step 3: Running CalculiX Solver (ccx)...");
                         String ccxResult = calculixExecutor.executeCalculix("job_solid");

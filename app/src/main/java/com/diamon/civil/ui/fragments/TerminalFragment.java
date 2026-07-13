@@ -100,7 +100,20 @@ public class TerminalFragment extends Fragment {
         scrollDown();
 
         executor.execute(() -> {
-            String result = terminalExecutor.execute(input);
+            String result = null;
+            
+            // Special test command for headless DRAWEXE
+            if (input.equalsIgnoreCase("test_draw")) {
+                String drawScript = "box b 10 10 10\n" +
+                                   "writebrep b test_box.brep\n" +
+                                   "puts \"BOX CREATED SUCCESSFULLY\"\n" +
+                                   "exit\n";
+                result = "Executing Headless DRAWEXE Test...\n";
+                result += calculixExecutor.executeBinaryWithInput("DRAWEXE", drawScript);
+            } else {
+                result = terminalExecutor.execute(input);
+            }
+
             if (result == null) {
                 // Delegate to binary execution if command not built-in
                 String[] parts = input.split("\\s+");
@@ -118,8 +131,10 @@ public class TerminalFragment extends Fragment {
             }
             final String finalResult = result;
             getActivity().runOnUiThread(() -> {
-                binding.tvLog.append(finalResult + "\n");
-                scrollDown();
+                if (binding != null) {
+                    binding.tvLog.append(finalResult + "\n");
+                    scrollDown();
+                }
             });
         });
     }

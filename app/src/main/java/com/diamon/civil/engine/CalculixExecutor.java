@@ -37,15 +37,15 @@ public class CalculixExecutor {
     }
 
     public String executeBinary(String binaryName, String... args) {
+        return executeBinaryWithInput(binaryName, null, args);
+    }
+
+    public String executeBinaryWithInput(String binaryName, String input, String... args) {
         // AssetHelper creates symlinks in usr/bin that point to lib*.so
         File binary = new File(new File(workDir, "usr/bin"), binaryName);
         
         if (!binary.exists()) {
-            // Fallback to normalized physical name in nativeLibDir
-            String normalizedName = binaryName;
-            // Removed incorrect mapping for gmsh to v5_0_0 shared library. 
-            // The 6KB libgmsh.so is the actual PIE binary.
-            binary = new File(nativeLibDir, "lib" + normalizedName + ".so");
+            binary = new File(nativeLibDir, "lib" + binaryName + ".so");
         }
         
         if (!binary.exists()) {
@@ -65,7 +65,6 @@ public class CalculixExecutor {
 
             Map<String, String> env = pb.environment();
             
-            // Mirror verified test environment and native runner logic
             String numCores = String.valueOf(Runtime.getRuntime().availableProcessors());
             env.put("OMP_NUM_THREADS", numCores);
             env.put("CCX_NPROC_EQUATION_SOLVER", numCores);
@@ -73,13 +72,22 @@ public class CalculixExecutor {
             File usrLib = new File(workDir, "usr/lib");
             File usrBin = new File(workDir, "usr/bin");
             
-            // Critical: Add GFortran and OpenBLAS dependencies if present in workDir/usr/lib
+            // Critical TCL/TK environment for DRAWEXE headless execution
+            env.put("TCL_LIBRARY", new File(usrLib, "tcl8.6").getAbsolutePath());
+            env.put("TK_LIBRARY", new File(usrLib, "tk8.6").getAbsolutePath());
+            env.put("TCLLIBPATH", String.format("%s %s %s", 
+                    usrLib.getAbsolutePath(),
+                    new File(usrLib, "tcl8.6").getAbsolutePath(),
+                    new File(usrLib, "tk8.6").getAbsolutePath()));
+            
+            // Force headless mode by ensuring DISPLAY is absent
+            env.remove("DISPLAY");
+
             String currentLdPath = System.getenv("LD_LIBRARY_PATH");
             if (currentLdPath == null) currentLdPath = "";
             
             env.put("LD_LIBRARY_PATH", usrLib.getAbsolutePath() + ":" + 
                     nativeLibDir.getAbsolutePath() + ":" + 
-                    workDir.getAbsolutePath() + "/usr/lib/calculix:" +
                     currentLdPath);
                     
             String currentPath = System.getenv("PATH");
@@ -90,6 +98,15 @@ public class CalculixExecutor {
 
             Process process = pb.start();
             
+            // Send input to stdin if provided
+            if (input != null && !input.isEmpty()) {
+                try (java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8))) {
+                    writer.write(input);
+                    if (!input.endsWith("\n")) writer.write("\n");
+                    writer.flush();
+                }
+            }
+
             StringBuilder output = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
                 String line;
