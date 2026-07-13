@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setupNavigation() {
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, binding.drawerLayout, binding.toolbar,
-                R.string.app_name, R.string.app_name); // Use generic strings if needed
+                R.string.app_name, R.string.app_name); 
         binding.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -71,9 +71,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void switchFragment(Fragment fragment, String title) {
+        if (isFinishing() || isDestroyed()) return;
+        
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment, fragment)
-                .commit();
+                .commitAllowingStateLoss();
+        
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(title);
         }
@@ -89,7 +92,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_terminal) {
             switchFragment(new TerminalFragment(), "Advanced Terminal");
         } else if (id == R.id.nav_docs) {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.calculix.de/html/ccx.html")));
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.calculix.de/html/ccx.html")));
+            } catch (Exception e) {
+                Toast.makeText(this, "Could not open browser", Toast.LENGTH_SHORT).show();
+            }
         } else if (id == R.id.nav_about) {
             showAboutDialog();
         }

@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 
 /**
  * A1: GmshRunner — Executes the Gmsh binary to mesh STL/STEP/IGES files.
- * Produces a .msh output file that MshToInpConverter can then translate to CalculiX format.
+ * Produces a .msh or .inp output file for CalculiX.
  */
 public class GmshRunner {
 

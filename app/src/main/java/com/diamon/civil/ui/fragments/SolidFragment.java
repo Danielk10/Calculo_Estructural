@@ -43,9 +43,13 @@ public class SolidFragment extends Fragment {
         // Ensure libraries are loaded before any native call
         NativeFeaCore.loadLibraries();
         
+        final android.content.Context appContext = requireContext().getApplicationContext();
+        final File nativeLibDir = new File(requireContext().getApplicationInfo().nativeLibraryDir);
+        final File filesDir = requireContext().getFilesDir();
+
         executor.execute(() -> {
-            gmshRunner = new GmshRunner(requireContext().getFilesDir(), new File(requireContext().getApplicationInfo().nativeLibraryDir));
-            calculixExecutor = new CalculixExecutor(requireContext());
+            gmshRunner = new GmshRunner(filesDir, nativeLibDir);
+            calculixExecutor = new CalculixExecutor(appContext);
         });
         
         logger.attachToTextView(binding.tvSolidLog);
@@ -59,12 +63,17 @@ public class SolidFragment extends Fragment {
         // Safer initialization to prevent crash on entry
         binding.solidSceneViewContainer.post(() -> {
             if (isAdded() && binding != null) {
-                SceneViewBridgeKt.setSceneViewContent(binding.solidSceneViewContainer, "models/test_beam.glb", (MainActivity) getActivity());
+                try {
+                    SceneViewBridgeKt.setSceneViewContent(binding.solidSceneViewContainer, "models/test_beam.glb", (MainActivity) getActivity());
+                } catch (Exception e) {
+                    logger.error("SceneView Error: " + e.getMessage());
+                }
             }
         });
     }
 
     private void loadDefaultTestCase() {
+        if (binding == null) return;
         binding.seekbarMeshDensity.setProgress(2);
         // Ensure box.brep exists for the demo
         createPrimitive("box");
@@ -108,7 +117,8 @@ public class SolidFragment extends Fragment {
     }
 
     private void copyToClipboard(String text) {
-        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+        if (getContext() == null) return;
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
         android.content.ClipData clip = android.content.ClipData.newPlainText("FEA Log", text);
         if (clipboard != null) {
             clipboard.setPrimaryClip(clip);
@@ -117,7 +127,8 @@ public class SolidFragment extends Fragment {
     }
 
     private void exportResults() {
-        File workDir = requireContext().getFilesDir();
+        if (getContext() == null) return;
+        File workDir = getContext().getFilesDir();
         File reportFile = new File(workDir, "Solid_Analysis_Report.pdf");
         
         String logText = logger.getFullLog();
@@ -127,7 +138,7 @@ public class SolidFragment extends Fragment {
 
         File[] files = workDir.listFiles((dir, name) -> name.startsWith("job_solid") || name.endsWith(".brep") || name.endsWith(".msh") || name.equals("Solid_Analysis_Report.pdf"));
         if (files != null && files.length > 0) {
-            com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(requireContext());
+            com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(getContext());
             for (File f : files) {
                 manager.exportToDownloads(f, "Solid_Analysis");
             }
@@ -138,17 +149,21 @@ public class SolidFragment extends Fragment {
     }
 
     private void createPrimitive(String type) {
+        if (getContext() == null) return;
+        final String path = new File(getContext().getFilesDir(), type + ".brep").getAbsolutePath();
         executor.execute(() -> {
-            File outFile = new File(requireContext().getFilesDir(), type + ".brep");
             boolean success = false;
-            if (type.equals("box")) success = OcctPrimitivesJNI.createBox(10, 10, 10, outFile.getAbsolutePath());
-            else if (type.equals("cylinder")) success = OcctPrimitivesJNI.createCylinder(5, 10, outFile.getAbsolutePath());
-            else if (type.equals("sphere")) success = OcctPrimitivesJNI.createSphere(5, outFile.getAbsolutePath());
+            if (type.equals("box")) success = OcctPrimitivesJNI.createBox(10, 10, 10, path);
+            else if (type.equals("cylinder")) success = OcctPrimitivesJNI.createCylinder(5, 10, path);
+            else if (type.equals("sphere")) success = OcctPrimitivesJNI.createSphere(5, path);
 
             if (success) {
                 logger.info("Created primitive: " + type);
-                if (isAdded()) {
-                    getActivity().runOnUiThread(() -> Toast.makeText(getContext(), type.toUpperCase() + " created", Toast.LENGTH_SHORT).show());
+                android.app.Activity activity = getActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(() -> {
+                        if (isAdded()) Toast.makeText(getContext(), type.toUpperCase() + " created", Toast.LENGTH_SHORT).show();
+                    });
                 }
             } else {
                 logger.error("Failed to create " + type);
@@ -157,6 +172,8 @@ public class SolidFragment extends Fragment {
     }
 
     private void runFullPipeline() {
+        if (binding == null || getContext() == null) return;
+
         if (binding.spinnerElementType.getSelectedItem() == null) {
             Toast.makeText(getContext(), "Please select an element type", Toast.LENGTH_SHORT).show();
             return;
@@ -167,8 +184,10 @@ public class SolidFragment extends Fragment {
         String elementType = binding.spinnerElementType.getSelectedItem().toString();
         logger.info("Starting Pipeline for: " + elementType);
 
-        File workDir = requireContext().getFilesDir();
-        File cadFile = new File(workDir, "box.brep");
+        final File workDir = getContext().getFilesDir();
+        final File cadFile = new File(workDir, "box.brep");
+        final android.content.Context appContext = getContext().getApplicationContext();
+
         if (!cadFile.exists()) {
             logger.error("Simulation Error: Source geometry (box.brep) not found.");
             binding.pbSolid.setVisibility(View.GONE);
@@ -187,6 +206,11 @@ public class SolidFragment extends Fragment {
                     try {
                         logger.info("Step 2: Assembling CalculiX Input (.inp)...");
                         String rawInpPath = workDir.getAbsolutePath() + "/job_solid_raw.inp";
+                        
+                        if (calculixExecutor == null) {
+                            calculixExecutor = new CalculixExecutor(appContext);
+                        }
+
                         String gmshResult = calculixExecutor.executeBinary("gmsh", 
                             cadFile.getAbsolutePath(), "-3", "-format", "inp", "-o", rawInpPath);
                         logger.debug(gmshResult);
@@ -206,28 +230,35 @@ public class SolidFragment extends Fragment {
                             
                             File glbFile = new File(workDir, "job_solid.glb");
                             if (calculixExecutor.convertFrdToGlb(frdFile.getAbsolutePath(), glbFile.getAbsolutePath())) {
-                                if (isAdded()) {
-                                    getActivity().runOnUiThread(() -> {
-                                        SceneViewBridgeKt.setSceneViewContent(binding.solidSceneViewContainer, glbFile.getAbsolutePath(), (MainActivity) getActivity());
+                                android.app.Activity activity = getActivity();
+                                if (activity != null) {
+                                    activity.runOnUiThread(() -> {
+                                        if (binding != null) SceneViewBridgeKt.setSceneViewContent(binding.solidSceneViewContainer, glbFile.getAbsolutePath(), (MainActivity) activity);
                                     });
                                 }
                             }
                         }
 
-                        if (isAdded()) {
-                            getActivity().runOnUiThread(() -> {
-                                binding.pbSolid.setVisibility(View.GONE);
-                                binding.btnRunSolidAnalysis.setEnabled(true);
-                                Toast.makeText(getContext(), "Simulation Complete", Toast.LENGTH_SHORT).show();
+                        android.app.Activity activity = getActivity();
+                        if (activity != null) {
+                            activity.runOnUiThread(() -> {
+                                if (binding != null) {
+                                    binding.pbSolid.setVisibility(View.GONE);
+                                    binding.btnRunSolidAnalysis.setEnabled(true);
+                                    Toast.makeText(appContext, "Simulation Complete", Toast.LENGTH_SHORT).show();
+                                }
                             });
                         }
 
                     } catch (Exception e) {
                         logger.error("Pipeline Failure: " + e.getMessage());
-                        if (isAdded()) {
-                            getActivity().runOnUiThread(() -> {
-                                binding.pbSolid.setVisibility(View.GONE);
-                                binding.btnRunSolidAnalysis.setEnabled(true);
+                        android.app.Activity activity = getActivity();
+                        if (activity != null) {
+                            activity.runOnUiThread(() -> {
+                                if (binding != null) {
+                                    binding.pbSolid.setVisibility(View.GONE);
+                                    binding.btnRunSolidAnalysis.setEnabled(true);
+                                }
                             });
                         }
                     }
@@ -237,10 +268,13 @@ public class SolidFragment extends Fragment {
             @Override
             public void onError(String message) {
                 logger.error("Meshing Failed: " + message);
-                if (isAdded()) {
-                    getActivity().runOnUiThread(() -> {
-                        binding.pbSolid.setVisibility(View.GONE);
-                        binding.btnRunSolidAnalysis.setEnabled(true);
+                android.app.Activity activity = getActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(() -> {
+                        if (binding != null) {
+                            binding.pbSolid.setVisibility(View.GONE);
+                            binding.btnRunSolidAnalysis.setEnabled(true);
+                        }
                     });
                 }
             }

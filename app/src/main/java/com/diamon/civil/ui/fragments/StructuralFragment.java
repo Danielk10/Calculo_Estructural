@@ -38,8 +38,9 @@ public class StructuralFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
+        final android.content.Context appContext = requireContext().getApplicationContext();
         executor.execute(() -> {
-            calculixExecutor = new CalculixExecutor(requireContext());
+            calculixExecutor = new CalculixExecutor(appContext);
         });
         datParser = new DatParser();
         logger.attachToTextView(binding.tvStructuralLog);
@@ -50,16 +51,17 @@ public class StructuralFragment extends Fragment {
     }
 
     private void loadDefaultTestCase() {
+        if (binding == null) return;
         // Sample Cantilever Beam
         binding.etNodes.setText("1, 0, 0, 0\n2, 10, 0, 0\n3, 5, 0, 0");
         binding.etElements.setText("1, 1, 3\n2, 3, 2");
-        Toast.makeText(getContext(), "Loaded Cantilever Example", Toast.LENGTH_SHORT).show();
     }
 
     private void setupTabs() {
         binding.tabLayoutStructural.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                if (binding == null) return;
                 binding.layoutStructuralData.setVisibility(tab.getPosition() == 0 ? View.VISIBLE : View.GONE);
                 binding.layoutStructuralGL.setVisibility(tab.getPosition() == 1 ? View.VISIBLE : View.GONE);
                 binding.layoutStructuralLog.setVisibility(tab.getPosition() == 2 ? View.VISIBLE : View.GONE);
@@ -80,7 +82,7 @@ public class StructuralFragment extends Fragment {
         binding.btnExportStructural.setOnClickListener(v -> exportResults());
         binding.btnClearStructuralLog.setOnClickListener(v -> logger.clear());
         binding.btnCopyStructuralLog.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Log copied to clipboard", Toast.LENGTH_SHORT).show();
+            copyToClipboard(logger.getFullLog());
         });
 
         binding.btnShowBMD.setOnClickListener(v -> binding.diagramView.setDiagramType(1));
@@ -93,13 +95,24 @@ public class StructuralFragment extends Fragment {
         });
     }
 
+    private void copyToClipboard(String text) {
+        if (getContext() == null) return;
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+        android.content.ClipData clip = android.content.ClipData.newPlainText("FEA Log", text);
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(getContext(), "Log copied to clipboard", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void exportResults() {
-        File workDir = requireContext().getFilesDir();
+        if (getContext() == null) return;
+        File workDir = getContext().getFilesDir();
         File reportFile = new File(workDir, "Structural_Report.pdf");
         
         // Comprehensive PDF report including results and log
         StringBuilder reportContent = new StringBuilder();
-        reportContent.append("STRUCTURE TYPE: ").append(binding.spinnerStructureType.getSelectedItem().toString()).append("\n\n");
+        reportContent.append("STRUCTURE TYPE: ").append(binding.spinnerStructureType.getSelectedItem() != null ? binding.spinnerStructureType.getSelectedItem().toString() : "N/A").append("\n\n");
         reportContent.append(binding.tvStructuralResultSummary.getText().toString()).append("\n\n");
         reportContent.append("--- FULL SOLVER LOG ---\n").append(logger.getFullLog());
 
@@ -107,7 +120,7 @@ public class StructuralFragment extends Fragment {
 
         File[] files = workDir.listFiles((dir, name) -> name.startsWith("structural_job") || name.equals("Structural_Report.pdf"));
         if (files != null && files.length > 0) {
-            com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(requireContext());
+            com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(getContext());
             for (File f : files) {
                 manager.exportToDownloads(f, "Structural_Analysis");
             }
@@ -118,6 +131,8 @@ public class StructuralFragment extends Fragment {
     }
 
     private void runAnalysis() {
+        if (getContext() == null || binding == null) return;
+        
         if (binding.spinnerStructureType.getSelectedItem() == null) {
             Toast.makeText(getContext(), "Please select a structure type", Toast.LENGTH_SHORT).show();
             return;
@@ -135,6 +150,9 @@ public class StructuralFragment extends Fragment {
         binding.btnSolveStructural.setEnabled(false);
         logger.info("Starting Structural Analysis...");
 
+        final android.content.Context appContext = getContext().getApplicationContext();
+        final File filesDir = getContext().getFilesDir();
+
         executor.execute(() -> {
             NativeFeaCore core = new NativeFeaCore();
             long modelPtr = core.createModel();
@@ -145,45 +163,55 @@ public class StructuralFragment extends Fragment {
                 
                 logger.info("Assembling CalculiX Input (.inp)...");
                 String inpContent = core.modelToInp(modelPtr);
-                File inpFile = new File(requireContext().getFilesDir(), "structural_job.inp");
+                File inpFile = new File(filesDir, "structural_job.inp");
                 try (java.io.FileOutputStream fos = new java.io.FileOutputStream(inpFile)) {
                     fos.write(inpContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
                 }
                 
                 logger.info("Executing CalculiX Solver (ccx)...");
                 if (calculixExecutor == null) {
-                    calculixExecutor = new CalculixExecutor(requireContext());
+                    calculixExecutor = new CalculixExecutor(appContext);
                 }
                 String result = calculixExecutor.executeCalculix("structural_job");
                 logger.log(result);
 
-                File datFile = new File(requireContext().getFilesDir(), "structural_job.dat");
+                File datFile = new File(filesDir, "structural_job.dat");
                 if (datFile.exists()) {
                     String nativeSummary = core.parseDatResults(datFile.getAbsolutePath());
                     DatParser.ParseResult parseResult = datParser.parse(datFile);
-                    if (isAdded() && binding != null) {
-                        getActivity().runOnUiThread(() -> {
-                            binding.tvStructuralResultSummary.setText("NATIVE SUMMARY:\n" + nativeSummary + "\n\n" + datParser.formatSummary(parseResult));
-                            binding.diagramView.setModelAndResults(model, parseResult);
-                            binding.diagramView.setDiagramType(1);
+                    
+                    android.app.Activity activity = getActivity();
+                    if (activity != null) {
+                        activity.runOnUiThread(() -> {
+                            if (binding != null) {
+                                binding.tvStructuralResultSummary.setText("NATIVE SUMMARY:\n" + nativeSummary + "\n\n" + datParser.formatSummary(parseResult));
+                                binding.diagramView.setModelAndResults(model, parseResult);
+                                binding.diagramView.setDiagramType(1);
+                            }
                         });
                     }
                 }
 
-                if (isAdded() && binding != null) {
-                    getActivity().runOnUiThread(() -> {
-                        binding.pbStructural.setVisibility(View.GONE);
-                        binding.btnSolveStructural.setEnabled(true);
-                        Toast.makeText(getContext(), "Analysis Complete", Toast.LENGTH_SHORT).show();
+                android.app.Activity activity = getActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(() -> {
+                        if (binding != null) {
+                            binding.pbStructural.setVisibility(View.GONE);
+                            binding.btnSolveStructural.setEnabled(true);
+                            Toast.makeText(appContext, "Analysis Complete", Toast.LENGTH_SHORT).show();
+                        }
                     });
                 }
 
             } catch (Exception e) {
                 logger.error(e.getMessage());
-                if (isAdded() && binding != null) {
-                    getActivity().runOnUiThread(() -> {
-                        binding.pbStructural.setVisibility(View.GONE);
-                        binding.btnSolveStructural.setEnabled(true);
+                android.app.Activity activity = getActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(() -> {
+                        if (binding != null) {
+                            binding.pbStructural.setVisibility(View.GONE);
+                            binding.btnSolveStructural.setEnabled(true);
+                        }
                     });
                 }
             } finally {
