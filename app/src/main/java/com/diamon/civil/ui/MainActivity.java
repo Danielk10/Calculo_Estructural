@@ -179,11 +179,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.layoutLoading.setVisibility(View.VISIBLE);
         binding.tvLoadingText.setText("Deploying FEM Core Engine...");
         executor.execute(() -> {
+            com.diamon.civil.util.NativeLoader.setFilesDir(getFilesDir());
             boolean assetsOk = assetHelper.ensureRuntimeReady();
             
             // Pre-load native libraries to avoid freeze in fragments
             runOnUiThread(() -> binding.tvLoadingText.setText("Initializing Native Modules..."));
-            com.diamon.civil.engine.NativeFeaCore.loadLibraries();
+            try {
+                com.diamon.civil.engine.NativeFeaCore.loadLibraries();
+            } catch (Exception e) {
+                android.util.Log.e("MainActivity", "Failed to load libraries: " + e.getMessage());
+            }
             
             runOnUiThread(() -> {
                 binding.layoutLoading.setVisibility(View.GONE);

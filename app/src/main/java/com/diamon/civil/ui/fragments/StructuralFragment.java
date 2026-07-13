@@ -138,8 +138,9 @@ public class StructuralFragment extends Fragment {
             return;
         }
 
-        String nodesStr = binding.etNodes.getText().toString().trim();
-        String elementsStr = binding.etElements.getText().toString().trim();
+        final String nodesStr = binding.etNodes.getText().toString().trim();
+        final String elementsStr = binding.etElements.getText().toString().trim();
+        final String structureType = binding.spinnerStructureType.getSelectedItem().toString();
 
         if (nodesStr.isEmpty() || elementsStr.isEmpty()) {
             Toast.makeText(getContext(), "Please define nodes and elements", Toast.LENGTH_SHORT).show();
@@ -155,10 +156,11 @@ public class StructuralFragment extends Fragment {
 
         executor.execute(() -> {
             NativeFeaCore core = new NativeFeaCore();
-            long modelPtr = core.createModel();
+            long modelPtr = 0;
             try {
+                modelPtr = core.createModel();
                 StructuralModel model = parseInputs(nodesStr, elementsStr);
-                String jsonModel = modelToJson(model);
+                String jsonModel = modelToJson(model, structureType);
                 core.modelFromJson(modelPtr, jsonModel);
                 
                 logger.info("Assembling CalculiX Input (.inp)...");
@@ -204,7 +206,7 @@ public class StructuralFragment extends Fragment {
                 }
 
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error("Analysis Error: " + e.getMessage());
                 android.app.Activity activity = getActivity();
                 if (activity != null) {
                     activity.runOnUiThread(() -> {
@@ -220,29 +222,28 @@ public class StructuralFragment extends Fragment {
         });
     }
 
-    private String modelToJson(StructuralModel model) {
-        String selection = binding.spinnerStructureType.getSelectedItem().toString();
+    private String modelToJson(StructuralModel model, String structureType) {
         String elementType = "B32"; // Default
-        if (selection.contains("B32")) elementType = "B32";
-        else if (selection.contains("T2D2")) elementType = "T2D2";
-        else if (selection.contains("B31")) elementType = "B31";
+        if (structureType.contains("B32")) elementType = "B32";
+        else if (structureType.contains("T2D2")) elementType = "T2D2";
+        else if (structureType.contains("B31")) elementType = "B31";
 
         StringBuilder sb = new StringBuilder();
         sb.append("{ \"nodes\": [");
         for (int i = 0; i < model.nodes.size(); i++) {
             StructuralModel.Node n = model.nodes.get(i);
-            sb.append(String.format("{\"id\":%d,\"x\":%f,\"y\":%f,\"z\":%f}", n.id, n.x, n.y, n.z));
+            sb.append(String.format(java.util.Locale.US, "{\"id\":%d,\"x\":%f,\"y\":%f,\"z\":%f}", n.id, n.x, n.y, n.z));
             if (i < model.nodes.size() - 1) sb.append(",");
         }
         sb.append("], \"elements\": [");
         for (int i = 0; i < model.elements.size(); i++) {
             StructuralModel.Element e = model.elements.get(i);
-            // Use the selected element type
-            sb.append(String.format("{\"id\":%d,\"type\":\"%s\",\"nodes\":[%d,%d]}", e.id, elementType, e.node1Id, e.node2Id));
+            sb.append(String.format(java.util.Locale.US, "{\"id\":%d,\"type\":\"%s\",\"nodes\":[%d,%d]}", e.id, elementType, e.node1Id, e.node2Id));
             if (i < model.elements.size() - 1) sb.append(",");
         }
         sb.append("], \"materials\": [{\"name\":\"Steel\",\"youngModulus\":210000,\"poissonRatio\":0.3,\"density\":7850}],");
-        sb.append("\"sections\": [{\"elset\":\"ALL\",\"type\":\"BEAM\",\"material\":\"Steel\",\"params\":[200,200]}]");
+        sb.append("\"sections\": [{\"elset\":\"ALL\",\"type\":\"BEAM\",\"material\":\"Steel\",\"params\":[200,200]}],");
+        sb.append("\"constraints\": [], \"loads\": []"); // Ensure arrays are present for native parser
         sb.append("}");
         return sb.toString();
     }

@@ -40,25 +40,35 @@ public class SolidFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        // Ensure libraries are loaded before any native call
-        NativeFeaCore.loadLibraries();
-        
         final android.content.Context appContext = requireContext().getApplicationContext();
         final File nativeLibDir = new File(requireContext().getApplicationInfo().nativeLibraryDir);
         final File filesDir = requireContext().getFilesDir();
 
         executor.execute(() -> {
-            gmshRunner = new GmshRunner(filesDir, nativeLibDir);
-            calculixExecutor = new CalculixExecutor(appContext);
+            try {
+                // Ensure libraries are loaded before initializing runners
+                NativeFeaCore.loadLibraries();
+                gmshRunner = new GmshRunner(filesDir, nativeLibDir);
+                calculixExecutor = new CalculixExecutor(appContext);
+                
+                android.app.Activity activity = getActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(() -> {
+                        if (isAdded() && binding != null) {
+                            logger.info("Native engines initialized successfully");
+                            loadDefaultTestCase();
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                logger.error("Initialization Error: " + e.getMessage());
+            }
         });
         
         logger.attachToTextView(binding.tvSolidLog);
 
         setupTabs();
         setupButtons();
-        
-        // Pre-load test case
-        loadDefaultTestCase();
 
         // Safer initialization to prevent crash on entry
         binding.solidSceneViewContainer.post(() -> {

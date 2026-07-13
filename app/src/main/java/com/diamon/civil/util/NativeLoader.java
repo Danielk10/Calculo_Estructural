@@ -51,13 +51,21 @@ public class NativeLoader {
         LIBRARY_MAP.put("freetype", "freetype_v6");
     }
 
+    private static String filesDirPath = "/data/data/com.diamon.civil/files";
+
+    public static void setFilesDir(File filesDir) {
+        if (filesDir != null) {
+            filesDirPath = filesDir.getAbsolutePath();
+        }
+    }
+
     public static void loadLibrary(String libName) {
         String physicalName = LIBRARY_MAP.getOrDefault(libName, libName);
         try {
             Log.d(TAG, "Cargando librería nativa: " + libName + " (físico: " + physicalName + ")");
             System.loadLibrary(physicalName);
         } catch (Throwable t) {
-            Log.e(TAG, "Fallo inicial cargando " + libName + ", intentando fallback por ruta...");
+            Log.e(TAG, "Fallo inicial cargando " + libName + " (physical: " + physicalName + "): " + t.getMessage() + ", intentando fallback por ruta...");
             if (!loadByPath(libName)) {
                  Log.e(TAG, "FALLO CRÍTICO: No se pudo cargar " + libName);
             }
@@ -65,12 +73,7 @@ public class NativeLoader {
     }
 
     private static boolean loadByPath(String libName) {
-        // Intentar cargar desde el symlink en usr/lib (donde conservan el nombre original con puntos)
-        File usrLib = new File(System.getProperty("user.dir"), "usr/lib");
-        if (!usrLib.exists()) {
-             // Fallback a ruta absoluta manual si user.dir no es lo esperado
-             usrLib = new File("/data/data/com.diamon.civil/files/usr/lib");
-        }
+        File usrLib = new File(filesDirPath, "usr/lib");
         
         // Probar con el nombre exacto que podria tener puntos (ej: libTKMath.so.8.0.0)
         // o la convención _dot.so para librerías cuyo SONAME original termina en punto.
@@ -90,7 +93,9 @@ public class NativeLoader {
                     Log.d(TAG, "Cargando por ruta absoluta: " + libFile.getAbsolutePath());
                     System.load(libFile.getAbsolutePath());
                     return true;
-                } catch (Throwable ignored) {}
+                } catch (Throwable t) {
+                    Log.w(TAG, "Fallo carga por ruta (" + libFile.getAbsolutePath() + "): " + t.getMessage());
+                }
             }
         }
         return false;

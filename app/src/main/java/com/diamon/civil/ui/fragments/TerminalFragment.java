@@ -33,8 +33,16 @@ public class TerminalFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        terminalExecutor = new TerminalCommandExecutor(requireContext().getFilesDir());
-        calculixExecutor = new CalculixExecutor(requireContext());
+        final android.content.Context appContext = requireContext().getApplicationContext();
+        terminalExecutor = new TerminalCommandExecutor(appContext.getFilesDir());
+        
+        executor.execute(() -> {
+            try {
+                calculixExecutor = new CalculixExecutor(appContext);
+            } catch (Exception e) {
+                // Log error if needed
+            }
+        });
 
         binding.btnSend.setOnClickListener(v -> sendCommand());
         binding.etCommand.setOnEditorActionListener((v, actionId, event) -> {
