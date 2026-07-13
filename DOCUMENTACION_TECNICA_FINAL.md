@@ -53,7 +53,7 @@ Este documento unifica toda la auditoría técnica del proyecto Android principa
 *   **`native-lib.cpp`**: Punto de entrada JNI; registra las funciones que llaman a la lógica nativa.
 *   **`AnalysisModel.cpp` / `AnalysisModel.hpp`**: Define la clase nativa `AnalysisModel` para gestión de nodos, elementos, cargas y BCs. Provee serialización JSON.
 *   **`ProjectStore.cpp` / `ProjectStore.hpp`**: Lógica de persistencia nativa; guarda/carga el estado del proyecto en archivos JSON.
-*   **`CalculixRunner.cpp` / `CalculixRunner.hpp`**: Lógica nativa de bajo nivel para ejecutar binarios de cálculo (manejando buffers de memoria y procesos).
+*   **`CalculixRunner.cpp` / `CalculixRunner.hpp`**: (ELIMINADO) Lógica de ejecución de subprocesos nativos; se retiró para unificar todo el flujo de procesos en la capa Java mediante CalculixExecutor y cumplir con las políticas de SELinux de Android 10+.
 *   **`frd_converter.cpp`**: Conversor de resultados FRD (formato binario de CalculiX) a GLB para visualización 3D.
 *   **`OcctBooleanJNI.cpp`**: Mapeo JNI para operaciones booleanas geométricas basadas en OpenCASCADE.
 *   **`OcctPrimitivesJNI.cpp`**: Mapeo JNI para creación de primitivas OCCT (cubos, esferas, etc.).
@@ -99,7 +99,7 @@ Este documento unifica toda la auditoría técnica del proyecto Android principa
 | `FaceSelector.java` | Selección táctil 3D. | **C3** |
 | `AnalysisModel.*` | Estructura nativa FEA. | **A1** |
 | `ProjectStore.*` | Persistencia estado. | **A1** |
-| `CalculixRunner.*` | Gestión nativa binarios. | **A1** |
+| `CalculixRunner.*` | Gestión nativa binarios (ELIMINADO). | **A1** |
 | `frd_converter.cpp` | Conversión FRD -> GLB. | **A1** |
 | `OcctBooleanJNI.cpp` | Booleanas OCCT. | **C2** |
 | `OcctPrimitivesJNI.cpp` | Primitivas OCCT. | **C1** |

@@ -172,11 +172,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.layoutLoading.setVisibility(View.VISIBLE);
         binding.tvLoadingText.setText("Deploying FEM Core Engine...");
         executor.execute(() -> {
-            boolean success = assetHelper.ensureRuntimeReady();
+            boolean assetsOk = assetHelper.ensureRuntimeReady();
+            
+            // Pre-load native libraries to avoid freeze in fragments
+            runOnUiThread(() -> binding.tvLoadingText.setText("Initializing Native Modules..."));
+            com.diamon.civil.engine.NativeFeaCore.loadLibraries();
+            
             runOnUiThread(() -> {
                 binding.layoutLoading.setVisibility(View.GONE);
-                if (!success) {
-                    Toast.makeText(this, "Engine Failure", Toast.LENGTH_LONG).show();
+                if (!assetsOk) {
+                    Toast.makeText(this, "Engine Failure: Assets could not be deployed", Toast.LENGTH_LONG).show();
                 }
             });
         });

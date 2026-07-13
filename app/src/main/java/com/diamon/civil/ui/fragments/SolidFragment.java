@@ -40,19 +40,34 @@ public class SolidFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        gmshRunner = new GmshRunner(requireContext().getFilesDir(), new File(requireContext().getApplicationInfo().nativeLibraryDir));
-        calculixExecutor = new CalculixExecutor(requireContext());
+        // Ensure libraries are loaded before any native call
+        NativeFeaCore.loadLibraries();
+        
+        executor.execute(() -> {
+            gmshRunner = new GmshRunner(requireContext().getFilesDir(), new File(requireContext().getApplicationInfo().nativeLibraryDir));
+            calculixExecutor = new CalculixExecutor(requireContext());
+        });
+        
         logger.attachToTextView(binding.tvSolidLog);
 
         setupTabs();
         setupButtons();
         
+        // Pre-load test case
+        loadDefaultTestCase();
+
         // Safer initialization to prevent crash on entry
         binding.solidSceneViewContainer.post(() -> {
             if (isAdded() && binding != null) {
                 SceneViewBridgeKt.setSceneViewContent(binding.solidSceneViewContainer, "models/test_beam.glb", (MainActivity) getActivity());
             }
         });
+    }
+
+    private void loadDefaultTestCase() {
+        binding.seekbarMeshDensity.setProgress(2);
+        // Ensure box.brep exists for the demo
+        createPrimitive("box");
     }
 
     private void setupTabs() {
@@ -82,6 +97,13 @@ public class SolidFragment extends Fragment {
         binding.btnClearSolidLog.setOnClickListener(v -> logger.clear());
         binding.btnCopySolidLog.setOnClickListener(v -> {
             copyToClipboard(logger.getFullLog());
+        });
+
+        // Professional addition: Sample Model Button
+        binding.btnSampleModel.setOnClickListener(v -> {
+            binding.seekbarMeshDensity.setProgress(3);
+            createPrimitive("box");
+            Toast.makeText(getContext(), "Sample Box Geometry Loaded", Toast.LENGTH_SHORT).show();
         });
     }
 

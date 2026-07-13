@@ -148,6 +148,15 @@
                     app:cornerRadius="8dp" />
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSampleModel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="LOAD SAMPLE MODEL"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_marginTop="4dp"
+                    app:cornerRadius="8dp" />
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnImportExternalCad"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"

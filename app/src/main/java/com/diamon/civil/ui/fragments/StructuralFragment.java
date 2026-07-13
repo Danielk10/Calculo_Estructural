@@ -38,12 +38,22 @@ public class StructuralFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        calculixExecutor = new CalculixExecutor(requireContext());
+        executor.execute(() -> {
+            calculixExecutor = new CalculixExecutor(requireContext());
+        });
         datParser = new DatParser();
         logger.attachToTextView(binding.tvStructuralLog);
 
         setupTabs();
         setupButtons();
+        loadDefaultTestCase();
+    }
+
+    private void loadDefaultTestCase() {
+        // Sample Cantilever Beam
+        binding.etNodes.setText("1, 0, 0, 0\n2, 10, 0, 0\n3, 5, 0, 0");
+        binding.etElements.setText("1, 1, 3\n2, 3, 2");
+        Toast.makeText(getContext(), "Loaded Cantilever Example", Toast.LENGTH_SHORT).show();
     }
 
     private void setupTabs() {
@@ -76,6 +86,11 @@ public class StructuralFragment extends Fragment {
         binding.btnShowBMD.setOnClickListener(v -> binding.diagramView.setDiagramType(1));
         binding.btnShowSFD.setOnClickListener(v -> binding.diagramView.setDiagramType(2));
         binding.btnShowAFD.setOnClickListener(v -> binding.diagramView.setDiagramType(3));
+
+        // Sample Model Button
+        binding.btnSampleModel.setOnClickListener(v -> {
+            loadDefaultTestCase();
+        });
     }
 
     private void exportResults() {
@@ -128,11 +143,18 @@ public class StructuralFragment extends Fragment {
                 String jsonModel = modelToJson(model);
                 core.modelFromJson(modelPtr, jsonModel);
                 
-                String workDir = requireContext().getFilesDir().getAbsolutePath();
-                String libDir = requireContext().getApplicationInfo().nativeLibraryDir;
+                logger.info("Assembling CalculiX Input (.inp)...");
+                String inpContent = core.modelToInp(modelPtr);
+                File inpFile = new File(requireContext().getFilesDir(), "structural_job.inp");
+                try (java.io.FileOutputStream fos = new java.io.FileOutputStream(inpFile)) {
+                    fos.write(inpContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                }
                 
-                logger.info("Executing Native Solver...");
-                String result = core.runCalculix(workDir, libDir, "structural_job", modelPtr);
+                logger.info("Executing CalculiX Solver (ccx)...");
+                if (calculixExecutor == null) {
+                    calculixExecutor = new CalculixExecutor(requireContext());
+                }
+                String result = calculixExecutor.executeCalculix("structural_job");
                 logger.log(result);
 
                 File datFile = new File(requireContext().getFilesDir(), "structural_job.dat");

@@ -91,9 +91,20 @@ public class GmshRunner {
 
             Map<String, String> env = pb.environment();
             File usrLib = new File(workDir, "usr/lib");
-            env.put("LD_LIBRARY_PATH",
-                    usrLib.getAbsolutePath() + ":" + nativeLibDir.getAbsolutePath()
-                            + (env.get("LD_LIBRARY_PATH") != null ? ":" + env.get("LD_LIBRARY_PATH") : ""));
+            File usrBin = new File(workDir, "usr/bin");
+            
+            String currentLdPath = env.get("LD_LIBRARY_PATH");
+            if (currentLdPath == null) currentLdPath = "";
+            
+            env.put("LD_LIBRARY_PATH", 
+                    usrLib.getAbsolutePath() + ":" + 
+                    nativeLibDir.getAbsolutePath() + ":" + 
+                    workDir.getAbsolutePath() + "/usr/lib/calculix:" +
+                    currentLdPath);
+                    
+            String currentPath = env.get("PATH");
+            if (currentPath == null) currentPath = "";
+            env.put("PATH", usrBin.getAbsolutePath() + ":" + nativeLibDir.getAbsolutePath() + ":" + currentPath);
 
             Process process = pb.start();
             StringBuilder output = new StringBuilder();

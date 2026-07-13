@@ -28,6 +28,16 @@ public class InpAssembler {
         Set<Integer> fixedNodes = extractNodesFromPhysical(lines, "Fixed");
         Set<Integer> loadedNodes = extractNodesFromPhysical(lines, "Loaded");
 
+        // Fallback: If no physical sets found, use first and last nodes for demo purposes
+        if (fixedNodes.isEmpty() && !lines.isEmpty()) {
+             fixedNodes.add(1); 
+             android.util.Log.w("InpAssembler", "No Fixed set found, using fallback Node 1");
+        }
+        if (loadedNodes.isEmpty() && lines.size() > 10) {
+             loadedNodes.add(10);
+             android.util.Log.w("InpAssembler", "No Loaded set found, using fallback Node 10");
+        }
+
         try (PrintWriter pw = new PrintWriter(new FileWriter(nsetsInp))) {
             pw.println("*NSET, NSET=NFix");
             writeNodes(pw, fixedNodes);
@@ -37,8 +47,17 @@ public class InpAssembler {
 
         // 2. Clean up main mesh (remove Gmsh specific boundary definitions)
         try (PrintWriter pw = new PrintWriter(new FileWriter(cleanInp))) {
+            boolean inElementBlock = false;
             for (String line : lines) {
                 String u = line.trim().toUpperCase();
+                
+                // Ensure we use a valid element type for 3D (C3D4 for Gmsh tetras)
+                if (u.startsWith("*ELEMENT") && u.contains("TYPE=TET4")) {
+                    pw.println("*ELEMENT, TYPE=C3D4, ELSET=Eall");
+                    inElementBlock = true;
+                    continue;
+                }
+                
                 if (u.startsWith("*BOUNDARY") || u.startsWith("*STEP") || u.startsWith("*CLOAD")) {
                     break; 
                 }

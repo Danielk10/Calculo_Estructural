@@ -22,13 +22,8 @@ public class CalculixExecutor {
         this.workDir = context.getFilesDir();
         this.nativeLibDir = new File(context.getApplicationInfo().nativeLibraryDir);
         
-        // Ensure dependencies are loaded via NativeFeaCore's static block
-        // and try to load our own native part if needed
-        try {
-            NativeLoader.loadLibrary("calculoestructural");
-        } catch (Throwable t) {
-            android.util.Log.e(TAG, "Failed to load native library: calculoestructural", t);
-        }
+        // Ensure all dependencies are loaded correctly
+        NativeFeaCore.loadLibraries();
     }
 
     public native boolean convertFrdToGlb(String inputPath, String outputPath);
@@ -48,7 +43,8 @@ public class CalculixExecutor {
         if (!binary.exists()) {
             // Fallback to normalized physical name in nativeLibDir
             String normalizedName = binaryName;
-            if (binaryName.equalsIgnoreCase("gmsh")) normalizedName = "gmsh_v5_0_0"; // Match Documentación
+            // Removed incorrect mapping for gmsh to v5_0_0 shared library. 
+            // The 6KB libgmsh.so is the actual PIE binary.
             binary = new File(nativeLibDir, "lib" + normalizedName + ".so");
         }
         
@@ -69,7 +65,7 @@ public class CalculixExecutor {
 
             Map<String, String> env = pb.environment();
             
-            // Mirror verified test environment
+            // Mirror verified test environment and native runner logic
             String numCores = String.valueOf(Runtime.getRuntime().availableProcessors());
             env.put("OMP_NUM_THREADS", numCores);
             env.put("CCX_NPROC_EQUATION_SOLVER", numCores);
@@ -77,8 +73,20 @@ public class CalculixExecutor {
             File usrLib = new File(workDir, "usr/lib");
             File usrBin = new File(workDir, "usr/bin");
             
-            env.put("LD_LIBRARY_PATH", usrLib.getAbsolutePath() + ":" + nativeLibDir.getAbsolutePath() + ":" + System.getenv("LD_LIBRARY_PATH"));
-            env.put("PATH", usrBin.getAbsolutePath() + ":" + nativeLibDir.getAbsolutePath() + ":" + System.getenv("PATH"));
+            // Critical: Add GFortran and OpenBLAS dependencies if present in workDir/usr/lib
+            String currentLdPath = System.getenv("LD_LIBRARY_PATH");
+            if (currentLdPath == null) currentLdPath = "";
+            
+            env.put("LD_LIBRARY_PATH", usrLib.getAbsolutePath() + ":" + 
+                    nativeLibDir.getAbsolutePath() + ":" + 
+                    workDir.getAbsolutePath() + "/usr/lib/calculix:" +
+                    currentLdPath);
+                    
+            String currentPath = System.getenv("PATH");
+            if (currentPath == null) currentPath = "";
+            env.put("PATH", usrBin.getAbsolutePath() + ":" + 
+                    nativeLibDir.getAbsolutePath() + ":" + 
+                    currentPath);
 
             Process process = pb.start();
             

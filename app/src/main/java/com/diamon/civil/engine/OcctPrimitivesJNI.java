@@ -7,10 +7,7 @@ import com.diamon.civil.util.NativeLoader;
 
 public class OcctPrimitivesJNI {
     static {
-        NativeLoader.loadLibrary("c++_shared");
-        NativeLoader.loadLibrary("openblas");
-        NativeLoader.loadLibrary("gmsh");
-        NativeLoader.loadLibrary("calculoestructural");
+        NativeFeaCore.loadLibraries();
     }
 
     public static native boolean createBox(double l, double w, double h, String outPath);

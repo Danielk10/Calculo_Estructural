@@ -4,7 +4,6 @@
 #include <fstream>
 #include <sstream>
 #include "AnalysisModel.hpp"
-#include "CalculixRunner.hpp"
 #include "ProjectStore.hpp"
 
 extern "C" JNIEXPORT jlong JNICALL
@@ -64,25 +63,6 @@ Java_com_diamon_civil_engine_NativeFeaCore_loadProject(JNIEnv* env, jobject, jst
     bool success = FEA::ProjectStore::loadProject(path, *model);
     env->ReleaseStringUTFChars(jPath, path);
     return success ? JNI_TRUE : JNI_FALSE;
-}
-
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_diamon_civil_engine_NativeFeaCore_runCalculix(JNIEnv* env, jobject, jstring jWorkDir, jstring jLibDir, jstring jJobName, jlong ptr) {
-    auto model = reinterpret_cast<FEA::AnalysisModel*>(ptr);
-    if (!model) return env->NewStringUTF("Error: Invalid model pointer");
-    
-    const char* workDir = env->GetStringUTFChars(jWorkDir, nullptr);
-    const char* libDir = env->GetStringUTFChars(jLibDir, nullptr);
-    const char* jobName = env->GetStringUTFChars(jJobName, nullptr);
-    
-    FEA::CalculixRunner runner(workDir, libDir);
-    FEA::JobStatus status = runner.runJob(jobName, *model);
-    
-    env->ReleaseStringUTFChars(jWorkDir, workDir);
-    env->ReleaseStringUTFChars(jLibDir, libDir);
-    env->ReleaseStringUTFChars(jJobName, jobName);
-    
-    return env->NewStringUTF(status.output.c_str());
 }
 
 extern "C" JNIEXPORT jstring JNICALL

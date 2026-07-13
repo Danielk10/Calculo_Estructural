@@ -10,7 +10,6 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         native-lib.cpp
         AnalysisModel.cpp
         frd_converter.cpp
-        CalculixRunner.cpp
         ProjectStore.cpp
         OcctPrimitivesJNI.cpp
         OcctBooleanJNI.cpp)

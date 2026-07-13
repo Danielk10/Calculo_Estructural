@@ -7,10 +7,7 @@ import com.diamon.civil.util.NativeLoader;
 
 public class OcctBooleanJNI {
     static {
-        NativeLoader.loadLibrary("c++_shared");
-        NativeLoader.loadLibrary("openblas");
-        NativeLoader.loadLibrary("gmsh");
-        NativeLoader.loadLibrary("calculoestructural");
+        NativeFeaCore.loadLibraries();
     }
 
     public static native boolean fuse(String pathA, String pathB, String outPath);
