@@ -25,8 +25,12 @@ public class InpAssembler {
         }
 
         // 1. Extract NSETs from physical surfaces (Gmsh format)
+        // Check both "Fixed"/"Loaded" and "SURFACE1"/"SURFACE2" for maximum compatibility
         Set<Integer> fixedNodes = extractNodesFromPhysical(lines, "Fixed");
+        if (fixedNodes.isEmpty()) fixedNodes = extractNodesFromPhysical(lines, "SURFACE1");
+        
         Set<Integer> loadedNodes = extractNodesFromPhysical(lines, "Loaded");
+        if (loadedNodes.isEmpty()) loadedNodes = extractNodesFromPhysical(lines, "SURFACE2");
 
         // Fallback: If no physical sets found, use first and last nodes for demo purposes
         if (fixedNodes.isEmpty() && !lines.isEmpty()) {
@@ -45,18 +49,32 @@ public class InpAssembler {
             writeNodes(pw, loadedNodes);
         }
 
-        // 2. Clean up main mesh (remove Gmsh specific boundary definitions)
+        // 2. Clean up main mesh and remove incompatible elements (like CPS3)
         try (PrintWriter pw = new PrintWriter(new FileWriter(cleanInp))) {
             boolean inElementBlock = false;
+            boolean skipCurrentBlock = false;
             for (String line : lines) {
                 String u = line.trim().toUpperCase();
                 
                 // Ensure we use a valid element type for 3D (C3D4 for Gmsh tetras)
-                if (u.startsWith("*ELEMENT") && u.contains("TYPE=TET4")) {
-                    pw.println("*ELEMENT, TYPE=C3D4, ELSET=Eall");
-                    inElementBlock = true;
-                    continue;
+                if (u.startsWith("*ELEMENT")) {
+                    if (u.contains("TYPE=CPS3") || u.contains("TYPE=T3D2")) {
+                        skipCurrentBlock = true;
+                        continue;
+                    }
+                    if (u.contains("TYPE=TET4") || u.contains("TYPE=C3D4")) {
+                        pw.println("*ELEMENT, TYPE=C3D4, ELSET=Eall");
+                        inElementBlock = true;
+                        skipCurrentBlock = false;
+                        continue;
+                    }
                 }
+                
+                if (u.startsWith("*") && !u.startsWith("*ELEMENT") && skipCurrentBlock) {
+                    skipCurrentBlock = false;
+                }
+
+                if (skipCurrentBlock) continue;
                 
                 if (u.startsWith("*BOUNDARY") || u.startsWith("*STEP") || u.startsWith("*CLOAD")) {
                     break; 

@@ -47,10 +47,11 @@ public class GmshRunner {
     public void meshAsync(File inputFile, int meshDensity, GmshCallback callback) {
         executor.execute(() -> {
             try {
-                File outputMsh = new File(workDir, stripExtension(inputFile.getName()) + ".msh");
-                String result = runGmsh(inputFile, outputMsh, meshDensity);
-                if (outputMsh.exists() && outputMsh.length() > 0) {
-                    callback.onSuccess(outputMsh);
+                // Generar directamente el .inp crudo para el ensamblador
+                File outputInp = new File(workDir, stripExtension(inputFile.getName()) + "_raw.inp");
+                String result = runGmsh(inputFile, outputInp, meshDensity);
+                if (outputInp.exists() && outputInp.length() > 0) {
+                    callback.onSuccess(outputInp);
                 } else {
                     callback.onError("Gmsh did not produce output.\n" + result);
                 }
@@ -80,7 +81,7 @@ public class GmshRunner {
         command.add("-o");
         command.add(outputMsh.getAbsolutePath());
         command.add("-format");
-        command.add("msh2");                       // Use MSH2 for wider compatibility
+        command.add("inp");                        // Use INP for CalculiX compatibility
         command.add("-v");
         command.add("0");                          // Quiet mode
 
@@ -129,13 +130,17 @@ public class GmshRunner {
         }
     }
 
-    /** Find gmsh binary: prioritize the symlink in usr/bin created by AssetHelper */
+    /** Find gmsh binary: prioritize the verified binary used in simulation tests */
     private File findGmshBinary() {
-        // El AssetHelper crea un enlace simbólico en usr/bin/gmsh que apunta a libgmsh.so
+        // 1. Probar el binario verificado de los tests
+        File verifiedGmsh = new File(nativeLibDir, "libgmsh_v5_0_0.so");
+        if (verifiedGmsh.exists()) return verifiedGmsh;
+
+        // 2. Probar el enlace simbólico en usr/bin creado por AssetHelper
         File usrBin = new File(workDir, "usr/bin/gmsh");
         if (usrBin.exists()) return usrBin;
 
-        // Fallback al nombre físico en jniLibs
+        // 3. Fallback al nombre físico estándar
         File libGmsh = new File(nativeLibDir, "libgmsh.so");
         if (libGmsh.exists()) return libGmsh;
 

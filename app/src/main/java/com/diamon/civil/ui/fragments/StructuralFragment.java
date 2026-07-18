@@ -236,7 +236,7 @@ public class StructuralFragment extends Fragment {
     }
 
     private String modelToJson(StructuralModel model, String structureType) {
-        String elementType = "B32"; // Default
+        String elementType = "B31"; // Default to linear beam (2 nodes)
         if (structureType.contains("B32")) elementType = "B32";
         else if (structureType.contains("T2D2")) elementType = "T2D2";
         else if (structureType.contains("B31")) elementType = "B31";
@@ -251,11 +251,12 @@ public class StructuralFragment extends Fragment {
         sb.append("], \"elements\": [");
         for (int i = 0; i < model.elements.size(); i++) {
             StructuralModel.Element e = model.elements.get(i);
-            sb.append(String.format(java.util.Locale.US, "{\"id\":%d,\"type\":\"%s\",\"nodes\":[%d,%d]}", e.id, elementType, e.node1Id, e.node2Id));
+            // Explicitly set elset to Eall for results parsing
+            sb.append(String.format(java.util.Locale.US, "{\"id\":%d,\"type\":\"%s\",\"elset\":\"Eall\",\"nodes\":[%d,%d]}", e.id, elementType, e.node1Id, e.node2Id));
             if (i < model.elements.size() - 1) sb.append(",");
         }
         sb.append("], \"materials\": [{\"name\":\"Steel\",\"youngModulus\":210000,\"poissonRatio\":0.3,\"density\":7850}],");
-        sb.append("\"sections\": [{\"elset\":\"ALL\",\"type\":\"BEAM\",\"material\":\"Steel\",\"params\":[200,200]}],");
+        sb.append("\"sections\": [{\"elset\":\"Eall\",\"type\":\"BEAM\",\"material\":\"Steel\",\"params\":[200,200]}],");
         sb.append("\"constraints\": [], \"loads\": []"); // Ensure arrays are present for native parser
         sb.append("}");
         return sb.toString();

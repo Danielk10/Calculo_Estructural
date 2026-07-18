@@ -222,20 +222,22 @@ public class SolidFragment extends Fragment {
         
         gmshRunner.meshAsync(cadFile, density, new GmshRunner.GmshCallback() {
             @Override
-            public void onSuccess(File mshFile) {
-                logger.info("Mesh OK: " + mshFile.getName());
+            public void onSuccess(File rawInp) {
+                logger.info("Mesh OK: " + rawInp.getName());
                 executor.execute(() -> {
                     try {
                         logger.info("Step 2: Assembling CalculiX Input (.inp)...");
-                        String rawInpPath = workDir.getAbsolutePath() + "/job_solid_raw.inp";
+                        
+                        // Renombrar el archivo para que coincida con lo esperado por InpAssembler
+                        File finalRawInp = new File(workDir, "job_solid_raw.inp");
+                        if (rawInp.exists()) {
+                            if (finalRawInp.exists()) finalRawInp.delete();
+                            rawInp.renameTo(finalRawInp);
+                        }
                         
                         if (calculixExecutor == null) {
                             calculixExecutor = new CalculixExecutor(appContext);
                         }
-
-                        String gmshResult = calculixExecutor.executeBinary("gmsh", 
-                            cadFile.getAbsolutePath(), "-3", "-format", "inp", "-o", rawInpPath);
-                        logger.debug(gmshResult);
 
                         // Use captured UI values (E, elementType)
                         com.diamon.civil.engine.InpAssembler.assemble(workDir, "job_solid", "Steel", E, 0.3, -100.0, elementType);

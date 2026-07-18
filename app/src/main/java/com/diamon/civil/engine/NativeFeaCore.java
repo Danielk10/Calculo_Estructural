@@ -9,19 +9,25 @@ public class NativeFeaCore {
         if (librariesLoaded) return;
         
         try {
-            // 1. Capa Base y Dependencias de Terceros
+            // 1. Capa Base de Gráficos (Crítico para SceneView y OCCT en Android)
+            NativeLoader.loadLibrary("GLdispatch");
+            NativeLoader.loadLibrary("EGL");
+            NativeLoader.loadLibrary("GLESv2");
+
+            // 2. Capa Base y Dependencias de Terceros
             NativeLoader.loadLibrary("c++_shared");
             NativeLoader.loadLibrary("openblas");
             NativeLoader.loadLibrary("gmp");
             NativeLoader.loadLibrary("z");
             NativeLoader.loadLibrary("freetype");
+            NativeLoader.loadLibrary("bz2");
             
-            // 2. Dependencias de Formatos (HDF5 / MED) - Necesarios para GMSH
+            // 3. Dependencias de Formatos (HDF5 / MED) - Necesarios para GMSH
             NativeLoader.loadLibrary("hdf5");
             NativeLoader.loadLibrary("hdf5_hl");
             NativeLoader.loadLibrary("medC");
             
-            // 3. Núcleo OpenCASCADE (Orden Estricto de Dependencia)
+            // 4. Núcleo OpenCASCADE (Orden Estricto de Dependencia)
             // Foundation
             NativeLoader.loadLibrary("TKernel");
             NativeLoader.loadLibrary("TKMath");
@@ -57,8 +63,10 @@ public class NativeFeaCore {
             NativeLoader.loadLibrary("TKDESTEP");
             NativeLoader.loadLibrary("TKDEIGES");
             
-            // 4. Motores de Simulación y JNI Final
-            // gmsh se ejecuta como binario independiente, no se carga como librería.
+            // 5. Motores de Simulación y JNI Final
+            // Note: gmsh binary is used as a standalone process via symlink, 
+            // but we might need its shared lib if something links to it.
+            try { NativeLoader.loadLibrary("gmsh"); } catch(Throwable ignore) {}
             NativeLoader.loadLibrary("calculoestructural");
             
             librariesLoaded = true;
