@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.diamon.civil.ui.MainActivity;
 import com.diamon.civil.R;
+import com.diamon.civil.engine.NativeFeaCore;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -43,15 +44,8 @@ public class AutoTester {
     }
 
     private static void checkLibraryStatus() {
-        String[] libs = {"c++_shared", "openblas", "gmsh", "calculoestructural", "TKPrim", "TKMath", "TKernel"};
-        for (String lib : libs) {
-            try {
-                System.loadLibrary(lib);
-                Log.d(TAG, "Library loaded successfully: " + lib);
-            } catch (UnsatisfiedLinkError e) {
-                Log.e(TAG, "Library FAILED to load: " + lib + " - " + e.getMessage());
-            }
-        }
+        NativeFeaCore.loadLibraries();
+        Log.d(TAG, "JNI libraries ready: " + NativeFeaCore.isLibrariesLoaded());
     }
 
     private static void runStructuralTest(MainActivity activity) {
@@ -89,22 +83,13 @@ public class AutoTester {
             }
             
             // Set parameters
-            android.widget.EditText etLength = activity.findViewById(com.diamon.civil.R.id.etLength);
-            android.widget.EditText etSection = activity.findViewById(com.diamon.civil.R.id.etSection);
-            android.widget.EditText etModulus = activity.findViewById(com.diamon.civil.R.id.etModulus);
-            android.widget.EditText etDensity = activity.findViewById(com.diamon.civil.R.id.etDensity);
-            android.widget.EditText etLoad = activity.findViewById(com.diamon.civil.R.id.etLoad);
-            android.widget.Button btnRun = activity.findViewById(com.diamon.civil.R.id.btnRunAnalysis);
+            android.widget.EditText etModulus = activity.findViewById(com.diamon.civil.R.id.etSolidModulus);
+            android.widget.Button btnRun = activity.findViewById(com.diamon.civil.R.id.btnRunSolidAnalysis);
 
-            if (etLength != null) etLength.setText("5.0");
-            if (etSection != null) etSection.setText("300x500");
             if (etModulus != null) etModulus.setText("210000");
-            if (etDensity != null) etDensity.setText("7850");
-            if (etLoad != null) etLoad.setText("-100");
             
             Log.d(TAG, "Clicking Run Analysis...");
             if (btnRun != null) btnRun.performClick();
         });
     }
 }
-

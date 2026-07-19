@@ -45,17 +45,22 @@ public class GmshRunner {
      * @param callback   Called on the calling thread pool when done
      */
     public void meshAsync(File inputFile, int meshDensity, GmshCallback callback) {
+        meshAsync(inputFile, meshDensity, stripExtension(inputFile.getName()), callback);
+    }
+
+    /** Creates a raw CalculiX mesh using a deterministic job name. */
+    public void meshAsync(File inputFile, int meshDensity, String jobName, GmshCallback callback) {
         executor.execute(() -> {
             try {
                 // Generar directamente el .inp crudo para el ensamblador
-                File outputInp = new File(workDir, stripExtension(inputFile.getName()) + "_raw.inp");
+                File outputInp = new File(workDir, jobName + "_raw.inp");
                 String result = runGmsh(inputFile, outputInp, meshDensity);
                 if (outputInp.exists() && outputInp.length() > 0) {
                     callback.onSuccess(outputInp);
                 } else {
                     callback.onError("Gmsh did not produce output.\n" + result);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 callback.onError("GmshRunner exception: " + e.getMessage());
             }
         });
@@ -124,7 +129,7 @@ public class GmshRunner {
             Log.d(TAG, result);
             return result;
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Log.e(TAG, "Gmsh execution failed: " + e.getMessage());
             return "Execution Error: " + e.getMessage();
         }
@@ -153,6 +158,6 @@ public class GmshRunner {
     }
 
     public void shutdown() {
-        executor.shutdown();
+        executor.shutdownNow();
     }
 }

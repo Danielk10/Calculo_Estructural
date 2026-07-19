@@ -3,7 +3,9 @@ package com.diamon.civil.util;
 import android.util.Log;
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Utilidad para la carga de librerías nativas con nombres normalizados.
@@ -12,6 +14,8 @@ import java.util.Map;
 public class NativeLoader {
     private static final String TAG = "NativeLoader";
     private static final Map<String, String> LIBRARY_MAP = new HashMap<>();
+    private static final Set<String> LOADED_LIBRARIES = new HashSet<>();
+    private static final Map<String, String> LOAD_FAILURES = new HashMap<>();
 
     static {
         // Mapeo basado en DOCUMENTACION_RENOMBRADO_BINARIOS.md y REPORTE_ANALISIS_DEPENDENCIAS.md
@@ -59,25 +63,53 @@ public class NativeLoader {
         }
     }
 
-    public static void loadLibrary(String libName) {
+    /**
+     * Loads one library and reports the real result.  The previous implementation
+     * only logged an error and pretended that the native layer was ready; the next
+     * JNI invocation then terminated the application with an uncaught LinkageError.
+     */
+    public static synchronized boolean loadLibrary(String libName) {
         String physicalName = LIBRARY_MAP.getOrDefault(libName, libName);
+        if (LOADED_LIBRARIES.contains(physicalName)) {
+            return true;
+        }
+
         try {
             Log.d(TAG, "Cargando librería nativa: " + libName + " (físico: " + physicalName + ")");
             System.loadLibrary(physicalName);
+            LOADED_LIBRARIES.add(physicalName);
+            LOAD_FAILURES.remove(libName);
+            return true;
         } catch (Throwable t) {
             Log.e(TAG, "Fallo inicial cargando " + libName + " (physical: " + physicalName + "): " + t.getMessage() + ", intentando fallback por ruta...");
-            if (!loadByPath(libName)) {
-                 Log.e(TAG, "FALLO CRÍTICO: No se pudo cargar " + libName);
+            if (loadByPath(libName, physicalName)) {
+                LOADED_LIBRARIES.add(physicalName);
+                LOAD_FAILURES.remove(libName);
+                return true;
             }
+            String detail = t.getMessage() == null ? t.getClass().getSimpleName() : t.getMessage();
+            LOAD_FAILURES.put(libName, detail);
+            Log.e(TAG, "FALLO CRÍTICO: No se pudo cargar " + libName + ": " + detail);
+            return false;
         }
     }
 
-    private static boolean loadByPath(String libName) {
+    /** Loads a mandatory JNI dependency or fails before any native method is invoked. */
+    public static void loadRequiredLibrary(String libName) {
+        if (!loadLibrary(libName)) {
+            String detail = LOAD_FAILURES.get(libName);
+            throw new UnsatisfiedLinkError("No se pudo cargar " + libName +
+                    (detail == null ? "" : ": " + detail));
+        }
+    }
+
+    private static boolean loadByPath(String libName, String physicalName) {
         File usrLib = new File(filesDirPath, "usr/lib");
         
         // Probar con el nombre exacto que podria tener puntos (ej: libTKMath.so.8.0.0)
         // o la convención _dot.so para librerías cuyo SONAME original termina en punto.
         String[] possibleNames = {
+            "lib" + physicalName + ".so",
             "lib" + libName + ".so",
             "lib" + libName + ".so_dot.so",
             "lib" + libName + ".so.8.0.0",

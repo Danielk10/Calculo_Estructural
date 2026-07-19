@@ -51,7 +51,7 @@ public class StructuralFragment extends Fragment {
                         }
                     });
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("Initialization failed: " + e.getMessage());
             }
         });
@@ -65,9 +65,10 @@ public class StructuralFragment extends Fragment {
 
     private void loadDefaultTestCase() {
         if (binding == null) return;
-        // Sample Cantilever Beam
-        binding.etNodes.setText("1, 0, 0, 0\n2, 10, 0, 0\n3, 5, 0, 0");
-        binding.etElements.setText("1, 1, 3\n2, 3, 2");
+        // Solvable B31 cantilever: fixed at node 1 and load at node 2.
+        binding.spinnerStructureType.setSelection(0);
+        binding.etNodes.setText("1, 0, 0, 0\n2, 10, 0, 0");
+        binding.etElements.setText("1, 1, 2");
     }
 
     private void setupTabs() {
@@ -173,6 +174,7 @@ public class StructuralFragment extends Fragment {
             try {
                 modelPtr = core.createModel();
                 StructuralModel model = parseInputs(nodesStr, elementsStr);
+                validateModel(model);
                 String jsonModel = modelToJson(model, structureType);
                 core.modelFromJson(modelPtr, jsonModel);
                 
@@ -218,7 +220,7 @@ public class StructuralFragment extends Fragment {
                     });
                 }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("Analysis Error: " + e.getMessage());
                 android.app.Activity activity = getActivity();
                 if (activity != null) {
@@ -230,16 +232,21 @@ public class StructuralFragment extends Fragment {
                     });
                 }
             } finally {
-                if (modelPtr != 0) core.deleteModel(modelPtr);
+                if (modelPtr != 0) {
+                    try {
+                        core.deleteModel(modelPtr);
+                    } catch (Throwable error) {
+                        logger.error("No se pudo liberar el modelo nativo: " + error.getMessage());
+                    }
+                }
             }
         });
     }
 
     private String modelToJson(StructuralModel model, String structureType) {
-        String elementType = "B31"; // Default to linear beam (2 nodes)
-        if (structureType.contains("B32")) elementType = "B32";
-        else if (structureType.contains("T2D2")) elementType = "T2D2";
-        else if (structureType.contains("B31")) elementType = "B31";
+        // The editor accepts two nodes per element, therefore it intentionally
+        // exposes B31 only.  B32 was incompatible and produced invalid jobs.
+        String elementType = "B31";
 
         StringBuilder sb = new StringBuilder();
         sb.append("{ \"nodes\": [");
@@ -257,9 +264,47 @@ public class StructuralFragment extends Fragment {
         }
         sb.append("], \"materials\": [{\"name\":\"Steel\",\"youngModulus\":210000,\"poissonRatio\":0.3,\"density\":7850}],");
         sb.append("\"sections\": [{\"elset\":\"Eall\",\"type\":\"BEAM\",\"material\":\"Steel\",\"params\":[200,200]}],");
-        sb.append("\"constraints\": [], \"loads\": []"); // Ensure arrays are present for native parser
+        int fixedNodeId = model.nodes.get(0).id;
+        int loadedNodeId = fixedNodeId;
+        double minX = model.nodes.get(0).x;
+        double maxX = minX;
+        for (StructuralModel.Node node : model.nodes) {
+            if (node.x < minX) {
+                minX = node.x;
+                fixedNodeId = node.id;
+            }
+            if (node.x > maxX) {
+                maxX = node.x;
+                loadedNodeId = node.id;
+            }
+        }
+        if (fixedNodeId == loadedNodeId && model.nodes.size() > 1) {
+            loadedNodeId = model.nodes.get(model.nodes.size() - 1).id;
+        }
+        sb.append("\"constraints\": [{\"nodeId\":").append(fixedNodeId)
+                .append(",\"dofs\":[1,2,3,4,5,6],\"value\":0}],");
+        sb.append("\"loads\": [{\"nodeId\":").append(loadedNodeId)
+                .append(",\"fx\":0,\"fy\":-100,\"fz\":0}]");
         sb.append("}");
         return sb.toString();
+    }
+
+    private void validateModel(StructuralModel model) {
+        if (model.nodes.size() < 2) {
+            throw new IllegalArgumentException("Defina al menos dos nodos válidos");
+        }
+        if (model.elements.isEmpty()) {
+            throw new IllegalArgumentException("Defina al menos un elemento válido");
+        }
+        java.util.HashSet<Integer> nodeIds = new java.util.HashSet<>();
+        for (StructuralModel.Node node : model.nodes) {
+            nodeIds.add(node.id);
+        }
+        for (StructuralModel.Element element : model.elements) {
+            if (!nodeIds.contains(element.node1Id) || !nodeIds.contains(element.node2Id)) {
+                throw new IllegalArgumentException("El elemento " + element.id + " referencia nodos inexistentes");
+            }
+        }
     }
 
     private StructuralModel parseInputs(String nodes, String elements) {
@@ -297,6 +342,7 @@ public class StructuralFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        executor.shutdownNow();
         super.onDestroyView();
         binding = null;
     }

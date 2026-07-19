@@ -27,13 +27,9 @@
 
     <string-array name="element_types_solid">
         <item>Linear Tetrahedron (C3D4)</item>
-        <item>Quadratic Tetrahedron (C3D10)</item>
-        <item>Linear Hexahedron (C3D8)</item>
     </string-array>
 
     <string-array name="structure_types_structural">
-        <item>2D Frame (B32)</item>
-        <item>2D Truss (T2D2)</item>
-        <item>Beam (B31)</item>
+        <item>3D Cantilever Beam (B31)</item>
     </string-array>
 </resources>

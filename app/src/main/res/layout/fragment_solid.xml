@@ -166,15 +166,6 @@
                     app:cornerRadius="12dp"
                     android:layout_marginBottom="48dp" />
 
-                <!-- Legacy Test Compatibility (Hidden) -->
-                <View android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone">
-                    <EditText android:id="@+id/etLength" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                    <EditText android:id="@+id/etSection" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                    <EditText android:id="@+id/etModulus" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                    <EditText android:id="@+id/etDensity" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                    <EditText android:id="@+id/etLoad" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                    <Button android:id="@+id/btnRunAnalysis" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                </View>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 

@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <string>
 #include <memory>
+#include <exception>
 #include <fstream>
 #include <sstream>
 #include "AnalysisModel.hpp"
@@ -39,9 +40,26 @@ Java_com_diamon_civil_engine_NativeFeaCore_modelToJson(JNIEnv* env, jobject, jlo
 extern "C" JNIEXPORT void JNICALL
 Java_com_diamon_civil_engine_NativeFeaCore_modelFromJson(JNIEnv* env, jobject, jlong ptr, jstring jJson) {
     auto model = reinterpret_cast<FEA::AnalysisModel*>(ptr);
-    if (!model) return;
+    if (!model || !jJson) return;
     const char* jsonStr = env->GetStringUTFChars(jJson, nullptr);
-    model->fromJson(jsonStr);
+    if (!jsonStr) return;
+    try {
+        model->fromJson(jsonStr);
+    } catch (const std::exception& error) {
+        env->ReleaseStringUTFChars(jJson, jsonStr);
+        jclass exceptionClass = env->FindClass("java/lang/IllegalArgumentException");
+        if (exceptionClass) {
+            env->ThrowNew(exceptionClass, error.what());
+        }
+        return;
+    } catch (...) {
+        env->ReleaseStringUTFChars(jJson, jsonStr);
+        jclass exceptionClass = env->FindClass("java/lang/IllegalArgumentException");
+        if (exceptionClass) {
+            env->ThrowNew(exceptionClass, "Modelo estructural inválido");
+        }
+        return;
+    }
     env->ReleaseStringUTFChars(jJson, jsonStr);
 }
 

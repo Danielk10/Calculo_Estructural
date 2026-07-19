@@ -3,80 +3,42 @@ package com.diamon.civil.engine;
 import com.diamon.civil.util.NativeLoader;
 
 public class NativeFeaCore {
-    private static boolean librariesLoaded = false;
+    private static volatile boolean librariesLoaded = false;
+
+    /*
+     * These are exactly the JNI library's CMake dependencies.  Gmsh and CalculiX
+     * are executable processes, not in-process libraries.  Likewise SceneView
+     * must use Android's EGL/GLES implementation, never the desktop copies shipped
+     * for the standalone CAD executables.
+     */
+    private static final String[] JNI_DEPENDENCIES = {
+            "c++_shared",
+            "TKernel", "TKMath", "TKG2d", "TKG3d", "TKGeomBase",
+            "TKBRep", "TKGeomAlgo", "TKTopAlgo", "TKPrim", "TKBO", "TKBool",
+            "calculoestructural"
+    };
 
     public static synchronized void loadLibraries() {
         if (librariesLoaded) return;
         
         try {
-            // 1. Capa Base de Gráficos (Crítico para SceneView y OCCT en Android)
-            NativeLoader.loadLibrary("GLdispatch");
-            NativeLoader.loadLibrary("EGL");
-            NativeLoader.loadLibrary("GLESv2");
-
-            // 2. Capa Base y Dependencias de Terceros
-            NativeLoader.loadLibrary("c++_shared");
-            NativeLoader.loadLibrary("openblas");
-            NativeLoader.loadLibrary("gmp");
-            NativeLoader.loadLibrary("z");
-            NativeLoader.loadLibrary("freetype");
-            NativeLoader.loadLibrary("bz2");
-            
-            // 3. Dependencias de Formatos (HDF5 / MED) - Necesarios para GMSH
-            NativeLoader.loadLibrary("hdf5");
-            NativeLoader.loadLibrary("hdf5_hl");
-            NativeLoader.loadLibrary("medC");
-            
-            // 4. Núcleo OpenCASCADE (Orden Estricto de Dependencia)
-            // Foundation
-            NativeLoader.loadLibrary("TKernel");
-            NativeLoader.loadLibrary("TKMath");
-            
-            // Modeling Data
-            NativeLoader.loadLibrary("TKG2d");
-            NativeLoader.loadLibrary("TKG3d");
-            NativeLoader.loadLibrary("TKGeomBase");
-            NativeLoader.loadLibrary("TKBRep");
-            
-            // Modeling Algorithms
-            NativeLoader.loadLibrary("TKGeomAlgo");
-            NativeLoader.loadLibrary("TKTopAlgo");
-            NativeLoader.loadLibrary("TKPrim");
-            NativeLoader.loadLibrary("TKBO");
-            NativeLoader.loadLibrary("TKBool");
-            NativeLoader.loadLibrary("TKMesh");
-            NativeLoader.loadLibrary("TKShHealing");
-            NativeLoader.loadLibrary("TKFillet");
-            NativeLoader.loadLibrary("TKOffset");
-            NativeLoader.loadLibrary("TKFeat");
-            
-            // Visualization & Data Exchange (Necesarios para GMSH/CAD)
-            NativeLoader.loadLibrary("TKService");
-            NativeLoader.loadLibrary("TKHLR");
-            NativeLoader.loadLibrary("TKCDF");
-            NativeLoader.loadLibrary("TKV3d");
-            NativeLoader.loadLibrary("TKCAF");
-            NativeLoader.loadLibrary("TKVCAF");
-            NativeLoader.loadLibrary("TKLCAF");
-            NativeLoader.loadLibrary("TKXCAF");
-            NativeLoader.loadLibrary("TKXSBase");
-            NativeLoader.loadLibrary("TKDESTEP");
-            NativeLoader.loadLibrary("TKDEIGES");
-            
-            // 5. Motores de Simulación y JNI Final
-            // Note: gmsh binary is used as a standalone process via symlink, 
-            // but we might need its shared lib if something links to it.
-            try { NativeLoader.loadLibrary("gmsh"); } catch(Throwable ignore) {}
-            NativeLoader.loadLibrary("calculoestructural");
+            for (String dependency : JNI_DEPENDENCIES) {
+                NativeLoader.loadRequiredLibrary(dependency);
+            }
             
             librariesLoaded = true;
             android.util.Log.d("NativeFeaCore", "Exhaustive native library loading completed successfully");
         } catch (Throwable t) {
+            librariesLoaded = false;
             android.util.Log.e("NativeFeaCore", "CRITICAL ERROR: Native library loading failed: " + t.getMessage());
             // Log full stack trace for easier debugging
             t.printStackTrace();
             throw new RuntimeException("Could not initialize native FEA engine: " + t.getMessage(), t);
         }
+    }
+
+    public static boolean isLibrariesLoaded() {
+        return librariesLoaded;
     }
 
     static {

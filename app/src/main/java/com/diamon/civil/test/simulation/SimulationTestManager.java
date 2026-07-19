@@ -2,11 +2,12 @@ package com.diamon.civil.test.simulation;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.diamon.civil.engine.SampleSimulationCase;
 
 public class SimulationTestManager {
     public static String runTest(File workDir, File nativeLibDir) {
@@ -14,19 +15,8 @@ public class SimulationTestManager {
         try {
             report.append("=== Iniciando Simulacion Standalone ===\n");
             
-            // 1. Crear cantilever.geo
-            File geoFile = new File(workDir, "cantilever.geo");
-            String script = "SetFactory(\"OpenCASCADE\");\n" +
-                    "Box(1) = {0, 0, 0, 10, 1, 1};\n" +
-                    "Mesh.CharacteristicLengthMax = 0.5;\n" +
-                    "s() = Surface In BoundingBox{-0.1,-0.1,-0.1, 0.1,1.1,1.1};\n" +
-                    "Physical Surface(\"Fixed\") = s();\n" +
-                    "s2() = Surface In BoundingBox{9.9,-0.1,-0.1, 10.1,1.1,1.1};\n" +
-                    "Physical Surface(\"Loaded\") = s2();\n" +
-                    "Physical Volume(\"Steel\") = {1};\n";
-            try (FileOutputStream fos = new FileOutputStream(geoFile)) {
-                fos.write(script.getBytes());
-            }
+            // 1. Crear el mismo caso de referencia que utiliza la interfaz Solid.
+            File geoFile = SampleSimulationCase.createCantileverGeo(workDir);
             report.append("OK: cantilever.geo generado\n");
 
             // 2. Ejecutar Gmsh

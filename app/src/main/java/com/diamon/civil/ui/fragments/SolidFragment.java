@@ -13,6 +13,7 @@ import com.diamon.civil.engine.CalculixExecutor;
 import com.diamon.civil.engine.GmshRunner;
 import com.diamon.civil.engine.OcctPrimitivesJNI;
 import com.diamon.civil.engine.NativeFeaCore;
+import com.diamon.civil.engine.SampleSimulationCase;
 import com.diamon.civil.ui.MainActivity;
 import com.diamon.civil.ui.SceneViewBridgeKt;
 import com.diamon.civil.util.logging.ModuleLogger;
@@ -28,6 +29,10 @@ public class SolidFragment extends Fragment {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private GmshRunner gmshRunner;
     private CalculixExecutor calculixExecutor;
+    private volatile boolean engineReady;
+    private volatile File activeSimulationGeometry;
+    private volatile String modelPath = "models/test_beam.glb";
+    private File workDir;
 
     @Nullable
     @Override
@@ -43,40 +48,41 @@ public class SolidFragment extends Fragment {
         final android.content.Context appContext = requireContext().getApplicationContext();
         final File nativeLibDir = new File(requireContext().getApplicationInfo().nativeLibraryDir);
         final File filesDir = requireContext().getFilesDir();
+        workDir = filesDir;
+
+        logger.attachToTextView(binding.tvSolidLog);
+        setupTabs();
+        setupButtons();
+        binding.btnRunSolidAnalysis.setEnabled(false);
 
         executor.execute(() -> {
             try {
-                // Ensure libraries are loaded before initializing runners
+                // Load only the JNI dependencies; Gmsh and ccx remain child processes.
                 NativeFeaCore.loadLibraries();
                 gmshRunner = new GmshRunner(filesDir, nativeLibDir);
                 calculixExecutor = new CalculixExecutor(appContext);
+                activeSimulationGeometry = SampleSimulationCase.createCantileverGeo(filesDir);
                 
                 android.app.Activity activity = getActivity();
                 if (activity != null) {
                     activity.runOnUiThread(() -> {
                         if (isAdded() && binding != null) {
+                            engineReady = true;
+                            binding.btnRunSolidAnalysis.setEnabled(true);
                             logger.info("Native engines initialized successfully");
                             loadDefaultTestCase();
                         }
                     });
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("Initialization Error: " + e.getMessage());
-            }
-        });
-        
-        logger.attachToTextView(binding.tvSolidLog);
-
-        setupTabs();
-        setupButtons();
-
-        // Safer initialization to prevent crash on entry
-        binding.solidSceneViewContainer.post(() -> {
-            if (isAdded() && binding != null) {
-                try {
-                    SceneViewBridgeKt.setSceneViewContent(binding.solidSceneViewContainer, "models/test_beam.glb", (MainActivity) getActivity());
-                } catch (Exception e) {
-                    logger.error("SceneView Error: " + e.getMessage());
+                android.app.Activity activity = getActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(() -> {
+                        if (binding != null) {
+                            binding.btnRunSolidAnalysis.setEnabled(false);
+                        }
+                    });
                 }
             }
         });
@@ -85,8 +91,9 @@ public class SolidFragment extends Fragment {
     private void loadDefaultTestCase() {
         if (binding == null) return;
         binding.seekbarMeshDensity.setProgress(2);
-        // Ensure box.brep exists for the demo
-        createPrimitive("box");
+        binding.spinnerElementType.setSelection(0);
+        binding.etSolidModulus.setText("210000");
+        logger.info("Caso de prueba listo: voladizo 3D de acero, apoyo fijo y carga vertical.");
     }
 
     private void setupTabs() {
@@ -97,6 +104,9 @@ public class SolidFragment extends Fragment {
                 binding.layoutSolidParams.setVisibility(tab.getPosition() == 0 ? View.VISIBLE : View.GONE);
                 binding.solidSceneViewContainer.setVisibility(tab.getPosition() == 1 ? View.VISIBLE : View.GONE);
                 binding.layoutSolidLog.setVisibility(tab.getPosition() == 2 ? View.VISIBLE : View.GONE);
+                if (tab.getPosition() == 1) {
+                    showModelInViewer();
+                }
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {}
@@ -120,9 +130,26 @@ public class SolidFragment extends Fragment {
 
         // Professional addition: Sample Model Button
         binding.btnSampleModel.setOnClickListener(v -> {
-            binding.seekbarMeshDensity.setProgress(3);
-            createPrimitive("box");
-            Toast.makeText(getContext(), "Sample Box Geometry Loaded", Toast.LENGTH_SHORT).show();
+            if (!engineReady) {
+                Toast.makeText(getContext(), "El motor aún se está inicializando", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            executor.execute(() -> {
+                try {
+                    activeSimulationGeometry = SampleSimulationCase.createCantileverGeo(workDir);
+                    android.app.Activity activity = getActivity();
+                    if (activity != null) {
+                        activity.runOnUiThread(() -> {
+                            if (binding != null) {
+                                loadDefaultTestCase();
+                                Toast.makeText(getContext(), "Caso de voladizo cargado y listo para calcular", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                } catch (Exception error) {
+                    logger.error("No se pudo crear el caso de prueba: " + error.getMessage());
+                }
+            });
         });
     }
 
@@ -160,14 +187,19 @@ public class SolidFragment extends Fragment {
 
     private void createPrimitive(String type) {
         if (getContext() == null) return;
-        final String path = new File(getContext().getFilesDir(), type + ".brep").getAbsolutePath();
+        final String path = new File(workDir, type + ".brep").getAbsolutePath();
         executor.execute(() -> {
             boolean success = false;
-            if (type.equals("box")) success = OcctPrimitivesJNI.createBox(10, 10, 10, path);
-            else if (type.equals("cylinder")) success = OcctPrimitivesJNI.createCylinder(5, 10, path);
-            else if (type.equals("sphere")) success = OcctPrimitivesJNI.createSphere(5, path);
+            try {
+                if (type.equals("box")) success = OcctPrimitivesJNI.createBox(10, 10, 10, path);
+                else if (type.equals("cylinder")) success = OcctPrimitivesJNI.createCylinder(5, 10, path);
+                else if (type.equals("sphere")) success = OcctPrimitivesJNI.createSphere(5, path);
+            } catch (Throwable error) {
+                logger.error("Native CAD Error: " + error.getMessage());
+            }
 
             if (success) {
+                activeSimulationGeometry = new File(path);
                 logger.info("Created primitive: " + type);
                 android.app.Activity activity = getActivity();
                 if (activity != null) {
@@ -184,6 +216,11 @@ public class SolidFragment extends Fragment {
     private void runFullPipeline() {
         if (binding == null || getContext() == null) return;
 
+        if (!engineReady || gmshRunner == null || calculixExecutor == null) {
+            Toast.makeText(getContext(), "El motor de análisis aún no está listo", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (binding.spinnerElementType.getSelectedItem() == null) {
             Toast.makeText(getContext(), "Please select an element type", Toast.LENGTH_SHORT).show();
             return;
@@ -193,7 +230,6 @@ public class SolidFragment extends Fragment {
         binding.btnRunSolidAnalysis.setEnabled(false);
         
         // Capture ALL UI values on main thread to avoid crashes
-        final String elementType = binding.spinnerElementType.getSelectedItem().toString();
         final int density = binding.seekbarMeshDensity.getProgress() + 1;
         final String modulusStr = binding.etSolidModulus.getText().toString().trim();
         
@@ -205,14 +241,21 @@ public class SolidFragment extends Fragment {
         }
         final double E = youngModulusTemp;
 
-        logger.info("Starting Pipeline for: " + elementType);
+        logger.info("Starting Pipeline for: Linear Tetrahedron (C3D4)");
 
         final File workDir = getContext().getFilesDir();
-        final File cadFile = new File(workDir, "box.brep");
+        final File cadFile = activeSimulationGeometry;
         final android.content.Context appContext = getContext().getApplicationContext();
 
-        if (!cadFile.exists()) {
-            logger.error("Simulation Error: Source geometry (box.brep) not found.");
+        if (cadFile == null || !cadFile.exists()) {
+            logger.error("Simulation Error: no hay geometría de prueba disponible.");
+            binding.pbSolid.setVisibility(View.GONE);
+            binding.btnRunSolidAnalysis.setEnabled(true);
+            return;
+        }
+
+        if (!cadFile.getName().endsWith(".geo")) {
+            logger.error("La geometría CAD no define superficies Fixed/Loaded. Cargue el caso de prueba antes de resolver.");
             binding.pbSolid.setVisibility(View.GONE);
             binding.btnRunSolidAnalysis.setEnabled(true);
             return;
@@ -220,7 +263,7 @@ public class SolidFragment extends Fragment {
 
         logger.info("Step 1: Generating Mesh with Gmsh (Density: " + density + ")...");
         
-        gmshRunner.meshAsync(cadFile, density, new GmshRunner.GmshCallback() {
+        gmshRunner.meshAsync(cadFile, density, "job_solid", new GmshRunner.GmshCallback() {
             @Override
             public void onSuccess(File rawInp) {
                 logger.info("Mesh OK: " + rawInp.getName());
@@ -228,23 +271,22 @@ public class SolidFragment extends Fragment {
                     try {
                         logger.info("Step 2: Assembling CalculiX Input (.inp)...");
                         
-                        // Renombrar el archivo para que coincida con lo esperado por InpAssembler
-                        File finalRawInp = new File(workDir, "job_solid_raw.inp");
-                        if (rawInp.exists()) {
-                            if (finalRawInp.exists()) finalRawInp.delete();
-                            rawInp.renameTo(finalRawInp);
+                        if (!rawInp.exists()) {
+                            throw new java.io.FileNotFoundException("No se generó la malla de entrada");
                         }
                         
                         if (calculixExecutor == null) {
                             calculixExecutor = new CalculixExecutor(appContext);
                         }
 
-                        // Use captured UI values (E, elementType)
-                        com.diamon.civil.engine.InpAssembler.assemble(workDir, "job_solid", "Steel", E, 0.3, -100.0, elementType);
+                        com.diamon.civil.engine.InpAssembler.assemble(workDir, "job_solid", "Steel", E, 0.3, -100.0);
                         
                         logger.info("Step 3: Running CalculiX Solver (ccx)...");
                         String ccxResult = calculixExecutor.executeCalculix("job_solid");
                         logger.log(ccxResult);
+                        if (!CalculixExecutor.wasSuccessful(ccxResult)) {
+                            throw new IllegalStateException("CalculiX terminó con error; consulte el Solver Log");
+                        }
 
                         File frdFile = new File(workDir, "job_solid.frd");
                         if (frdFile.exists()) {
@@ -255,10 +297,11 @@ public class SolidFragment extends Fragment {
                             
                             File glbFile = new File(workDir, "job_solid.glb");
                             if (calculixExecutor.convertFrdToGlb(frdFile.getAbsolutePath(), glbFile.getAbsolutePath())) {
+                                modelPath = glbFile.getAbsolutePath();
                                 android.app.Activity activity = getActivity();
                                 if (activity != null) {
                                     activity.runOnUiThread(() -> {
-                                        if (binding != null) SceneViewBridgeKt.setSceneViewContent(binding.solidSceneViewContainer, glbFile.getAbsolutePath(), (MainActivity) activity);
+                                        if (binding != null) showModelInViewer();
                                     });
                                 }
                             }
@@ -275,7 +318,7 @@ public class SolidFragment extends Fragment {
                             });
                         }
 
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         logger.error("Pipeline Failure: " + e.getMessage());
                         android.app.Activity activity = getActivity();
                         if (activity != null) {
@@ -306,11 +349,28 @@ public class SolidFragment extends Fragment {
         });
     }
 
+    /** Initializes SceneView only when the user opens the viewer or a result exists. */
+    private void showModelInViewer() {
+        if (!isAdded() || binding == null || !(getActivity() instanceof MainActivity)) return;
+        try {
+            SceneViewBridgeKt.setSceneViewContent(
+                    binding.solidSceneViewContainer,
+                    modelPath,
+                    (MainActivity) getActivity());
+        } catch (Throwable error) {
+            logger.error("SceneView Error: " + error.getMessage());
+        }
+    }
+
     @Override
     public void onDestroyView() {
+        engineReady = false;
+        if (binding != null) {
+            binding.solidSceneViewContainer.disposeComposition();
+        }
         super.onDestroyView();
         if (gmshRunner != null) gmshRunner.shutdown();
-        executor.shutdown();
+        executor.shutdownNow();
         binding = null;
     }
 }

@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             runOnUiThread(() -> binding.tvLoadingText.setText("Initializing Native Modules..."));
             try {
                 com.diamon.civil.engine.NativeFeaCore.loadLibraries();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 android.util.Log.e("MainActivity", "Failed to load libraries: " + e.getMessage());
             }
             

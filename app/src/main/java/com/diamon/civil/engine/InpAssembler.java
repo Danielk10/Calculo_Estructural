@@ -8,7 +8,7 @@ import java.util.*;
  * Ported from verified simulation tests to the main engine.
  */
 public class InpAssembler {
-    public static void assemble(File workDir, String inputName, String materialName, double E, double nu, double loadValue, String elsetType) throws IOException {
+    public static void assemble(File workDir, String inputName, String materialName, double E, double nu, double loadValue) throws IOException {
         File rawInp = new File(workDir, inputName + "_raw.inp");
         File cleanInp = new File(workDir, inputName + "_clean.inp");
         File nsetsInp = new File(workDir, "nsets.inp");
@@ -32,14 +32,8 @@ public class InpAssembler {
         Set<Integer> loadedNodes = extractNodesFromPhysical(lines, "Loaded");
         if (loadedNodes.isEmpty()) loadedNodes = extractNodesFromPhysical(lines, "SURFACE2");
 
-        // Fallback: If no physical sets found, use first and last nodes for demo purposes
-        if (fixedNodes.isEmpty() && !lines.isEmpty()) {
-             fixedNodes.add(1); 
-             android.util.Log.w("InpAssembler", "No Fixed set found, using fallback Node 1");
-        }
-        if (loadedNodes.isEmpty() && lines.size() > 10) {
-             loadedNodes.add(10);
-             android.util.Log.w("InpAssembler", "No Loaded set found, using fallback Node 10");
+        if (fixedNodes.isEmpty() || loadedNodes.isEmpty()) {
+            throw new IOException("La malla no contiene las superficies físicas Fixed y Loaded requeridas");
         }
 
         try (PrintWriter pw = new PrintWriter(new FileWriter(nsetsInp))) {

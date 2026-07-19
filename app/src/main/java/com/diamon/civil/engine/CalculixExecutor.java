@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.diamon.civil.util.NativeLoader;
-
 public class CalculixExecutor {
     private static final String TAG = "CalculixExecutor";
     private final File workDir;
@@ -22,14 +20,22 @@ public class CalculixExecutor {
         this.workDir = context.getFilesDir();
         this.nativeLibDir = new File(context.getApplicationInfo().nativeLibraryDir);
         
-        // Ensure all dependencies are loaded correctly
-        NativeFeaCore.loadLibraries();
+        // The solver is a child process. Do not load the JNI/OCCT stack here: the
+        // terminal must remain usable even when the optional 3D viewer is absent.
     }
 
     public native boolean convertFrdToGlb(String inputPath, String outputPath);
 
     public String executeCalculix(String jobName) {
-        return executeBinary("ccx", jobName);
+        if (jobName == null || jobName.trim().isEmpty()) {
+            return "Execution Error: CalculiX job name is empty";
+        }
+        String baseName = jobName.endsWith(".inp")
+                ? jobName.substring(0, jobName.length() - ".inp".length())
+                : jobName;
+        File inputBase = new File(workDir, baseName);
+        // This is the same explicit invocation used by the validated terminal test.
+        return executeBinary("ccx", "-i", inputBase.getAbsolutePath());
     }
 
     public String runGmsh(String inputPath, String outputPath, double meshSize) {
@@ -42,10 +48,14 @@ public class CalculixExecutor {
 
     public String executeBinaryWithInput(String binaryName, String input, String... args) {
         // AssetHelper creates symlinks in usr/bin that point to lib*.so
-        File binary = new File(new File(workDir, "usr/bin"), binaryName);
-        
-        if (!binary.exists()) {
-            binary = new File(nativeLibDir, "lib" + binaryName + ".so");
+        File binary;
+        // ccx is already validated as an executable in nativeLibraryDir. Prefer it
+        // over a user-space symlink, whose target can be stale after an app update.
+        File packagedBinary = new File(nativeLibDir, "lib" + binaryName + ".so");
+        if (packagedBinary.exists()) {
+            binary = packagedBinary;
+        } else {
+            binary = new File(new File(workDir, "usr/bin"), binaryName);
         }
         
         if (!binary.exists()) {
@@ -122,5 +132,9 @@ public class CalculixExecutor {
             Log.e(TAG, "Execution Failed: " + e.getMessage());
             return "Execution Error: " + e.getMessage();
         }
+    }
+
+    public static boolean wasSuccessful(String output) {
+        return output != null && output.contains("Exit Code: 0");
     }
 }
