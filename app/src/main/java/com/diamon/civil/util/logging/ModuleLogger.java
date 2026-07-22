@@ -42,10 +42,6 @@ public class ModuleLogger {
     public void log(String message) {
         logBuilder.append(message).append("\n");
         notifyListeners();
-        
-        if (this != GLOBAL_LOGGER) {
-            GLOBAL_LOGGER.log("[" + moduleName + "] " + message);
-        }
     }
 
     public void info(String message) {

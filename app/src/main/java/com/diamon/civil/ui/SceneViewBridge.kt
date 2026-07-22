@@ -17,6 +17,9 @@ import io.github.sceneview.Scene
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberModelInstance
+import io.github.sceneview.rememberCameraManipulator
+import com.google.android.filament.LightManager
+import dev.romainguy.kotlin.math.Float3
 
 /**
  * Listener de eventos táctiles en el visor 3D.
@@ -43,6 +46,7 @@ fun SceneViewWrapper(modelPath: String?, listener: OnHitListener?) {
 
     val engine      = rememberEngine()
     val modelLoader = rememberModelLoader(engine)
+    val cameraManipulator = rememberCameraManipulator()
 
     // Resolver ruta: relativas van como asset://, absolutas van tal cual
     val resolvedPath: String? = modelPath?.let { raw ->
@@ -61,8 +65,16 @@ fun SceneViewWrapper(modelPath: String?, listener: OnHitListener?) {
             modifier = Modifier.fillMaxSize(),
             engine = engine,
             modelLoader = modelLoader,
+            cameraManipulator = cameraManipulator,
             onFrame = { /* frame callback disponible si se necesita */ },
         ) {
+            // Luz direccional para que el modelo sea visible
+            LightNode(
+                type = LightManager.Type.DIRECTIONAL,
+                position = Float3(0f, 5f, 5f),
+                direction = Float3(0f, -1f, -1f),
+            )
+
             // Carga del modelo sólo si hay una ruta válida
             if (resolvedPath != null && !loadError) {
                 val modelInstance = rememberModelInstance(modelLoader, resolvedPath)
