@@ -25,8 +25,6 @@ import com.diamon.civil.util.AssetHelper;
 import com.diamon.civil.util.export.ExportManager;
 import com.google.android.material.navigation.NavigationView;
 
-import io.github.sceneview.collision.HitResult;
-
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -200,13 +198,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onHit(HitResult hitResult) {
-        // Forward this to fragments if they implement OnHitListener
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        // If we want the fragment to handle it, we could use an interface or casting
-        if (currentFragment instanceof SolidFragment) {
-            // Toast or specific logic
-        }
+    public void onHit(Object info) {
+        // Forward hit events to the current fragment if needed
     }
 
     @Override

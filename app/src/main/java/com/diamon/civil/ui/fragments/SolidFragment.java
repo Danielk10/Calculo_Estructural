@@ -31,7 +31,7 @@ public class SolidFragment extends Fragment {
     private CalculixExecutor calculixExecutor;
     private volatile boolean engineReady;
     private volatile File activeSimulationGeometry;
-    private volatile String modelPath = "models/test_beam.glb";
+    private volatile String modelPath = null;
     private File workDir;
 
     @Nullable

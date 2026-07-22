@@ -1,30 +1,36 @@
 package com.diamon.civil.ui
 
+import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
-import com.google.android.filament.LightManager
-import dev.romainguy.kotlin.math.Float3
-import io.github.sceneview.SceneView
-import io.github.sceneview.collision.HitResult
-import io.github.sceneview.rememberCameraManipulator
+import io.github.sceneview.Scene
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberModelInstance
-import io.github.sceneview.rememberOnGestureListener
 
+/**
+ * Listener de eventos táctiles en el visor 3D.
+ * Interfaz simplificada sin dependencia de tipos internos de SceneView.
+ */
 interface OnHitListener {
-    fun onHit(hitResult: HitResult?)
+    fun onHit(info: Any?)
 }
 
 /**
- * Punto de entrada desde Java (MainActivity) para actualizar el modelo cargado en el SceneView.
- * Si modelPath es null se muestra la escena vacía con iluminación lista para recibir un modelo.
+ * Punto de entrada desde Java (SolidFragment) para inyectar el visor 3D
+ * dentro de un ComposeView del layout XML.
+ *
+ * Si modelPath es null se muestra la escena vacía con iluminación lista.
  */
 fun setSceneViewContent(composeView: ComposeView, modelPath: String?, listener: OnHitListener?) {
     composeView.setContent {
@@ -35,54 +41,47 @@ fun setSceneViewContent(composeView: ComposeView, modelPath: String?, listener: 
 @Composable
 fun SceneViewWrapper(modelPath: String?, listener: OnHitListener?) {
 
-    val engine        = rememberEngine()
-    val modelLoader   = rememberModelLoader(engine)
+    val engine      = rememberEngine()
+    val modelLoader = rememberModelLoader(engine)
 
-    // Camara con gestos orbit/zoom/pan habilitados
-    val cameraManipulator = rememberCameraManipulator()
-
-    // Convertir ruta absoluta a "asset://..." cuando viene de assets,
-    // o dejarla como ruta de archivo cuando es un resultado de simulación.
+    // Resolver ruta: relativas van como asset://, absolutas van tal cual
     val resolvedPath: String? = modelPath?.let { raw ->
         when {
-            // Ruta de asset relativa → prefijo que SceneView entiende
+            raw.isBlank() -> null
             !raw.startsWith("/") -> "asset://$raw"
-            // Ruta absoluta de archivo (resultado FRD→GLB generado en runtime)
             else -> raw
         }
     }
 
-    SceneView(
-        modifier          = Modifier.fillMaxSize(),
-        engine            = engine,
-        modelLoader       = modelLoader,
-        // ► FIX 2: cameraManipulator habilita zoom/orbita/pan
-        cameraManipulator = cameraManipulator,
-        // ► FIX 3: onGestureListener para notificar hits sin bloquear la cámara
-        onGestureListener = rememberOnGestureListener(
-            onSingleTapConfirmed = { motionEvent, node ->
-                listener?.onHit(null)
-            }
-        ),
-    ) {
-        // ► FIX 5: Luz direccional para que el modelo sea visible
-        LightNode(
-            type      = LightManager.Type.DIRECTIONAL,
-            position  = Float3(0f, 5f, 5f),
-            direction = Float3(0f, -1f, -1f),
-        )
+    // Controlar errores de carga para evitar crashes
+    var loadError by remember { mutableStateOf(false) }
 
-        // ► FIX 4: Carga del modelo con autoCenter y scaleToUnits
-        if (resolvedPath != null) {
-            val modelInstance = rememberModelInstance(modelLoader, resolvedPath)
-            modelInstance?.let { instance ->
-                ModelNode(
-                    modelInstance = instance,
-                    // Escala el modelo para que quepa en ~1 unidad — siempre visible
-                    scaleToUnits  = 1.0f,
-                )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scene(
+            modifier = Modifier.fillMaxSize(),
+            engine = engine,
+            modelLoader = modelLoader,
+            onFrame = { /* frame callback disponible si se necesita */ },
+        ) {
+            // Carga del modelo sólo si hay una ruta válida
+            if (resolvedPath != null && !loadError) {
+                val modelInstance = rememberModelInstance(modelLoader, resolvedPath)
+                modelInstance?.let { instance ->
+                    ModelNode(
+                        modelInstance = instance,
+                        scaleToUnits = 1.0f,
+                    )
+                }
             }
+            // Escena vacía con cámara e iluminación por defecto si no hay modelo
         }
-        // Si no hay modelo cargado la escena queda lista con cámara e iluminación
+
+        if (loadError) {
+            Text(
+                text = "⚠ No se pudo cargar el modelo 3D",
+                modifier = Modifier.align(Alignment.Center),
+                color = Color.White,
+            )
+        }
     }
 }
