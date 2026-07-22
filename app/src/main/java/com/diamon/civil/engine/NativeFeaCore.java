@@ -14,7 +14,7 @@ public class NativeFeaCore {
     private static final String[] JNI_DEPENDENCIES = {
             "c++_shared",
             "TKernel", "TKMath", "TKG2d", "TKG3d", "TKGeomBase",
-            "TKBRep", "TKGeomAlgo", "TKTopAlgo", "TKPrim", "TKBO", "TKBool",
+            "TKBRep", "TKGeomAlgo", "TKTopAlgo", "TKPrim", "TKShHealing", "TKBO", "TKBool",
             "calculoestructural"
     };
 
