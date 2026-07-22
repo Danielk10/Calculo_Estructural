@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModuleLogger {
+    private static final ModuleLogger GLOBAL_LOGGER = new ModuleLogger("Global");
+
+    private final String moduleName;
     private final StringBuilder logBuilder = new StringBuilder();
     private final List<LogListener> listeners = new ArrayList<>();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -15,13 +18,34 @@ public class ModuleLogger {
         void onLogUpdated(String fullLog);
     }
 
+    public static ModuleLogger getGlobal() {
+        return GLOBAL_LOGGER;
+    }
+
+    public ModuleLogger(String moduleName) {
+        this.moduleName = moduleName;
+        if (this != GLOBAL_LOGGER) {
+            // Seed initial global log with current status if applicable
+        }
+    }
+
+    public ModuleLogger() {
+        this("General");
+    }
+
     public void addListener(LogListener listener) {
         listeners.add(listener);
+        // Call immediately with existing content to synchronize UI
+        listener.onLogUpdated(getFullLog());
     }
 
     public void log(String message) {
         logBuilder.append(message).append("\n");
         notifyListeners();
+        
+        if (this != GLOBAL_LOGGER) {
+            GLOBAL_LOGGER.log("[" + moduleName + "] " + message);
+        }
     }
 
     public void info(String message) {
@@ -32,6 +56,25 @@ public class ModuleLogger {
         log("[ERROR] " + message);
     }
 
+    public void error(String message, Throwable throwable) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[ERROR] ").append(message);
+        if (throwable != null) {
+            sb.append("\nException: ").append(throwable.toString()).append("\n");
+            for (StackTraceElement ste : throwable.getStackTrace()) {
+                sb.append("    at ").append(ste.toString()).append("\n");
+            }
+            Throwable cause = throwable.getCause();
+            if (cause != null) {
+                sb.append("Caused by: ").append(cause.toString()).append("\n");
+                for (StackTraceElement ste : cause.getStackTrace()) {
+                    sb.append("    at ").append(ste.toString()).append("\n");
+                }
+            }
+        }
+        log(sb.toString());
+    }
+
     public void debug(String message) {
         log("[DEBUG] " + message);
     }
@@ -39,6 +82,10 @@ public class ModuleLogger {
     public void clear() {
         logBuilder.setLength(0);
         notifyListeners();
+        if (this == GLOBAL_LOGGER) {
+            logBuilder.append("--- FEA System Log Console ---\n");
+            notifyListeners();
+        }
     }
 
     public String getFullLog() {
@@ -57,7 +104,6 @@ public class ModuleLogger {
     public void attachToTextView(final TextView textView) {
         addListener(fullLog -> {
             textView.setText(fullLog);
-            // Auto-scroll logic can be added in the fragment
         });
     }
 }

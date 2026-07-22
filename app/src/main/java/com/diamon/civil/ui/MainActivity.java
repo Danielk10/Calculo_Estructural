@@ -186,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 com.diamon.civil.engine.NativeFeaCore.loadLibraries();
             } catch (Throwable e) {
                 android.util.Log.e("MainActivity", "Failed to load libraries: " + e.getMessage());
+                com.diamon.civil.util.logging.ModuleLogger.getGlobal().error("CRITICAL: Failed to load JNI libraries in MainActivity", e);
             }
             
             runOnUiThread(() -> {

@@ -25,7 +25,7 @@ import java.util.concurrent.Executors;
 public class SolidFragment extends Fragment {
 
     private FragmentSolidBinding binding;
-    private final ModuleLogger logger = new ModuleLogger();
+    private final ModuleLogger logger = new ModuleLogger("Solid");
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private GmshRunner gmshRunner;
     private CalculixExecutor calculixExecutor;

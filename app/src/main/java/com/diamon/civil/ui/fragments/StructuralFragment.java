@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 public class StructuralFragment extends Fragment {
 
     private FragmentStructuralBinding binding;
-    private final ModuleLogger logger = new ModuleLogger();
+    private final ModuleLogger logger = new ModuleLogger("Structural");
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private CalculixExecutor calculixExecutor;
     private DatParser datParser;
@@ -52,7 +52,7 @@ public class StructuralFragment extends Fragment {
                     });
                 }
             } catch (Throwable e) {
-                logger.error("Initialization failed: " + e.getMessage());
+                logger.error("Initialization failed", e);
             }
         });
         datParser = new DatParser();

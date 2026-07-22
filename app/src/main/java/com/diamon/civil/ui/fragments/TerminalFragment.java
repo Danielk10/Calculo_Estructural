@@ -53,6 +53,8 @@ public class TerminalFragment extends Fragment {
         binding.btnCopyLog.setOnClickListener(v -> copyLogToClipboard());
         binding.btnExportReport.setOnClickListener(v -> exportTerminalReport());
         binding.tvLog.setOnClickListener(v -> copyLogToClipboard());
+        
+        com.diamon.civil.util.logging.ModuleLogger.getGlobal().attachToTextView(binding.tvLog);
     }
 
     private void copyLogToClipboard() {
@@ -92,11 +94,11 @@ public class TerminalFragment extends Fragment {
 
         binding.etCommand.setText("");
         if (input.equalsIgnoreCase("clear")) {
-            binding.tvLog.setText("--- FEA Terminal Core ---\n");
+            com.diamon.civil.util.logging.ModuleLogger.getGlobal().clear();
             return;
         }
 
-        binding.tvLog.append("\n$ " + input + "\n");
+        com.diamon.civil.util.logging.ModuleLogger.getGlobal().log("$ " + input);
         scrollDown();
 
         executor.execute(() -> {
@@ -132,7 +134,7 @@ public class TerminalFragment extends Fragment {
             final String finalResult = result;
             getActivity().runOnUiThread(() -> {
                 if (binding != null) {
-                    binding.tvLog.append(finalResult + "\n");
+                    com.diamon.civil.util.logging.ModuleLogger.getGlobal().log(finalResult);
                     scrollDown();
                 }
             });
