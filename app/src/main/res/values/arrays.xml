@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="material_types">
+        <item>Steel</item>
+        <item>Concrete</item>
+        <item>Wood</item>
+        <item>Aluminum</item>
+    </string-array>
+
+    <string-array name="element_types_structural">
+        <item>Beam</item>
+        <item>Column</item>
+        <item>Slab</item>
+        <item>Wall</item>
+        <item>Truss</item>
+    </string-array>
+</resources>
