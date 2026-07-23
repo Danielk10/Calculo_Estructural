@@ -64,20 +64,28 @@ Una de las funciones más potentes es la asignación visual de Condiciones de Co
 
 ---
 
-## 3. Pestaña de Terminal (Logs)
+## 3. Pestaña de Terminal Avanzada (Consola de la App)
 
-La pestaña **Terminal** es la consola del desarrollador y del ingeniero. Cualquier error, advertencia o mensaje de éxito de los motores subyacentes se imprime aquí en tiempo real. 
+La aplicación cuenta con una **Terminal Avanzada** (Advanced Terminal) integrada que funciona como una consola tipo Unix dentro del directorio de trabajo de la app (sandbox). 
 
-### 3.1 Cómo leer la Terminal:
-- **[INFO] Native engines initialized:** Indica que las librerías C++ (OCCT) cargaron correctamente.
-- **[INFO] Executing CalculiX Solver ccx:** Comienza el proceso matemático de resolución de matrices.
-- **Exit Code 0:** Significa que el motor completó su tarea con éxito.
-- **Exit Code 201:** Es el código de salida de emergencia de CalculiX. Si ves esto, significa que hubo un error crítico (ej. falta una condición de contorno, modelo inestable, o sintaxis INP inválida).
-- **Advertencias (WARNINGS):** Gmsh y CalculiX pueden generar advertencias de distorsión de malla. Si la malla es muy gruesa, verás advertencias topológicas.
+### 3.1 Comandos Básicos Disponibles
+Puedes escribir comandos directamente en el input inferior:
+- `ls`: Muestra los archivos y directorios (ej. tus modelos `.inp`, `.dat`, `.frd`).
+- `pwd`: Muestra el directorio de trabajo actual.
+- `cd <ruta>`: Navega por los directorios (ej. `cd ..` o `cd mi_carpeta`).
+- `mkdir <nombre>`: Crea un nuevo directorio.
+- `rm <archivo>` o `rm -rf <carpeta>`: Elimina archivos o carpetas.
+- `clear`: Limpia la pantalla de la terminal.
+- `help`: Muestra la lista de comandos disponibles.
 
-### 3.2 Utilidades de la Terminal:
-- **Botón Flotante (FAB):** Limpia completamente el historial de la terminal.
-- **Copiar al Portapapeles:** Si tocas el texto de la terminal, todo el log se copiará a tu portapapeles. Útil para enviar reportes de bugs o analizar el archivo `.dat` en bruto.
+### 3.2 Comandos de Simulación y Mallado
+- `test-gmsh`: Este comando genera automáticamente un archivo script (`prueba_booleana.geo`) que modela un cilindro hueco (con una esfera restada en el centro usando operaciones booleanas de OpenCASCADE). Luego te indica cómo mallarlo.
+- `gmsh <archivo.geo> [opciones]`: Llama directamente al motor de Gmsh compilado en Android. Por ejemplo: `gmsh prueba_booleana.geo -3 -format inp -o cilindro_hueco.inp`.
+- `run-sim-test`: Ejecuta un pipeline completo de prueba (SimulationTestManager) interno de la aplicación.
+- `<nombre_trabajo>` (ej. `job_solid`): Si escribes el nombre de un archivo de entrada `.inp` (sin la extensión), la terminal llamará directamente a **CalculiX** (ccx) para resolver ese archivo de manera manual.
+
+### 3.3 Utilidades de la Terminal
+- **Copiar al Portapapeles:** Tocar cualquier parte del texto de log copiará todo el contenido, útil para debugear, ver estadísticas de CalculiX o analizar matrices de rigidez.
 
 ---
 
