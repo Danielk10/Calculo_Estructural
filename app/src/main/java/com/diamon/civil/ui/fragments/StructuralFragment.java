@@ -257,27 +257,33 @@ public class StructuralFragment extends Fragment {
         }
         sb.append("], \"materials\": [{\"name\":\"Steel\",\"youngModulus\":210000,\"poissonRatio\":0.3,\"density\":7850}],");
         sb.append("\"sections\": [{\"elset\":\"Eall\",\"type\":\"BEAM\",\"material\":\"Steel\",\"params\":[200,200]}],");
-        int fixedNodeId = model.nodes.get(0).id;
-        int loadedNodeId = fixedNodeId;
-        double minX = model.nodes.get(0).x;
-        double maxX = minX;
+        
+        sb.append("\"constraints\": [");
+        boolean firstConstraint = true;
         for (StructuralModel.Node node : model.nodes) {
-            if (node.x < minX) {
-                minX = node.x;
-                fixedNodeId = node.id;
+            if (node.y == 0.0) { // Fijar la base del pórtico
+                if (!firstConstraint) sb.append(",");
+                sb.append("{\"nodeId\":").append(node.id).append(",\"dofs\":[1,2,3,4,5,6],\"value\":0}");
+                firstConstraint = false;
             }
-            if (node.x > maxX) {
-                maxX = node.x;
+        }
+        sb.append("],");
+        
+        // Carga lateral en el nodo superior izquierdo
+        int loadedNodeId = model.nodes.get(model.nodes.size() - 1).id;
+        double maxY = 0;
+        double minX = Double.MAX_VALUE;
+        for (StructuralModel.Node node : model.nodes) {
+            if (node.y > maxY) maxY = node.y;
+        }
+        for (StructuralModel.Node node : model.nodes) {
+            if (node.y == maxY && node.x < minX) {
+                minX = node.x;
                 loadedNodeId = node.id;
             }
         }
-        if (fixedNodeId == loadedNodeId && model.nodes.size() > 1) {
-            loadedNodeId = model.nodes.get(model.nodes.size() - 1).id;
-        }
-        sb.append("\"constraints\": [{\"nodeId\":").append(fixedNodeId)
-                .append(",\"dofs\":[1,2,3,4,5,6],\"value\":0}],");
         sb.append("\"loads\": [{\"nodeId\":").append(loadedNodeId)
-                .append(",\"fx\":0,\"fy\":-100,\"fz\":0}]");
+                .append(",\"fx\":10000,\"fy\":0,\"fz\":0}]");
         sb.append("}");
         return sb.toString();
     }

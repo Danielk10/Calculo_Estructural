@@ -107,11 +107,16 @@ public class DiagramView extends View {
             // Draw Beam
             canvas.drawLine(x1, y1, x2, y2, beamPaint);
             
-            // Draw Deformed Shape (Placeholder: offset by a scaled displacement factor)
-            float dispScale = 200f; // Amplification factor for visibility
-            float d1 = (float) (n1.y * 0.05); // Simulated displacement
-            float d2 = (float) (n2.y * 0.05);
-            canvas.drawLine(x1, y1 - d1 * dispScale, x2, y2 - d2 * dispScale, deformedPaint);
+            // Draw Deformed Shape
+            float dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+            if (results.displacements != null) {
+                for (DatParser.NodeDisplacement nd : results.displacements) {
+                    if (nd.nodeId == n1.id) { dx1 = (float)nd.ux; dy1 = (float)nd.uy; }
+                    if (nd.nodeId == n2.id) { dx2 = (float)nd.ux; dy2 = (float)nd.uy; }
+                }
+            }
+            float dispScale = 1000f; // Amplification factor for visibility
+            canvas.drawLine(x1 + dx1 * dispScale, y1 - dy1 * dispScale, x2 + dx2 * dispScale, y2 - dy2 * dispScale, deformedPaint);
 
             // Draw Diagram
             DatParser.SectionForces f = elemResults.get(e.id);

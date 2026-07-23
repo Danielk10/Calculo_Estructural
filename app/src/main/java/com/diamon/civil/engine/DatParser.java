@@ -47,15 +47,22 @@ public class DatParser {
         }
     }
 
+    public static class NodeDisplacement {
+        public int nodeId;
+        public double ux, uy, uz;
+    }
+
     /** Summary of the most extreme values found in the .dat */
     public static class ParseResult {
         public final List<SectionForces> forces;
+        public final List<NodeDisplacement> displacements = new ArrayList<>();
         public double maxAbsN  = 0;
         public double maxAbsV2 = 0;
         public double maxAbsV3 = 0;
         public double maxAbsM1 = 0;
         public double maxAbsM2 = 0;
         public double maxAbsM3 = 0;
+        public double maxDisp = 0;
         public String error = null;
 
         public ParseResult(List<SectionForces> forces) {
@@ -71,9 +78,9 @@ public class DatParser {
      */
     public ParseResult parse(File datFile) {
         List<SectionForces> results = new ArrayList<>();
+        ParseResult r = new ParseResult(results);
 
         if (!datFile.exists()) {
-            ParseResult r = new ParseResult(results);
             r.error = "File not found: " + datFile.getName();
             return r;
         }
@@ -81,76 +88,92 @@ public class DatParser {
         try (BufferedReader reader = new BufferedReader(new FileReader(datFile))) {
             String line;
             boolean inSectionBlock = false;
+            boolean inDispBlock = false;
             boolean skipHeader = false;
             int headerLines = 0;
 
             while ((line = reader.readLine()) != null) {
                 String trimmed = line.trim();
 
-                // Detect start of a section forces block
-                if (trimmed.toLowerCase().contains("section forces") &&
-                    trimmed.toLowerCase().contains("moment")) {
+                if (trimmed.toLowerCase().contains("section forces") && trimmed.toLowerCase().contains("moment")) {
                     inSectionBlock = true;
+                    inDispBlock = false;
                     skipHeader = true;
                     headerLines = 0;
                     continue;
                 }
 
-                // Skip the two header/label lines after the block title
-                if (inSectionBlock && skipHeader) {
+                if (trimmed.toLowerCase().contains("displacements (vx,vy,vz)")) {
+                    inDispBlock = true;
+                    inSectionBlock = false;
+                    skipHeader = true;
+                    headerLines = 0;
+                    continue;
+                }
+
+                if (trimmed.isEmpty()) {
+                    inSectionBlock = false;
+                    inDispBlock = false;
+                    continue;
+                }
+
+                if (skipHeader) {
                     headerLines++;
                     if (headerLines >= 2) skipHeader = false;
                     continue;
                 }
 
-                // Blank line or new keyword ends the section block
                 if (inSectionBlock) {
-                    if (trimmed.isEmpty() || trimmed.startsWith("*") ||
-                        (trimmed.startsWith("set") && trimmed.contains("time"))) {
-                        inSectionBlock = false;
-                        continue;
-                    }
-
-                    // Parse data line: elemId  intPt  N  V2  V3  M1  M2  M3
-                    String[] tok = trimmed.split("\\s+");
-                    if (tok.length >= 8) {
+                    String[] parts = trimmed.split("\\s+");
+                    if (parts.length >= 8) {
                         try {
                             SectionForces sf = new SectionForces();
-                            sf.elementId        = Integer.parseInt(tok[0]);
-                            sf.integrationPoint = Integer.parseInt(tok[1]);
-                            sf.N  = parseScientific(tok[2]);
-                            sf.V2 = parseScientific(tok[3]);
-                            sf.V3 = parseScientific(tok[4]);
-                            sf.M1 = parseScientific(tok[5]);
-                            sf.M2 = parseScientific(tok[6]);
-                            sf.M3 = parseScientific(tok[7]);
+                            sf.elementId = Integer.parseInt(parts[0]);
+                            sf.integrationPoint = Integer.parseInt(parts[1]);
+                            sf.N = parseScientific(parts[2]);
+                            sf.V2 = parseScientific(parts[3]);
+                            sf.V3 = parseScientific(parts[4]);
+                            sf.M1 = parseScientific(parts[5]);
+                            sf.M2 = parseScientific(parts[6]);
+                            sf.M3 = parseScientific(parts[7]);
+
+                            r.maxAbsN = Math.max(r.maxAbsN, Math.abs(sf.N));
+                            r.maxAbsV2 = Math.max(r.maxAbsV2, Math.abs(sf.V2));
+                            r.maxAbsV3 = Math.max(r.maxAbsV3, Math.abs(sf.V3));
+                            r.maxAbsM1 = Math.max(r.maxAbsM1, Math.abs(sf.M1));
+                            r.maxAbsM2 = Math.max(r.maxAbsM2, Math.abs(sf.M2));
+                            r.maxAbsM3 = Math.max(r.maxAbsM3, Math.abs(sf.M3));
+
                             results.add(sf);
                         } catch (NumberFormatException e) {
-                            Log.w(TAG, "Skipping malformed line: " + trimmed);
+                            Log.w(TAG, "Parsing error section block: " + line);
+                        }
+                    }
+                } else if (inDispBlock) {
+                    String[] parts = trimmed.split("\\s+");
+                    if (parts.length >= 4) {
+                        try {
+                            NodeDisplacement nd = new NodeDisplacement();
+                            nd.nodeId = Integer.parseInt(parts[0]);
+                            nd.ux = parseScientific(parts[1]);
+                            nd.uy = parseScientific(parts[2]);
+                            nd.uz = parseScientific(parts[3]);
+                            
+                            double mag = Math.sqrt(nd.ux*nd.ux + nd.uy*nd.uy + nd.uz*nd.uz);
+                            r.maxDisp = Math.max(r.maxDisp, mag);
+                            r.displacements.add(nd);
+                        } catch (NumberFormatException e) {
+                            Log.w(TAG, "Parsing error disp block: " + line);
                         }
                     }
                 }
             }
-
         } catch (IOException e) {
-            ParseResult r = new ParseResult(results);
-            r.error = "Read error: " + e.getMessage();
-            return r;
-        }
-
-        // Compute envelope maxima
-        ParseResult result = new ParseResult(results);
-        for (SectionForces sf : results) {
-            result.maxAbsN  = Math.max(result.maxAbsN,  Math.abs(sf.N));
-            result.maxAbsV2 = Math.max(result.maxAbsV2, Math.abs(sf.V2));
-            result.maxAbsV3 = Math.max(result.maxAbsV3, Math.abs(sf.V3));
-            result.maxAbsM1 = Math.max(result.maxAbsM1, Math.abs(sf.M1));
-            result.maxAbsM2 = Math.max(result.maxAbsM2, Math.abs(sf.M2));
-            result.maxAbsM3 = Math.max(result.maxAbsM3, Math.abs(sf.M3));
+            r.error = "Error reading file: " + e.getMessage();
         }
 
         Log.d(TAG, "Parsed " + results.size() + " section force records from " + datFile.getName());
-        return result;
+        return r;
     }
 
     /**
