@@ -241,11 +241,14 @@ public class FrameRenderer implements GLSurfaceView.Renderer {
         this.zoom *= scale;
         if (this.zoom < 1f) this.zoom = 1f;
         if (this.zoom > 100f) this.zoom = 100f;
+        updateProjectionMatrix();
     }
 
     private void updateProjectionMatrix() {
+        if (screenWidth == 0 || screenHeight == 0) return;
         float ratio = (float) screenWidth / screenHeight;
-        Matrix.perspectiveM(projectionMatrix, 0, 45f, ratio, 0.1f, 200f);
+        float orthoScale = zoom / 3f;
+        Matrix.orthoM(projectionMatrix, 0, -ratio * orthoScale, ratio * orthoScale, -orthoScale, orthoScale, 0.1f, 200f);
     }
 
     private void createGrid() {
