@@ -62,7 +62,7 @@
                             <Button android:id="@+id/btnCreateCylinder" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="CYL" style="@style/Widget.MaterialComponents.Button.TextButton"/>
                             <Button android:id="@+id/btnCreateSphere" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="SPHERE" style="@style/Widget.MaterialComponents.Button.TextButton"/>
                         </LinearLayout>
-
+                        <Button android:id="@+id/btnLoadTestCase" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="LOAD TEST CASE (CANTILEVER)" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_marginTop="8dp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

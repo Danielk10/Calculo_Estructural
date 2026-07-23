@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             switchFragment(new TerminalFragment(), "Advanced Terminal");
         } else if (id == R.id.nav_docs) {
             try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.calculix.de/html/ccx.html")));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.dhondt.de/ccx_2.23.pdf")));
             } catch (Exception e) {
                 Toast.makeText(this, "Could not open browser", Toast.LENGTH_SHORT).show();
             }
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivityForResult(intent, 1);
             return true;
         } else if (id == R.id.action_docs_calculix) {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.calculix.de/html/ccx.html")));
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.dhondt.de/ccx_2.23.pdf")));
             return true;
         } else if (id == R.id.action_docs_gmsh) {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://gmsh.info/doc/texinfo/gmsh.html")));

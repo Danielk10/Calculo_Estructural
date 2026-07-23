@@ -119,6 +119,17 @@ public class SolidFragment extends Fragment {
         binding.btnCreateBox.setOnClickListener(v -> createPrimitive("box"));
         binding.btnCreateCylinder.setOnClickListener(v -> createPrimitive("cylinder"));
         binding.btnCreateSphere.setOnClickListener(v -> createPrimitive("sphere"));
+        binding.btnLoadTestCase.setOnClickListener(v -> {
+            if (getContext() != null) {
+                try {
+                    activeSimulationGeometry = com.diamon.civil.engine.SampleSimulationCase.createCantileverGeo(getContext().getFilesDir());
+                    loadDefaultTestCase();
+                    android.widget.Toast.makeText(getContext(), "Test Case Loaded", android.widget.Toast.LENGTH_SHORT).show();
+                } catch (java.io.IOException e) {
+                    logger.error("Failed to load test case: " + e.getMessage());
+                }
+            }
+        });
         
         binding.btnRunSolidAnalysis.setOnClickListener(v -> runFullPipeline());
         binding.btnExportSolid.setOnClickListener(v -> exportResults());

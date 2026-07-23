@@ -13,7 +13,7 @@
     <item
         android:id="@+id/action_export_all"
         android:title="Export All Files"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_docs_calculix"
         android:title="CalculiX Docs"
@@ -29,10 +29,6 @@
     <item
         android:id="@+id/action_licenses"
         android:title="About Licenses"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_about"
-        android:title="About"
         app:showAsAction="never" />
 </menu>
 
