@@ -84,7 +84,7 @@
                             android:id="@+id/spinnerMaterialStructural"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:entries="@array/material_types"
+                            android:entries="@array/material_options"
                             android:layout_marginBottom="12dp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>

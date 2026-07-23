@@ -32,4 +32,12 @@
     <string-array name="structure_types_structural">
         <item>3D Cantilever Beam (B31)</item>
     </string-array>
+
+    <string-array name="element_types_structural">
+        <item>Beam</item>
+        <item>Column</item>
+        <item>Slab</item>
+        <item>Wall</item>
+        <item>Truss</item>
+    </string-array>
 </resources>

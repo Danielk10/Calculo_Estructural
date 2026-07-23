@@ -92,7 +92,7 @@
                             android:id="@+id/spinnerMaterialSolid"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:entries="@array/material_types"
+                            android:entries="@array/material_options"
                             android:layout_marginBottom="12dp" />
 
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mesh Density" android:textSize="12sp" android:layout_marginBottom="4dp"/>
