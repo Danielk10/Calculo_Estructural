@@ -198,18 +198,24 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <com.diamon.civil.ui.FrameGLSurfaceView
-                android:id="@+id/frameGLView"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="2" />
+                android:layout_weight="1">
 
-            <com.diamon.civil.ui.DiagramView
-                android:id="@+id/diagramView"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="#FAFAFA" />
+                <com.diamon.civil.ui.FrameGLSurfaceView
+                    android:id="@+id/frameGLView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <com.diamon.civil.ui.DiagramView
+                    android:id="@+id/diagramView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:clickable="false"
+                    android:focusable="false" />
+            </FrameLayout>
                 
             <LinearLayout
                 android:layout_width="match_parent"
