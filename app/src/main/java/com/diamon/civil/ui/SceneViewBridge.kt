@@ -57,7 +57,7 @@ fun SceneViewWrapper(modelPath: String?, listener: OnHitListener?) {
             modelInstance?.let {
                 ModelNode(
                     modelInstance = it,
-                    scaleToUnits = 1.0f
+                    scaleToUnits = 0.4f
                 )
             }
         } else {

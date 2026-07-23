@@ -35,7 +35,7 @@ public class FrameGLSurfaceView extends GLSurfaceView {
         setEGLContextClientVersion(3);
         renderer = new FrameRenderer(context);
         setRenderer(renderer);
-        setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY); // Animación fluida
+        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY); // Ahorra batería y actualiza bajo demanda
 
         setupGestures(context);
     }
@@ -46,9 +46,10 @@ public class FrameGLSurfaceView extends GLSurfaceView {
         scaleDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
-                float scaleFactor = detector.getScaleFactor();
-                renderer.setZoom(1f / scaleFactor);
+                final float scaleFactor = detector.getScaleFactor();
+                queueEvent(() -> renderer.setZoom(1f / scaleFactor));
                 isScaling = true;
+                requestRender();
                 return true;
             }
         });
@@ -56,26 +57,30 @@ public class FrameGLSurfaceView extends GLSurfaceView {
         gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
-                float x = (e.getX() - getWidth() / 2f) / 50f;
-                float y = -(e.getY() - getHeight() / 2f) / 50f;
+                final float x = (e.getX() - getWidth() / 2f) / 50f;
+                final float y = -(e.getY() - getHeight() / 2f) / 50f;
                 
-                StructuralModel.Node newNode = new StructuralModel.Node(nextNodeId++, x, y, 0);
-                renderer.addNode(newNode);
+                queueEvent(() -> {
+                    StructuralModel.Node newNode = new StructuralModel.Node(nextNodeId++, x, y, 0);
+                    renderer.addNode(newNode);
+                    
+                    if (lastSelectedNode != null) {
+                        renderer.addElement(new StructuralModel.Element(nextElemId++, lastSelectedNode.id, newNode.id, "W8x31", "Steel"));
+                    }
+                    lastSelectedNode = newNode;
+                });
                 
-                if (lastSelectedNode != null) {
-                    renderer.addElement(new StructuralModel.Element(nextElemId++, lastSelectedNode.id, newNode.id, "W8x31", "Steel"));
-                }
-                lastSelectedNode = newNode;
-                
+                requestRender();
                 return true;
             }
 
             @Override
             public void onLongPress(MotionEvent e) {
-                renderer.clear();
+                queueEvent(() -> renderer.clear());
                 nextNodeId = 1;
                 nextElemId = 1;
                 lastSelectedNode = null;
+                requestRender();
             }
         });
     }
@@ -117,10 +122,13 @@ public class FrameGLSurfaceView extends GLSurfaceView {
                     float dx = (x - previousX) * 0.3f;
                     float dy = (y - previousY) * 0.3f;
 
-                    renderer.addRotation(dx, dy);
+                    final float fdx = dx;
+                    final float fdy = dy;
+                    queueEvent(() -> renderer.addRotation(fdx, fdy));
 
                     previousX = x;
                     previousY = y;
+                    requestRender();
                 } else if (pointerCount == 2) {
                     float midX = (event.getX(0) + event.getX(1)) / 2f;
                     float midY = (event.getY(0) + event.getY(1)) / 2f;
@@ -128,10 +136,13 @@ public class FrameGLSurfaceView extends GLSurfaceView {
                     float dx = (midX - prevMidX) * 0.02f;
                     float dy = -(midY - prevMidY) * 0.02f;
 
-                    renderer.setTranslation(dx, dy);
+                    final float fdx = dx;
+                    final float fdy = dy;
+                    queueEvent(() -> renderer.setTranslation(fdx, fdy));
 
                     prevMidX = midX;
                     prevMidY = midY;
+                    requestRender();
                 }
                 break;
             }
