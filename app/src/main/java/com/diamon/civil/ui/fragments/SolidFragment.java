@@ -123,34 +123,13 @@ public class SolidFragment extends Fragment {
         binding.btnRunSolidAnalysis.setOnClickListener(v -> runFullPipeline());
         binding.btnExportSolid.setOnClickListener(v -> exportResults());
         
-        binding.btnClearSolidLog.setOnClickListener(v -> logger.clear());
-        binding.btnCopySolidLog.setOnClickListener(v -> {
-            copyToClipboard(logger.getFullLog());
-        });
+        binding.fabClearSolidLog.setOnClickListener(v -> logger.clear());
+        
+        // Make the entire scrollview or log text copyable on tap
+        binding.scrollSolidLog.setOnClickListener(v -> copyToClipboard(logger.getFullLog()));
+        binding.tvSolidLog.setOnClickListener(v -> copyToClipboard(logger.getFullLog()));
 
-        // Professional addition: Sample Model Button
-        binding.btnSampleModel.setOnClickListener(v -> {
-            if (!engineReady) {
-                Toast.makeText(getContext(), "El motor aún se está inicializando", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            executor.execute(() -> {
-                try {
-                    activeSimulationGeometry = SampleSimulationCase.createCantileverGeo(workDir);
-                    android.app.Activity activity = getActivity();
-                    if (activity != null) {
-                        activity.runOnUiThread(() -> {
-                            if (binding != null) {
-                                loadDefaultTestCase();
-                                Toast.makeText(getContext(), "Caso de voladizo cargado y listo para calcular", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                } catch (Exception error) {
-                    logger.error("No se pudo crear el caso de prueba: " + error.getMessage());
-                }
-            });
-        });
+
     }
 
     private void copyToClipboard(String text) {
@@ -163,23 +142,23 @@ public class SolidFragment extends Fragment {
         }
     }
 
-    private void exportResults() {
+    public void exportResults() {
         if (getContext() == null) return;
         File workDir = getContext().getFilesDir();
         File reportFile = new File(workDir, "Solid_Analysis_Report.pdf");
         
         String logText = logger.getFullLog();
         if (!logText.isEmpty()) {
-            com.diamon.civil.engine.ReportGenerator.generateReport(reportFile, "3D Solid Analysis Report (Abacus-style)", logText, null);
+            com.diamon.civil.engine.ReportGenerator.generateReport(reportFile, "3D Solid Analysis Report Abacus style", logText, null);
         }
 
         File[] files = workDir.listFiles((dir, name) -> name.startsWith("job_solid") || name.endsWith(".brep") || name.endsWith(".msh") || name.equals("Solid_Analysis_Report.pdf"));
         if (files != null && files.length > 0) {
             com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(getContext());
             for (File f : files) {
-                manager.exportToDownloads(f, "Solid_Analysis");
+                manager.exportToDownloads(f);
             }
-            Toast.makeText(getContext(), "Exported to Downloads/FEA_Suite/Solid_Analysis", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Exported to Downloads/Structural_Analysis_FEA_Advanced", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(getContext(), "No files to export", Toast.LENGTH_SHORT).show();
         }
@@ -241,7 +220,7 @@ public class SolidFragment extends Fragment {
         }
         final double E = youngModulusTemp;
 
-        logger.info("Starting Pipeline for: Linear Tetrahedron (C3D4)");
+        logger.info("Starting Pipeline for: Linear Tetrahedron C3D4");
 
         final File workDir = getContext().getFilesDir();
         final File cadFile = activeSimulationGeometry;
@@ -269,7 +248,7 @@ public class SolidFragment extends Fragment {
                 logger.info("Mesh OK: " + rawInp.getName());
                 executor.execute(() -> {
                     try {
-                        logger.info("Step 2: Assembling CalculiX Input (.inp)...");
+                        logger.info("Step 2: Assembling CalculiX Input INP...");
                         
                         if (!rawInp.exists()) {
                             throw new java.io.FileNotFoundException("No se generó la malla de entrada");
@@ -281,7 +260,7 @@ public class SolidFragment extends Fragment {
 
                         com.diamon.civil.engine.InpAssembler.assemble(workDir, "job_solid", "Steel", E, 0.3, -100.0);
                         
-                        logger.info("Step 3: Running CalculiX Solver (ccx)...");
+                        logger.info("Step 3: Running CalculiX Solver ccx...");
                         String ccxResult = calculixExecutor.executeCalculix("job_solid");
                         logger.log(ccxResult);
                         if (!CalculixExecutor.wasSuccessful(ccxResult)) {
@@ -290,7 +269,7 @@ public class SolidFragment extends Fragment {
 
                         File frdFile = new File(workDir, "job_solid.frd");
                         if (frdFile.exists()) {
-                            logger.info("Step 4: Parsing Engineering Results (Native)...");
+                            logger.info("Step 4: Parsing Engineering Results Native...");
                             NativeFeaCore core = new NativeFeaCore();
                             String summary = core.parseFrdSummary(frdFile.getAbsolutePath());
                             logger.info("NATIVE SIMULATION SUMMARY:\n" + summary);

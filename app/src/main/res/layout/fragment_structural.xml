@@ -36,7 +36,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Structural FEA Analysis"
+                    android:text="Structural Frame Analysis"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="@color/primaryDarkColor"
@@ -69,6 +69,22 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:entries="@array/structure_types_structural"
+                            android:layout_marginBottom="12dp" />
+                            
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Element Type" android:textSize="12sp" android:layout_marginBottom="4dp"/>
+                        <Spinner
+                            android:id="@+id/spinnerElementTypeStructural"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:entries="@array/element_types_structural"
+                            android:layout_marginBottom="12dp" />
+
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Material" android:textSize="12sp" android:layout_marginBottom="4dp"/>
+                        <Spinner
+                            android:id="@+id/spinnerMaterialStructural"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:entries="@array/material_types"
                             android:layout_marginBottom="12dp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -179,16 +195,7 @@
                     app:icon="@android:drawable/ic_menu_save"
                     app:cornerRadius="8dp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSampleModel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="LOAD SAMPLE MODEL"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_marginTop="4dp"
-                    app:cornerRadius="8dp" />
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+
 
         <!-- Tab 1: GL Viewer -->
         <LinearLayout
@@ -233,47 +240,33 @@
             android:background="#000000"
             android:visibility="gone">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Structural Solver Log"
-                    android:textColor="#00FF00"
-                    android:textStyle="bold" />
-                <Button
-                    android:id="@+id/btnClearStructuralLog"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="CLEAR"
-                    android:textColor="#00FF00" />
-                <Button
-                    android:id="@+id/btnCopyStructuralLog"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="COPY"
-                    android:textColor="#00FF00" />
-            </LinearLayout>
-
-            <ScrollView
-                android:id="@+id/scrollStructuralLog"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <TextView
-                    android:id="@+id/tvStructuralLog"
+
+                <ScrollView
+                    android:id="@+id/scrollStructuralLog"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/tvStructuralLog"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:textColor="#00FF00"
+                        android:textSize="11sp" />
+                </ScrollView>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabClearStructuralLog"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
-                    android:textColor="#00FF00"
-                    android:textSize="11sp" />
-            </ScrollView>
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="16dp"
+                    android:src="@android:drawable/ic_menu_delete"
+                    app:fabSize="mini"
+                    app:tint="@color/white" />
+            </FrameLayout>
         </LinearLayout>
 
     </FrameLayout>

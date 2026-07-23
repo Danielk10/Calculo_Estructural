@@ -50,8 +50,7 @@ public class TerminalFragment extends Fragment {
             return true;
         });
 
-        binding.btnCopyLog.setOnClickListener(v -> copyLogToClipboard());
-        binding.btnExportReport.setOnClickListener(v -> exportTerminalReport());
+        binding.scrollLog.setOnClickListener(v -> copyLogToClipboard());
         binding.tvLog.setOnClickListener(v -> copyLogToClipboard());
         
         com.diamon.civil.util.logging.ModuleLogger.getGlobal().attachToTextView(binding.tvLog);
@@ -66,26 +65,18 @@ public class TerminalFragment extends Fragment {
         }
     }
 
-    private void exportTerminalReport() {
-        executor.execute(() -> {
-            try {
-                File workDir = requireContext().getFilesDir();
-                File reportFile = new File(workDir, "terminal_report.txt");
-                try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(reportFile))) {
-                    pw.println("FEA CORE TERMINAL SESSION REPORT");
-                    pw.println("Generated: " + new java.util.Date().toString());
-                    pw.println("----------------------------------");
-                    pw.println(binding.tvLog.getText().toString());
-                }
-                
-                com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(requireContext());
-                if (manager.exportToDownloads(reportFile, "Terminal")) {
-                    getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Report exported to Downloads/FEA_Suite/Terminal", Toast.LENGTH_LONG).show());
-                }
-            } catch (Exception e) {
-                getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Export Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-            }
-        });
+    public void exportResults() {
+        if (getContext() == null || binding == null) return;
+        File workDir = getContext().getFilesDir();
+        File logFile = new File(workDir, "Terminal_Log.txt");
+        try (java.io.FileOutputStream fos = new java.io.FileOutputStream(logFile)) {
+            fos.write(binding.tvLog.getText().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(getContext());
+            manager.exportToDownloads(logFile);
+            Toast.makeText(getContext(), "Exported to Downloads/Structural_Analysis_FEA_Advanced", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Export failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void sendCommand() {

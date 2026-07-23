@@ -18,11 +18,11 @@ public class ExportManager {
         this.context = context;
     }
 
-    public boolean exportToDownloads(File sourceFile, String subFolder) {
+    public boolean exportToDownloads(File sourceFile) {
         if (!sourceFile.exists()) return false;
 
         String displayName = sourceFile.getName();
-        String relativePath = Environment.DIRECTORY_DOWNLOADS + "/FEA_Suite/" + subFolder;
+        String relativePath = Environment.DIRECTORY_DOWNLOADS + "/Structural_Analysis_FEA_Advanced";
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -45,7 +45,7 @@ public class ExportManager {
                 return true;
             } else {
                 File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                File targetDir = new File(downloadDir, "FEA_Suite/" + subFolder);
+                File targetDir = new File(downloadDir, "Structural_Analysis_FEA_Advanced");
                 if (!targetDir.exists() && !targetDir.mkdirs()) return false;
                 
                 File targetFile = new File(targetDir, displayName);

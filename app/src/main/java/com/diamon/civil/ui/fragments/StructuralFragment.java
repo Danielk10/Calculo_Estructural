@@ -94,20 +94,16 @@ public class StructuralFragment extends Fragment {
     private void setupButtons() {
         binding.btnSolveStructural.setOnClickListener(v -> runAnalysis());
         binding.btnExportStructural.setOnClickListener(v -> exportResults());
-        binding.btnClearStructuralLog.setOnClickListener(v -> logger.clear());
-        binding.btnCopyStructuralLog.setOnClickListener(v -> {
-            copyToClipboard(logger.getFullLog());
-        });
+        binding.fabClearStructuralLog.setOnClickListener(v -> logger.clear());
+        
+        binding.scrollStructuralLog.setOnClickListener(v -> copyToClipboard(logger.getFullLog()));
+        binding.tvStructuralLog.setOnClickListener(v -> copyToClipboard(logger.getFullLog()));
 
         binding.btnShowBMD.setOnClickListener(v -> binding.diagramView.setDiagramType(1));
         binding.btnShowSFD.setOnClickListener(v -> binding.diagramView.setDiagramType(2));
         binding.btnShowAFD.setOnClickListener(v -> binding.diagramView.setDiagramType(3));
 
-        // Sample Model Button
-        binding.btnSampleModel.setOnClickListener(v -> {
-            loadDefaultTestCase();
-        });
-    }
+
 
     private void copyToClipboard(String text) {
         if (getContext() == null) return;
@@ -119,7 +115,7 @@ public class StructuralFragment extends Fragment {
         }
     }
 
-    private void exportResults() {
+    public void exportResults() {
         if (getContext() == null) return;
         File workDir = getContext().getFilesDir();
         File reportFile = new File(workDir, "Structural_Report.pdf");
@@ -130,15 +126,15 @@ public class StructuralFragment extends Fragment {
         reportContent.append(binding.tvStructuralResultSummary.getText().toString()).append("\n\n");
         reportContent.append("--- FULL SOLVER LOG ---\n").append(logger.getFullLog());
 
-        com.diamon.civil.engine.ReportGenerator.generateReport(reportFile, "Structural Analysis Report (SAP2000-style)", reportContent.toString(), null);
+        com.diamon.civil.engine.ReportGenerator.generateReport(reportFile, "Structural Analysis Report SAP2000 style", reportContent.toString(), null);
 
         File[] files = workDir.listFiles((dir, name) -> name.startsWith("structural_job") || name.equals("Structural_Report.pdf"));
         if (files != null && files.length > 0) {
             com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(getContext());
             for (File f : files) {
-                manager.exportToDownloads(f, "Structural_Analysis");
+                manager.exportToDownloads(f);
             }
-            Toast.makeText(getContext(), "Exported to Downloads/FEA_Suite", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Exported to Downloads/Structural_Analysis_FEA_Advanced", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(getContext(), "No results to export", Toast.LENGTH_SHORT).show();
         }
@@ -178,14 +174,14 @@ public class StructuralFragment extends Fragment {
                 String jsonModel = modelToJson(model, structureType);
                 core.modelFromJson(modelPtr, jsonModel);
                 
-                logger.info("Assembling CalculiX Input (.inp)...");
+                logger.info("Assembling CalculiX Input INP...");
                 String inpContent = core.modelToInp(modelPtr);
                 File inpFile = new File(filesDir, "structural_job.inp");
                 try (java.io.FileOutputStream fos = new java.io.FileOutputStream(inpFile)) {
                     fos.write(inpContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
                 }
                 
-                logger.info("Executing CalculiX Solver (ccx)...");
+                logger.info("Executing CalculiX Solver ccx...");
                 if (calculixExecutor == null) {
                     calculixExecutor = new CalculixExecutor(appContext);
                 }

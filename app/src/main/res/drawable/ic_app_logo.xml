@@ -1,0 +1,37 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="24.0"
+    android:viewportHeight="24.0">
+    
+    <!-- Background Circle -->
+    <path
+        android:fillColor="#020617"
+        android:pathData="M12,12m-11.5,0a11.5,11.5 0,1 1,23 0a11.5,11.5 0,1 1,-23 0" />
+        
+    <!-- Main Triangle (Truss Outline) -->
+    <path
+        android:fillColor="#1D4ED8"
+        android:pathData="M12,5 L20,18 L4,18 Z" />
+        
+    <!-- Inner Truss Members -->
+    <path
+        android:strokeColor="#60A5FA"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M12,5 L20,18 L4,18 Z M12,5 L12,18 M8,11.5 L16,11.5" />
+        
+    <!-- Central Node Highlights -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,5m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M4,18m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M20,18m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,18m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+</vector>

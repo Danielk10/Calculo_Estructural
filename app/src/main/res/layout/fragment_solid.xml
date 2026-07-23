@@ -36,7 +36,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="3D Solid Analysis (OCCT + Gmsh)"
+                    android:text="Solid Stress Analysis"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/primaryDarkColor"
@@ -62,15 +62,7 @@
                             <Button android:id="@+id/btnCreateCylinder" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="CYL" style="@style/Widget.MaterialComponents.Button.TextButton"/>
                             <Button android:id="@+id/btnCreateSphere" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="SPHERE" style="@style/Widget.MaterialComponents.Button.TextButton"/>
                         </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="8dp">
-                            <Button android:id="@+id/btnFuse" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="UNION" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:textSize="10sp"/>
-                            <Button android:id="@+id/btnCut" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="SUBTRACT" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:textSize="10sp"/>
-                            <Button android:id="@+id/btnIntersect" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="INTERSECT" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:textSize="10sp"/>
-                        </LinearLayout>
+
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -93,6 +85,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:entries="@array/element_types_solid"
+                            android:layout_marginBottom="12dp" />
+
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Material" android:textSize="12sp" android:layout_marginBottom="4dp"/>
+                        <Spinner
+                            android:id="@+id/spinnerMaterialSolid"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:entries="@array/material_types"
                             android:layout_marginBottom="12dp" />
 
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mesh Density" android:textSize="12sp" android:layout_marginBottom="4dp"/>
@@ -147,24 +147,7 @@
                     app:icon="@android:drawable/ic_menu_save"
                     app:cornerRadius="8dp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSampleModel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="LOAD SAMPLE MODEL"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_marginTop="4dp"
-                    app:cornerRadius="8dp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnImportExternalCad"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="IMPORT EXTERNAL CAD"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:icon="@android:drawable/ic_menu_upload"
-                    app:cornerRadius="12dp"
-                    android:layout_marginBottom="48dp" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
@@ -186,47 +169,33 @@
             android:background="#000000"
             android:visibility="gone">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Solid Solver Log"
-                    android:textColor="#00FF00"
-                    android:textStyle="bold" />
-                <Button
-                    android:id="@+id/btnClearSolidLog"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="CLEAR"
-                    android:textColor="#00FF00" />
-                <Button
-                    android:id="@+id/btnCopySolidLog"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="COPY"
-                    android:textColor="#00FF00" />
-            </LinearLayout>
-
-            <ScrollView
-                android:id="@+id/scrollSolidLog"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <TextView
-                    android:id="@+id/tvSolidLog"
+
+                <ScrollView
+                    android:id="@+id/scrollSolidLog"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/tvSolidLog"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:textColor="#00FF00"
+                        android:textSize="11sp" />
+                </ScrollView>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabClearSolidLog"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
-                    android:textColor="#00FF00"
-                    android:textSize="11sp" />
-            </ScrollView>
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="16dp"
+                    android:src="@android:drawable/ic_menu_delete"
+                    app:fabSize="mini"
+                    app:tint="@color/white" />
+            </FrameLayout>
         </LinearLayout>
 
     </FrameLayout>

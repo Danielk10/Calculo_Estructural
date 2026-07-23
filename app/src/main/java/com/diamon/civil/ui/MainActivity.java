@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private AssetHelper assetHelper;
     private com.diamon.civil.util.export.ProjectExporter projectExporter;
-    private static final int PICK_INP_FILE = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void showAboutDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("About FEA Suite")
+                .setTitle("About Structural Analysis FEA Advanced")
                 .setMessage("Structural & 3D Solid Analysis\nPowered by CalculiX & GMSH\n\nDeveloped by Daniel Diamon")
                 .setPositiveButton("Close", null)
                 .show();
@@ -121,51 +121,71 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_export_all) {
-            projectExporter.exportAll(getFilesDir(), "Project_Export");
+            projectExporter.exportAll(getFilesDir());
+            return true;
+        } else if (id == R.id.action_export) {
+            Fragment current = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+            if (current instanceof SolidFragment) {
+                ((SolidFragment) current).exportResults();
+            } else if (current instanceof StructuralFragment) {
+                ((StructuralFragment) current).exportResults();
+            } else if (current instanceof TerminalFragment) {
+                ((TerminalFragment) current).exportResults();
+            } else {
+                Toast.makeText(this, "No module active to export", Toast.LENGTH_SHORT).show();
+            }
             return true;
         } else if (id == R.id.action_import) {
-            openFilePicker();
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*");
+            startActivityForResult(intent, 1);
             return true;
-        } else if (id == R.id.action_docs) {
+        } else if (id == R.id.action_docs_calculix) {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.calculix.de/html/ccx.html")));
+            return true;
+        } else if (id == R.id.action_docs_gmsh) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://gmsh.info/doc/texinfo/gmsh.html")));
+            return true;
+        } else if (id == R.id.action_docs_occt) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://dev.opencascade.org/doc/overview/html/index.html")));
+            return true;
+        } else if (id == R.id.action_licenses) {
+            new AlertDialog.Builder(this)
+                .setTitle("Licenses")
+                .setMessage("CalculiX - GPLv2\nGmsh - GPLv2 or later\nOpenCASCADE - LGPLv2.1")
+                .setPositiveButton("Close", null)
+                .show();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void openFilePicker() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
-        startActivityForResult(intent, PICK_INP_FILE);
-    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_INP_FILE && resultCode == RESULT_OK && data != null) {
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
             Uri uri = data.getData();
-            if (uri != null) importInpFile(uri);
-        }
-    }
-
-    private void importInpFile(Uri uri) {
-        executor.execute(() -> {
-            try {
-                File tempFile = new File(getFilesDir(), "imported.inp");
-                com.diamon.civil.io.FileHelper fh = new com.diamon.civil.io.FileHelper(getContentResolver());
-                if (fh.importFile(uri, tempFile)) {
-                    com.diamon.civil.io.AbaqusInpImporter importer = new com.diamon.civil.io.AbaqusInpImporter();
-                    com.diamon.civil.engine.StructuralModel model = importer.importInp(tempFile);
-                    
-                    runOnUiThread(() -> {
-                        Toast.makeText(this, "Imported " + model.nodes.size() + " nodes", Toast.LENGTH_SHORT).show();
-                        switchFragment(new com.diamon.civil.ui.fragments.StructuralFragment(), "Structural Analysis");
-                    });
-                }
-            } catch (Exception e) {
-                runOnUiThread(() -> Toast.makeText(this, "Import Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            if (uri != null) {
+                executor.execute(() -> {
+                    try {
+                        File tempFile = new File(getFilesDir(), "imported.inp");
+                        com.diamon.civil.io.FileHelper fh = new com.diamon.civil.io.FileHelper(getContentResolver());
+                        if (fh.importFile(uri, tempFile)) {
+                            com.diamon.civil.io.AbaqusInpImporter importer = new com.diamon.civil.io.AbaqusInpImporter();
+                            com.diamon.civil.engine.StructuralModel model = importer.importInp(tempFile);
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Imported " + model.nodes.size() + " nodes", Toast.LENGTH_SHORT).show();
+                                switchFragment(new StructuralFragment(), "Structural Analysis");
+                            });
+                        }
+                    } catch (Exception e) {
+                        runOnUiThread(() -> Toast.makeText(this, "Import Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    }
+                });
             }
-        });
+        }
     }
 
     private void resetAssets() {

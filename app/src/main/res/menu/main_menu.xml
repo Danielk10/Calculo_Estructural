@@ -1,29 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
         android:id="@+id/action_import"
-        android:title="Importar .inp"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_export"
-        android:title="Exportar Reporte (.txt)"
+        android:title="Import .INP"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_export_pdf"
-        android:title="Exportar Reporte (PDF)"
+        android:id="@+id/action_export"
+        android:title="Export PDF Report"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_export_all"
-        android:title="Export Everything (.zip)"
+        android:title="Export All Files"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_docs"
-        android:title="CalculiX Manual"
+        android:id="@+id/action_docs_calculix"
+        android:title="CalculiX Docs"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_docs_gmsh"
+        android:title="Gmsh Docs"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_docs_occt"
+        android:title="OCCT Docs"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_licenses"
+        android:title="About Licenses"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_about"
         android:title="About"
         app:showAsAction="never" />
-    </menu>
+</menu>
 
