@@ -241,22 +241,53 @@ public class StructuralFragment extends Fragment {
     }
 
     private String modelToJson(StructuralModel model, String structureType) {
-        // The editor accepts two nodes per element, therefore it intentionally
-        // exposes B31 only.  B32 was incompatible and produced invalid jobs.
-        String elementType = "B31";
+        // Automatically interpolate a third node to use B32 quadratic beam elements
+        String elementType = "B32";
 
         StringBuilder sb = new StringBuilder();
         sb.append("{ \"nodes\": [");
+        
+        int maxNodeId = 0;
         for (int i = 0; i < model.nodes.size(); i++) {
             StructuralModel.Node n = model.nodes.get(i);
+            if (n.id > maxNodeId) maxNodeId = n.id;
             sb.append(String.format(java.util.Locale.US, "{\"id\":%d,\"x\":%f,\"y\":%f,\"z\":%f}", n.id, n.x, n.y, n.z));
-            if (i < model.nodes.size() - 1) sb.append(",");
+            sb.append(",");
         }
+        
+        // List to hold the 3 node IDs for each element
+        java.util.List<int[]> elementNodes = new java.util.ArrayList<>();
+        for (int i = 0; i < model.elements.size(); i++) {
+            StructuralModel.Element e = model.elements.get(i);
+            StructuralModel.Node n1 = null, n2 = null;
+            for (StructuralModel.Node n : model.nodes) {
+                if (n.id == e.node1Id) n1 = n;
+                if (n.id == e.node2Id) n2 = n;
+            }
+            if (n1 != null && n2 != null) {
+                maxNodeId++;
+                int midNodeId = maxNodeId;
+                double mx = (n1.x + n2.x) / 2.0;
+                double my = (n1.y + n2.y) / 2.0;
+                double mz = (n1.z + n2.z) / 2.0;
+                sb.append(String.format(java.util.Locale.US, "{\"id\":%d,\"x\":%f,\"y\":%f,\"z\":%f}", midNodeId, mx, my, mz));
+                if (i < model.elements.size() - 1) sb.append(",");
+                
+                elementNodes.add(new int[]{e.node1Id, e.node2Id, midNodeId});
+            } else {
+                elementNodes.add(new int[]{e.node1Id, e.node2Id}); // Fallback
+            }
+        }
+        
         sb.append("], \"elements\": [");
         for (int i = 0; i < model.elements.size(); i++) {
             StructuralModel.Element e = model.elements.get(i);
-            // Explicitly set elset to Eall for results parsing
-            sb.append(String.format(java.util.Locale.US, "{\"id\":%d,\"type\":\"%s\",\"elset\":\"Eall\",\"nodes\":[%d,%d]}", e.id, elementType, e.node1Id, e.node2Id));
+            int[] nodes = elementNodes.get(i);
+            if (nodes.length == 3) {
+                sb.append(String.format(java.util.Locale.US, "{\"id\":%d,\"type\":\"%s\",\"elset\":\"Eall\",\"nodes\":[%d,%d,%d]}", e.id, elementType, nodes[0], nodes[1], nodes[2]));
+            } else {
+                sb.append(String.format(java.util.Locale.US, "{\"id\":%d,\"type\":\"B31\",\"elset\":\"Eall\",\"nodes\":[%d,%d]}", e.id, nodes[0], nodes[1]));
+            }
             if (i < model.elements.size() - 1) sb.append(",");
         }
         sb.append("], \"materials\": [{\"name\":\"Steel\",\"youngModulus\":210000,\"poissonRatio\":0.3,\"density\":7850}],");
