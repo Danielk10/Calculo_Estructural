@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.diamon.civil.engine.StructuralModel;
 
@@ -17,25 +18,65 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class FrameRenderer implements GLSurfaceView.Renderer {
+    private static final String TAG = "FrameRenderer";
 
     private final Context context;
-    private final float[] projectionMatrix = new float[16];
-    private final float[] viewMatrix = new float[16];
-    
-    private int program;
-    private int uProjectionLocation;
-    private int uViewLocation;
-    private int uColorLocation;
-
-    private FloatBuffer gridBuffer;
-    private int gridVertexCount;
-
     private final List<StructuralModel.Node> nodes = new ArrayList<>();
     private final List<StructuralModel.Element> elements = new ArrayList<>();
-    private FloatBuffer nodeBuffer;
-    private int nodeVertexCount = 0;
-    private FloatBuffer beamBuffer;
-    private int beamVertexCount = 0;
+
+    // Shader sources (GLSL ES 3.0)
+    private static final String VERTEX_SHADER =
+            "#version 300 es\n" +
+            "uniform mat4 uMVPMatrix;\n" +
+            "uniform float uPointSize;\n" +
+            "in vec3 aPosition;\n" +
+            "in vec4 aColor;\n" +
+            "out vec4 vColor;\n" +
+            "void main() {\n" +
+            "    gl_Position = uMVPMatrix * vec4(aPosition, 1.0);\n" +
+            "    gl_PointSize = uPointSize;\n" +
+            "    vColor = aColor;\n" +
+            "}\n";
+
+    private static final String FRAGMENT_SHADER =
+            "#version 300 es\n" +
+            "precision mediump float;\n" +
+            "in vec4 vColor;\n" +
+            "out vec4 fragColor;\n" +
+            "void main() {\n" +
+            "    fragColor = vColor;\n" +
+            "}\n";
+
+    private final float[] mvpMatrix = new float[16];
+    private final float[] projectionMatrix = new float[16];
+    private final float[] viewMatrix = new float[16];
+    private final float[] modelMatrix = new float[16];
+    private final float[] tempMatrix = new float[16];
+
+    private float rotationX = 30f;
+    private float rotationY = -45f;
+    private float translationX = 0f;
+    private float translationY = 0f;
+    private float zoom = 15f;
+
+    private int programId;
+    private int mvpMatrixHandle;
+    private int positionHandle;
+    private int colorHandle;
+    private int pointSizeHandle;
+
+    private int[] nodeVBO = new int[2];
+    private int[] elemVBO = new int[2];
+    private int[] gridVBO = new int[2];
+
+    private int nodeCount = 0;
+    private int elemVertexCount = 0;
+    private int gridVertexCount = 0;
+
+    private int screenWidth = 1;
+    private int screenHeight = 1;
+    
+    private boolean vbosInitialized = false;
 
     public FrameRenderer(Context context) {
         this.context = context;
@@ -43,53 +84,73 @@ public class FrameRenderer implements GLSurfaceView.Renderer {
 
     public void addNode(StructuralModel.Node node) {
         nodes.add(node);
-        updateBuffers();
+        updateModelBuffers();
     }
 
     public void addElement(StructuralModel.Element element) {
         elements.add(element);
-        updateBuffers();
+        updateModelBuffers();
     }
 
     public void clear() {
         nodes.clear();
         elements.clear();
-        updateBuffers();
+        updateModelBuffers();
     }
 
-    private void updateBuffers() {
-        // Nodes
-        float[] nodeVertices = new float[nodes.size() * 3];
-        for (int i = 0; i < nodes.size(); i++) {
-            nodeVertices[i * 3] = (float) nodes.get(i).x;
-            nodeVertices[i * 3 + 1] = (float) nodes.get(i).y;
-            nodeVertices[i * 3 + 2] = (float) nodes.get(i).z;
-        }
-        nodeVertexCount = nodes.size();
-        if (nodeVertexCount > 0) {
-            nodeBuffer = ByteBuffer.allocateDirect(nodeVertices.length * 4)
-                    .order(ByteOrder.nativeOrder())
-                    .asFloatBuffer();
-            nodeBuffer.put(nodeVertices).position(0);
+    private void updateModelBuffers() {
+        if (!vbosInitialized) return;
+        
+        // Build Nodes Data
+        if (nodes.isEmpty()) {
+            nodeCount = 0;
+        } else {
+            float[] nodePositions = new float[nodes.size() * 3];
+            float[] nodeColors = new float[nodes.size() * 4];
+            for (int i = 0; i < nodes.size(); i++) {
+                nodePositions[i * 3] = (float) nodes.get(i).x;
+                nodePositions[i * 3 + 1] = (float) nodes.get(i).y;
+                nodePositions[i * 3 + 2] = (float) nodes.get(i).z;
+                
+                nodeColors[i * 4] = 1.0f;     // R
+                nodeColors[i * 4 + 1] = 0.3f; // G
+                nodeColors[i * 4 + 2] = 0.3f; // B
+                nodeColors[i * 4 + 3] = 1.0f; // A
+            }
+            nodeCount = nodes.size();
+            uploadVBO(nodeVBO, nodePositions, nodeColors);
         }
 
-        // Beams
-        float[] beamVertices = new float[elements.size() * 6];
-        int idx = 0;
-        for (StructuralModel.Element e : elements) {
-            StructuralModel.Node n1 = findNode(e.node1Id);
-            StructuralModel.Node n2 = findNode(e.node2Id);
-            if (n1 != null && n2 != null) {
-                beamVertices[idx++] = (float) n1.x; beamVertices[idx++] = (float) n1.y; beamVertices[idx++] = (float) n1.z;
-                beamVertices[idx++] = (float) n2.x; beamVertices[idx++] = (float) n2.y; beamVertices[idx++] = (float) n2.z;
+        // Build Elements Data
+        if (elements.isEmpty()) {
+            elemVertexCount = 0;
+        } else {
+            float[] elemPositions = new float[elements.size() * 6];
+            float[] elemColors = new float[elements.size() * 8];
+            int posIdx = 0;
+            int colIdx = 0;
+            for (StructuralModel.Element e : elements) {
+                StructuralModel.Node n1 = findNode(e.node1Id);
+                StructuralModel.Node n2 = findNode(e.node2Id);
+                if (n1 != null && n2 != null) {
+                    elemPositions[posIdx++] = (float) n1.x;
+                    elemPositions[posIdx++] = (float) n1.y;
+                    elemPositions[posIdx++] = (float) n1.z;
+                    
+                    elemPositions[posIdx++] = (float) n2.x;
+                    elemPositions[posIdx++] = (float) n2.y;
+                    elemPositions[posIdx++] = (float) n2.z;
+                    
+                    // Node 1 Color (Blue)
+                    elemColors[colIdx++] = 0.2f; elemColors[colIdx++] = 0.4f; elemColors[colIdx++] = 0.8f; elemColors[colIdx++] = 1.0f;
+                    // Node 2 Color (Blue)
+                    elemColors[colIdx++] = 0.2f; elemColors[colIdx++] = 0.4f; elemColors[colIdx++] = 0.8f; elemColors[colIdx++] = 1.0f;
+                }
             }
-        }
-        beamVertexCount = idx / 3;
-        if (beamVertexCount > 0) {
-            beamBuffer = ByteBuffer.allocateDirect(beamVertices.length * 4)
-                    .order(ByteOrder.nativeOrder())
-                    .asFloatBuffer();
-            beamBuffer.put(beamVertices).position(0);
+            elemVertexCount = posIdx / 3;
+            if (elemVertexCount > 0) {
+                uploadVBO(elemVBO, elemPositions, elemColors);
+            }
         }
     }
 
@@ -100,104 +161,161 @@ public class FrameRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        GLES30.glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
+        GLES30.glClearColor(0.08f, 0.08f, 0.12f, 1.0f); // Dark blue-gray background
         GLES30.glEnable(GLES30.GL_DEPTH_TEST);
-        GLES30.glLineWidth(5.0f);
+        GLES30.glLineWidth(3.0f);
+
+        programId = createProgram(VERTEX_SHADER, FRAGMENT_SHADER);
+        if (programId == 0) return;
+
+        mvpMatrixHandle = GLES30.glGetUniformLocation(programId, "uMVPMatrix");
+        positionHandle = GLES30.glGetAttribLocation(programId, "aPosition");
+        colorHandle = GLES30.glGetAttribLocation(programId, "aColor");
+        pointSizeHandle = GLES30.glGetUniformLocation(programId, "uPointSize");
+
+        GLES30.glGenBuffers(2, nodeVBO, 0);
+        GLES30.glGenBuffers(2, elemVBO, 0);
+        GLES30.glGenBuffers(2, gridVBO, 0);
         
-        // Simple program
-        String vertexShaderCode = 
-            "#version 300 es\n" +
-            "layout(location = 0) in vec3 aPosition;\n" +
-            "uniform mat4 uProjection;\n" +
-            "uniform mat4 uView;\n" +
-            "void main() {\n" +
-            "    gl_Position = uProjection * uView * vec4(aPosition, 1.0);\n" +
-            "    gl_PointSize = 20.0;\n" + // Set point size here
-            "}";
-            
-        String fragmentShaderCode = 
-            "#version 300 es\n" +
-            "precision mediump float;\n" +
-            "out vec4 fragColor;\n" +
-            "uniform vec4 uColor;\n" +
-            "void main() {\n" +
-            "    fragColor = uColor;\n" +
-            "}";
+        vbosInitialized = true;
 
-        program = createProgram(vertexShaderCode, fragmentShaderCode);
-        uProjectionLocation = GLES30.glGetUniformLocation(program, "uProjection");
-        uViewLocation = GLES30.glGetUniformLocation(program, "uView");
-        uColorLocation = GLES30.glGetUniformLocation(program, "uColor");
-
-        setupGrid();
-    }
-
-    private void setupGrid() {
-        int size = 20;
-        int step = 1;
-        float[] gridVertices = new float[(size * 2 + 1) * 2 * 2 * 3];
-        int idx = 0;
-
-        for (int i = -size; i <= size; i += step) {
-            // Horizontal lines
-            gridVertices[idx++] = -size; gridVertices[idx++] = 0; gridVertices[idx++] = i;
-            gridVertices[idx++] = size; gridVertices[idx++] = 0; gridVertices[idx++] = i;
-            // Vertical lines
-            gridVertices[idx++] = i; gridVertices[idx++] = 0; gridVertices[idx++] = -size;
-            gridVertices[idx++] = i; gridVertices[idx++] = 0; gridVertices[idx++] = size;
-        }
-        gridVertexCount = idx / 3;
-
-        gridBuffer = ByteBuffer.allocateDirect(gridVertices.length * 4)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
-        gridBuffer.put(gridVertices);
-        gridBuffer.position(0);
+        createGrid();
+        updateModelBuffers(); // Ensure previously added nodes are buffered
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES30.glViewport(0, 0, width, height);
-        float ratio = (float) width / height;
-        Matrix.perspectiveM(projectionMatrix, 0, 45, ratio, 0.1f, 100.0f);
-        Matrix.setLookAtM(viewMatrix, 0, 10, 10, 10, 0, 0, 0, 0, 1, 0);
+        screenWidth = width;
+        screenHeight = height;
+        updateProjectionMatrix();
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
 
-        GLES30.glUseProgram(program);
-        GLES30.glUniformMatrix4fv(uProjectionLocation, 1, false, projectionMatrix, 0);
-        GLES30.glUniformMatrix4fv(uViewLocation, 1, false, viewMatrix, 0);
+        if (programId == 0) return;
+        GLES30.glUseProgram(programId);
 
-        GLES30.glEnableVertexAttribArray(0);
+        Matrix.setIdentityM(viewMatrix, 0);
+        Matrix.translateM(viewMatrix, 0, translationX, translationY, -zoom);
+        Matrix.rotateM(viewMatrix, 0, rotationX, 1f, 0f, 0f);
+        Matrix.rotateM(viewMatrix, 0, rotationY, 0f, 1f, 0f);
 
-        // 1. Draw Grid
-        GLES30.glUniform4f(uColorLocation, 0.7f, 0.7f, 0.7f, 1.0f);
-        GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, false, 0, gridBuffer);
-        GLES30.glDrawArrays(GLES30.GL_LINES, 0, gridVertexCount);
+        Matrix.setIdentityM(modelMatrix, 0);
 
-        // 2. Draw Beams
-        if (beamVertexCount > 0) {
-            GLES30.glUniform4f(uColorLocation, 0.2f, 0.4f, 0.8f, 1.0f); // Blue
-            GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, false, 0, beamBuffer);
-            GLES30.glDrawArrays(GLES30.GL_LINES, 0, beamVertexCount);
+        Matrix.multiplyMM(tempMatrix, 0, viewMatrix, 0, modelMatrix, 0);
+        Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, tempMatrix, 0);
+
+        GLES30.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0);
+
+        if (gridVertexCount > 0) {
+            GLES30.glUniform1f(pointSizeHandle, 1.0f);
+            drawVBO(gridVBO, gridVertexCount, GLES30.GL_LINES);
         }
 
-        // 3. Draw Nodes
-        if (nodeVertexCount > 0) {
-            GLES30.glUniform4f(uColorLocation, 1.0f, 0.3f, 0.3f, 1.0f); // Red
-            GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, false, 0, nodeBuffer);
-            GLES30.glDrawArrays(GLES30.GL_POINTS, 0, nodeVertexCount);
+        if (elemVertexCount > 0) {
+            drawVBO(elemVBO, elemVertexCount, GLES30.GL_LINES);
         }
 
-        GLES30.glDisableVertexAttribArray(0);
+        if (nodeCount > 0) {
+            GLES30.glUniform1f(pointSizeHandle, 15.0f);
+            drawVBO(nodeVBO, nodeCount, GLES30.GL_POINTS);
+        }
     }
 
-    private int createProgram(String vertexCode, String fragmentCode) {
-        int vertexShader = loadShader(GLES30.GL_VERTEX_SHADER, vertexCode);
-        int fragmentShader = loadShader(GLES30.GL_FRAGMENT_SHADER, fragmentCode);
+    public void addRotation(float dx, float dy) {
+        this.rotationY += dx;
+        this.rotationX += dy;
+        if (this.rotationX > 89f) this.rotationX = 89f;
+        if (this.rotationX < -89f) this.rotationX = -89f;
+    }
+
+    public void setTranslation(float dx, float dy) {
+        this.translationX += dx;
+        this.translationY += dy;
+    }
+
+    public void setZoom(float scale) {
+        this.zoom *= scale;
+        if (this.zoom < 1f) this.zoom = 1f;
+        if (this.zoom > 100f) this.zoom = 100f;
+    }
+
+    private void updateProjectionMatrix() {
+        float ratio = (float) screenWidth / screenHeight;
+        Matrix.perspectiveM(projectionMatrix, 0, 45f, ratio, 0.1f, 200f);
+    }
+
+    private void createGrid() {
+        int gridSize = 10;
+        int lineCount = (gridSize * 2 + 1) * 2;
+        float[] positions = new float[lineCount * 2 * 3];
+        float[] colors = new float[lineCount * 2 * 4];
+
+        int idx = 0;
+        int cidx = 0;
+        for (int i = -gridSize; i <= gridSize; i++) {
+            positions[idx++] = i; positions[idx++] = 0; positions[idx++] = -gridSize;
+            positions[idx++] = i; positions[idx++] = 0; positions[idx++] = gridSize;
+            
+            positions[idx++] = -gridSize; positions[idx++] = 0; positions[idx++] = i;
+            positions[idx++] = gridSize; positions[idx++] = 0; positions[idx++] = i;
+
+            float alpha = (i == 0) ? 0.5f : 0.15f;
+            for (int j = 0; j < 4; j++) {
+                colors[cidx++] = 0.4f; colors[cidx++] = 0.4f; colors[cidx++] = 0.5f; colors[cidx++] = alpha;
+            }
+        }
+
+        gridVertexCount = idx / 3;
+        uploadVBO(gridVBO, positions, colors);
+    }
+
+    private void uploadVBO(int[] vbo, float[] positions, float[] colors) {
+        FloatBuffer posBuffer = createFloatBuffer(positions);
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, vbo[0]);
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, positions.length * 4, posBuffer, GLES30.GL_STATIC_DRAW);
+
+        FloatBuffer colorBuffer = createFloatBuffer(colors);
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, vbo[1]);
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, colors.length * 4, colorBuffer, GLES30.GL_STATIC_DRAW);
+
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
+    }
+
+    private void drawVBO(int[] vbo, int vertexCount, int drawMode) {
+        if (vbo[0] == 0 || vbo[1] == 0) return;
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, vbo[0]);
+        GLES30.glEnableVertexAttribArray(positionHandle);
+        GLES30.glVertexAttribPointer(positionHandle, 3, GLES30.GL_FLOAT, false, 0, 0);
+
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, vbo[1]);
+        GLES30.glEnableVertexAttribArray(colorHandle);
+        GLES30.glVertexAttribPointer(colorHandle, 4, GLES30.GL_FLOAT, false, 0, 0);
+
+        GLES30.glDrawArrays(drawMode, 0, vertexCount);
+
+        GLES30.glDisableVertexAttribArray(positionHandle);
+        GLES30.glDisableVertexAttribArray(colorHandle);
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
+    }
+
+    private FloatBuffer createFloatBuffer(float[] data) {
+        ByteBuffer bb = ByteBuffer.allocateDirect(data.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+        FloatBuffer fb = bb.asFloatBuffer();
+        fb.put(data);
+        fb.position(0);
+        return fb;
+    }
+
+    private int createProgram(String vertexSource, String fragmentSource) {
+        int vertexShader = loadShader(GLES30.GL_VERTEX_SHADER, vertexSource);
+        int fragmentShader = loadShader(GLES30.GL_FRAGMENT_SHADER, fragmentSource);
+        if (vertexShader == 0 || fragmentShader == 0) return 0;
+
         int program = GLES30.glCreateProgram();
         GLES30.glAttachShader(program, vertexShader);
         GLES30.glAttachShader(program, fragmentShader);
@@ -205,9 +323,9 @@ public class FrameRenderer implements GLSurfaceView.Renderer {
         return program;
     }
 
-    private int loadShader(int type, String shaderCode) {
+    private int loadShader(int type, String source) {
         int shader = GLES30.glCreateShader(type);
-        GLES30.glShaderSource(shader, shaderCode);
+        GLES30.glShaderSource(shader, source);
         GLES30.glCompileShader(shader);
         return shader;
     }
