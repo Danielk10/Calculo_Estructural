@@ -223,9 +223,9 @@
                 android:orientation="horizontal"
                 android:padding="8dp"
                 android:background="@color/white">
-                <Button android:id="@+id/btnShowBMD" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="BMD" style="@style/Widget.MaterialComponents.Button.TextButton" android:textSize="10sp"/>
-                <Button android:id="@+id/btnShowSFD" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="SFD" style="@style/Widget.MaterialComponents.Button.TextButton" android:textSize="10sp"/>
-                <Button android:id="@+id/btnShowAFD" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="AFD" style="@style/Widget.MaterialComponents.Button.TextButton" android:textSize="10sp"/>
+                <Button android:id="@+id/btnViewWireframe" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="MALLA" style="@style/Widget.MaterialComponents.Button.TextButton" android:textSize="10sp"/>
+                <Button android:id="@+id/btnViewDeformed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="DEFORMADA" style="@style/Widget.MaterialComponents.Button.TextButton" android:textSize="10sp"/>
+                <Button android:id="@+id/btnViewDiagrams" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="DIAGRAMA" style="@style/Widget.MaterialComponents.Button.TextButton" android:textSize="10sp"/>
             </LinearLayout>
         </LinearLayout>
 

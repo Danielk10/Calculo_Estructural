@@ -97,11 +97,22 @@ public class StructuralFragment extends Fragment {
         binding.fabClearStructuralLog.setOnClickListener(v -> logger.clear());
         
         binding.scrollStructuralLog.setOnClickListener(v -> copyToClipboard(logger.getFullLog()));
+        binding.btnViewWireframe.setOnClickListener(v -> {
+            binding.frameGLView.setShowDeformed(false);
+            binding.frameGLView.setShowDiagrams(false);
+        });
+        
+        binding.btnViewDeformed.setOnClickListener(v -> {
+            binding.frameGLView.setShowDeformed(true);
+            binding.frameGLView.setShowDiagrams(false);
+        });
+        
+        binding.btnViewDiagrams.setOnClickListener(v -> {
+            binding.frameGLView.setShowDeformed(true);
+            binding.frameGLView.setShowDiagrams(true);
+        });
+        
         binding.tvStructuralLog.setOnClickListener(v -> copyToClipboard(logger.getFullLog()));
-
-        binding.btnShowBMD.setOnClickListener(v -> binding.diagramView.setDiagramType(1));
-        binding.btnShowSFD.setOnClickListener(v -> binding.diagramView.setDiagramType(2));
-        binding.btnShowAFD.setOnClickListener(v -> binding.diagramView.setDiagramType(3));
     }
 
 
@@ -190,16 +201,7 @@ public class StructuralFragment extends Fragment {
                 File datFile = new File(filesDir, "structural_job.dat");
                 if (datFile.exists()) {
                     DatParser.ParseResult parseResult = datParser.parse(datFile);
-                    
-                    android.app.Activity activity = getActivity();
-                    if (activity != null) {
-                        activity.runOnUiThread(() -> {
-                            if (binding != null) {
-                                binding.diagramView.setModelAndResults(model, parseResult);
-                                binding.diagramView.setDiagramType(1);
-                            }
-                        });
-                    }
+                    calculateVBOs(model, parseResult);
                 }
 
                 android.app.Activity activity = getActivity();
@@ -337,6 +339,105 @@ public class StructuralFragment extends Fragment {
             }
         }
         return model;
+    }
+
+    private void calculateVBOs(StructuralModel model, DatParser.ParseResult res) {
+        float dispScale = 1000f; 
+        
+        java.util.List<Float> defLines = new java.util.ArrayList<>();
+        java.util.List<Float> defColors = new java.util.ArrayList<>();
+        
+        java.util.List<Float> diagLines = new java.util.ArrayList<>();
+        java.util.List<Float> diagColors = new java.util.ArrayList<>();
+        
+        java.util.Map<Integer, DatParser.NodeDisplacement> dispMap = new java.util.HashMap<>();
+        if (res.displacements != null) {
+            for (DatParser.NodeDisplacement nd : res.displacements) {
+                dispMap.put(nd.nodeId, nd);
+            }
+        }
+        
+        java.util.Map<Integer, DatParser.SectionForces> forceMap = new java.util.HashMap<>();
+        if (res.forces != null) {
+            for (DatParser.SectionForces f : res.forces) {
+                forceMap.put(f.elementId, f);
+            }
+        }
+
+        for (StructuralModel.Element elem : model.elements) {
+            StructuralModel.Node n1 = null, n2 = null;
+            for (StructuralModel.Node n : model.nodes) {
+                if (n.id == elem.node1Id) n1 = n;
+                if (n.id == elem.node2Id) n2 = n;
+            }
+            if (n1 == null || n2 == null) continue;
+            
+            DatParser.NodeDisplacement d1 = dispMap.get(n1.id);
+            DatParser.NodeDisplacement d2 = dispMap.get(n2.id);
+            
+            float dx1 = d1 != null ? (float)d1.ux * dispScale : 0;
+            float dy1 = d1 != null ? (float)d1.uy * dispScale : 0;
+            float dz1 = d1 != null ? (float)d1.uz * dispScale : 0;
+            
+            float dx2 = d2 != null ? (float)d2.ux * dispScale : 0;
+            float dy2 = d2 != null ? (float)d2.uy * dispScale : 0;
+            float dz2 = d2 != null ? (float)d2.uz * dispScale : 0;
+            
+            defLines.add((float)n1.x + dx1); defLines.add((float)n1.y + dy1); defLines.add((float)n1.z + dz1);
+            defLines.add((float)n2.x + dx2); defLines.add((float)n2.y + dy2); defLines.add((float)n2.z + dz2);
+            defColors.add(1f); defColors.add(0f); defColors.add(0f); defColors.add(1f);
+            defColors.add(1f); defColors.add(0f); defColors.add(0f); defColors.add(1f);
+            
+            DatParser.SectionForces sf = forceMap.get(elem.id);
+            if (sf != null) {
+                float M = (float)sf.M1;
+                float offsetScale = 0.005f;
+                float offset = M * offsetScale;
+                
+                float L = (float)Math.hypot(n2.x - n1.x, n2.y - n1.y);
+                if (L > 1e-4) {
+                    float nx = (float)(-(n2.y - n1.y)/L) * offset;
+                    float ny = (float)((n2.x - n1.x)/L) * offset;
+                    
+                    diagLines.add((float)n1.x); diagLines.add((float)n1.y); diagLines.add((float)n1.z);
+                    diagLines.add((float)n1.x + nx); diagLines.add((float)n1.y + ny); diagLines.add((float)n1.z);
+                    
+                    diagLines.add((float)n1.x + nx); diagLines.add((float)n1.y + ny); diagLines.add((float)n1.z);
+                    diagLines.add((float)n2.x + nx); diagLines.add((float)n2.y + ny); diagLines.add((float)n2.z);
+                    
+                    diagLines.add((float)n2.x + nx); diagLines.add((float)n2.y + ny); diagLines.add((float)n2.z);
+                    diagLines.add((float)n2.x); diagLines.add((float)n2.y); diagLines.add((float)n2.z);
+                    
+                    for (int k=0; k<6; k++) {
+                        diagColors.add(1f); diagColors.add(0f); diagColors.add(1f); diagColors.add(1f);
+                    }
+                }
+            }
+        }
+        
+        float[] defPosArray = new float[defLines.size()];
+        for (int i=0; i<defLines.size(); i++) defPosArray[i] = defLines.get(i);
+        float[] defColArray = new float[defColors.size()];
+        for (int i=0; i<defColors.size(); i++) defColArray[i] = defColors.get(i);
+        
+        float[] diagPosArray = new float[diagLines.size()];
+        for (int i=0; i<diagLines.size(); i++) diagPosArray[i] = diagLines.get(i);
+        float[] diagColArray = new float[diagColors.size()];
+        for (int i=0; i<diagColors.size(); i++) diagColArray[i] = diagColors.get(i);
+        
+        android.app.Activity activity = getActivity();
+        if (activity != null) {
+            activity.runOnUiThread(() -> {
+                if (binding != null) {
+                    binding.frameGLView.setDeformedShape(defPosArray, defColArray);
+                    binding.frameGLView.setDiagrams(diagPosArray, diagColArray);
+                    binding.frameGLView.setShowDeformed(true);
+                    binding.frameGLView.setShowDiagrams(true);
+                    
+                    binding.diagramView.setVisibility(android.view.View.GONE);
+                }
+            });
+        }
     }
 
     @Override

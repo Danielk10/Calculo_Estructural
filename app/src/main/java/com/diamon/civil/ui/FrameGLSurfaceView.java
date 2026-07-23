@@ -42,6 +42,34 @@ public class FrameGLSurfaceView extends GLSurfaceView {
 
     public FrameRenderer getRenderer() { return renderer; }
 
+    public void setShowDeformed(boolean show) {
+        queueEvent(() -> {
+            renderer.setShowDeformed(show);
+            requestRender();
+        });
+    }
+
+    public void setShowDiagrams(boolean show) {
+        queueEvent(() -> {
+            renderer.setShowDiagrams(show);
+            requestRender();
+        });
+    }
+
+    public void setDeformedShape(float[] positions, float[] colors) {
+        queueEvent(() -> {
+            renderer.setDeformedShape(positions, colors);
+            requestRender();
+        });
+    }
+
+    public void setDiagrams(float[] positions, float[] colors) {
+        queueEvent(() -> {
+            renderer.setDiagrams(positions, colors);
+            requestRender();
+        });
+    }
+
     private void setupGestures(Context context) {
         scaleDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
             @Override

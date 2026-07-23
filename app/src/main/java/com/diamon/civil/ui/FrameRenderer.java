@@ -68,6 +68,19 @@ public class FrameRenderer implements GLSurfaceView.Renderer {
     private int[] nodeVBO = new int[2];
     private int[] elemVBO = new int[2];
     private int[] gridVBO = new int[2];
+    private int[] deformedVBO = new int[2];
+    private int[] diagramVBO = new int[2];
+
+    private float[] deformedPositions;
+    private float[] deformedColors;
+    private int deformedVertexCount = 0;
+
+    private float[] diagramPositions;
+    private float[] diagramColors;
+    private int diagramVertexCount = 0;
+
+    private boolean showDeformed = false;
+    private boolean showDiagrams = false;
 
     private int nodeCount = 0;
     private int elemVertexCount = 0;
@@ -176,11 +189,16 @@ public class FrameRenderer implements GLSurfaceView.Renderer {
         GLES30.glGenBuffers(2, nodeVBO, 0);
         GLES30.glGenBuffers(2, elemVBO, 0);
         GLES30.glGenBuffers(2, gridVBO, 0);
+        GLES30.glGenBuffers(2, deformedVBO, 0);
+        GLES30.glGenBuffers(2, diagramVBO, 0);
         
         vbosInitialized = true;
 
         createGrid();
         updateModelBuffers(); // Ensure previously added nodes are buffered
+
+        if (deformedVertexCount > 0) uploadVBO(deformedVBO, deformedPositions, deformedColors);
+        if (diagramVertexCount > 0) uploadVBO(diagramVBO, diagramPositions, diagramColors);
     }
 
     @Override
@@ -219,9 +237,49 @@ public class FrameRenderer implements GLSurfaceView.Renderer {
             drawVBO(elemVBO, elemVertexCount, GLES30.GL_LINES);
         }
 
+        if (showDeformed && deformedVertexCount > 0) {
+            GLES30.glLineWidth(3.0f);
+            drawVBO(deformedVBO, deformedVertexCount, GLES30.GL_LINES);
+            GLES30.glLineWidth(2.0f);
+        }
+
+        if (showDiagrams && diagramVertexCount > 0) {
+            GLES30.glLineWidth(2.5f);
+            drawVBO(diagramVBO, diagramVertexCount, GLES30.GL_LINES);
+            GLES30.glLineWidth(2.0f);
+        }
+
         if (nodeCount > 0) {
             GLES30.glUniform1f(pointSizeHandle, 15.0f);
             drawVBO(nodeVBO, nodeCount, GLES30.GL_POINTS);
+        }
+    }
+
+    public void setShowDeformed(boolean show) {
+        this.showDeformed = show;
+    }
+
+    public void setShowDiagrams(boolean show) {
+        this.showDiagrams = show;
+    }
+
+    public void setDeformedShape(float[] positions, float[] colors) {
+        if (positions == null || positions.length == 0) return;
+        deformedVertexCount = positions.length / 3;
+        deformedPositions = positions;
+        deformedColors = colors;
+        if (vbosInitialized) {
+            uploadVBO(deformedVBO, positions, colors);
+        }
+    }
+
+    public void setDiagrams(float[] positions, float[] colors) {
+        if (positions == null || positions.length == 0) return;
+        diagramVertexCount = positions.length / 3;
+        diagramPositions = positions;
+        diagramColors = colors;
+        if (vbosInitialized) {
+            uploadVBO(diagramVBO, positions, colors);
         }
     }
 
