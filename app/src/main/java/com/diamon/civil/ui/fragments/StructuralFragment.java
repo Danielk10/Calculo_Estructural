@@ -123,7 +123,6 @@ public class StructuralFragment extends Fragment {
         // Comprehensive PDF report including results and log
         StringBuilder reportContent = new StringBuilder();
         reportContent.append("STRUCTURE TYPE: ").append(binding.spinnerStructureType.getSelectedItem() != null ? binding.spinnerStructureType.getSelectedItem().toString() : "N/A").append("\n\n");
-        reportContent.append(binding.tvStructuralResultSummary.getText().toString()).append("\n\n");
         reportContent.append("--- FULL SOLVER LOG ---\n").append(logger.getFullLog());
 
         com.diamon.civil.engine.ReportGenerator.generateReport(reportFile, "Structural Analysis Report SAP2000 style", reportContent.toString(), null);
@@ -190,14 +189,12 @@ public class StructuralFragment extends Fragment {
 
                 File datFile = new File(filesDir, "structural_job.dat");
                 if (datFile.exists()) {
-                    String nativeSummary = core.parseDatResults(datFile.getAbsolutePath());
                     DatParser.ParseResult parseResult = datParser.parse(datFile);
                     
                     android.app.Activity activity = getActivity();
                     if (activity != null) {
                         activity.runOnUiThread(() -> {
                             if (binding != null) {
-                                binding.tvStructuralResultSummary.setText("NATIVE SUMMARY:\n" + nativeSummary + "\n\n" + datParser.formatSummary(parseResult));
                                 binding.diagramView.setModelAndResults(model, parseResult);
                                 binding.diagramView.setDiagramType(1);
                             }

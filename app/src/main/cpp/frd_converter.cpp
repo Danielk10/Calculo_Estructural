@@ -316,11 +316,19 @@ Java_com_diamon_civil_engine_CalculixExecutor_convertFrdToGlb(
     int idxAcc = make_accessor(idxView, TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT, TINYGLTF_TYPE_SCALAR,
                                index_data.size(), idxMin, idxMax, 1);
 
+    tinygltf::Material mat;
+    mat.name = "FEA_Material";
+    mat.pbrMetallicRoughness.metallicFactor = 0.1;
+    mat.pbrMetallicRoughness.roughnessFactor = 0.8;
+    mat.doubleSided = true;
+    gltf.materials.push_back(mat);
+
     tinygltf::Primitive prim;
     prim.attributes["POSITION"] = posAcc;
     prim.attributes["COLOR_0"]  = colAcc;
     prim.indices = idxAcc;
     prim.mode    = TINYGLTF_MODE_TRIANGLES;
+    prim.material = 0;
 
     tinygltf::Mesh mesh;
     mesh.name = "FEA_Result";

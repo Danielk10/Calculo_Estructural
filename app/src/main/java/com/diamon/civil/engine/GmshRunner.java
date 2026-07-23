@@ -137,13 +137,13 @@ public class GmshRunner {
 
     /** Find gmsh binary: prioritize the verified binary used in simulation tests */
     private File findGmshBinary() {
-        // 1. Probar el binario verificado de los tests
+        // 1. Probar el enlace simbólico en usr/bin creado por AssetHelper (Standalone que funciona)
+        File usrBin = new File(workDir, "usr/bin/gmsh");
+        if (usrBin.exists() && usrBin.canExecute()) return usrBin;
+
+        // 2. Probar el binario empaquetado en jniLibs
         File verifiedGmsh = new File(nativeLibDir, "libgmsh_v5_0_0.so");
         if (verifiedGmsh.exists()) return verifiedGmsh;
-
-        // 2. Probar el enlace simbólico en usr/bin creado por AssetHelper
-        File usrBin = new File(workDir, "usr/bin/gmsh");
-        if (usrBin.exists()) return usrBin;
 
         // 3. Fallback al nombre físico estándar
         File libGmsh = new File(nativeLibDir, "libgmsh.so");

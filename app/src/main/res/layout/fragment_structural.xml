@@ -175,15 +175,7 @@
                     android:visibility="gone"
                     android:layout_marginBottom="16dp" />
 
-                <TextView
-                    android:id="@+id/tvStructuralResultSummary"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:text="Summary will appear here."
-                    android:background="#F0F0F0"
-                    android:fontFamily="monospace"
-                    android:textSize="12sp" />
+
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnExportStructural"

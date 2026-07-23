@@ -36,8 +36,8 @@ fun SceneViewWrapper(modelPath: String?, listener: OnHitListener?) {
     val resolvedPath: String? = modelPath?.let { raw ->
         when {
             raw.isBlank() -> null
-            !raw.startsWith("/") -> "asset://$raw"
-            else -> raw
+            !raw.startsWith("/") -> raw // SceneView uses relative paths for assets automatically
+            else -> "file://$raw" // SceneView needs file:// scheme for local files
         }
     }
     

@@ -281,10 +281,8 @@ public class SolidFragment extends Fragment {
                         File frdFile = new File(workDir, "job_solid.frd");
                         if (frdFile.exists()) {
                             logger.info("Step 4: Parsing Engineering Results Native...");
-                            NativeFeaCore core = new NativeFeaCore();
-                            String summary = core.parseFrdSummary(frdFile.getAbsolutePath());
-                            logger.info("NATIVE SIMULATION SUMMARY:\n" + summary);
                             
+
                             File glbFile = new File(workDir, "job_solid.glb");
                             if (calculixExecutor.convertFrdToGlb(frdFile.getAbsolutePath(), glbFile.getAbsolutePath())) {
                                 modelPath = glbFile.getAbsolutePath();

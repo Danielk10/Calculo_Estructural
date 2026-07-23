@@ -72,7 +72,7 @@ std::string AnalysisModel::toInpString() const {
 
     // Results in .dat file for DatParser
     ss << "*NODE PRINT, NSET=NALL\nU\n";
-    ss << "*EL PRINT, ELSET=Eall\nSOF, SOM\n";
+    ss << "*EL PRINT, ELSET=Eall\nS, E\n";
 
     ss << "*END STEP\n";
 
