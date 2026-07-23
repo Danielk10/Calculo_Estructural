@@ -26,6 +26,8 @@ public class StructuralFragment extends Fragment {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private CalculixExecutor calculixExecutor;
     private DatParser datParser;
+    private StructuralModel currentModel;
+    private DatParser.ParseResult currentResult;
 
     @Nullable
     @Override
@@ -129,24 +131,22 @@ public class StructuralFragment extends Fragment {
     public void exportResults() {
         if (getContext() == null) return;
         File workDir = getContext().getFilesDir();
-        File reportFile = new File(workDir, "Structural_Report.pdf");
+        File reportFile = new File(workDir, "Structural_Report_SAP2000.pdf");
         
-        // Comprehensive PDF report including results and log
-        StringBuilder reportContent = new StringBuilder();
-        reportContent.append("STRUCTURE TYPE: ").append(binding.spinnerStructureType.getSelectedItem() != null ? binding.spinnerStructureType.getSelectedItem().toString() : "N/A").append("\n\n");
-        reportContent.append("--- FULL SOLVER LOG ---\n").append(logger.getFullLog());
+        if (currentModel == null || currentResult == null) {
+            Toast.makeText(getContext(), "Please run analysis first", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        com.diamon.civil.engine.ReportGenerator.generateReport(reportFile, "Structural Analysis Report SAP2000 style", reportContent.toString(), null);
+        com.diamon.civil.util.export.PDFReportGenerator generator = new com.diamon.civil.util.export.PDFReportGenerator();
+        boolean success = generator.generateReport(getContext(), currentModel, currentResult, "Structural Frame Analysis", "Calculo Estructural User", reportFile);
 
-        File[] files = workDir.listFiles((dir, name) -> name.startsWith("structural_job") || name.equals("Structural_Report.pdf"));
-        if (files != null && files.length > 0) {
+        if (success) {
             com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(getContext());
-            for (File f : files) {
-                manager.exportToDownloads(f);
-            }
-            Toast.makeText(getContext(), "Exported to Downloads/Structural_Analysis_FEA_Advanced", Toast.LENGTH_LONG).show();
+            manager.exportToDownloads(reportFile);
+            Toast.makeText(getContext(), "Exported PDF to Downloads", Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(getContext(), "No results to export", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Failed to export PDF", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -201,6 +201,8 @@ public class StructuralFragment extends Fragment {
                 File datFile = new File(filesDir, "structural_job.dat");
                 if (datFile.exists()) {
                     DatParser.ParseResult parseResult = datParser.parse(datFile);
+                    currentModel = model;
+                    currentResult = parseResult;
                     calculateVBOs(model, parseResult);
                 }
 
