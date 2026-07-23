@@ -10,9 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white">
-        <com.google.android.material.tabs.TabItem android:text="DATA" />
-        <com.google.android.material.tabs.TabItem android:text="GL VIEWER" />
-        <com.google.android.material.tabs.TabItem android:text="LOG" />
+        <com.google.android.material.tabs.TabItem android:text="PARAMETERS" />
+        <com.google.android.material.tabs.TabItem android:text="VIEWER 3D" />
+        <com.google.android.material.tabs.TabItem android:text="SOLVER LOG" />
     </com.google.android.material.tabs.TabLayout>
 
     <FrameLayout
