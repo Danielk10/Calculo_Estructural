@@ -33,6 +33,47 @@ public class SolidFragment extends Fragment {
     private volatile File activeSimulationGeometry;
     private volatile String modelPath = "models/test_beam.glb";
     private File workDir;
+    private androidx.activity.result.ActivityResultLauncher<android.content.Intent> importCadLauncher;
+    private volatile double currentDynamicLoadValue = -100.0;
+    private volatile String selectedFixedId = "Fixed";
+    private volatile String selectedLoadId = "Loaded";
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        importCadLauncher = registerForActivityResult(
+            new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
+                    android.net.Uri uri = result.getData().getData();
+                    if (uri != null) {
+                        executor.execute(() -> {
+                            try {
+                                java.io.InputStream in = requireContext().getContentResolver().openInputStream(uri);
+                                File out = new File(requireContext().getFilesDir(), "imported_cad.step");
+                                java.io.FileOutputStream fout = new java.io.FileOutputStream(out);
+                                byte[] buf = new byte[1024];
+                                int len;
+                                while((len = in.read(buf)) > 0) { fout.write(buf, 0, len); }
+                                in.close(); fout.close();
+                                activeSimulationGeometry = out;
+                                android.app.Activity activity = getActivity();
+                                if (activity != null) {
+                                    activity.runOnUiThread(() -> {
+                                        if (getContext() != null) {
+                                            Toast.makeText(getContext(), "CAD Imported", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            } catch (Exception e) {
+                                logger.error("Import failed: " + e.getMessage());
+                            }
+                        });
+                    }
+                }
+            }
+        );
+    }
 
     @Nullable
     @Override
@@ -93,6 +134,8 @@ public class SolidFragment extends Fragment {
         binding.seekbarMeshDensity.setProgress(2);
         binding.spinnerElementType.setSelection(0);
         binding.etSolidModulus.setText("210000");
+        binding.cbQuadratic.setChecked(false);
+        binding.cbHexahedral.setChecked(false);
         logger.info("Caso de prueba listo: voladizo 3D de acero, apoyo fijo y carga vertical.");
     }
 
@@ -119,6 +162,16 @@ public class SolidFragment extends Fragment {
         binding.btnCreateBox.setOnClickListener(v -> createPrimitive("box"));
         binding.btnCreateCylinder.setOnClickListener(v -> createPrimitive("cylinder"));
         binding.btnCreateSphere.setOnClickListener(v -> createPrimitive("sphere"));
+        
+        binding.btnImportCAD.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*");
+            importCadLauncher.launch(intent);
+        });
+
+        binding.btnFillet.setOnClickListener(v -> applyOperation("fillet"));
+        binding.btnChamfer.setOnClickListener(v -> applyOperation("chamfer"));
+        binding.btnExtrude.setOnClickListener(v -> applyOperation("extrude"));
         binding.btnLoadTestCase.setOnClickListener(v -> {
             if (getContext() != null) {
                 try {
@@ -160,7 +213,8 @@ public class SolidFragment extends Fragment {
         
         String logText = logger.getFullLog();
         if (!logText.isEmpty()) {
-            com.diamon.civil.engine.ReportGenerator.generateReport(reportFile, "3D Solid Analysis Report Abacus style", logText, null);
+            com.diamon.civil.util.export.SolidPDFReportGenerator generator = new com.diamon.civil.util.export.SolidPDFReportGenerator();
+            generator.generateReport(getContext(), reportFile, "3D Solid Analysis", logText);
         }
 
         File[] files = workDir.listFiles((dir, name) -> name.startsWith("job_solid") || name.endsWith(".brep") || name.endsWith(".msh") || name.equals("Solid_Analysis_Report.pdf"));
@@ -203,6 +257,38 @@ public class SolidFragment extends Fragment {
         });
     }
 
+    private void applyOperation(String op) {
+        if (activeSimulationGeometry == null) {
+            Toast.makeText(getContext(), "No active geometry", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        executor.execute(() -> {
+            boolean success = false;
+            String inPath = activeSimulationGeometry.getAbsolutePath();
+            String outPath = new File(workDir, "operated_" + op + ".brep").getAbsolutePath();
+            try {
+                if (op.equals("fillet")) success = OcctPrimitivesJNI.applyFillet(inPath, outPath, 1.0);
+                else if (op.equals("chamfer")) success = OcctPrimitivesJNI.applyChamfer(inPath, outPath, 1.0);
+                else if (op.equals("extrude")) success = OcctPrimitivesJNI.applyExtrude(inPath, outPath, 0, 0, 10.0);
+            } catch (Throwable e) {
+                logger.error("Operation failed: " + e.getMessage());
+            }
+
+            if (success) {
+                activeSimulationGeometry = new File(outPath);
+                logger.info("Applied operation: " + op);
+                android.app.Activity activity = getActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(() -> {
+                        if (isAdded()) Toast.makeText(getContext(), op.toUpperCase() + " applied", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            } else {
+                logger.error("Failed to apply " + op);
+            }
+        });
+    }
+
     private void runFullPipeline() {
         if (binding == null || getContext() == null) return;
 
@@ -221,6 +307,8 @@ public class SolidFragment extends Fragment {
         
         // Capture ALL UI values on main thread to avoid crashes
         final int density = binding.seekbarMeshDensity.getProgress() + 1;
+        final boolean useQuadratic = binding.cbQuadratic.isChecked();
+        final boolean useHexahedral = binding.cbHexahedral.isChecked();
         final String modulusStr = binding.etSolidModulus.getText().toString().trim();
         
         double youngModulusTemp = 210000.0;
@@ -253,7 +341,7 @@ public class SolidFragment extends Fragment {
 
         logger.info("Step 1: Generating Mesh with Gmsh (Density: " + density + ")...");
         
-        gmshRunner.meshAsync(cadFile, density, "job_solid", new GmshRunner.GmshCallback() {
+        gmshRunner.meshAsync(cadFile, density, "job_solid", useQuadratic, useHexahedral, new GmshRunner.GmshCallback() {
             @Override
             public void onSuccess(File rawInp) {
                 logger.info("Mesh OK: " + rawInp.getName());
@@ -269,7 +357,7 @@ public class SolidFragment extends Fragment {
                             calculixExecutor = new CalculixExecutor(appContext);
                         }
 
-                        com.diamon.civil.engine.InpAssembler.assemble(workDir, "job_solid", "Steel", E, 0.3, -100.0);
+                        com.diamon.civil.engine.InpAssembler.assemble(workDir, "job_solid", "Steel", E, 0.3, currentDynamicLoadValue, selectedFixedId, selectedLoadId);
                         
                         logger.info("Step 3: Running CalculiX Solver ccx...");
                         String ccxResult = calculixExecutor.executeCalculix("job_solid");
@@ -348,6 +436,43 @@ public class SolidFragment extends Fragment {
         } catch (Throwable error) {
             logger.error("SceneView Error: " + error.getMessage());
         }
+    }
+
+    public void onHit(Object info) {
+        if (info == null || getContext() == null) return;
+        
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog = new com.google.android.material.bottomsheet.BottomSheetDialog(getContext());
+        View sheetView = getLayoutInflater().inflate(com.diamon.civil.R.layout.bottom_sheet_boundary, null);
+        dialog.setContentView(sheetView);
+        
+        android.widget.TextView tvSelected = sheetView.findViewById(com.diamon.civil.R.id.tvSelectedFace);
+        tvSelected.setText("Selected: " + info.toString());
+
+        sheetView.findViewById(com.diamon.civil.R.id.btnApplyFixed).setOnClickListener(v -> {
+            selectedFixedId = info.toString();
+            Toast.makeText(getContext(), "Fixed Boundary Condition applied to selection", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+
+        sheetView.findViewById(com.diamon.civil.R.id.btnApplyLoad).setOnClickListener(v -> {
+            com.google.android.material.textfield.TextInputLayout layoutLoad = sheetView.findViewById(com.diamon.civil.R.id.layoutLoadValue);
+            if (layoutLoad.getVisibility() == View.GONE) {
+                layoutLoad.setVisibility(View.VISIBLE);
+            } else {
+                com.google.android.material.textfield.TextInputEditText et = sheetView.findViewById(com.diamon.civil.R.id.etLoadValue);
+                String val = et.getText().toString();
+                try {
+                    currentDynamicLoadValue = Double.parseDouble(val);
+                    selectedLoadId = info.toString();
+                    Toast.makeText(getContext(), "Load applied: " + val, Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                } catch(Exception e) {
+                    Toast.makeText(getContext(), "Invalid value", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        dialog.show();
     }
 
     @Override

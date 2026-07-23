@@ -62,6 +62,16 @@
                             <Button android:id="@+id/btnCreateCylinder" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="CYL" style="@style/Widget.MaterialComponents.Button.TextButton"/>
                             <Button android:id="@+id/btnCreateSphere" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="SPHERE" style="@style/Widget.MaterialComponents.Button.TextButton"/>
                         </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp">
+                            <Button android:id="@+id/btnFillet" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="FILLET" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                            <Button android:id="@+id/btnChamfer" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="CHAMFER" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                            <Button android:id="@+id/btnExtrude" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="EXTRUDE" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                        </LinearLayout>
+                        <Button android:id="@+id/btnImportCAD" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="IMPORT CAD (STEP/IGES/STL)" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_marginTop="8dp"/>
                         <Button android:id="@+id/btnLoadTestCase" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="LOAD TEST CASE (CANTILEVER)" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_marginTop="8dp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -103,6 +113,19 @@
                             android:max="4"
                             android:progress="2"
                             android:layout_marginBottom="16dp"/>
+
+                        <CheckBox
+                            android:id="@+id/cbQuadratic"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Quadratic Elements (2nd Order)" />
+
+                        <CheckBox
+                            android:id="@+id/cbHexahedral"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Hexahedral Meshing (Recombine)"
+                            android:layout_marginBottom="12dp"/>
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"

@@ -69,8 +69,9 @@ public class StructuralFragment extends Fragment {
         if (binding == null) return;
         // Solvable B31 cantilever: fixed at node 1 and load at node 2.
         binding.spinnerStructureType.setSelection(0);
-        binding.etNodes.setText("1, 0, 0, 0\n2, 10, 0, 0");
-        binding.etElements.setText("1, 1, 2");
+        if (binding.gridEditorView != null) {
+            binding.gridEditorView.clear();
+        }
     }
 
     private void setupTabs() {
@@ -97,6 +98,12 @@ public class StructuralFragment extends Fragment {
         binding.btnSolveStructural.setOnClickListener(v -> runAnalysis());
         binding.btnExportStructural.setOnClickListener(v -> exportResults());
         binding.fabClearStructuralLog.setOnClickListener(v -> logger.clear());
+        
+        binding.btnClearGrid.setOnClickListener(v -> {
+            if (binding.gridEditorView != null) {
+                binding.gridEditorView.clear();
+            }
+        });
         
         binding.scrollStructuralLog.setOnClickListener(v -> copyToClipboard(logger.getFullLog()));
         binding.btnViewWireframe.setOnClickListener(v -> {
@@ -158,12 +165,16 @@ public class StructuralFragment extends Fragment {
             return;
         }
 
-        final String nodesStr = binding.etNodes.getText().toString().trim();
-        final String elementsStr = binding.etElements.getText().toString().trim();
         final String structureType = binding.spinnerStructureType.getSelectedItem().toString();
 
-        if (nodesStr.isEmpty() || elementsStr.isEmpty()) {
-            Toast.makeText(getContext(), "Please define nodes and elements", Toast.LENGTH_SHORT).show();
+        StructuralModel uiModel = new StructuralModel();
+        if (binding.gridEditorView != null) {
+            uiModel.nodes.addAll(binding.gridEditorView.getNodes());
+            uiModel.elements.addAll(binding.gridEditorView.getElements());
+        }
+
+        if (uiModel.nodes.isEmpty() || uiModel.elements.isEmpty()) {
+            Toast.makeText(getContext(), "Please define nodes and elements in the grid", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -179,7 +190,7 @@ public class StructuralFragment extends Fragment {
             long modelPtr = 0;
             try {
                 modelPtr = core.createModel();
-                StructuralModel model = parseInputs(nodesStr, elementsStr);
+                StructuralModel model = uiModel;
                 validateModel(model);
                 String jsonModel = modelToJson(model, structureType);
                 core.modelFromJson(modelPtr, jsonModel);

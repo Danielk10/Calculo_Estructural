@@ -72,7 +72,7 @@ std::string AnalysisModel::toInpString() const {
 
     // Results in .dat file for DatParser (Displacements)
     ss << "*NODE PRINT, NSET=NALL\nU\n";
-    ss << "*EL PRINT, ELSET=Eall\nS\n";
+    ss << "*EL PRINT, ELSET=Eall\nS, SF\n";
 
     ss << "*END STEP\n";
 

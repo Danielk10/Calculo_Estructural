@@ -54,7 +54,7 @@ public class DatParser {
 
     /** Summary of the most extreme values found in the .dat */
     public static class ParseResult {
-        public final List<SectionForces> forces;
+        public List<SectionForces> forces;
         public final List<NodeDisplacement> displacements = new ArrayList<>();
         public double maxAbsN  = 0;
         public double maxAbsV2 = 0;

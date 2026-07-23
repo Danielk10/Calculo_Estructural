@@ -8,7 +8,7 @@ import java.util.*;
  * Ported from verified simulation tests to the main engine.
  */
 public class InpAssembler {
-    public static void assemble(File workDir, String inputName, String materialName, double E, double nu, double loadValue) throws IOException {
+    public static void assemble(File workDir, String inputName, String materialName, double E, double nu, double loadValue, String fixedId, String loadId) throws IOException {
         File rawInp = new File(workDir, inputName + "_raw.inp");
         File cleanInp = new File(workDir, inputName + "_clean.inp");
         File nsetsInp = new File(workDir, "nsets.inp");
@@ -24,16 +24,19 @@ public class InpAssembler {
             while ((line = reader.readLine()) != null) lines.add(line);
         }
 
-        // 1. Extract NSETs from physical surfaces (Gmsh format)
-        // Check both "Fixed"/"Loaded" and "SURFACE1"/"SURFACE2" for maximum compatibility
-        Set<Integer> fixedNodes = extractNodesFromPhysical(lines, "Fixed");
-        if (fixedNodes.isEmpty()) fixedNodes = extractNodesFromPhysical(lines, "SURFACE1");
+        // 1. Extract NSETs from physical surfaces (Gmsh format) or dynamically selected Ray-Casted IDs
+        Set<Integer> fixedNodes = extractNodesFromPhysical(lines, fixedId);
+        if (fixedNodes.isEmpty() && isInteger(fixedId)) fixedNodes.add(Integer.parseInt(fixedId));
+        if (fixedNodes.isEmpty()) fixedNodes = extractNodesFromPhysical(lines, "Fixed"); // Fallback
+        if (fixedNodes.isEmpty()) fixedNodes = extractNodesFromPhysical(lines, "SURFACE1"); // Fallback
         
-        Set<Integer> loadedNodes = extractNodesFromPhysical(lines, "Loaded");
-        if (loadedNodes.isEmpty()) loadedNodes = extractNodesFromPhysical(lines, "SURFACE2");
+        Set<Integer> loadedNodes = extractNodesFromPhysical(lines, loadId);
+        if (loadedNodes.isEmpty() && isInteger(loadId)) loadedNodes.add(Integer.parseInt(loadId));
+        if (loadedNodes.isEmpty()) loadedNodes = extractNodesFromPhysical(lines, "Loaded"); // Fallback
+        if (loadedNodes.isEmpty()) loadedNodes = extractNodesFromPhysical(lines, "SURFACE2"); // Fallback
 
         if (fixedNodes.isEmpty() || loadedNodes.isEmpty()) {
-            throw new IOException("La malla no contiene las superficies físicas Fixed y Loaded requeridas");
+            throw new IOException("La malla no contiene las superficies físicas Fixed y Loaded requeridas (IDs: " + fixedId + ", " + loadId + ")");
         }
 
         try (PrintWriter pw = new PrintWriter(new FileWriter(nsetsInp))) {
@@ -137,5 +140,15 @@ public class InpAssembler {
             if (++count % 10 == 0) pw.println();
         }
         pw.println();
+    }
+
+    private static boolean isInteger(String s) {
+        if (s == null || s.isEmpty()) return false;
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

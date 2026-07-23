@@ -48,7 +48,11 @@ fun SceneViewWrapper(modelPath: String?, listener: OnHitListener?) {
         cameraManipulator = cameraManipulator,
         onGestureListener = rememberOnGestureListener(
             onSingleTapConfirmed = { motionEvent, node ->
-                listener?.onHit(null)
+                if (node != null) {
+                    listener?.onHit(node.name ?: "Model_Surface")
+                } else {
+                    listener?.onHit(null)
+                }
             }
         )
     ) {

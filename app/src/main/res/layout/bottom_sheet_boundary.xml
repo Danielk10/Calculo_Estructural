@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bottom_sheet_bg"> 
+
+    <TextView
+        android:id="@+id/tvBoundaryTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Apply Boundary Condition"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="16dp"/>
+        
+    <TextView
+        android:id="@+id/tvSelectedFace"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Selected: Face/Node"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btnApplyFixed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="FIXED SUPPORT (SPC)"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnApplyLoad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="APPLY PRESSURE/LOAD (DLOAD)"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_marginBottom="12dp"/>
+        
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutLoadValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Load Value (N or MPa)"
+        android:visibility="gone"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etLoadValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:text="-100.0" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

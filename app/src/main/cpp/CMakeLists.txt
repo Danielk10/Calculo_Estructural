@@ -41,6 +41,7 @@ import_occt_lib(TKernel TKernel)
 import_occt_lib(TKGeomBase TKGeomBase)
 import_occt_lib(TKG3d TKG3d)
 import_occt_lib(TKG2d TKG2d)
+import_occt_lib(TKFillet TKFillet)
 
 # Specifies libraries CMake should link to your target library.
 target_link_libraries(${CMAKE_PROJECT_NAME}
@@ -55,4 +56,5 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         TKernel
         TKGeomBase
         TKG3d
-        TKG2d)
+        TKG2d
+        TKFillet)

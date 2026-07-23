@@ -45,20 +45,20 @@ public class GmshRunner {
      * @param callback   Called on the calling thread pool when done
      */
     public void meshAsync(File inputFile, int meshDensity, GmshCallback callback) {
-        meshAsync(inputFile, meshDensity, stripExtension(inputFile.getName()), false, 1, callback);
+        meshAsync(inputFile, meshDensity, stripExtension(inputFile.getName()), false, false, callback);
     }
 
     public void meshAsync(File inputFile, int meshDensity, String jobName, GmshCallback callback) {
-        meshAsync(inputFile, meshDensity, jobName, false, 1, callback);
+        meshAsync(inputFile, meshDensity, jobName, false, false, callback);
     }
 
     /** Creates a raw CalculiX mesh using a deterministic job name. */
-    public void meshAsync(File inputFile, int meshDensity, String jobName, boolean useQuadratic, int algorithm3D, GmshCallback callback) {
+    public void meshAsync(File inputFile, int meshDensity, String jobName, boolean useQuadratic, boolean useHexahedral, GmshCallback callback) {
         executor.execute(() -> {
             try {
                 // Generar directamente el .inp crudo para el ensamblador
                 File outputInp = new File(workDir, jobName + "_raw.inp");
-                String result = runGmsh(inputFile, outputInp, meshDensity, useQuadratic, algorithm3D);
+                String result = runGmsh(inputFile, outputInp, meshDensity, useQuadratic, useHexahedral);
                 if (outputInp.exists() && outputInp.length() > 0) {
                     callback.onSuccess(outputInp);
                 } else {
@@ -74,10 +74,10 @@ public class GmshRunner {
      * Synchronous Gmsh execution. Call from a background thread.
      */
     public String runGmsh(File inputFile, File outputMsh, int meshDensity) {
-        return runGmsh(inputFile, outputMsh, meshDensity, false, 1);
+        return runGmsh(inputFile, outputMsh, meshDensity, false, false);
     }
 
-    public String runGmsh(File inputFile, File outputMsh, int meshDensity, boolean useQuadratic, int algorithm3D) {
+    public String runGmsh(File inputFile, File outputMsh, int meshDensity, boolean useQuadratic, boolean useHexahedral) {
         File gmshBin = findGmshBinary();
         if (gmshBin == null) {
             return "Error: Gmsh binary not found in " + nativeLibDir.getAbsolutePath();
@@ -89,7 +89,12 @@ public class GmshRunner {
         command.add(gmshBin.getAbsolutePath());
         command.add(inputFile.getAbsolutePath());
         command.add("-string");
-        command.add("Mesh.ElementOrder=" + (useQuadratic ? 2 : 1) + "; Mesh.Algorithm3D=" + algorithm3D + ";");
+        
+        String meshOpts = "Mesh.ElementOrder=" + (useQuadratic ? 2 : 1) + ";";
+        if (useHexahedral) meshOpts += " Mesh.Recombine3DAll=1; Mesh.Algorithm3D=1; Mesh.Algorithm=6; Mesh.SubdivisionAlgorithm=2;";
+        else meshOpts += " Mesh.Algorithm3D=1;";
+        
+        command.add(meshOpts);
         command.add("-3");                         // 3D mesh
         command.add("-clmax");
         command.add(String.valueOf(clmax));
