@@ -195,7 +195,8 @@
                     app:icon="@android:drawable/ic_menu_save"
                     app:cornerRadius="8dp" />
 
-
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
         <!-- Tab 1: GL Viewer -->
         <LinearLayout
