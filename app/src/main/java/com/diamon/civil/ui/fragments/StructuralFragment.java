@@ -199,8 +199,26 @@ public class StructuralFragment extends Fragment {
                 logger.log(result);
 
                 File datFile = new File(filesDir, "structural_job.dat");
+                File frdFile = new File(filesDir, "structural_job.frd");
                 if (datFile.exists()) {
                     DatParser.ParseResult parseResult = datParser.parse(datFile);
+                    if (frdFile.exists()) {
+                        com.diamon.civil.engine.FrdParser.ParseResult frdResult = new com.diamon.civil.engine.FrdParser().parse(frdFile);
+                        if (frdResult.forces != null) {
+                            parseResult.forces = new java.util.ArrayList<>();
+                            for (com.diamon.civil.engine.FrdParser.SectionForces f : frdResult.forces) {
+                                DatParser.SectionForces sf = new DatParser.SectionForces();
+                                sf.elementId = f.elementId;
+                                sf.M1 = f.bendingMoment1;
+                                sf.M2 = f.bendingMoment2;
+                                sf.M3 = f.torque;
+                                sf.V2 = f.shear1;
+                                sf.V3 = f.shear2;
+                                sf.N = f.axialNormal;
+                                parseResult.forces.add(sf);
+                            }
+                        }
+                    }
                     currentModel = model;
                     currentResult = parseResult;
                     calculateVBOs(model, parseResult);
