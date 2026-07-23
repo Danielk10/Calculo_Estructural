@@ -102,7 +102,7 @@ public class StructuralFragment extends Fragment {
         binding.btnShowBMD.setOnClickListener(v -> binding.diagramView.setDiagramType(1));
         binding.btnShowSFD.setOnClickListener(v -> binding.diagramView.setDiagramType(2));
         binding.btnShowAFD.setOnClickListener(v -> binding.diagramView.setDiagramType(3));
-
+    }
 
 
     private void copyToClipboard(String text) {
