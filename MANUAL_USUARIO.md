@@ -66,6 +66,35 @@ Una de las funciones más potentes es la asignación visual de Condiciones de Co
 
 ## 3. Pestaña de Terminal (Logs)
 
-Cualquier error, advertencia o mensaje de éxito de los motores subyacentes (OCCT, Gmsh, CalculiX) se imprimirá en tiempo real en la pestaña **Terminal**. 
-- Si ocurre un *Exit Code 201* o similar en CalculiX, revisa este log para ver si falta alguna condición de contorno.
-- Usa el botón flotante para borrar el historial o toca el texto para copiarlo al portapapeles.
+La pestaña **Terminal** es la consola del desarrollador y del ingeniero. Cualquier error, advertencia o mensaje de éxito de los motores subyacentes se imprime aquí en tiempo real. 
+
+### 3.1 Cómo leer la Terminal:
+- **[INFO] Native engines initialized:** Indica que las librerías C++ (OCCT) cargaron correctamente.
+- **[INFO] Executing CalculiX Solver ccx:** Comienza el proceso matemático de resolución de matrices.
+- **Exit Code 0:** Significa que el motor completó su tarea con éxito.
+- **Exit Code 201:** Es el código de salida de emergencia de CalculiX. Si ves esto, significa que hubo un error crítico (ej. falta una condición de contorno, modelo inestable, o sintaxis INP inválida).
+- **Advertencias (WARNINGS):** Gmsh y CalculiX pueden generar advertencias de distorsión de malla. Si la malla es muy gruesa, verás advertencias topológicas.
+
+### 3.2 Utilidades de la Terminal:
+- **Botón Flotante (FAB):** Limpia completamente el historial de la terminal.
+- **Copiar al Portapapeles:** Si tocas el texto de la terminal, todo el log se copiará a tu portapapeles. Útil para enviar reportes de bugs o analizar el archivo `.dat` en bruto.
+
+---
+
+## 4. Pruebas y Simulación (Testing)
+
+Para garantizar la estabilidad numérica de la aplicación sin tener que modelar estructuras desde cero, el código incluye archivos de pruebas y simulación que puedes utilizar.
+
+### 4.1 Uso de las Pruebas Unitarias/Locales
+Si eres desarrollador, puedes ejecutar los casos de prueba (Test Cases) directamente desde tu IDE o terminal local:
+1. Navega a `app/src/main/java/com/diamon/civil/test/simulation/`.
+2. Las clases de test automatizan la ejecución del pipeline: **InpAssembler -> CalculixExecutor -> DatParser -> FrdParser**.
+3. **Validación de Resultados:** Los parsers leen los archivos `.dat` (desplazamientos y fuerzas) y `.frd` (esfuerzos nodales 3D) verificando que los resultados numéricos de Von Mises y las Fuerzas Cortantes no tengan desviación de los esperados.
+
+### 4.2 Simulando Casos Clásicos en la UI
+En lugar de dibujar en el `GridEditorView`, la aplicación puede cargar configuraciones clásicas:
+- Al seleccionar una estructura del menú desplegable (Spinner), la aplicación generará modelos matemáticos perfectos.
+- **Voladizo 3D:** Un caso ideal para verificar la flexión pura en sólidos. Aplica una carga puntual en el extremo usando el **Ray-Casting** y observa cómo las fibras superiores se traccionan (Rojo) y las inferiores se comprimen (Azul) en los diagramas de esfuerzo de Filament.
+
+---
+**Nota:** *El entorno simula cálculos con rigor profesional, pero debido a las limitaciones de RAM de los dispositivos móviles, se recomienda no generar mallas excesivamente finas (más de 50,000 elementos) para evitar cierres inesperados por falta de memoria.*
