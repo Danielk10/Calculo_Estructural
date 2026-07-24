@@ -9,6 +9,15 @@ import java.util.List;
 public class ModuleLogger {
     private static final ModuleLogger GLOBAL_LOGGER = new ModuleLogger("Global");
 
+    static {
+        GLOBAL_LOGGER.log("--- FEA Advanced Terminal System ---\n" +
+            "Type 'help' to see list of available commands.\n\n" +
+            "Special Test Commands:\n" +
+            "  test-gmsh    - Run a 3D CAD Boolean operations subtraction & mesh test (Gmsh + OCCT)\n" +
+            "  test-draw    - Run OpenCASCADE DRAWEXE headless primitive box test (OCCT)\n" +
+            "  run-sim-test - Run automated end-to-end FEA calculation test (Cantilever Beam)\n");
+    }
+
     private final String moduleName;
     private final StringBuilder logBuilder = new StringBuilder();
     private final List<LogListener> listeners = new ArrayList<>();
@@ -79,7 +88,12 @@ public class ModuleLogger {
         logBuilder.setLength(0);
         notifyListeners();
         if (this == GLOBAL_LOGGER) {
-            logBuilder.append("--- FEA System Log Console ---\n");
+            logBuilder.append("--- FEA Advanced Terminal System ---\n" +
+                "Type 'help' to see list of available commands.\n\n" +
+                "Special Test Commands:\n" +
+                "  test-gmsh    - Run a 3D CAD Boolean operations subtraction & mesh test (Gmsh + OCCT)\n" +
+                "  test-draw    - Run OpenCASCADE DRAWEXE headless primitive box test (OCCT)\n" +
+                "  run-sim-test - Run automated end-to-end FEA calculation test (Cantilever Beam)\n\n");
             notifyListeners();
         }
     }

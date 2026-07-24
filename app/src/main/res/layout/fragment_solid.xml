@@ -71,6 +71,15 @@
                             <Button android:id="@+id/btnChamfer" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="CHAMFER" style="@style/Widget.MaterialComponents.Button.TextButton"/>
                             <Button android:id="@+id/btnExtrude" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="EXTRUDE" style="@style/Widget.MaterialComponents.Button.TextButton"/>
                         </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="4dp">
+                            <Button android:id="@+id/btnUnion" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="UNION" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                            <Button android:id="@+id/btnCut" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="CUT" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                            <Button android:id="@+id/btnIntersect" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="INTERSECT" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                        </LinearLayout>
                         <Button android:id="@+id/btnImportCAD" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="IMPORT CAD (STEP/IGES/STL)" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_marginTop="8dp"/>
                         <Button android:id="@+id/btnLoadTestCase" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="LOAD TEST CASE (CANTILEVER)" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_marginTop="8dp"/>
                     </LinearLayout>

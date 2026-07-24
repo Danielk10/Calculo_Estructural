@@ -120,7 +120,7 @@ public class PDFReportGenerator {
     }
 
     private void finishPage(PdfDocument document, Canvas canvas) {
-        String footer = String.format("Calculo Estructural | CalculiX Engine | Page %d", pageNumber);
+        String footer = String.format("Structural Analysis FEA Advanced | CalculiX Engine | Page %d", pageNumber);
         canvas.drawText(footer, MARGIN_LEFT, PAGE_HEIGHT - 20f, footerPaint);
 
         String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(new Date());
@@ -151,11 +151,13 @@ public class PDFReportGenerator {
         y += 40f;
 
         String[][] info = {
-                {"Proyecto:", projectName != null ? projectName : "Cálculo Estructural - Proyecto"},
+                {"Proyecto:", projectName != null ? projectName : "Cálculo Estructural"},
                 {"Ingeniero:", engineerName != null ? engineerName : "N/A"},
                 {"Fecha:", new SimpleDateFormat("dd 'de' MMMM, yyyy", Locale.getDefault()).format(new Date())},
-                {"Software:", "Cálculo Estructural"},
+                {"Software:", "Structural Analysis FEA Advanced"},
                 {"Motor de Cálculo:", "CalculiX (ccx)"},
+                {"Mallador:", "Gmsh"},
+                {"Modelador CAD:", "Open CASCADE Technology (OCCT)"},
                 {"Plataforma:", "Android NDK / ARM64-v8a"}
         };
 

@@ -72,14 +72,16 @@ public class TerminalFragment extends Fragment {
         try (java.io.FileOutputStream fos = new java.io.FileOutputStream(logFile)) {
             fos.write(binding.tvLog.getText().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
             com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(getContext());
-            manager.exportToDownloads(logFile);
-            Toast.makeText(getContext(), "Exported to Downloads/Structural_Analysis_FEA_Advanced", Toast.LENGTH_LONG).show();
+            manager.exportToDownloads(logFile, "terminal");
+            Toast.makeText(getContext(), "Exported to Downloads/Structural_Analysis_FEA_Advanced/terminal", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             Toast.makeText(getContext(), "Export failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
     private void sendCommand() {
+        if (getContext() == null || binding == null) return;
+        final File filesDir = getContext().getApplicationContext().getFilesDir();
         String input = binding.etCommand.getText().toString().trim();
         if (input.isEmpty()) return;
 
@@ -95,14 +97,65 @@ public class TerminalFragment extends Fragment {
         executor.execute(() -> {
             String result = null;
             
-            // Special test command for headless DRAWEXE
-            if (input.equalsIgnoreCase("test_draw")) {
+            // Special test command for Gmsh Boolean & OCCT Meshing
+            if (input.equalsIgnoreCase("test-gmsh") || input.equalsIgnoreCase("test_gmsh")) {
+                result = "Executing Gmsh Boolean Operation Test (Hollow Cylinder)...\n";
+                File geoFile = new File(filesDir, "prueba_booleana.geo");
+                String script = "SetFactory(\"OpenCASCADE\");\n" +
+                        "Cylinder(1) = {0, 0, 0, 0, 0, 5, 2};\n" +
+                        "Sphere(2) = {0, 0, 2.5, 1.5};\n" +
+                        "BooleanDifference(3) = { Volume{1}; Delete; } { Volume{2}; Delete; };\n" +
+                        "Mesh.MeshSizeMax = 0.5;\n";
+                try (java.io.FileOutputStream fos = new java.io.FileOutputStream(geoFile)) {
+                    fos.write(script.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    result += "Created 'prueba_booleana.geo'.\nRunning Gmsh mesher to generate 'cilindro_hueco.inp'...\n";
+                    String gmshOut = calculixExecutor.executeBinary("gmsh", "prueba_booleana.geo", "-3", "-format", "inp", "-o", "cilindro_hueco.inp");
+                    result += gmshOut;
+                } catch (Exception e) {
+                    result += "Error running test: " + e.getMessage();
+                }
+            } else if (input.equalsIgnoreCase("test_draw") || input.equalsIgnoreCase("test-draw") || input.equalsIgnoreCase("test-occt")) {
                 String drawScript = "box b 10 10 10\n" +
                                    "writebrep b test_box.brep\n" +
                                    "puts \"BOX CREATED SUCCESSFULLY\"\n" +
                                    "exit\n";
-                result = "Executing Headless DRAWEXE Test...\n";
+                result = "Executing Headless DRAWEXE Test (OCCT Box Primitive)...\n";
                 result += calculixExecutor.executeBinaryWithInput("DRAWEXE", drawScript);
+            } else if (input.equalsIgnoreCase("test-cad-solve")) {
+                result = "Executing Headless CAD Meshing & Solving Pipeline (OCCT + Gmsh + CalculiX)...\n";
+                String drawScript = "box b 2 2 10\n" +
+                                   "writebrep b bar.brep\n" +
+                                   "exit\n";
+                result += "Step 1: Generating CAD geometry (bar.brep) with DRAWEXE...\n";
+                result += calculixExecutor.executeBinaryWithInput("DRAWEXE", drawScript) + "\n";
+                
+                File geoFile = new File(filesDir, "bar.geo");
+                String geoScript = "SetFactory(\"OpenCASCADE\");\n" +
+                                   "Merge \"bar.brep\";\n" +
+                                   "Mesh.MeshSizeMax = 1.0;\n";
+                try (java.io.FileOutputStream fos = new java.io.FileOutputStream(geoFile)) {
+                    fos.write(geoScript.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    result += "Step 2: Created 'bar.geo'. Running Gmsh to generate 'bar_raw.inp'...\n";
+                    String gmshOut = calculixExecutor.executeBinary("gmsh", "bar.geo", "-3", "-format", "inp", "-o", "bar_raw.inp");
+                    result += gmshOut + "\n";
+                    
+                    result += "Step 3: Assembling final 'bar.inp' using InpAssembler (Coordinate Fallback)...\n";
+                    com.diamon.civil.engine.InpAssembler.assemble(filesDir, "bar", "Steel", 210000.0, 0.3, -500.0, "nonexistent_fixed", "nonexistent_load");
+                    
+                    result += "Step 4: Executing CalculiX Solver (ccx -i bar)...\n";
+                    String ccxOut = calculixExecutor.executeBinary("ccx", "-i", "bar");
+                    result += ccxOut + "\n";
+                    
+                    File frdFile = new File(filesDir, "bar.frd");
+                    if (frdFile.exists()) {
+                        result += "\nStep 5: Summarizing Engineering Results:\n";
+                        result += com.diamon.civil.test.simulation.FrdParser.parseAndSummarize(frdFile);
+                    } else {
+                        result += "\nError: No .frd results generated.\n";
+                    }
+                } catch (Exception e) {
+                    result += "Error running test: " + e.getMessage();
+                }
             } else {
                 result = terminalExecutor.execute(input);
             }

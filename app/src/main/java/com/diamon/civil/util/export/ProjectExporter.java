@@ -16,13 +16,13 @@ public class ProjectExporter {
         this.exportManager = new ExportManager(context);
     }
 
-    public void exportAll(File workDir) {
+    public void exportAll(File workDir, final String subFolder) {
         executor.execute(() -> {
             File[] files = workDir.listFiles();
             int count = 0;
             if (files != null) {
                 for (File f : files) {
-                    if (f.isFile() && !f.getName().startsWith(".") && exportManager.exportToDownloads(f)) {
+                    if (!f.getName().startsWith(".") && exportManager.exportToDownloads(f, subFolder)) {
                         count++;
                     }
                 }
@@ -30,7 +30,7 @@ public class ProjectExporter {
             final int finalCount = count;
             if (context instanceof android.app.Activity) {
                 ((android.app.Activity) context).runOnUiThread(() -> 
-                    Toast.makeText(context, "Exported " + finalCount + " files to Structural_Analysis_FEA_Advanced", Toast.LENGTH_LONG).show());
+                    Toast.makeText(context, "Exported " + finalCount + " items to Downloads/Structural_Analysis_FEA_Advanced/" + subFolder, Toast.LENGTH_LONG).show());
             }
         });
     }

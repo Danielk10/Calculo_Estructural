@@ -75,10 +75,10 @@ struct BBox {
 //   -3  <- fin del bloque
 
 static bool parseFRD(std::istream& frd,
-                     std::map<int, Node>& nodes,
-                     std::vector<Element>& elements,
-                     std::map<int, Result>& results,
-                     float& min_stress, float& max_stress)
+                      std::map<int, Node>& nodes,
+                      std::vector<Element>& elements,
+                      std::map<int, Result>& results,
+                      float& min_stress, float& max_stress)
 {
     min_stress =  std::numeric_limits<float>::max();
     max_stress = -std::numeric_limits<float>::max();
@@ -88,44 +88,101 @@ static bool parseFRD(std::istream& frd,
     bool inElemBlock    = false;
     bool inResultBlock  = false;
 
-    while (std::getline(frd, line)) {
-        if (line.size() < 5) continue;
+    Element currentElement;
+    bool hasPendingElement = false;
 
-        // Detectar inicio de bloque de nodos: líneas que empiezan con "    2C"
-        if (line.substr(0, 6) == "    2C") { inNodeBlock = true;  inElemBlock = false; inResultBlock = false; continue; }
-        if (line.substr(0, 6) == "    3C") { inElemBlock = true;  inNodeBlock = false; inResultBlock = false; continue; }
+    while (std::getline(frd, line)) {
+        if (line.empty()) continue;
+
+        // Trim leading and trailing spaces
+        std::string trimmed = line;
+        trimmed.erase(0, trimmed.find_first_not_of(" \t"));
+        trimmed.erase(trimmed.find_last_not_of(" \t") + 1);
+
+        if (trimmed.empty()) continue;
+
+        // Detectar inicio de bloque de nodos: líneas que contienen "2C" en la cabecera
+        if (trimmed.substr(0, 2) == "2C") { 
+            inNodeBlock = true;  
+            inElemBlock = false; 
+            inResultBlock = false; 
+            continue; 
+        }
+        if (trimmed.substr(0, 2) == "3C") { 
+            inElemBlock = true;  
+            inNodeBlock = false; 
+            inResultBlock = false; 
+            if (hasPendingElement) {
+                elements.push_back(currentElement);
+                hasPendingElement = false;
+            }
+            continue; 
+        }
 
         // Detectar bloques de resultados (STRESS, DISP, etc.)
-        if (line.find("STRESS") != std::string::npos ||
-            line.find("CLSTRESS") != std::string::npos ||
-            line.find("DISP") != std::string::npos) {
-            inResultBlock = true; inNodeBlock = false; inElemBlock = false; continue;
+        if (trimmed.find("STRESS") != std::string::npos ||
+            trimmed.find("CLSTRESS") != std::string::npos ||
+            trimmed.find("DISP") != std::string::npos) {
+            inResultBlock = true; 
+            inNodeBlock = false; 
+            inElemBlock = false; 
+            if (hasPendingElement) {
+                elements.push_back(currentElement);
+                hasPendingElement = false;
+            }
+            continue;
         }
 
         // Fin de bloque
-        if (line.substr(0, 3) == " -3") { inNodeBlock = false; inElemBlock = false; inResultBlock = false; continue; }
+        if (trimmed.substr(0, 2) == "-3") { 
+            inNodeBlock = false; 
+            inElemBlock = false; 
+            inResultBlock = false; 
+            if (hasPendingElement) {
+                elements.push_back(currentElement);
+                hasPendingElement = false;
+            }
+            continue; 
+        }
 
-        // ── Líneas de nodo: " -1   <id>   <x>   <y>   <z>"
-        if (inNodeBlock && line.substr(0, 3) == " -1") {
-            std::stringstream ss(line.substr(3));
+        // ── Líneas de nodo: "-1 <id> <x> <y> <z>"
+        if (inNodeBlock && trimmed.substr(0, 2) == "-1") {
+            std::stringstream ss(trimmed.substr(2));
             int id; float x, y, z;
-            if (ss >> id >> x >> y >> z) nodes[id] = {x, y, z};
+            if (ss >> id >> x >> y >> z) {
+                nodes[id] = {x, y, z};
+            }
             continue;
         }
 
-        // ── Líneas de elemento: " -1   <id>   <type>   <n1>  <n2> ..."
-        if (inElemBlock && line.substr(0, 3) == " -1") {
-            std::stringstream ss(line.substr(3));
-            int id, type; ss >> id >> type;
-            Element el; int nid;
-            while (ss >> nid) el.nodes.push_back(nid);
-            if (!el.nodes.empty()) elements.push_back(el);
-            continue;
+        // ── Líneas de elemento: "-1 <id> <type> ..."
+        if (inElemBlock) {
+            if (trimmed.substr(0, 2) == "-1") {
+                if (hasPendingElement) {
+                    elements.push_back(currentElement);
+                }
+                std::stringstream ss(trimmed.substr(2));
+                int id, type; 
+                if (ss >> id >> type) {
+                    currentElement = Element();
+                    hasPendingElement = true;
+                }
+                continue;
+            }
+            // ── Líneas de conectividad: "-2 <n1> <n2> <n3> ..."
+            if (trimmed.substr(0, 2) == "-2" && hasPendingElement) {
+                std::stringstream ss(trimmed.substr(2));
+                int nid;
+                while (ss >> nid) {
+                    currentElement.nodes.push_back(nid);
+                }
+                continue;
+            }
         }
 
-        // ── Líneas de resultado de nodo: " -1   <id>   <val1>   ..."
-        if (inResultBlock && line.substr(0, 3) == " -1") {
-            std::stringstream ss(line.substr(3));
+        // ── Líneas de resultado de nodo: "-1 <id> <val1> ..."
+        if (inResultBlock && trimmed.substr(0, 2) == "-1") {
+            std::stringstream ss(trimmed.substr(2));
             int id; float val;
             if (ss >> id >> val) {
                 results[id] = {val};
@@ -134,6 +191,10 @@ static bool parseFRD(std::istream& frd,
             }
             continue;
         }
+    }
+
+    if (hasPendingElement) {
+        elements.push_back(currentElement);
     }
 
     return !nodes.empty();
@@ -263,6 +324,7 @@ Java_com_diamon_civil_engine_CalculixExecutor_convertFrdToGlb(
     tinygltf::Model gltf;
     gltf.asset.version   = "2.0";
     gltf.asset.generator = "StructuralFEA-frd_converter";
+    gltf.extensionsUsed.push_back("KHR_materials_unlit");
 
     // Un único buffer por tipo (separados para compatibilidad con validadores GLTF)
     auto add_buffer_view = [&](const void* data, size_t byteSize, int target) -> int {
@@ -318,9 +380,9 @@ Java_com_diamon_civil_engine_CalculixExecutor_convertFrdToGlb(
 
     tinygltf::Material mat;
     mat.name = "FEA_Material";
-    mat.pbrMetallicRoughness.metallicFactor = 0.1;
-    mat.pbrMetallicRoughness.roughnessFactor = 0.8;
     mat.doubleSided = true;
+    tinygltf::Value::Object unlit_ext;
+    mat.extensions["KHR_materials_unlit"] = tinygltf::Value(unlit_ext);
     gltf.materials.push_back(mat);
 
     tinygltf::Primitive prim;

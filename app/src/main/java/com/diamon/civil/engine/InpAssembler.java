@@ -36,7 +36,66 @@ public class InpAssembler {
         if (loadedNodes.isEmpty()) loadedNodes = extractNodesFromPhysical(lines, "SURFACE2"); // Fallback
 
         if (fixedNodes.isEmpty() || loadedNodes.isEmpty()) {
-            throw new IOException("La malla no contiene las superficies físicas Fixed y Loaded requeridas (IDs: " + fixedId + ", " + loadId + ")");
+            Map<Integer, double[]> nodeCoords = new HashMap<>();
+            boolean inNodeBlock = false;
+            for (String line : lines) {
+                String u = line.trim().toUpperCase();
+                if (u.startsWith("*NODE")) {
+                    inNodeBlock = true;
+                    continue;
+                }
+                if (inNodeBlock) {
+                    if (u.startsWith("*")) {
+                        inNodeBlock = false;
+                        continue;
+                    }
+                    String[] parts = line.trim().split(",");
+                    if (parts.length >= 4) {
+                        try {
+                            int id = Integer.parseInt(parts[0].trim());
+                            double x = Double.parseDouble(parts[1].trim());
+                            double y = Double.parseDouble(parts[2].trim());
+                            double z = Double.parseDouble(parts[3].trim());
+                            nodeCoords.put(id, new double[]{x, y, z});
+                        } catch (NumberFormatException ignore) {}
+                    }
+                }
+            }
+            if (!nodeCoords.isEmpty()) {
+                double minX = Double.MAX_VALUE, maxX = -Double.MAX_VALUE;
+                double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
+                double minZ = Double.MAX_VALUE, maxZ = -Double.MAX_VALUE;
+                for (double[] coords : nodeCoords.values()) {
+                    minX = Math.min(minX, coords[0]); maxX = Math.max(maxX, coords[0]);
+                    minY = Math.min(minY, coords[1]); maxY = Math.max(maxY, coords[1]);
+                    minZ = Math.min(minZ, coords[2]); maxZ = Math.max(maxZ, coords[2]);
+                }
+                double dx = maxX - minX;
+                double dy = maxY - minY;
+                double dz = maxZ - minZ;
+                
+                int axis = 2; // Default Z
+                double minVal = minZ, maxVal = maxZ;
+                if (dx > dy && dx > dz) { axis = 0; minVal = minX; maxVal = maxX; }
+                else if (dy > dx && dy > dz) { axis = 1; minVal = minY; maxVal = maxY; }
+                
+                double range = maxVal - minVal;
+                double tol = range * 0.05; // 5% tolerance
+                
+                for (Map.Entry<Integer, double[]> entry : nodeCoords.entrySet()) {
+                    double val = entry.getValue()[axis];
+                    if (fixedNodes.isEmpty() && val <= minVal + tol) {
+                        fixedNodes.add(entry.getKey());
+                    }
+                    if (loadedNodes.isEmpty() && val >= maxVal - tol) {
+                        loadedNodes.add(entry.getKey());
+                    }
+                }
+            }
+        }
+
+        if (fixedNodes.isEmpty() || loadedNodes.isEmpty()) {
+            throw new IOException("La malla no contiene las superficies físicas Fixed/Loaded y la selección por coordenadas espaciales falló.");
         }
 
         try (PrintWriter pw = new PrintWriter(new FileWriter(nsetsInp))) {

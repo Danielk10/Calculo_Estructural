@@ -12,6 +12,7 @@ import com.diamon.civil.databinding.FragmentSolidBinding;
 import com.diamon.civil.engine.CalculixExecutor;
 import com.diamon.civil.engine.GmshRunner;
 import com.diamon.civil.engine.OcctPrimitivesJNI;
+import com.diamon.civil.engine.OcctBooleanJNI;
 import com.diamon.civil.engine.NativeFeaCore;
 import com.diamon.civil.engine.SampleSimulationCase;
 import com.diamon.civil.ui.MainActivity;
@@ -50,7 +51,9 @@ public class SolidFragment extends Fragment {
                         executor.execute(() -> {
                             try {
                                 java.io.InputStream in = requireContext().getContentResolver().openInputStream(uri);
-                                File out = new File(requireContext().getFilesDir(), "imported_cad.step");
+                                File targetDir = new File(requireContext().getFilesDir(), "3d_solid_analysis");
+                                if (!targetDir.exists()) targetDir.mkdirs();
+                                File out = new File(targetDir, "imported_cad.step");
                                 java.io.FileOutputStream fout = new java.io.FileOutputStream(out);
                                 byte[] buf = new byte[1024];
                                 int len;
@@ -89,7 +92,10 @@ public class SolidFragment extends Fragment {
         final android.content.Context appContext = requireContext().getApplicationContext();
         final File nativeLibDir = new File(requireContext().getApplicationInfo().nativeLibraryDir);
         final File filesDir = requireContext().getFilesDir();
-        workDir = filesDir;
+        workDir = new File(filesDir, "3d_solid_analysis");
+        if (!workDir.exists()) {
+            workDir.mkdirs();
+        }
 
         logger.attachToTextView(binding.tvSolidLog);
         setupTabs();
@@ -100,9 +106,9 @@ public class SolidFragment extends Fragment {
             try {
                 // Load only the JNI dependencies; Gmsh and ccx remain child processes.
                 NativeFeaCore.loadLibraries();
-                gmshRunner = new GmshRunner(filesDir, nativeLibDir);
-                calculixExecutor = new CalculixExecutor(appContext);
-                activeSimulationGeometry = SampleSimulationCase.createCantileverGeo(filesDir);
+                gmshRunner = new GmshRunner(workDir, nativeLibDir);
+                calculixExecutor = new CalculixExecutor(appContext, workDir);
+                activeSimulationGeometry = SampleSimulationCase.createCantileverGeo(workDir);
                 
                 android.app.Activity activity = getActivity();
                 if (activity != null) {
@@ -172,6 +178,9 @@ public class SolidFragment extends Fragment {
         binding.btnFillet.setOnClickListener(v -> applyOperation("fillet"));
         binding.btnChamfer.setOnClickListener(v -> applyOperation("chamfer"));
         binding.btnExtrude.setOnClickListener(v -> applyOperation("extrude"));
+        binding.btnUnion.setOnClickListener(v -> showBooleanDialog("union"));
+        binding.btnCut.setOnClickListener(v -> showBooleanDialog("cut"));
+        binding.btnIntersect.setOnClickListener(v -> showBooleanDialog("intersect"));
         binding.btnLoadTestCase.setOnClickListener(v -> {
             if (getContext() != null) {
                 try {
@@ -208,7 +217,8 @@ public class SolidFragment extends Fragment {
 
     public void exportResults() {
         if (getContext() == null) return;
-        File workDir = getContext().getFilesDir();
+        File workDir = new File(getContext().getFilesDir(), "3d_solid_analysis");
+        if (!workDir.exists()) workDir.mkdirs();
         File reportFile = new File(workDir, "Solid_Analysis_Report.pdf");
         
         String logText = logger.getFullLog();
@@ -217,13 +227,13 @@ public class SolidFragment extends Fragment {
             generator.generateReport(getContext(), reportFile, "3D Solid Analysis", logText);
         }
 
-        File[] files = workDir.listFiles((dir, name) -> name.startsWith("job_solid") || name.endsWith(".brep") || name.endsWith(".msh") || name.equals("Solid_Analysis_Report.pdf"));
+        File[] files = workDir.listFiles((dir, name) -> !name.startsWith(".") && new File(dir, name).isFile());
         if (files != null && files.length > 0) {
             com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(getContext());
             for (File f : files) {
-                manager.exportToDownloads(f);
+                manager.exportToDownloads(f, "3d_solid_analysis");
             }
-            Toast.makeText(getContext(), "Exported to Downloads/Structural_Analysis_FEA_Advanced", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Exported to Downloads/Structural_Analysis_FEA_Advanced/3d_solid_analysis", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(getContext(), "No files to export", Toast.LENGTH_SHORT).show();
         }
@@ -289,6 +299,99 @@ public class SolidFragment extends Fragment {
         });
     }
 
+    private void showBooleanDialog(final String op) {
+        if (getContext() == null) return;
+        final File[] files = workDir.listFiles((dir, name) -> name.endsWith(".brep") || name.endsWith(".step") || name.endsWith(".stp"));
+        if (files == null || files.length < 2) {
+            Toast.makeText(getContext(), "Please create or import at least 2 CAD files (.brep/.step) first", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        final String[] fileNames = new String[files.length];
+        for (int i = 0; i < files.length; i++) {
+            fileNames[i] = files[i].getName();
+        }
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(getContext());
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(40, 20, 40, 20);
+
+        android.widget.TextView tvA = new android.widget.TextView(getContext());
+        tvA.setText("Select Solid A (Target):");
+        tvA.setPadding(0, 10, 0, 10);
+        layout.addView(tvA);
+
+        final android.widget.Spinner spinnerA = new android.widget.Spinner(getContext());
+        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, fileNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerA.setAdapter(adapter);
+        layout.addView(spinnerA);
+
+        android.widget.TextView tvB = new android.widget.TextView(getContext());
+        tvB.setText("Select Solid B (Tool):");
+        tvB.setPadding(0, 20, 0, 10);
+        layout.addView(tvB);
+
+        final android.widget.Spinner spinnerB = new android.widget.Spinner(getContext());
+        spinnerB.setAdapter(adapter);
+        if (fileNames.length > 1) {
+            spinnerB.setSelection(1);
+        }
+        layout.addView(spinnerB);
+
+        new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                .setTitle("Boolean Operation: " + op.toUpperCase())
+                .setView(layout)
+                .setPositiveButton("APPLY", (dialog, which) -> {
+                    int idxA = spinnerA.getSelectedItemPosition();
+                    int idxB = spinnerB.getSelectedItemPosition();
+                    if (idxA == idxB) {
+                        Toast.makeText(getContext(), "Solid A and Solid B must be different files", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    
+                    final File fileA = files[idxA];
+                    final File fileB = files[idxB];
+                    final String outPath = new File(workDir, op + "_result.brep").getAbsolutePath();
+                    
+                    logger.info("Running Boolean " + op.toUpperCase() + " between " + fileA.getName() + " and " + fileB.getName() + "...");
+                    
+                    executor.execute(() -> {
+                        boolean success = false;
+                        try {
+                            if (op.equals("union")) {
+                                success = OcctBooleanJNI.fuse(fileA.getAbsolutePath(), fileB.getAbsolutePath(), outPath);
+                            } else if (op.equals("cut")) {
+                                success = OcctBooleanJNI.cut(fileA.getAbsolutePath(), fileB.getAbsolutePath(), outPath);
+                            } else if (op.equals("intersect")) {
+                                success = OcctBooleanJNI.intersect(fileA.getAbsolutePath(), fileB.getAbsolutePath(), outPath);
+                            }
+                        } catch (Throwable e) {
+                            logger.error("Boolean operation error: " + e.getMessage());
+                        }
+
+                        final boolean finalSuccess = success;
+                        android.app.Activity activity = getActivity();
+                        if (activity != null) {
+                            activity.runOnUiThread(() -> {
+                                if (isAdded()) {
+                                    if (finalSuccess) {
+                                        activeSimulationGeometry = new File(outPath);
+                                        logger.info("Boolean " + op.toUpperCase() + " Success! Saved as " + op + "_result.brep");
+                                        Toast.makeText(getContext(), "Boolean " + op.toUpperCase() + " applied successfully", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        logger.error("Boolean " + op.toUpperCase() + " failed.");
+                                        Toast.makeText(getContext(), "Operation failed. Check engine logs.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                })
+                .setNegativeButton("CANCEL", null)
+                .show();
+    }
+
     private void runFullPipeline() {
         if (binding == null || getContext() == null) return;
 
@@ -321,7 +424,8 @@ public class SolidFragment extends Fragment {
 
         logger.info("Starting Pipeline for: Linear Tetrahedron C3D4");
 
-        final File workDir = getContext().getFilesDir();
+        final File workDir = new File(getContext().getFilesDir(), "3d_solid_analysis");
+        if (!workDir.exists()) workDir.mkdirs();
         final File cadFile = activeSimulationGeometry;
         final android.content.Context appContext = getContext().getApplicationContext();
 
@@ -332,8 +436,9 @@ public class SolidFragment extends Fragment {
             return;
         }
 
-        if (!cadFile.getName().endsWith(".geo")) {
-            logger.error("La geometría CAD no define superficies Fixed/Loaded. Cargue el caso de prueba antes de resolver.");
+        String nameLower = cadFile.getName().toLowerCase();
+        if (!nameLower.endsWith(".geo") && !nameLower.endsWith(".step") && !nameLower.endsWith(".stp") && !nameLower.endsWith(".brep") && !nameLower.endsWith(".iges") && !nameLower.endsWith(".igs")) {
+            logger.error("Geometría no soportada. Cargue un modelo compatible (.geo, .step, .brep, .iges) antes de resolver.");
             binding.pbSolid.setVisibility(View.GONE);
             binding.btnRunSolidAnalysis.setEnabled(true);
             return;
@@ -354,7 +459,7 @@ public class SolidFragment extends Fragment {
                         }
                         
                         if (calculixExecutor == null) {
-                            calculixExecutor = new CalculixExecutor(appContext);
+                            calculixExecutor = new CalculixExecutor(appContext, workDir);
                         }
 
                         com.diamon.civil.engine.InpAssembler.assemble(workDir, "job_solid", "Steel", E, 0.3, currentDynamicLoadValue, selectedFixedId, selectedLoadId);
@@ -454,21 +559,25 @@ public class SolidFragment extends Fragment {
             dialog.dismiss();
         });
 
-        sheetView.findViewById(com.diamon.civil.R.id.btnApplyLoad).setOnClickListener(v -> {
-            com.google.android.material.textfield.TextInputLayout layoutLoad = sheetView.findViewById(com.diamon.civil.R.id.layoutLoadValue);
+        View layoutLoad = sheetView.findViewById(com.diamon.civil.R.id.layoutLoadValue);
+        android.widget.Button btnLoad = sheetView.findViewById(com.diamon.civil.R.id.btnApplyLoad);
+        btnLoad.setOnClickListener(v -> {
             if (layoutLoad.getVisibility() == View.GONE) {
                 layoutLoad.setVisibility(View.VISIBLE);
+                btnLoad.setText("CONFIRM LOAD VALUE");
             } else {
-                com.google.android.material.textfield.TextInputEditText et = sheetView.findViewById(com.diamon.civil.R.id.etLoadValue);
-                String val = et.getText().toString();
-                try {
-                    currentDynamicLoadValue = Double.parseDouble(val);
-                    selectedLoadId = info.toString();
-                    Toast.makeText(getContext(), "Load applied: " + val, Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                } catch(Exception e) {
-                    Toast.makeText(getContext(), "Invalid value", Toast.LENGTH_SHORT).show();
+                android.widget.EditText etLoad = sheetView.findViewById(com.diamon.civil.R.id.etLoadValue);
+                String valStr = etLoad.getText().toString();
+                if (!valStr.isEmpty()) {
+                    try {
+                        currentDynamicLoadValue = Double.parseDouble(valStr);
+                        selectedLoadId = info.toString();
+                        Toast.makeText(getContext(), "Load of " + valStr + " applied to selection", Toast.LENGTH_SHORT).show();
+                    } catch(Exception e) {
+                        Toast.makeText(getContext(), "Invalid value", Toast.LENGTH_SHORT).show();
+                    }
                 }
+                dialog.dismiss();
             }
         });
 

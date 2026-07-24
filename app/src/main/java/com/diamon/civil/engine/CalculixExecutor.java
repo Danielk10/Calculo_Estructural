@@ -17,7 +17,11 @@ public class CalculixExecutor {
     private final File nativeLibDir;
 
     public CalculixExecutor(Context context) {
-        this.workDir = context.getFilesDir();
+        this(context, context.getFilesDir());
+    }
+
+    public CalculixExecutor(Context context, File workDir) {
+        this.workDir = workDir;
         this.nativeLibDir = new File(context.getApplicationInfo().nativeLibraryDir);
         
         // The solver is a child process. Do not load the JNI/OCCT stack here: the

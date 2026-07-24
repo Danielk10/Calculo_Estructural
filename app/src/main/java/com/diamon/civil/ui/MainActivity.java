@@ -121,7 +121,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_export_all) {
-            projectExporter.exportAll(getFilesDir());
+            Fragment current = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+            if (current instanceof SolidFragment) {
+                File workDir = new File(getFilesDir(), "3d_solid_analysis");
+                projectExporter.exportAll(workDir, "3d_solid_analysis");
+            } else if (current instanceof StructuralFragment) {
+                File workDir = new File(getFilesDir(), "structural_analysis");
+                projectExporter.exportAll(workDir, "structural_analysis");
+            } else if (current instanceof TerminalFragment) {
+                projectExporter.exportAll(getFilesDir(), "terminal");
+            } else {
+                Toast.makeText(this, "No module active to export all", Toast.LENGTH_SHORT).show();
+            }
             return true;
         } else if (id == R.id.action_export) {
             Fragment current = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
@@ -170,7 +181,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (uri != null) {
                 executor.execute(() -> {
                     try {
-                        File tempFile = new File(getFilesDir(), "imported.inp");
+                        File workDir = new File(getFilesDir(), "structural_analysis");
+                        if (!workDir.exists()) workDir.mkdirs();
+                        File tempFile = new File(workDir, "imported.inp");
                         com.diamon.civil.io.FileHelper fh = new com.diamon.civil.io.FileHelper(getContentResolver());
                         if (fh.importFile(uri, tempFile)) {
                             com.diamon.civil.io.AbaqusInpImporter importer = new com.diamon.civil.io.AbaqusInpImporter();
@@ -220,7 +233,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onHit(Object info) {
-        // Forward hit events to the current fragment if needed
+        Fragment current = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        if (current instanceof SolidFragment) {
+            ((SolidFragment) current).onHit(info);
+        }
     }
 
     @Override

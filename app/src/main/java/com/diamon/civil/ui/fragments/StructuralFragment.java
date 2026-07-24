@@ -41,10 +41,12 @@ public class StructuralFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         
         final android.content.Context appContext = requireContext().getApplicationContext();
+        final File workDir = new File(appContext.getFilesDir(), "structural_analysis");
+        if (!workDir.exists()) workDir.mkdirs();
         executor.execute(() -> {
             try {
                 NativeFeaCore.loadLibraries();
-                calculixExecutor = new CalculixExecutor(appContext);
+                calculixExecutor = new CalculixExecutor(appContext, workDir);
                 android.app.Activity activity = getActivity();
                 if (activity != null) {
                     activity.runOnUiThread(() -> {
@@ -137,8 +139,9 @@ public class StructuralFragment extends Fragment {
 
     public void exportResults() {
         if (getContext() == null) return;
-        File workDir = getContext().getFilesDir();
-        File reportFile = new File(workDir, "Structural_Report_SAP2000.pdf");
+        File workDir = new File(getContext().getFilesDir(), "structural_analysis");
+        if (!workDir.exists()) workDir.mkdirs();
+        File reportFile = new File(workDir, "Structural_Report.pdf");
         
         if (currentModel == null || currentResult == null) {
             Toast.makeText(getContext(), "Please run analysis first", Toast.LENGTH_SHORT).show();
@@ -149,9 +152,16 @@ public class StructuralFragment extends Fragment {
         boolean success = generator.generateReport(getContext(), currentModel, currentResult, "Structural Frame Analysis", "Calculo Estructural User", reportFile);
 
         if (success) {
-            com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(getContext());
-            manager.exportToDownloads(reportFile);
-            Toast.makeText(getContext(), "Exported PDF to Downloads", Toast.LENGTH_LONG).show();
+            File[] files = workDir.listFiles((dir, name) -> !name.startsWith(".") && new File(dir, name).isFile());
+            if (files != null && files.length > 0) {
+                com.diamon.civil.util.export.ExportManager manager = new com.diamon.civil.util.export.ExportManager(getContext());
+                for (File f : files) {
+                    manager.exportToDownloads(f, "structural_analysis");
+                }
+                Toast.makeText(getContext(), "Exported to Downloads/Structural_Analysis_FEA_Advanced/structural_analysis", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getContext(), "No files to export", Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(getContext(), "Failed to export PDF", Toast.LENGTH_SHORT).show();
         }
@@ -183,7 +193,8 @@ public class StructuralFragment extends Fragment {
         logger.info("Starting Structural Analysis...");
 
         final android.content.Context appContext = getContext().getApplicationContext();
-        final File filesDir = getContext().getFilesDir();
+        final File workDir = new File(getContext().getFilesDir(), "structural_analysis");
+        if (!workDir.exists()) workDir.mkdirs();
 
         executor.execute(() -> {
             NativeFeaCore core = new NativeFeaCore();
@@ -197,20 +208,20 @@ public class StructuralFragment extends Fragment {
                 
                 logger.info("Assembling CalculiX Input INP...");
                 String inpContent = core.modelToInp(modelPtr);
-                File inpFile = new File(filesDir, "structural_job.inp");
+                File inpFile = new File(workDir, "structural_job.inp");
                 try (java.io.FileOutputStream fos = new java.io.FileOutputStream(inpFile)) {
                     fos.write(inpContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
                 }
                 
                 logger.info("Executing CalculiX Solver ccx...");
                 if (calculixExecutor == null) {
-                    calculixExecutor = new CalculixExecutor(appContext);
+                    calculixExecutor = new CalculixExecutor(appContext, workDir);
                 }
                 String result = calculixExecutor.executeCalculix("structural_job");
                 logger.log(result);
 
-                File datFile = new File(filesDir, "structural_job.dat");
-                File frdFile = new File(filesDir, "structural_job.frd");
+                File datFile = new File(workDir, "structural_job.dat");
+                File frdFile = new File(workDir, "structural_job.frd");
                 if (datFile.exists()) {
                     DatParser.ParseResult parseResult = datParser.parse(datFile);
                     if (frdFile.exists()) {

@@ -10,12 +10,12 @@
         android:id="@+id/tvTerminalHelp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Type 'help' for available commands"
+        android:text="FEA Advanced Terminal Console"
         android:textColor="@color/terminal_green"
-        android:textSize="10sp"
+        android:textSize="13sp"
         android:paddingStart="12dp"
         android:paddingTop="8dp"
-        android:textStyle="italic" />
+        android:textStyle="bold" />
 
     <ScrollView
         android:id="@+id/scrollLog"

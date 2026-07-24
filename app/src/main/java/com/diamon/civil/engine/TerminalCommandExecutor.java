@@ -37,13 +37,17 @@ public class TerminalCommandExecutor {
             case "pwd":
                 return getRelativePath(currentDir);
             case "test-gmsh":
-                return runGmshBooleanTest();
+                return null; // Intercepted and executed fully in TerminalFragment
+            case "test-draw":
+            case "test-occt":
+            case "test-cad-solve":
+                return null; // Intercepted and executed fully in TerminalFragment
             case "run-sim-test":
                 return SimulationTestManager.runTest(rootDir, new File(System.getProperty("java.library.path")));
             case "gmsh":
                 return null; // Delegate to binary executor in MainActivity
             case "help":
-                return "Available Commands: ls, mkdir, rm, cd, pwd, test-gmsh, gmsh, run-sim-test, clear, help\nOr enter an .inp job name to run CalculiX.";
+                return "Available Commands: ls, mkdir, rm, cd, pwd, test-gmsh, test-draw, test-cad-solve, run-sim-test, clear, help\nOr enter an .inp job name to run CalculiX.";
             default:
                 return null; // Delegate
         }
