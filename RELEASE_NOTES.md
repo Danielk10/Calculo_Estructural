@@ -1,6 +1,6 @@
-# Notas de Versión - Versión Alfa 0.2.0
+# Notas de Versión - Versión Alfa 0.1.0
 
-## 📦 Calculo Estructural v0.2.0 (Pre-Release)
+## 📦 Calculo Estructural v0.1.0 (Pre-Release)
 
 ### 🚀 Novedades, Mejoras de UI y Correcciones de la Versión
 
