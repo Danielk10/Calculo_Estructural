@@ -39,6 +39,13 @@ public class ProjectExporter {
 
     private boolean shouldIgnore(File f) {
         String name = f.getName();
+        if (f.isDirectory()) {
+            if (name.equalsIgnoreCase("3d_solid_analysis") ||
+                name.equalsIgnoreCase("structural_analysis") ||
+                name.equalsIgnoreCase("terminal")) {
+                return true;
+            }
+        }
         return name.equalsIgnoreCase("usr") || 
                name.equalsIgnoreCase("fake_root") || 
                name.equalsIgnoreCase("lib") ||

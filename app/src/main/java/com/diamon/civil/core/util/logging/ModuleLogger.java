@@ -18,7 +18,7 @@ public class ModuleLogger {
         "Type 'help' to see list of available commands.\n\n" +
         "Special Test & Pipeline Commands:\n" +
         "  test-gmsh              - Run 3D CAD Boolean subtraction & mesh test (Gmsh + OCCT)\n" +
-        "  test-draw / test-occt  - Run OpenCASCADE DRAWEXE headless primitive box test (OCCT)\n" +
+        "  test-draw              - Run OpenCASCADE DRAWEXE headless primitive box test (OCCT)\n" +
         "  test-calculix          - Run CalculiX validation test (test_calculix.inp)\n" +
         "  test-calculix-parallel - Run CalculiX test with multi-threading (4 cores)\n" +
         "  test-frame             - Run 2D Frame structural analysis test (test_portico.inp)\n" +

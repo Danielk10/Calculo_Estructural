@@ -201,9 +201,15 @@ public class SolidInpAssemblerTest {
                            "box b 3 3 15\n" +
                            "writebrep b bar.brep\n" +
                            "exit\n";
-        String drawBin = new File("/usr/bin/DRAWEXE").exists() ? "/usr/bin/DRAWEXE" :
-                         (new File("/usr/bin/occt-draw").exists() ? "/usr/bin/occt-draw" : "/usr/share/opencascade/bin/draw.sh");
-        ProcessBuilder pbDraw = new ProcessBuilder("xvfb-run", "-a", drawBin);
+        File drawBinFile = new File("/usr/bin/DRAWEXE").exists() ? new File("/usr/bin/DRAWEXE") :
+                         (new File("/usr/bin/occt-draw").exists() ? new File("/usr/bin/occt-draw") :
+                         (new File("/usr/share/opencascade/bin/draw.sh").exists() ? new File("/usr/share/opencascade/bin/draw.sh") : null));
+        boolean hasXvfb = new File("/usr/bin/xvfb-run").exists();
+        if (drawBinFile == null || !drawBinFile.exists() || !hasXvfb) {
+            org.junit.Assume.assumeTrue("DRAWEXE and xvfb-run required for headless CAD modeling test", false);
+            return;
+        }
+        ProcessBuilder pbDraw = new ProcessBuilder("xvfb-run", "-a", drawBinFile.getAbsolutePath());
         pbDraw.directory(workDir);
         pbDraw.environment().put("CSF_OCCTResourcePath", "/usr/share/opencascade/resources");
         pbDraw.redirectErrorStream(true);

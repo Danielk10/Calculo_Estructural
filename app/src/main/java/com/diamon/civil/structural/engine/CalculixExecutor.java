@@ -171,9 +171,10 @@ public class CalculixExecutor {
                 int read;
                 while ((read = reader.read(buffer, 0, buffer.length)) != -1) {
                     String chunk = new String(buffer, 0, read);
-                    output.append(chunk);
+                    String cleanChunk = sanitizeBinaryOutput(chunk, binaryName, binary);
+                    output.append(cleanChunk);
                     if (listener != null) {
-                        listener.onOutput(chunk);
+                        listener.onOutput(cleanChunk);
                     }
                 }
             }
@@ -194,6 +195,21 @@ public class CalculixExecutor {
                 currentProcess = null;
             }
         }
+    }
+
+    public static String sanitizeBinaryOutput(String text) {
+        return sanitizeBinaryOutput(text, null, null);
+    }
+
+    public static String sanitizeBinaryOutput(String text, String binaryName, File binary) {
+        if (text == null || text.isEmpty()) return text;
+        String res = text;
+        if (binary != null) {
+            res = res.replace(binary.getAbsolutePath(), binaryName != null ? binaryName : binary.getName());
+        }
+        res = res.replaceAll("/data/app/[^\\s'\"`]+/lib/(?:arm64|armeabi-v7a|x86_64|x86)/lib([a-zA-Z0-9_-]+)\\.so", "$1");
+        res = res.replaceAll("/data/(?:data|user/[0-9]+)/[^\\s'\"`]+/files/usr/bin/([a-zA-Z0-9_-]+)", "$1");
+        return res;
     }
 
     public static boolean wasSuccessful(String output) {

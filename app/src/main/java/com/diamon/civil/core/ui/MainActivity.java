@@ -172,7 +172,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 File workDir = new File(getFilesDir(), "structural_analysis");
                 projectExporter.exportAll(workDir, "structural_analysis");
             } else if (current instanceof TerminalFragment) {
-                projectExporter.exportAll(getFilesDir(), "terminal");
+                File workDir = new File(getFilesDir(), "terminal");
+                if (!workDir.exists()) workDir.mkdirs();
+                projectExporter.exportAll(workDir, "terminal");
             } else {
                 Toast.makeText(this, R.string.toast_no_active_module, Toast.LENGTH_SHORT).show();
             }
@@ -237,7 +239,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 });
                             }
                         } else if (current instanceof TerminalFragment) {
-                            File terminalDir = getFilesDir();
+                            File terminalDir = new File(getFilesDir(), "terminal");
+                            if (!terminalDir.exists()) terminalDir.mkdirs();
                             File targetFile = new File(terminalDir, fileName);
                             if (fh.importFile(uri, targetFile)) {
                                 runOnUiThread(() -> {

@@ -309,6 +309,12 @@ public class PDFReportGenerator {
                                    String projectName, String engineerName, File outputFile) {
         PdfDocument document = new PdfDocument();
         pageNumber = 0;
+        lastOverstressedCount = 0;
+        lastMaxGoverningDC = 0.0;
+        lastMaxDisplacement_mm = 0.0;
+        lastMaxDriftRatioPct = 0.0;
+        lastDeflectionVerify = false;
+        lastDriftExceeds = false;
         PageContext ctx = new PageContext(document, this);
 
         try {
@@ -779,6 +785,7 @@ public class PDFReportGenerator {
                 dispMap.put(d.nodeId, d);
             }
 
+            double maxDisp_mm = 0.0;
             for (StructuralModel.Node node : model.nodes) {
                 ctx.ensureSpace(14f);
                 StructuralBeamDatParser.NodeDisplacement disp = dispMap.get(node.id);
@@ -786,6 +793,13 @@ public class PDFReportGenerator {
                 double uy_mm = (disp != null) ? disp.uy * 1000.0 : 0.0;
                 double uz_mm = (disp != null) ? disp.uz * 1000.0 : 0.0;
                 double mag_mm = Math.sqrt(ux_mm * ux_mm + uy_mm * uy_mm + uz_mm * uz_mm);
+                if (mag_mm > maxDisp_mm) {
+                    maxDisp_mm = mag_mm;
+                }
+                boolean isVerify = (mag_mm >= 25.0);
+                if (isVerify) {
+                    lastDeflectionVerify = true;
+                }
 
                 String[] row = {
                         String.valueOf(node.id),
@@ -793,10 +807,11 @@ public class PDFReportGenerator {
                         String.format(Locale.US, "%+.4f", uy_mm),
                         String.format(Locale.US, "%+.4f", uz_mm),
                         String.format(Locale.US, "%.4f", mag_mm),
-                        mag_mm < 25.0 ? "PASS / OK" : "VERIFY"
+                        !isVerify ? "PASS / OK" : "VERIFY"
                 };
                 ctx.y = drawTableRow(ctx, row, dispWidths);
             }
+            lastMaxDisplacement_mm = maxDisp_mm;
             ctx.y += 14f;
         }
 
@@ -835,6 +850,12 @@ public class PDFReportGenerator {
 
                     double driftDelta = Math.abs(currentMaxUx - prevMaxUx);
                     double driftRatioPct = (storyHeight > 1e-4) ? (driftDelta / storyHeight) * 100.0 : 0.0;
+                    if (driftRatioPct > lastMaxDriftRatioPct) {
+                        lastMaxDriftRatioPct = driftRatioPct;
+                    }
+                    if (driftRatioPct > 1.0) {
+                        lastDriftExceeds = true;
+                    }
 
                     String status = driftRatioPct <= 1.0 ? "PASS / OK" : (driftRatioPct <= 1.5 ? "ACCEPTABLE" : "EXCEEDS");
                     String[] row = {
@@ -933,6 +954,10 @@ public class PDFReportGenerator {
 
     private int lastOverstressedCount = 0;
     private double lastMaxGoverningDC = 0.0;
+    private double lastMaxDisplacement_mm = 0.0;
+    private double lastMaxDriftRatioPct = 0.0;
+    private boolean lastDeflectionVerify = false;
+    private boolean lastDriftExceeds = false;
 
     private void drawChapter7_AiscDesignAndStability(PageContext ctx, StructuralModel model, StructuralBeamDatParser.ParseResult result) {
         drawSectionTitle(ctx, "7. AISC 360-22 LRFD / ASD STRUCTURAL MEMBER DESIGN & STABILITY CHECK");
@@ -1060,11 +1085,16 @@ public class PDFReportGenerator {
         double maxForceV = result.maxAbsV2 / 1000.0;
         double maxMomM = result.maxAbsM1 / 1000.0;
 
+        if (maxDisp >= 25.0) {
+            lastDeflectionVerify = true;
+        }
+
         String[] perfHeaders = {"Structural Performance Metric", "Computed Peak Response", "Governing Limit / Reference", "Performance Assessment"};
         float[] perfWidths = {169f, 110f, 130f, 110f}; // Sum = 519f
         ctx.y = drawTableHeader(ctx, perfHeaders, perfWidths);
 
-        ctx.y = drawTableRow(ctx, new String[]{"Peak Vector Deflection |U|", String.format(Locale.US, "%.4f mm", maxDisp), "L / 360 Floor Serviceability", maxDisp < 25.0 ? "PASS / OK" : "VERIFY"}, perfWidths);
+        String deflAssessment = (maxDisp < 25.0) ? "PASS / OK" : "VERIFY";
+        ctx.y = drawTableRow(ctx, new String[]{"Peak Vector Deflection |U|", String.format(Locale.US, "%.4f mm", maxDisp), "L / 360 Floor Serviceability (25 mm)", deflAssessment}, perfWidths);
         ctx.y = drawTableRow(ctx, new String[]{"Peak Frame Axial Force |P|", String.format(Locale.US, "%.2f kN", maxForceN), "AISC Compression / Tension", "PASS / OK"}, perfWidths);
         ctx.y = drawTableRow(ctx, new String[]{"Peak Major Shear Force |V2|", String.format(Locale.US, "%.2f kN", maxForceV), "AISC Shear Yielding (φv·Vn)", "PASS / OK"}, perfWidths);
         ctx.y = drawTableRow(ctx, new String[]{"Peak Major Bending Moment |M3|", String.format(Locale.US, "%.2f kN·m", maxMomM), "AISC Plastic Flexure (φb·Mn)", "PASS / OK"}, perfWidths);
@@ -1080,34 +1110,67 @@ public class PDFReportGenerator {
         ctx.y = drawWrappedText(ctx, "1. GLOBAL EQUILIBRIUM: Strict global equilibrium (Newton's 3rd law) is confirmed with 0.000 kN solver residual error.", MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
 
         if (lastOverstressedCount == 0) {
-            ctx.y = drawWrappedText(ctx, String.format(Locale.US, "2. MEMBER STRENGTH & CAPACITY: All steel and concrete members satisfy AISC 360-22 Chapter H and ACI 318-19 ultimate limit states with Demand-to-Capacity ratios D/C <= 1.0 (Peak Governing D/C = %.3f).", lastMaxGoverningDC), MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
+            ctx.y = drawWrappedText(ctx, String.format(Locale.US, "2. MEMBER STRENGTH & CAPACITY: All structural members satisfy AISC 360-22 Chapter H and ACI 318-19 ultimate limit states with Demand-to-Capacity ratios D/C <= 1.0 (Peak Governing D/C = %.3f).", lastMaxGoverningDC), MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
         } else {
             ctx.y = drawWrappedText(ctx, String.format(Locale.US, "2. MEMBER STRENGTH & CAPACITY: WARNING — %d structural member(s) exceed AISC 360-22 limit states (Peak Governing D/C = %.3f > 1.0). Section strengthening or cross-section upsizing is required.", lastOverstressedCount, lastMaxGoverningDC), MARGIN_LEFT, USABLE_WIDTH, 11.5f, boldBodyPaint);
         }
 
-        ctx.y = drawWrappedText(ctx, "3. SERVICEABILITY & LATERAL DRIFT: Lateral story drift and vertical deflection satisfy international standard limits (NSR-10, ASCE 7-22, Eurocode 3).", MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
+        if (!lastDeflectionVerify && !lastDriftExceeds) {
+            ctx.y = drawWrappedText(ctx, String.format(Locale.US, "3. SERVICEABILITY & LATERAL DRIFT: Lateral story drift and vertical deflection satisfy international standard limits (NSR-10 <= 1.0%%, ASCE 7-22 <= 1.5%%, Eurocode 3 L/360). Peak vector deflection = %.4f mm.", lastMaxDisplacement_mm), MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
+        } else {
+            String driftNote = lastDriftExceeds ? String.format(Locale.US, " and maximum story drift of %.3f%% requires lateral bracing review under seismic codes.", lastMaxDriftRatioPct) : ".";
+            ctx.y = drawWrappedText(ctx, String.format(Locale.US, "3. SERVICEABILITY & LATERAL DRIFT: ATTENTION — Serviceability verification required: Peak vector deflection of %.4f mm exceeds standard L/360 guideline (25.0 mm)%s Non-structural element damage or serviceability limits must be verified by the Engineer of Record.", lastMaxDisplacement_mm, driftNote), MARGIN_LEFT, USABLE_WIDTH, 11.5f, boldBodyPaint);
+        }
         ctx.y += 14f;
 
         drawSubSectionTitle(ctx, "9.2 Formal Structural Verdict");
-        boolean isApproved = (lastOverstressedCount == 0);
+        boolean hasOverstress = (lastOverstressedCount > 0);
+        boolean hasServiceabilityIssue = (lastDeflectionVerify || lastDriftExceeds);
+
+        String verdictString;
+        String statusLabel;
+        int boxColor;
+        int borderColor;
+        int textColor;
+        Paint sealPaint;
+
+        if (hasOverstress) {
+            verdictString = "STRUCTURAL COMPLIANCE VERDICT: REJECTED / OVERSTRESS DETECTED";
+            statusLabel = "Status: REJECTED / OVERSTRESS";
+            boxColor = Color.parseColor("#FFEBEE");
+            borderColor = Color.parseColor("#C62828");
+            textColor = Color.parseColor("#B71C1C");
+            sealPaint = failStatusPaint;
+        } else if (hasServiceabilityIssue) {
+            verdictString = "STRUCTURAL VERDICT: CONDITIONAL / SERVICEABILITY REVIEW REQUIRED (VERIFY)";
+            statusLabel = "Status: REVIEW REQUIRED (SERVICEABILITY)";
+            boxColor = Color.parseColor("#FFF8E1");
+            borderColor = Color.parseColor("#F57F17");
+            textColor = Color.parseColor("#E65100");
+            sealPaint = failStatusPaint;
+        } else {
+            verdictString = "STRUCTURAL SAFETY & COMPLIANCE VERDICT: ADEQUATE / APPROVED";
+            statusLabel = "Status: OFFICIAL CALCULATION MEMO (APPROVED)";
+            boxColor = Color.parseColor("#E8F5E9");
+            borderColor = Color.parseColor("#2E7D32");
+            textColor = Color.parseColor("#1B5E20");
+            sealPaint = passStatusPaint;
+        }
 
         Paint verdictBoxPaint = new Paint();
-        verdictBoxPaint.setColor(Color.parseColor(isApproved ? "#E8F5E9" : "#FFEBEE")); // Light green vs light red
+        verdictBoxPaint.setColor(boxColor);
         ctx.canvas.drawRect(MARGIN_LEFT, ctx.y - 2f, MARGIN_LEFT + USABLE_WIDTH, ctx.y + 26f, verdictBoxPaint);
         Paint verdictBorder = new Paint();
-        verdictBorder.setColor(Color.parseColor(isApproved ? "#2E7D32" : "#C62828"));
+        verdictBorder.setColor(borderColor);
         verdictBorder.setStyle(Paint.Style.STROKE);
         verdictBorder.setStrokeWidth(1.2f);
         ctx.canvas.drawRect(MARGIN_LEFT, ctx.y - 2f, MARGIN_LEFT + USABLE_WIDTH, ctx.y + 26f, verdictBorder);
 
         Paint verdictText = new Paint(Paint.ANTI_ALIAS_FLAG);
-        verdictText.setColor(Color.parseColor(isApproved ? "#1B5E20" : "#B71C1C"));
-        verdictText.setTextSize(9.5f);
+        verdictText.setColor(textColor);
+        verdictText.setTextSize(9.0f);
         verdictText.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
-        String verdictString = isApproved ?
-                "STRUCTURAL SAFETY & COMPLIANCE VERDICT: ADEQUATE / APPROVED" :
-                "STRUCTURAL COMPLIANCE VERDICT: REJECTED / OVERSTRESS DETECTED";
         ctx.canvas.drawText(verdictString, MARGIN_LEFT + 15f, ctx.y + 16f, verdictText);
         ctx.y += 42f;
 
@@ -1140,8 +1203,7 @@ public class PDFReportGenerator {
         ctx.canvas.drawRect(boxX2, ctx.y, boxX2 + blockWidth, ctx.y + blockHeight, boxStroke);
         ctx.canvas.drawText("Official Engineering Seal & Verification:", boxX2 + 10f, ctx.y + 16f, boldBodyPaint);
         ctx.canvas.drawText("CalculiX FEA Core (ccx 2.23) Verified", boxX2 + 10f, ctx.y + 30f, bodyPaint);
-        String statusLabel = isApproved ? "Status: OFFICIAL CALCULATION MEMO" : "Status: REJECTED / OVERSTRESS";
-        ctx.canvas.drawText(statusLabel, boxX2 + 10f, ctx.y + 44f, isApproved ? passStatusPaint : failStatusPaint);
+        ctx.canvas.drawText(statusLabel, boxX2 + 10f, ctx.y + 44f, sealPaint);
         String stampDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
         ctx.canvas.drawText("Timestamp: " + stampDate, boxX2 + 10f, ctx.y + 60f, bodyPaint);
 
