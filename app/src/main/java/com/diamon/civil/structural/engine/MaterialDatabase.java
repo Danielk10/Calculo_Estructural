@@ -22,6 +22,15 @@ public class MaterialDatabase {
         public double yieldStrength; // MPa
         public double fc;     // Compressive strength for concrete (MPa)
 
+        public Material(String name, double E, double nu, double rho, double yieldStrength, double fc) {
+            this.name = name;
+            this.E = E;
+            this.nu = nu;
+            this.rho = rho;
+            this.yieldStrength = yieldStrength;
+            this.fc = fc;
+        }
+
         public Material(JSONObject obj) throws JSONException {
             name = obj.getString("name");
             E = obj.getDouble("E");
@@ -34,7 +43,24 @@ public class MaterialDatabase {
 
     private final List<Material> materials = new ArrayList<>();
 
+    public MaterialDatabase() {
+        populateDefaults();
+    }
+
+    private void populateDefaults() {
+        materials.clear();
+        materials.add(new Material("Structural Steel A36", 200000.0, 0.30, 7850.0, 250.0, 0.0));
+        materials.add(new Material("Structural Steel A572 Gr50", 200000.0, 0.30, 7850.0, 345.0, 0.0));
+        materials.add(new Material("Structural Steel S275", 200000.0, 0.30, 7850.0, 275.0, 0.0));
+        materials.add(new Material("Structural Steel S355", 210000.0, 0.30, 7850.0, 355.0, 0.0));
+        materials.add(new Material("Normal Weight Concrete 25MPa", 23500.0, 0.20, 2400.0, 0.0, 25.0));
+        materials.add(new Material("Normal Weight Concrete 30MPa", 25700.0, 0.20, 2400.0, 0.0, 30.0));
+        materials.add(new Material("Aluminum 6061-T6", 68900.0, 0.33, 2700.0, 276.0, 0.0));
+        materials.add(new Material("Structural Timber / Wood", 12400.0, 0.29, 530.0, 50.0, 0.0));
+    }
+
     public void loadFromAssets(Context context) throws IOException, JSONException {
+        if (context == null) return;
         try (InputStream is = context.getAssets().open("materials.json");
              java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
             byte[] buf = new byte[4096];
@@ -44,9 +70,13 @@ public class MaterialDatabase {
             }
             String json = baos.toString(StandardCharsets.UTF_8.name());
             JSONArray array = new JSONArray(json);
-            materials.clear();
+            List<Material> loaded = new ArrayList<>();
             for (int i = 0; i < array.length(); i++) {
-                materials.add(new Material(array.getJSONObject(i)));
+                loaded.add(new Material(array.getJSONObject(i)));
+            }
+            if (!loaded.isEmpty()) {
+                materials.clear();
+                materials.addAll(loaded);
             }
         }
     }

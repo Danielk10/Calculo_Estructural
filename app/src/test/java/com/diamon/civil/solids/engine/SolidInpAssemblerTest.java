@@ -108,7 +108,7 @@ public class SolidInpAssemblerTest {
         SolidInpAssembler.assemble(workDir, "linkrods", "Steel", 210000.0, 0.3, -200.0, "nonexistent_fixed", "nonexistent_load");
 
         // 5. Execute local system CalculiX solver
-        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "-i", "linkrods");
+        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "linkrods");
         pbCcx.directory(workDir);
         pbCcx.redirectErrorStream(true);
         Process pCcx = pbCcx.start();
@@ -256,7 +256,7 @@ public class SolidInpAssemblerTest {
         SolidInpAssembler.assemble(workDir, "bar", "Steel", 210000.0, 0.3, -300.0, "nonexistent_fixed", "nonexistent_load");
 
         // 5. Run CalculiX Solver ccx
-        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "-i", "bar");
+        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "bar");
         pbCcx.directory(workDir);
         pbCcx.redirectErrorStream(true);
         Process pCcx = pbCcx.start();
@@ -314,10 +314,13 @@ public class SolidInpAssemblerTest {
             SolidInpAssembler.assemble(workDir, "sample", "Steel", 210000.0, 0.3, -1000.0, "Fixed", "Loaded");
 
             // 3. Run CalculiX ccx
-            ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "-i", "sample");
+            ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "sample");
             pbCcx.directory(workDir);
             pbCcx.redirectErrorStream(true);
             Process pCcx = pbCcx.start();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
+                while (reader.readLine() != null) {}
+            }
             int codeCcx = pCcx.waitFor();
             assertEquals("CalculiX solving STEP sample should succeed", 0, codeCcx);
 
@@ -438,10 +441,13 @@ public class SolidInpAssemblerTest {
         assertTrue("Final INP should exist for " + elemType, finalInp.exists());
         
         // 4. Solve with CalculiX
-        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "-i", "job");
+        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "job");
         pbCcx.directory(workDir);
         pbCcx.redirectErrorStream(true);
         Process pCcx = pbCcx.start();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
+            while (reader.readLine() != null) {}
+        }
         int codeCcx = pCcx.waitFor();
         assertEquals("CalculiX solving for " + elemType + " should succeed with code 0", 0, codeCcx);
         

@@ -47,7 +47,7 @@
     <string name="btn_select_move">Select / Move</string>
     <string name="btn_boundary_support">Support (SPC)</string>
     <string name="btn_delete_entity">Delete</string>
-    <string name="label_preset_template">Structural Template:</string>
+    <string name="label_preset_template">Engineering Preset / Benchmark:</string>
     <string name="btn_undo">UNDO</string>
     <string name="btn_clear">CLEAR</string>
     <string name="btn_run_fea_solver">EXECUTE FEA SOLVER</string>

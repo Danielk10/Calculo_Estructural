@@ -208,10 +208,13 @@ public class StructuralAllPresetsValidationTest {
         // 1. Run real CalculiX ccx
         File ccxBin = new File("/home/danielpdiamon/.local/bin/ccx");
         String ccxCmd = ccxBin.exists() ? ccxBin.getAbsolutePath() : "ccx";
-        ProcessBuilder pb = new ProcessBuilder(ccxCmd, "-i", testName);
+        ProcessBuilder pb = new ProcessBuilder(ccxCmd, testName);
         pb.directory(workDir);
         pb.redirectErrorStream(true);
         Process p = pb.start();
+        try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.InputStreamReader(p.getInputStream()))) {
+            while (r.readLine() != null) {}
+        }
         int exitCode = p.waitFor();
         assertEquals("CalculiX ccx must exit with code 0 for " + testName, 0, exitCode);
 

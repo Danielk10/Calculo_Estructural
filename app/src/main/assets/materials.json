@@ -1,0 +1,66 @@
+[
+  {
+    "name": "Structural Steel A36",
+    "E": 200000.0,
+    "nu": 0.30,
+    "rho": 7850.0,
+    "yield_strength": 250.0,
+    "f_c": 0.0
+  },
+  {
+    "name": "Structural Steel A572 Gr50",
+    "E": 200000.0,
+    "nu": 0.30,
+    "rho": 7850.0,
+    "yield_strength": 345.0,
+    "f_c": 0.0
+  },
+  {
+    "name": "Structural Steel S275",
+    "E": 200000.0,
+    "nu": 0.30,
+    "rho": 7850.0,
+    "yield_strength": 275.0,
+    "f_c": 0.0
+  },
+  {
+    "name": "Structural Steel S355",
+    "E": 210000.0,
+    "nu": 0.30,
+    "rho": 7850.0,
+    "yield_strength": 355.0,
+    "f_c": 0.0
+  },
+  {
+    "name": "Normal Weight Concrete 25MPa",
+    "E": 23500.0,
+    "nu": 0.20,
+    "rho": 2400.0,
+    "yield_strength": 0.0,
+    "f_c": 25.0
+  },
+  {
+    "name": "Normal Weight Concrete 30MPa",
+    "E": 25700.0,
+    "nu": 0.20,
+    "rho": 2400.0,
+    "yield_strength": 0.0,
+    "f_c": 30.0
+  },
+  {
+    "name": "Aluminum 6061-T6",
+    "E": 68900.0,
+    "nu": 0.33,
+    "rho": 2700.0,
+    "yield_strength": 276.0,
+    "f_c": 0.0
+  },
+  {
+    "name": "Structural Timber / Wood",
+    "E": 12400.0,
+    "nu": 0.29,
+    "rho": 530.0,
+    "yield_strength": 50.0,
+    "f_c": 0.0
+  }
+]

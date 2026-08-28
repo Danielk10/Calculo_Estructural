@@ -24,12 +24,16 @@ misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
 
-# Keystore files
+# Keystore and Credentials
 *.jks
 *.keystore
 keystore.properties
+*credentials*.json
+*service_account*.json
+google-services.json
+!app/src/main/assets/**/*.json
+!app/src/main/assets/*.json
 
-*.json
 GUIA_PUBLICACION_PLAY_STORE.md
 
 # Android Profiling

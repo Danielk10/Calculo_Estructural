@@ -164,6 +164,7 @@ public class SolidFragment extends Fragment {
         setupMaterialSpinner();
         setupMeshDensitySlider();
         setupGeometrySpinner();
+        refreshGeometrySpinner(activeSimulationGeometry);
 
         executor.execute(() -> {
             try {
@@ -192,6 +193,7 @@ public class SolidFragment extends Fragment {
                         if (binding != null) {
                             binding.btnRunSolidAnalysis.setEnabled(false);
                             logger.error("Engine initialization failed. FEA solver will not be available.");
+                            refreshGeometrySpinner(activeSimulationGeometry);
                         }
                     });
                 }
@@ -203,7 +205,13 @@ public class SolidFragment extends Fragment {
     private void setupMaterialSpinner() {
         try {
             materialDatabase = new MaterialDatabase();
-            materialDatabase.loadFromAssets(requireContext());
+            if (getContext() != null) {
+                try {
+                    materialDatabase.loadFromAssets(requireContext());
+                } catch (Exception e) {
+                    logger.warn("Using default materials: " + e.getMessage());
+                }
+            }
             List<String> matNames = new ArrayList<>();
             for (MaterialDatabase.Material m : materialDatabase.getMaterials()) {
                 matNames.add(m.name);
@@ -211,6 +219,10 @@ public class SolidFragment extends Fragment {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.item_spinner_compact, matNames);
             adapter.setDropDownViewResource(R.layout.item_spinner_dropdown_compact);
             binding.spinnerMaterialSolid.setAdapter(adapter);
+            if (!matNames.isEmpty()) {
+                binding.spinnerMaterialSolid.setSelection(0);
+                binding.etSolidModulus.setText(formatModulus(materialDatabase.getMaterials().get(0).E));
+            }
             
             binding.spinnerMaterialSolid.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override

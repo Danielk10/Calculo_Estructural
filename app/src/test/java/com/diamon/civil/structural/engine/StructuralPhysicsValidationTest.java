@@ -1275,7 +1275,7 @@ public class StructuralPhysicsValidationTest {
     // =====================================================
 
     private int runCalculiX(File workDir, String jobName) throws Exception {
-        ProcessBuilder pb = new ProcessBuilder(CCX_PATH, "-i", jobName);
+        ProcessBuilder pb = new ProcessBuilder(CCX_PATH, jobName);
         pb.directory(workDir);
         pb.redirectErrorStream(true);
         Process p = pb.start();

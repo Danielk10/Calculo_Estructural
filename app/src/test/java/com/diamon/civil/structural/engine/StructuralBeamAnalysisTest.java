@@ -69,7 +69,7 @@ public class StructuralBeamAnalysisTest {
         }
 
         // 2. Execute local CalculiX solver ccx
-        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "-i", "cantilever_beam");
+        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "cantilever_beam");
         pbCcx.directory(workDir);
         pbCcx.redirectErrorStream(true);
         Process pCcx = pbCcx.start();
@@ -135,10 +135,13 @@ public class StructuralBeamAnalysisTest {
             File workDir = tempFolder.newFolder("work_portal");
             Files.copy(portalInp.toPath(), new File(workDir, "portal_frame_2d.inp").toPath());
 
-            ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "-i", "portal_frame_2d");
+            ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "portal_frame_2d");
             pbCcx.directory(workDir);
             pbCcx.redirectErrorStream(true);
             Process pCcx = pbCcx.start();
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
+                while (r.readLine() != null) {}
+            }
             int code = pCcx.waitFor();
             assertEquals("CalculiX should solve 2D portal frame with 0", 0, code);
 
@@ -155,10 +158,13 @@ public class StructuralBeamAnalysisTest {
             File workDir = tempFolder.newFolder("work_space");
             Files.copy(spaceInp.toPath(), new File(workDir, "space_frame_3d.inp").toPath());
 
-            ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "-i", "space_frame_3d");
+            ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "space_frame_3d");
             pbCcx.directory(workDir);
             pbCcx.redirectErrorStream(true);
             Process pCcx = pbCcx.start();
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
+                while (r.readLine() != null) {}
+            }
             int code = pCcx.waitFor();
             assertEquals("CalculiX should solve 3D space frame with 0", 0, code);
 
@@ -173,11 +179,11 @@ public class StructuralBeamAnalysisTest {
 
     @Test
     public void testMultiStorySeismicDriftCalculation() throws Exception {
-        File workDir = tempFolder.newFolder("work_seismic_3story");
+        File workDir = tempFolder.newFolder("work_seismic");
         File inpFile = new File(workDir, "seismic_frame.inp");
-
-        // Write 3-Story Frame under Equivalent Lateral Forces
         try (PrintWriter pw = new PrintWriter(new FileWriter(inpFile))) {
+            pw.println("*HEADING");
+            pw.println("3-Story Seismic Frame with Equivalent Lateral Force (ELF)");
             pw.println("*NODE, NSET=NALL");
             pw.println("1, 0.0, 0.0, 0.0");
             pw.println("2, 6.0, 0.0, 0.0");
@@ -187,45 +193,48 @@ public class StructuralBeamAnalysisTest {
             pw.println("6, 6.0, 6.5, 0.0");
             pw.println("7, 0.0, 9.5, 0.0");
             pw.println("8, 6.0, 9.5, 0.0");
-            pw.println("*ELEMENT, TYPE=B31, ELSET=COLUMNS");
+            pw.println("*ELEMENT, TYPE=B31, ELSET=BEAMS");
             pw.println("1, 1, 3");
             pw.println("2, 2, 4");
-            pw.println("3, 3, 5");
-            pw.println("4, 4, 6");
-            pw.println("5, 5, 7");
-            pw.println("6, 6, 8");
-            pw.println("*ELEMENT, TYPE=B31, ELSET=BEAMS");
-            pw.println("7, 3, 4");
-            pw.println("8, 5, 6");
+            pw.println("3, 3, 4");
+            pw.println("4, 3, 5");
+            pw.println("5, 4, 6");
+            pw.println("6, 5, 6");
+            pw.println("7, 5, 7");
+            pw.println("8, 6, 8");
             pw.println("9, 7, 8");
-            pw.println("*BEAM SECTION, ELSET=COLUMNS, MATERIAL=STEEL, SECTION=RECT");
-            pw.println("0.24, 0.24");
-            pw.println("0.0, 0.0, 1.0");
             pw.println("*BEAM SECTION, ELSET=BEAMS, MATERIAL=STEEL, SECTION=RECT");
-            pw.println("0.15, 0.30");
+            pw.println("0.3, 0.3");
             pw.println("0.0, 0.0, 1.0");
             pw.println("*MATERIAL, NAME=STEEL");
             pw.println("*ELASTIC");
-            pw.println("200000000000.0, 0.3");
+            pw.println("210000000000.0, 0.3");
             pw.println("*BOUNDARY");
             pw.println("1, 1, 6, 0.0");
             pw.println("2, 1, 6, 0.0");
             pw.println("*STEP");
             pw.println("*STATIC");
             pw.println("*CLOAD");
-            pw.println("3, 1, 25000.0");
-            pw.println("5, 1, 50000.0");
-            pw.println("7, 1, 75000.0");
+            pw.println("3, 1, 15000.0");
+            pw.println("5, 1, 30000.0");
+            pw.println("7, 1, 45000.0");
+            pw.println("*NODE FILE");
+            pw.println("U");
+            pw.println("*EL FILE, SECTION FORCES, OUTPUT=2D");
+            pw.println("S");
             pw.println("*NODE PRINT, NSET=NALL");
             pw.println("U");
             pw.println("*END STEP");
         }
 
         // Solve with ccx
-        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "-i", "seismic_frame");
+        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "seismic_frame");
         pbCcx.directory(workDir);
         pbCcx.redirectErrorStream(true);
         Process pCcx = pbCcx.start();
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
+            while (r.readLine() != null) {}
+        }
         int code = pCcx.waitFor();
         assertEquals("CalculiX should solve 3-story seismic frame with 0", 0, code);
 
@@ -379,10 +388,13 @@ public class StructuralBeamAnalysisTest {
         File ccxBin = new File("/home/danielpdiamon/.local/bin/ccx");
         if (!ccxBin.exists()) ccxBin = new File("/usr/bin/ccx");
         if (ccxBin.exists()) {
-            ProcessBuilder pb = new ProcessBuilder(ccxBin.getAbsolutePath(), "-i", "custom_user_job");
+            ProcessBuilder pb = new ProcessBuilder(ccxBin.getAbsolutePath(), "custom_user_job");
             pb.directory(workDir);
             pb.redirectErrorStream(true);
             Process proc = pb.start();
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(proc.getInputStream()))) {
+                while (r.readLine() != null) {}
+            }
             proc.waitFor();
 
             File datFile = new File(workDir, "custom_user_job.dat");

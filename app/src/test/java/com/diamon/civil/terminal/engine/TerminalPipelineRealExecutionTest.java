@@ -96,8 +96,8 @@ public class TerminalPipelineRealExecutionTest {
             pw.println("*END STEP");
         }
 
-        // Run local CalculiX binary: ccx -i beam_solve
-        ProcessBuilder pb = new ProcessBuilder(CCX_PATH, "-i", "beam_solve");
+        // Run local CalculiX binary: ccx beam_solve
+        ProcessBuilder pb = new ProcessBuilder(CCX_PATH, "beam_solve");
         pb.directory(workDir);
         pb.redirectErrorStream(true);
         Process p = pb.start();

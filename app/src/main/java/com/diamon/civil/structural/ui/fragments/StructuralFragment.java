@@ -98,7 +98,13 @@ public class StructuralFragment extends Fragment {
             binding.spinnerElementTypeStructural.setAdapter(elemTypeAdapter);
 
             materialDatabase = new MaterialDatabase();
-            materialDatabase.loadFromAssets(requireContext());
+            if (getContext() != null) {
+                try {
+                    materialDatabase.loadFromAssets(requireContext());
+                } catch (Exception e) {
+                    logger.warn("Using default materials: " + e.getMessage());
+                }
+            }
             List<String> matNames = new ArrayList<>();
             for (MaterialDatabase.Material m : materialDatabase.getMaterials()) {
                 matNames.add(m.name);
@@ -106,9 +112,18 @@ public class StructuralFragment extends Fragment {
             ArrayAdapter<String> matAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_spinner_compact, matNames);
             matAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown_compact);
             binding.spinnerMaterialStructural.setAdapter(matAdapter);
+            if (!matNames.isEmpty() && binding.gridEditorView != null) {
+                binding.gridEditorView.setDefaultMaterial(matNames.get(0));
+            }
             
             sectionLibrary = new SectionLibrary();
-            sectionLibrary.loadFromAssets(requireContext());
+            if (getContext() != null) {
+                try {
+                    sectionLibrary.loadFromAssets(requireContext());
+                } catch (Exception e) {
+                    logger.warn("Using default sections: " + e.getMessage());
+                }
+            }
             List<String> secNames = new ArrayList<>();
             for (SectionLibrary.Section s : sectionLibrary.getSections()) {
                 secNames.add(s.name);
@@ -116,6 +131,9 @@ public class StructuralFragment extends Fragment {
             ArrayAdapter<String> secAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_spinner_compact, secNames);
             secAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown_compact);
             binding.spinnerSectionStructural.setAdapter(secAdapter);
+            if (!secNames.isEmpty() && binding.gridEditorView != null) {
+                binding.gridEditorView.setDefaultSection(secNames.get(0));
+            }
 
             binding.spinnerMaterialStructural.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
                 @Override
@@ -659,16 +677,26 @@ public class StructuralFragment extends Fragment {
                 logger.log(result);
 
                 File datFile = new File(workDir, "structural_job.dat");
+                StructuralBeamDatParser.ParseResult parseResult = null;
+                if (datFile.exists()) {
+                    StructuralBeamDatParser.ParseResult datResult = datParser.parse(datFile);
+                    if (datResult != null && datResult.displacements != null && !datResult.displacements.isEmpty()) {
+                        parseResult = datResult;
+                    }
+                }
+
+                // Analyze with FrameAnalysisEngine for direct stiffness verification / fallback
                 com.diamon.civil.structural.engine.FrameAnalysisEngine.AnalysisOutput engineOutput =
                         com.diamon.civil.structural.engine.FrameAnalysisEngine.analyze(model);
 
-                StructuralBeamDatParser.ParseResult parseResult = engineOutput.parseResult;
-                if ((parseResult.displacements == null || parseResult.displacements.isEmpty()) && datFile.exists()) {
-                    StructuralBeamDatParser.ParseResult datResult = datParser.parse(datFile);
-                    if (datResult.displacements != null && !datResult.displacements.isEmpty()) {
-                        parseResult.displacements.clear();
-                        parseResult.displacements.addAll(datResult.displacements);
-                        parseResult.maxDisp = datResult.maxDisp;
+                if (parseResult == null || parseResult.displacements == null || parseResult.displacements.isEmpty()) {
+                    parseResult = engineOutput.parseResult;
+                } else {
+                    // If CalculiX datResult has displacements but needs supplemental frame member forces
+                    if ((parseResult.forces == null || parseResult.forces.isEmpty()) &&
+                            engineOutput.parseResult != null && engineOutput.parseResult.forces != null && !engineOutput.parseResult.forces.isEmpty()) {
+                        parseResult.forces = engineOutput.parseResult.forces;
+                        parseResult.recalculateMaxForces();
                     }
                 }
 

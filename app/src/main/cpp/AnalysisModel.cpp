@@ -61,6 +61,27 @@ std::string AnalysisModel::toInpString() const {
         ss << "\n";
     }
 
+    // Collect beam element IDs for dedicated beam ELSET and section printing
+    std::vector<int> beamElementIds;
+    for (const auto& pair : elements) {
+        const Element& e = pair.second;
+        if (e.type.find("B3") != std::string::npos || e.type.find("B2") != std::string::npos || e.type.find("T3") != std::string::npos) {
+            int eid = e.id > 0 ? e.id : nextElemId++;
+            beamElementIds.push_back(eid);
+        }
+    }
+
+    if (!beamElementIds.empty()) {
+        ss << "*ELSET, ELSET=Ebeams\n";
+        for (size_t i = 0; i < beamElementIds.size(); ++i) {
+            ss << beamElementIds[i] << (i % 10 == 9 || i == beamElementIds.size() - 1 ? "" : ", ");
+            if (i % 10 == 9 && i != beamElementIds.size() - 1) {
+                ss << "\n";
+            }
+        }
+        ss << "\n";
+    }
+
     auto cleanName = [](const std::string& str) -> std::string {
         if (str.empty()) return "DEFAULT";
         std::string out = str;
@@ -91,7 +112,30 @@ std::string AnalysisModel::toInpString() const {
                 ss << sec.params[i] << (i == sec.params.size() - 1 ? "" : ", ");
             }
             ss << "\n";
-            ss << "0, 0, -1\n"; // Normal perpendicular to XY plane for 2D/3D frames
+            // Determine normal direction: if member is vertical along Z, use (0, 1, 0); otherwise use (0, 0, -1)
+            bool isVerticalZ = false;
+            for (const auto& epair : elements) {
+                const Element& el = epair.second;
+                std::string elElset = el.elset.empty() ? ("E" + std::to_string(el.id)) : el.elset;
+                if (cleanName(elElset) == cElset && el.nodeIds.size() >= 2) {
+                    auto n1It = nodes.find(el.nodeIds[0]);
+                    auto n2It = nodes.find(el.nodeIds[1]);
+                    if (n1It != nodes.end() && n2It != nodes.end()) {
+                        double dx = std::abs(n2It->second.x - n1It->second.x);
+                        double dy = std::abs(n2It->second.y - n1It->second.y);
+                        double dz = std::abs(n2It->second.z - n1It->second.z);
+                        if (dx < 1e-5 && dy < 1e-5 && dz > 1e-5) {
+                            isVerticalZ = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (isVerticalZ) {
+                ss << "0, 1, 0\n";
+            } else {
+                ss << "0, 0, -1\n";
+            }
         } else if (sec.type == "SHELL" || sec.type == "PLATE") {
             ss << "*SHELL SECTION, ELSET=" << cElset << ", MATERIAL=" << cMat << "\n";
             if (!sec.params.empty()) {
@@ -126,12 +170,8 @@ std::string AnalysisModel::toInpString() const {
         if (load.fz != 0) ss << load.nodeId << ", 3, " << load.fz << "\n";
     }
 
-    bool hasBeams = false;
-    bool hasNonBeams = false;
-    for (const auto& sec : sections) {
-        if (sec.type == "BEAM") hasBeams = true;
-        else hasNonBeams = true;
-    }
+    bool hasBeams = !beamElementIds.empty();
+    bool hasNonBeams = (allElementIds.size() > beamElementIds.size());
 
     if (hasBeams && !hasNonBeams) {
         ss << "*NODE FILE, OUTPUT=2D\nU\n";
@@ -141,7 +181,10 @@ std::string AnalysisModel::toInpString() const {
         ss << "*EL FILE\nS\n";
     }
 
-    // Results in .dat file for DatParser (Displacements)
+    // Results in .dat file for DatParser (Displacements & Element Stresses)
+    if (!beamElementIds.empty()) {
+        ss << "*EL PRINT, ELSET=Ebeams\nS\n";
+    }
     ss << "*NODE PRINT, NSET=NALL\nU\n";
     ss << "*END STEP\n";
 
