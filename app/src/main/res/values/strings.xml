@@ -1,0 +1,271 @@
+<resources>
+    <!-- Application & General -->
+    <string name="app_name">Structural Analysis FEA Advanced</string>
+    <string name="loading_engine">Initializing FEA Solver Engine...</string>
+    <string name="deploying_engine">Deploying FEM Runtime Assets...</string>
+    <string name="initializing_native_modules">Initializing Native Modules...</string>
+    <string name="engine_failure_assets">Engine Error: Runtime assets could not be deployed.</string>
+    <string name="close">Close</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="apply">Apply</string>
+    <string name="undo">Undo</string>
+    <string name="clear">Clear</string>
+
+    <!-- Navigation Drawer & Menus -->
+    <string name="menu_structural_analysis">Structural Analysis</string>
+    <string name="menu_solid_analysis">3D Solid Analysis</string>
+    <string name="menu_advanced_terminal">Advanced Terminal</string>
+    <string name="menu_support_tools">Support &amp; Utilities</string>
+    <string name="menu_documentation">Theoretical Manual &amp; Theory</string>
+    <string name="menu_about">About</string>
+    <string name="menu_import_inp">Import INP</string>
+    <string name="menu_export_pdf">Export PDF Calculation Report</string>
+    <string name="menu_export_all">Export All Simulation Artifacts</string>
+    <string name="menu_about_licenses">About / Licenses</string>
+
+    <string name="about_dialog_title">About Structural Analysis FEA Advanced</string>
+    <string name="about_dialog_message">Structural Analysis FEA Advanced v0.2.0\n\nHigh-performance 3D Solid &amp; Frame Finite Element Analysis (FEA) platform for Android.\nPowered by CalculiX (CCX 2.23), Gmsh 3D mesh generator (v5.0.0), and OpenCASCADE Technology (OCCT 8.0.0.p1).\n\nLead Developer: Daniel Diamon\nLocation: Tinaquillo, Cojedes, Venezuela\nLicense: GNU General Public License v3.0 (GPLv3)\nRepository: https://github.com/Danielk10/Calculo_Estructural</string>
+    <string name="licenses_dialog_title">About &amp; Licenses</string>
+    <string name="licenses_dialog_message">Structural Analysis FEA Advanced v0.2.0\n\nHigh-performance 3D Solid &amp; Frame Finite Element Analysis (FEA) platform for Android.\nPowered by CalculiX (CCX 2.23), Gmsh 3D mesh generator (v5.0.0), and OpenCASCADE Technology (OCCT 8.0.0.p1).\n\nLead Developer: Daniel Diamon\nLocation: Tinaquillo, Cojedes, Venezuela\nLicense: GNU General Public License v3.0 (GPLv3)\n\nBundled Open-Source Scientific Components &amp; Repositories:\n• CalculiX (CCX 2.23): GNU GPL (Guido Dhondt)\n  https://www.calculix.de\n• Gmsh (v5.0.0): GNU GPL v2.0+ (C. Geuzaine, J.-F. Remacle)\n  https://gmsh.info\n• OpenCASCADE Technology (OCCT 8.0.0.p1): GNU LGPL v2.1\n  https://dev.opencascade.org\n  https://github.com/Open-CASCADE-Technology/OCCT\n• SPOOLES (v2.2 MT): Public Domain (C. Ashcraft, J. Liu)\n  https://www.netlib.org/linalg/spooles/spooles.2.2.html\n• ARPACK-NG: BSD 3-Clause\n  https://github.com/opencollab/arpack-ng\n• OpenBLAS / LAPACK: BSD 3-Clause\n  https://github.com/OpenMathLib/OpenBLAS\n  https://www.netlib.org/lapack/\n• SceneView / Filament: Apache License 2.0\n  https://github.com/SceneView/sceneview-android\n  https://github.com/google/filament\n• iText 7 Core (v7.2.5): AGPL v3.0\n  https://github.com/itext/itext7\n• GCC Fortran Runtime: GNU GPL v3.0+\n  https://gcc.gnu.org</string>
+
+    <!-- Navigation & Tabs -->
+    <string name="tab_parameters">PARAMETERS</string>
+    <string name="tab_viewer_3d">VIEWER 3D</string>
+    <string name="tab_solver_log">SOLVER LOG</string>
+
+    <!-- Structural Analysis Module -->
+    <string name="structural_analysis_config">ANALYSIS CONFIGURATION</string>
+    <string name="label_structure_type">Structural System Type</string>
+    <string name="label_element_type">Finite Element Formulation</string>
+    <string name="label_material">Material Specification</string>
+    <string name="label_cross_section">Cross-Section Profile</string>
+    <string name="hint_load_magnitude">Applied Load Magnitude (N)</string>
+    <string name="grid_editor_title">2D FRAME &amp; TOPOLOGY EDITOR</string>
+    <string name="grid_stats_format">%1$d Nodes | %2$d Elements</string>
+    <string name="btn_draw_beam">Draw Member</string>
+    <string name="btn_select_move">Select / Move</string>
+    <string name="btn_boundary_support">Support (SPC)</string>
+    <string name="btn_delete_entity">Delete</string>
+    <string name="label_preset_template">Structural Template:</string>
+    <string name="btn_undo">UNDO</string>
+    <string name="btn_clear">CLEAR</string>
+    <string name="btn_run_fea_solver">EXECUTE FEA SOLVER</string>
+    <string name="btn_solving_fea">SOLVING WITH CALCULIX (CCX)...</string>
+    <string name="label_deformation_scale">Deformation Scale: 1.0x</string>
+    <string name="deformation_scale_format">Deformation Scale: %.1fx</string>
+    <string name="btn_view_wireframe">Geometry</string>
+    <string name="btn_view_deformed">Deformed Shape (U)</string>
+    <string name="btn_view_moment">Bending Moment (M33)</string>
+    <string name="btn_view_shear">Shear Force (V22)</string>
+    <string name="btn_view_axial">Axial Force (N)</string>
+    <string name="btn_reset_viewport">Center Viewport</string>
+
+    <!-- 3D Solid Module -->
+    <string name="cad_geometry_modeling">CAD Geometry</string>
+    <string name="label_active_cad_geometry">Active CAD Model:</string>
+    <string name="btn_delete_model">Delete Active Model</string>
+    <string name="dialog_delete_model_title">Delete CAD Model</string>
+    <string name="dialog_delete_model_msg">Are you sure you want to delete \'%1$s\' from the workspace?</string>
+    <string name="btn_primitive_box">Primitive Box</string>
+    <string name="btn_primitive_cylinder">Primitive Cylinder</string>
+    <string name="btn_primitive_sphere">Primitive Sphere</string>
+    <string name="btn_apply_fillet">Apply Fillet</string>
+    <string name="btn_apply_chamfer">Apply Chamfer</string>
+    <string name="btn_extrude_face">Extrude Face</string>
+    <string name="btn_boolean_union">Boolean Union</string>
+    <string name="btn_boolean_cut">Boolean Cut</string>
+    <string name="btn_boolean_intersect">Boolean Intersect</string>
+    <string name="btn_import_cad">Import CAD Geometry (STEP / IGES / BREP)</string>
+    <string name="btn_load_benchmark">Load Benchmark Model</string>
+    <string name="solid_fea_config">FINITE ELEMENT CONFIGURATION</string>
+    <string name="label_mesh_density">Mesh Refinement Density: Level 3 / 5 (Medium - ~20mm)</string>
+    <string name="mesh_density_format">Mesh Refinement Density: Level %1$d / 5 (%2$s)</string>
+    <string name="density_coarse">Coarse - ~50mm</string>
+    <string name="density_medium_coarse">Medium-Coarse - ~30mm</string>
+    <string name="density_medium">Medium - ~20mm</string>
+    <string name="density_fine">Fine - ~10mm</string>
+    <string name="density_ultra_fine">Ultra-Fine - ~5mm</string>
+    <string name="cb_quadratic_elements">Quadratic Elements (2nd-Order High-Precision)</string>
+    <string name="cb_hexahedral_meshing">Hexahedral Meshing (Recombine Transfinite)</string>
+    <string name="hint_young_modulus">Young\'s Modulus E (MPa)</string>
+    <string name="solid_boundary_config">BOUNDARY CONDITIONS &amp; APPLIED LOADS (SPC &amp; CLOAD)</string>
+    <string name="label_fixed_support_region">Fixed Support Region (SPC 1-3):</string>
+    <string name="label_load_application_region">Load Application Region (Loaded Face):</string>
+    <string name="label_load_direction">Load Force Vector Direction:</string>
+    <string name="label_load_magnitude">Total Force Magnitude (N):</string>
+    <string name="btn_reset_view">Center View</string>
+    <string name="btn_reload_mesh">Reload Mesh</string>
+
+    <!-- Boolean Dialog -->
+    <string name="dialog_boolean_title">Boolean Operation: %1$s</string>
+    <string name="dialog_boolean_solid_a">Select Solid A (Target):</string>
+    <string name="dialog_boolean_solid_b">Select Solid B (Tool):</string>
+
+    <!-- Boundary Dialog -->
+    <string name="dialog_boundary_title">Apply Boundary Condition</string>
+    <string name="dialog_boundary_selected_default">Selected: Face / Node</string>
+    <string name="dialog_boundary_selected_format">Selected: %1$s</string>
+    <string name="btn_fixed_support">FIXED SUPPORT (SPC 1-6)</string>
+    <string name="btn_apply_pressure_load">APPLY PRESSURE / LOAD (DLOAD)</string>
+    <string name="btn_confirm_load_value">CONFIRM LOAD VALUE</string>
+    <string name="hint_load_value">Load Magnitude (N or MPa)</string>
+
+    <!-- Terminal Module -->
+    <string name="terminal_prompt">fea@system:~$</string>
+    <string name="terminal_hint">Enter FEA command, batch script or test...</string>
+    <string name="terminal_cd_history_prev">Previous command</string>
+    <string name="terminal_cd_history_next">Next command</string>
+    <string name="terminal_cd_abort">Abort running process</string>
+    <string name="terminal_cd_clear">Clear terminal transcript</string>
+    <string name="terminal_cd_copy">Copy terminal transcript</string>
+    <string name="terminal_cd_send">Execute command</string>
+    <string name="terminal_copied_toast">Transcript copied to clipboard</string>
+    <string name="terminal_process_aborted">\n[PROCESS ABORTED BY USER]\n</string>
+
+    <!-- Toast & Feedback Messages -->
+    <string name="toast_cad_imported">CAD geometry imported successfully: %1$s</string>
+    <string name="toast_cad_imported_simple">CAD geometry imported successfully</string>
+    <string name="toast_solid_mesh_imported">Solid Mesh INP imported</string>
+    <string name="toast_structural_imported">Structural Frame imported: %1$d nodes, %2$d elements</string>
+    <string name="toast_only_inp_supported">Only INP mesh files (*.inp) are supported for import</string>
+    <string name="toast_inp_imported_terminal">INP file imported to Terminal workspace: %1$s</string>
+    <string name="toast_inp_imported_solid">Solid INP mesh imported to 3D Solid workspace: %1$s</string>
+    <string name="toast_inp_imported_structural">Structural Frame INP imported: %1$d nodes, %2$d elements</string>
+    <string name="toast_primitive_created">%1$s created successfully</string>
+    <string name="toast_primitive_failed">Failed to create %1$s</string>
+    <string name="toast_no_active_geometry">No active geometry loaded</string>
+    <string name="toast_sphere_no_edges">Not applicable: Sphere is a continuous smooth surface with no sharp edges to %1$s.</string>
+    <string name="toast_operation_applied">%1$s applied successfully</string>
+    <string name="toast_operation_failed_detail">Not applicable: %1$s requires sharp intersecting edges with sufficient thickness.</string>
+    <string name="toast_boolean_min_files">Not applicable: Please create or import at least 2 CAD files (.brep / .step) first for Boolean operations.</string>
+    <string name="toast_boolean_distinct">Solid A and Solid B must be different entities</string>
+    <string name="toast_boolean_non_manifold">Boolean %1$s not applicable: Shapes do not intersect in 3D space or have non-manifold boundaries.</string>
+    <string name="toast_engine_not_ready">Analysis Engine not ready</string>
+    <string name="toast_select_element_type">Please select an element type</string>
+    <string name="toast_test_case_loaded">Benchmark test case loaded</string>
+    <string name="toast_view_centered">Viewport reset to center</string>
+    <string name="toast_model_reloaded">Model reloaded in viewport</string>
+    <string name="toast_copied_to_clipboard">Copied to clipboard</string>
+    <string name="toast_pdf_exported">PDF calculation report exported to Downloads</string>
+    <string name="toast_no_report_to_export">No simulation report available to export</string>
+    <string name="toast_pdf_export_failed">Failed to export PDF calculation report</string>
+    <string name="toast_browser_open_error">Could not open web browser</string>
+    <string name="toast_unsupported_format">Unsupported file format: %1$s</string>
+    <string name="toast_unsupported_cad_format">Unsupported CAD format: %1$s. Supported formats: STEP (*.step, *.stp), IGES (*.iges, *.igs), BREP (*.brep), GEO (*.geo).</string>
+    <string name="toast_import_failed">Model import failed: %1$s</string>
+    <string name="toast_no_active_module">No active FEA module available for export</string>
+    <string name="toast_export_all_success">Exported %1$d items to Downloads/Structural_Analysis_FEA_Advanced/%2$s</string>
+    <string name="toast_simulation_complete">FEA Simulation Complete</string>
+    <string name="toast_fixed_boundary_applied">Fixed Support (SPC 1-6) applied to selection</string>
+    <string name="toast_load_boundary_applied">Load applied to selection: %1$.2f N</string>
+    <string name="toast_invalid_load_value">Invalid load magnitude</string>
+    <string name="toast_model_deleted">Model deleted: %1$s</string>
+    <string name="toast_no_model_to_delete">No model selected to delete</string>
+    <string name="toast_define_nodes_first">Please define structural nodes and elements on the grid</string>
+    <string name="toast_select_structure_type">Please select a valid structure type</string>
+    <string name="toast_run_analysis_first">Please execute FEA solver first</string>
+
+    <!-- Geometry Spinner Names -->
+    <string name="geo_item_benchmark">Benchmark: Cantilever Beam</string>
+    <string name="geo_item_box">Primitive: Box (10x10x10 mm)</string>
+    <string name="geo_item_cylinder">Primitive: Cylinder (r=5, h=10 mm)</string>
+    <string name="geo_item_sphere">Primitive: Sphere (r=5 mm)</string>
+    <string name="geo_item_fillet">Filleted Solid (Fillet r=1mm)</string>
+    <string name="geo_item_chamfer">Chamfered Solid (Chamfer 1mm)</string>
+    <string name="geo_item_extrude">Extruded Solid (Extrude 10mm)</string>
+    <string name="geo_item_union">Boolean Union (Fused Solid)</string>
+    <string name="geo_item_cut">Boolean Cut (Perforated Solid)</string>
+    <string name="geo_item_intersect">Boolean Intersect (Common Volume)</string>
+
+    <!-- Grid Editor HUD Modes -->
+    <string name="grid_mode_draw">DRAW (Snap Active)</string>
+    <string name="grid_mode_select_move">SELECT / EDIT</string>
+    <string name="grid_mode_support">BOUNDARY SUPPORTS</string>
+    <string name="grid_mode_load">ASSIGN LOADS</string>
+    <string name="grid_mode_delete">DELETE ENTITY</string>
+    <string name="btn_assign_load">Loads</string>
+    <string name="dialog_joint_load_title">Joint Restraints &amp; Point Loads</string>
+    <string name="dialog_element_title">Element Section &amp; Material Assignment</string>
+    <string name="toast_load_assigned">Point load assigned to Joint #%1$d: Fx=%2$.1f N, Fy=%3$.1f N</string>
+
+    <!-- String Arrays -->
+    <string-array name="analysis_modes">
+        <item>Linear Static Analysis (Static General)</item>
+        <item>Natural Frequencies &amp; Modal Extraction (Frequency)</item>
+    </string-array>
+
+    <string-array name="support_options">
+        <item>Fixed Support (Encaster SPC 1-6)</item>
+        <item>Pinned Support (Hinged SPC 1-3)</item>
+        <item>Roller Support (Sliding SPC 2)</item>
+        <item>Free End (Unconstrained)</item>
+    </string-array>
+
+    <string-array name="element_types_solid">
+        <item>1st-Order: C3D4 (4-Node Linear Tetrahedron)</item>
+        <item>1st-Order: C3D8 (8-Node Linear Hexahedron / Brick)</item>
+        <item>1st-Order: C3D8R (8-Node Reduced Integration Hexahedron)</item>
+        <item>1st-Order: C3D6 (6-Node Linear Wedge / Prism)</item>
+        <item>2nd-Order: C3D10 (10-Node Quadratic Tetrahedron)</item>
+        <item>2nd-Order: C3D20 (20-Node Quadratic Hexahedron / Brick)</item>
+        <item>2nd-Order: C3D20R (20-Node Reduced Integration Hexahedron)</item>
+        <item>2nd-Order: C3D15 (15-Node Quadratic Wedge / Prism)</item>
+    </string-array>
+
+    <string-array name="solid_fixed_regions">
+        <item>Auto / Physical Surface (Fixed / Longest Axis)</item>
+        <item>Left End Face (X- Min)</item>
+        <item>Right End Face (X+ Max)</item>
+        <item>Bottom Base Face (Y- Min)</item>
+        <item>Top Roof Face (Y+ Max)</item>
+        <item>Back Depth Face (Z- Min)</item>
+        <item>Front Face (Z+ Max)</item>
+    </string-array>
+
+    <string-array name="solid_load_regions">
+        <item>Auto / Physical Surface (Loaded / Longest Axis)</item>
+        <item>Right End Face (X+ Max)</item>
+        <item>Left End Face (X- Min)</item>
+        <item>Top Roof Face (Y+ Max)</item>
+        <item>Bottom Base Face (Y- Min)</item>
+        <item>Front Face (Z+ Max)</item>
+        <item>Back Depth Face (Z- Min)</item>
+    </string-array>
+
+    <string-array name="solid_load_directions">
+        <item>Vertical Y (Transverse / Gravity DOF 2)</item>
+        <item>Horizontal X (Axial DOF 1)</item>
+        <item>Lateral Depth Z (Lateral DOF 3)</item>
+    </string-array>
+
+    <string-array name="structure_types_structural">
+        <item>3D Planar / Spatial Frame (B32 Quadratic Beam)</item>
+        <item>3D Cantilever Beam (B31 Linear Beam)</item>
+        <item>Continuous Beam Bridge System (B32)</item>
+        <item>Truss Framework (T3D2 Axial Bar)</item>
+    </string-array>
+
+    <string-array name="element_types_structural">
+        <item>Euler-Bernoulli / Timoshenko Beam</item>
+        <item>Axial Column Member</item>
+        <item>Slab / Floor Diaphragm</item>
+        <item>Shear Wall Member</item>
+        <item>Truss Tension / Compression Member</item>
+    </string-array>
+
+    <string-array name="structural_presets">
+        <item>2D Portal Frame (4.0m x 3.0m)</item>
+        <item>Two-Bay Industrial Frame (2 Spans)</item>
+        <item>Continuous Beam (3 Supports)</item>
+        <item>Pitched Roof Truss Frame</item>
+        <item>Overhanging Cantilever Beam (4.0m + 2.0m)</item>
+        <item>3-Story Building Frame (Seismic Pattern)</item>
+        <item>12m Warren Truss Bridge (Deck Loading)</item>
+        <item>Concrete Continuous Beam (4m + 3m + 2m)</item>
+        <item>Pratt Plane Truss (10.0m Span)</item>
+        <item>Cantilever Bracket Frame (4.0m x 3.0m)</item>
+        <item>2D Concrete Slab / Plate (S4R Shell)</item>
+        <item>2D Reinforced Shear Wall (CPS4 Plane Stress)</item>
+    </string-array>
+</resources>

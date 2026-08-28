@@ -1,0 +1,40 @@
+ a KNOT was generated in node            3
+
+ a KNOT was generated in node            4
+
+ ELEMENT            1 with label "B31    R" and with nodes:
+          1          3
+  is expanded into a "C3D8I BR" element with topology:
+          5         21         22          6          8         24         23          7          0          0
+          0
+
+ ELEMENT            2 with label "B31    R" and with nodes:
+          2          4
+  is expanded into a "C3D8I BR" element with topology:
+         13         55         56         14         16         58         57         15          0          0
+          0
+
+ ELEMENT            3 with label "B31    R" and with nodes:
+          3          4
+  is expanded into a "C3D8I BR" element with topology:
+         29         63         64         30         32         66         65         31          0          0
+          0
+
+ a MEAN ROTATION MPC was generated in node            1
+                 about the axis (   1.0000000000000000      ,   0.0000000000000000      ,   0.0000000000000000      )
+
+ a MEAN ROTATION MPC was generated in node            1
+                 about the axis (   0.0000000000000000      ,   1.0000000000000000      ,   0.0000000000000000      )
+
+ a MEAN ROTATION MPC was generated in node            1
+                 about the axis (   0.0000000000000000      ,   0.0000000000000000      ,   1.0000000000000000      )
+
+ a MEAN ROTATION MPC was generated in node            2
+                 about the axis (   1.0000000000000000      ,   0.0000000000000000      ,   0.0000000000000000      )
+
+ a MEAN ROTATION MPC was generated in node            2
+                 about the axis (   0.0000000000000000      ,   1.0000000000000000      ,   0.0000000000000000      )
+
+ a MEAN ROTATION MPC was generated in node            2
+                 about the axis (   0.0000000000000000      ,   0.0000000000000000      ,   1.0000000000000000      )
+

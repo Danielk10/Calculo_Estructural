@@ -1,0 +1,100 @@
+plugins {
+    alias(libs.plugins.android.application)
+    id 'org.jetbrains.kotlin.plugin.compose'
+}
+
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { instr ->
+        keystoreProperties.load(instr)
+    }
+}
+
+android {
+    // Redirigir la carpeta build a /tmp
+    project.layout.buildDirectory.set(file("/tmp/calculoestructural_build"))
+
+    namespace 'com.diamon.civil'
+    compileSdk 37
+
+    buildToolsVersion '37.0.0'
+
+    defaultConfig {
+        applicationId "com.diamon.civil"
+        minSdk 24
+        targetSdk 37
+        versionCode 3
+        versionName "0.3.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ndkVersion "30.0.14904198"
+        ndk {
+            abiFilters "arm64-v8a"
+        }
+    }
+
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = file(keystoreProperties['storeFile'])
+                storePassword = keystoreProperties['storePassword']
+                keyAlias = keystoreProperties['keyAlias']
+                keyPassword = keystoreProperties['keyPassword']
+            } else {
+                def envStoreFile = System.getenv("SIGNING_STORE_FILE")
+                storeFile = envStoreFile ? file(envStoreFile) : null
+                storePassword = System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            optimization {
+                enable false
+            }
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    // kotlinOptions removed as AGP 9+ handles built-in Kotlin target automatically based on compileOptions
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '4.1.2'
+        }
+    }
+    buildFeatures {
+        viewBinding true
+        compose true
+    }
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+        doNotStrip "**/*.so"
+    }
+}
+
+dependencies {
+    implementation platform(libs.compose.bom)
+    implementation libs.compose.ui
+    implementation libs.compose.material3
+    implementation libs.compose.ui.tooling.preview
+    implementation 'androidx.activity:activity-compose:1.10.1'
+
+    implementation libs.appcompat
+    implementation libs.constraintlayout
+    implementation libs.material
+    implementation libs.sceneview
+    implementation libs.itext7.core
+    testImplementation libs.junit
+    androidTestImplementation libs.espresso.core
+    androidTestImplementation libs.ext.junit
+}

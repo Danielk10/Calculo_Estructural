@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutSolid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+        <com.google.android.material.tabs.TabItem android:text="@string/tab_parameters" />
+        <com.google.android.material.tabs.TabItem android:text="@string/tab_viewer_3d" />
+        <com.google.android.material.tabs.TabItem android:text="@string/tab_solver_log" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <FrameLayout
+        android:id="@+id/solid_content_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Tab 0: Parameters & CAD Modeling (Compact No-Scroll Fullscreen Design) -->
+        <LinearLayout
+            android:id="@+id/layoutSolidParams"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="6dp"
+            android:visibility="visible">
+
+            <!-- Card 1: CAD Geometry & Modeling Operations -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#1E293B">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="6dp">
+
+                    <!-- Row 1: Active CAD Geometry Selector + Actions -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="4dp">
+
+                            <TextView
+                                android:id="@+id/tvActiveGeometryLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_active_cad_geometry"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+
+                            <Spinner
+                                android:id="@+id/spinnerActiveGeometry"
+                                android:layout_width="match_parent"
+                                android:layout_height="32dp"
+                                android:background="@drawable/spinner_compact_bg"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+
+                        <ImageButton
+                            android:id="@+id/btnDeleteGeometry"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_marginTop="12dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_delete"
+                            android:contentDescription="@string/btn_delete_model"
+                            app:tint="#D32F2F" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnImportCAD"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginStart="4dp"
+                            android:text="📁 Import"
+                            android:textSize="10.5sp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            app:cornerRadius="6dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnLoadTestCase"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginStart="4dp"
+                            android:text="⚡ Benchmark"
+                            android:textSize="10.5sp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            app:cornerRadius="6dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                    </LinearLayout>
+
+                    <!-- Row 2: Primitives, Features & Boolean Operations Toolbar -->
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none"
+                        android:overScrollMode="never">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnCreateBox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:text="+ Box"
+                                android:textSize="10.5sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnCreateCylinder"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:text="+ Cylinder"
+                                android:textSize="10.5sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnCreateSphere"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:text="+ Sphere"
+                                android:textSize="10.5sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:layout_marginEnd="8dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnFillet"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:text="Fillet"
+                                android:textSize="10.5sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnChamfer"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:text="Chamfer"
+                                android:textSize="10.5sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnExtrude"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:text="Extrude"
+                                android:textSize="10.5sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:layout_marginEnd="8dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnUnion"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:text="Union ∪"
+                                android:textSize="10.5sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnCut"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:text="Cut ∖"
+                                android:textSize="10.5sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnIntersect"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:text="Intersect ∩"
+                                android:textSize="10.5sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                        </LinearLayout>
+                    </HorizontalScrollView>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card 2: Finite Element Formulation, Material & Mesh Parameters -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#1E293B">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="6dp">
+
+                    <!-- Row 1: Element Type, Material & Young's Modulus E -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="4dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_element_type"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <Spinner
+                                android:id="@+id/spinnerElementType"
+                                android:layout_width="match_parent"
+                                android:layout_height="32dp"
+                                android:background="@drawable/spinner_compact_bg"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="4dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_material"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <Spinner
+                                android:id="@+id/spinnerMaterialSolid"
+                                android:layout_width="match_parent"
+                                android:layout_height="32dp"
+                                android:background="@drawable/spinner_compact_bg"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.8"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="E (MPa)"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <EditText
+                                android:id="@+id/etSolidModulus"
+                                android:layout_width="match_parent"
+                                android:layout_height="32dp"
+                                android:background="@drawable/edit_text_border"
+                                android:inputType="numberDecimal"
+                                android:text="200000"
+                                android:textSize="11sp"
+                                android:gravity="center_vertical"
+                                android:paddingStart="6dp"
+                                android:paddingEnd="6dp"
+                                android:paddingTop="2dp"
+                                android:paddingBottom="2dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Row 2: Mesh Density Slider & Label -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/tvMeshDensityLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_mesh_density"
+                            android:textSize="9.5sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primaryColor" />
+                        <SeekBar
+                            android:id="@+id/seekbarMeshDensity"
+                            android:layout_width="match_parent"
+                            android:layout_height="24dp"
+                            android:max="4"
+                            android:progress="2" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card 3: Boundary Conditions & Applied Loads (SPC & CLOAD) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#1E293B">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="6dp">
+
+                    <!-- Row 1: Support & Load Regions -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="4dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_fixed_support_region"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <Spinner
+                                android:id="@+id/spinnerFixedRegion"
+                                android:layout_width="match_parent"
+                                android:layout_height="32dp"
+                                android:background="@drawable/spinner_compact_bg"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_load_application_region"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <Spinner
+                                android:id="@+id/spinnerLoadRegion"
+                                android:layout_width="match_parent"
+                                android:layout_height="32dp"
+                                android:background="@drawable/spinner_compact_bg"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Row 2: Load Direction & Force Magnitude -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="4dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_load_direction"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <Spinner
+                                android:id="@+id/spinnerLoadDirection"
+                                android:layout_width="match_parent"
+                                android:layout_height="32dp"
+                                android:background="@drawable/spinner_compact_bg"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.8"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_load_magnitude"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <EditText
+                                android:id="@+id/etLoadMagnitude"
+                                android:layout_width="match_parent"
+                                android:layout_height="32dp"
+                                android:background="@drawable/edit_text_border"
+                                android:inputType="numberSigned|numberDecimal"
+                                android:text="-100.0"
+                                android:textSize="11sp"
+                                android:gravity="center_vertical"
+                                android:paddingStart="6dp"
+                                android:paddingEnd="6dp"
+                                android:paddingTop="2dp"
+                                android:paddingBottom="2dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Flexible Space to fill single screen cleanly -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Calculation Progress Indicator (Positioned cleanly right above the Solve button) -->
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/pbSolid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="gone"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="2dp"
+                app:indicatorColor="#00E5FF"
+                app:trackColor="#2A3854"
+                app:trackCornerRadius="2dp"
+                app:trackThickness="4dp" />
+
+            <!-- Bottom Solve Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRunSolidAnalysis"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="2dp"
+                android:backgroundTint="@color/secondaryColor"
+                android:textColor="@color/white"
+                android:text="@string/btn_run_fea_solver"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="8dp" />
+
+        </LinearLayout>
+
+        <!-- Tab 1: SceneView Viewer (Bottom Toolbar without gesture conflicts or virtual button overlaps) -->
+        <LinearLayout
+            android:id="@+id/layoutViewer3D"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/solidSceneViewContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
+
+            <!-- 3D Solid SceneView Results Toolbar (Positioned at bottom) -->
+            <HorizontalScrollView
+                android:id="@+id/scrollSolidToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:fillViewport="true"
+                android:clipToPadding="false"
+                android:overScrollMode="always"
+                android:background="#161E2E"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnResetSolidCamera"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="38dp"
+                        android:text="@string/btn_reset_view"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:textSize="11sp"
+                        android:textColor="@color/white"
+                        app:strokeColor="#38BDF8"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnReloadSolidModel"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="38dp"
+                        android:text="@string/btn_reload_mesh"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:textSize="11sp"
+                        android:textColor="@color/white"
+                        app:strokeColor="#38BDF8"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp" />
+                </LinearLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
+
+        <!-- Tab 2: Independent Solver Log -->
+        <LinearLayout
+            android:id="@+id/layoutSolidLog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="#000000"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ScrollView
+                    android:id="@+id/scrollSolidLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/tvSolidLog"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:textColor="#00FF00"
+                        android:textSize="11sp" />
+                </ScrollView>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabClearSolidLog"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="16dp"
+                    android:src="@android:drawable/ic_menu_delete"
+                    app:fabSize="mini"
+                    app:tint="@color/white" />
+            </FrameLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+</LinearLayout>

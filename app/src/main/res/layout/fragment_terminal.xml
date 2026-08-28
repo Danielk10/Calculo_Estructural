@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/terminal_black">
+
+    <!-- Terminal Action Toolbar (Clean technical distribution) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:gravity="center_vertical"
+        android:background="#0D111A">
+
+        <!-- Copy Log Control (Left) -->
+        <ImageButton
+            android:id="@+id/btnCopyLog"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerInside"
+            android:padding="8dp"
+            android:focusable="false"
+            android:src="@drawable/ic_copy"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/terminal_cd_copy"
+            app:tint="@color/terminal_green" />
+
+        <!-- Distributing Space -->
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <!-- Execution & History Navigation Controls (Right Group) -->
+        <ImageButton
+            android:id="@+id/btnAbort"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerInside"
+            android:padding="8dp"
+            android:focusable="false"
+            android:src="@drawable/ic_stop"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/terminal_cd_abort"
+            android:visibility="gone"
+            app:tint="#FF5252"
+            android:layout_marginEnd="8dp" />
+
+        <ImageButton
+            android:id="@+id/btnHistoryPrev"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerInside"
+            android:padding="8dp"
+            android:focusable="false"
+            android:src="@drawable/ic_arrow_up"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/terminal_cd_history_prev"
+            app:tint="@color/terminal_green"
+            android:layout_marginEnd="8dp" />
+
+        <ImageButton
+            android:id="@+id/btnHistoryNext"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerInside"
+            android:padding="8dp"
+            android:focusable="false"
+            android:src="@drawable/ic_arrow_down"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/terminal_cd_history_next"
+            app:tint="@color/terminal_green" />
+    </LinearLayout>
+
+    <com.diamon.civil.terminal.ui.views.LogScrollView
+        android:id="@+id/scrollLog"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="12dp"
+        android:background="#0A0E17"
+        android:focusable="false"
+        android:focusableInTouchMode="false">
+
+        <TextView
+            android:id="@+id/tvLog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:textIsSelectable="true"
+            android:longClickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:textColorHighlight="#5580CBC4"
+            android:lineSpacingExtra="2dp"
+            android:textColor="@color/terminal_green"
+            android:textSize="12sp" />
+    </com.diamon.civil.terminal.ui.views.LogScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#0A0A0A"
+        android:gravity="center_vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/terminal_prompt"
+            android:textColor="@color/terminal_green"
+            android:fontFamily="monospace"
+            android:layout_marginEnd="8dp"/>
+
+        <EditText
+            android:id="@+id/etCommand"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/terminal_green"
+            android:hint="@string/terminal_hint"
+            android:textColorHint="#4D80CBC4"
+            android:background="@null"
+            android:imeOptions="actionSend|flagNoExtractUi"
+            android:inputType="textNoSuggestions"
+            android:fontFamily="monospace"
+            android:textSize="14sp" />
+
+        <ImageButton
+            android:id="@+id/btnSend"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:src="@drawable/ic_send"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/terminal_cd_send"
+            app:tint="@color/terminal_green" />
+    </LinearLayout>
+</LinearLayout>

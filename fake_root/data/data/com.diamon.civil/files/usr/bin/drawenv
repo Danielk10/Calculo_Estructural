@@ -1,0 +1,10 @@
+#!/bin/bash
+export APP_PREFIX="/data/data/com.diamon.civil/files/usr"
+export DESTDIR="/data/data/com.termux/files/home/fake_root"
+export FAKE_USR="/data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr"
+export TMX_PREFIX="/data/data/com.termux/files/usr"
+export LD_LIBRARY_PATH="/data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr/lib:/data/data/com.termux/files/usr/lib:/data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr/lib:/data/data/com.termux/files/usr/lib:/data/data/com.termux/files/usr/lib:/data/data/com.termux/files/usr/lib:"
+export TCL_LIBRARY="/data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr/lib/tcl8.6"
+export TK_LIBRARY="/data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr/lib/tk8.6"
+export TCLLIBPATH="/data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr/lib /data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr/lib/tcl8.6 /data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr/lib/tk8.6"
+exec "/data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr/bin/DRAWEXE" "$@"

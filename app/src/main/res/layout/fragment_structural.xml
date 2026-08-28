@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutStructural"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+        <com.google.android.material.tabs.TabItem android:text="@string/tab_parameters" />
+        <com.google.android.material.tabs.TabItem android:text="@string/tab_viewer_3d" />
+        <com.google.android.material.tabs.TabItem android:text="@string/tab_solver_log" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <FrameLayout
+        android:id="@+id/structural_content_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Tab 0: Input Data & 2D Grid Topology Editor (Compact No-Scroll Fullscreen Design) -->
+        <LinearLayout
+            android:id="@+id/layoutStructuralData"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="6dp"
+            android:visibility="visible">
+
+            <!-- Compact Analysis & Model Parameters Header Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#1E293B">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="6dp">
+
+                    <!-- Row 1: Sistema Estructural, Elemento Finito & Presets -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp">
+
+                        <!-- Structural System Type -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="4dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_structure_type"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <Spinner
+                                android:id="@+id/spinnerStructureType"
+                                android:layout_width="match_parent"
+                                android:layout_height="34dp"
+                                android:background="@drawable/spinner_compact_bg"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+
+                        <!-- Finite Element Formulation -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="4dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_element_type"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <Spinner
+                                android:id="@+id/spinnerElementTypeStructural"
+                                android:layout_width="match_parent"
+                                android:layout_height="34dp"
+                                android:background="@drawable/spinner_compact_bg"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+
+                        <!-- Presets / Ejemplos -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_preset_template"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <Spinner
+                                android:id="@+id/spinnerPresets"
+                                android:layout_width="match_parent"
+                                android:layout_height="34dp"
+                                android:background="@drawable/spinner_compact_bg"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Row 2: Material & Cross-Section -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp">
+
+                        <!-- Material -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="4dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_material"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <Spinner
+                                android:id="@+id/spinnerMaterialStructural"
+                                android:layout_width="match_parent"
+                                android:layout_height="34dp"
+                                android:background="@drawable/spinner_compact_bg"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+
+                        <!-- Cross-Section -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_cross_section"
+                                android:textSize="9.5sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primaryColor" />
+                            <Spinner
+                                android:id="@+id/spinnerSectionStructural"
+                                android:layout_width="match_parent"
+                                android:layout_height="34dp"
+                                android:background="@drawable/spinner_compact_bg"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Hidden fields kept for data binding compatibility -->
+                    <EditText
+                        android:id="@+id/etLoadValue"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone"
+                        android:text="10000" />
+
+                    <!-- Row 2: Barra de Herramientas Completa en HorizontalScrollView (Nunca se corta nada) -->
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none"
+                        android:overScrollMode="never">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <!-- Tool Mode Buttons -->
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnModeDraw"
+                                android:layout_width="wrap_content"
+                                android:layout_height="34dp"
+                                android:text="✏ Draw"
+                                android:textSize="11sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnModeSelect"
+                                android:layout_width="wrap_content"
+                                android:layout_height="34dp"
+                                android:text="✥ Select/Move"
+                                android:textSize="11sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnModeSupport"
+                                android:layout_width="wrap_content"
+                                android:layout_height="34dp"
+                                android:text="⏏ Support"
+                                android:textSize="11sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnModeLoad"
+                                android:layout_width="wrap_content"
+                                android:layout_height="34dp"
+                                android:text="⬇ Load"
+                                android:textSize="11sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnModeDelete"
+                                android:layout_width="wrap_content"
+                                android:layout_height="34dp"
+                                android:text="🗑 Delete"
+                                android:textSize="11sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:layout_marginEnd="8dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnUndoGrid"
+                                android:layout_width="wrap_content"
+                                android:layout_height="34dp"
+                                android:text="↶ Undo"
+                                android:textSize="11sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnClearGrid"
+                                android:layout_width="wrap_content"
+                                android:layout_height="34dp"
+                                android:text="✕ Clear"
+                                android:textSize="11sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:textColor="#D32F2F"
+                                app:strokeColor="#D32F2F"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                        </LinearLayout>
+                    </HorizontalScrollView>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 2D Canvas Topology & Frame Grid Editor (Fills all remaining height) -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <com.diamon.civil.structural.ui.views.GridEditorView
+                    android:id="@+id/gridEditorView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/edit_text_border" />
+
+                <!-- Floating Stats Badge at Bottom Right of Editor -->
+                <TextView
+                    android:id="@+id/tvGridStats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="8dp"
+                    android:background="#CC101726"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="4 Nodes | 3 Elements"
+                    android:textSize="11sp"
+                    android:textColor="#00E5FF"
+                    android:fontFamily="monospace" />
+            </FrameLayout>
+
+            <!-- Calculation Progress Indicator (Positioned cleanly right above the Solve button) -->
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/pbStructural"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="gone"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="2dp"
+                app:indicatorColor="#00E5FF"
+                app:trackColor="#2A3854"
+                app:trackCornerRadius="2dp"
+                app:trackThickness="4dp" />
+
+            <!-- Bottom Solve Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSolveStructural"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="2dp"
+                android:backgroundTint="@color/secondaryColor"
+                android:textColor="@color/white"
+                android:text="@string/btn_run_fea_solver"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="8dp" />
+
+        </LinearLayout>
+
+        <!-- Tab 1: GL Viewer -->
+        <LinearLayout
+            android:id="@+id/layoutStructuralGL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <com.diamon.civil.structural.ui.FrameGLSurfaceView
+                    android:id="@+id/frameGLView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_margin="12dp"
+                    android:background="#CC101726"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:id="@+id/tvStructDeformScale"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_deformation_scale"
+                        android:textColor="#00E5FF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <SeekBar
+                        android:id="@+id/seekStructDeformScale"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="200"
+                        android:progress="100" />
+                </LinearLayout>
+            </FrameLayout>
+                
+            <!-- 3D Structural Results Toolbar -->
+            <HorizontalScrollView
+                android:id="@+id/scrollStructuralToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:fillViewport="true"
+                android:clipToPadding="false"
+                android:overScrollMode="always"
+                android:background="#161E2E"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnViewWireframe"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:text="@string/btn_view_wireframe"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:textSize="11sp"
+                        android:textColor="@color/white"
+                        app:strokeColor="#38BDF8"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnViewDeformed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:text="@string/btn_view_deformed"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:textSize="11sp"
+                        android:textColor="@color/white"
+                        app:strokeColor="#38BDF8"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnViewMoment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:text="@string/btn_view_moment"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:textSize="11sp"
+                        android:textColor="@color/white"
+                        app:strokeColor="#38BDF8"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnViewShear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:text="@string/btn_view_shear"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:textSize="11sp"
+                        android:textColor="@color/white"
+                        app:strokeColor="#38BDF8"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnViewAxial"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:text="@string/btn_view_axial"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:textSize="11sp"
+                        android:textColor="@color/white"
+                        app:strokeColor="#38BDF8"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnResetCamera"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:text="@string/btn_reset_viewport"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:textSize="11sp"
+                        android:textColor="@color/white"
+                        app:strokeColor="#38BDF8"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp" />
+                </LinearLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
+
+        <!-- Tab 2: Independent Log -->
+        <LinearLayout
+            android:id="@+id/layoutStructuralLog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="#000000"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ScrollView
+                    android:id="@+id/scrollStructuralLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/tvStructuralLog"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:textColor="#00FF00"
+                        android:textSize="11sp" />
+                </ScrollView>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabClearStructuralLog"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="16dp"
+                    android:src="@android:drawable/ic_menu_delete"
+                    app:fabSize="mini"
+                    app:tint="@color/white" />
+            </FrameLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+</LinearLayout>
