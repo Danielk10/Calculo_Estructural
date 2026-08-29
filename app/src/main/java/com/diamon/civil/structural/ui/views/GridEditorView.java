@@ -1136,54 +1136,92 @@ public class GridEditorView extends View {
 
             float fx = (float) l.fx;
             float fy = (float) l.fy;
-            float mag = (float) Math.hypot(fx, fy);
-            if (mag < 1e-4) continue;
+            float fz = (float) l.fz;
+            float magInPlane = (float) Math.hypot(fx, fy);
+            boolean hasInPlane = magInPlane >= 1e-4;
+            boolean hasOutPlane = Math.abs(fz) >= 1e-4;
 
-            float arrowLen = 65f;
-            float ux = (fx / mag) * arrowLen;
-            float uy = -(fy / mag) * arrowLen; // screen Y inverted
+            if (!hasInPlane && !hasOutPlane) continue;
 
-            float startX = sx - ux;
-            float startY = sy - uy;
+            if (hasInPlane) {
+                float arrowLen = 65f;
+                float ux = (fx / magInPlane) * arrowLen;
+                float uy = -(fy / magInPlane) * arrowLen; // screen Y inverted
 
-            // Shaft
-            canvas.drawLine(startX, startY, sx, sy, loadArrowPaint);
+                float startX = sx - ux;
+                float startY = sy - uy;
 
-            // Arrow head
-            float headLen = 18f;
-            float wingAngle = 0.40f;
-            double angle = Math.atan2(-uy, -ux);
+                // Arrow head calculations
+                float headLen = 20f;
+                float wingAngle = 0.42f;
+                double angle = Math.atan2(-uy, -ux);
 
-            float w1x = sx + (float) (headLen * Math.cos(angle + wingAngle));
-            float w1y = sy + (float) (headLen * Math.sin(angle + wingAngle));
-            float w2x = sx + (float) (headLen * Math.cos(angle - wingAngle));
-            float w2y = sy + (float) (headLen * Math.sin(angle - wingAngle));
+                float w1x = sx + (float) (headLen * Math.cos(angle + wingAngle));
+                float w1y = sy + (float) (headLen * Math.sin(angle + wingAngle));
+                float w2x = sx + (float) (headLen * Math.cos(angle - wingAngle));
+                float w2y = sy + (float) (headLen * Math.sin(angle - wingAngle));
 
-            Path headPath = new Path();
-            headPath.moveTo(sx, sy);
-            headPath.lineTo(w1x, w1y);
-            headPath.lineTo(w2x, w2y);
-            headPath.close();
-            canvas.drawPath(headPath, loadArrowPaint);
+                float baseCenterDist = headLen * 0.70f;
+                float baseCx = sx + (float) (baseCenterDist * Math.cos(angle));
+                float baseCy = sy + (float) (baseCenterDist * Math.sin(angle));
 
-            // Professional Load Badge at arrow tail
-            String label;
-            if (Math.abs(fx) > 0 && Math.abs(fy) > 0) {
-                label = String.format(Locale.US, "Fx:%.1f Fy:%.1f kN", fx / 1000.0, fy / 1000.0);
-            } else if (Math.abs(fx) > 0) {
-                label = String.format(Locale.US, "Fx:%.1f kN", fx / 1000.0);
+                // Shaft ending at base of arrow head
+                loadArrowPaint.setStrokeWidth(4.5f);
+                canvas.drawLine(startX, startY, baseCx, baseCy, loadArrowPaint);
+
+                // Sharp filled Arrowhead
+                Path headPath = new Path();
+                headPath.moveTo(sx, sy);
+                headPath.lineTo(w1x, w1y);
+                headPath.lineTo(w2x, w2y);
+                headPath.close();
+                canvas.drawPath(headPath, loadArrowPaint);
+
+                // Load Badge at arrow tail
+                String label;
+                if (Math.abs(fx) > 0 && Math.abs(fy) > 0 && Math.abs(fz) > 0) {
+                    label = String.format(Locale.US, "Fx:%.1f Fy:%.1f Fz:%.1f kN", fx / 1000.0, fy / 1000.0, fz / 1000.0);
+                } else if (Math.abs(fx) > 0 && Math.abs(fy) > 0) {
+                    label = String.format(Locale.US, "Fx:%.1f Fy:%.1f kN", fx / 1000.0, fy / 1000.0);
+                } else if (Math.abs(fx) > 0) {
+                    label = String.format(Locale.US, "Fx:%.1f kN", fx / 1000.0);
+                } else {
+                    label = String.format(Locale.US, "Fy:%.1f kN", fy / 1000.0);
+                }
+
+                float textW = loadTextPaint.measureText(label);
+                float badgeCx = startX - (float) ((ux / arrowLen) * 20.0);
+                float badgeCy = startY - (float) ((uy / arrowLen) * 20.0);
+
+                RectF badgeRect = new RectF(badgeCx - textW / 2f - 8f, badgeCy - 16f, badgeCx + textW / 2f + 8f, badgeCy + 10f);
+                canvas.drawRoundRect(badgeRect, 6f, 6f, loadBadgeBgPaint);
+                canvas.drawRoundRect(badgeRect, 6f, 6f, loadBadgeBorderPaint);
+                canvas.drawText(label, badgeCx, badgeCy + 2f, loadTextPaint);
             } else {
-                label = String.format(Locale.US, "Fy:%.1f kN", fy / 1000.0);
+                // Out-of-plane pure Fz load symbol (standard structural engineering: circle + dot for +Z, circle + X for -Z)
+                float r = 16f;
+                canvas.drawCircle(sx, sy, r, loadBadgeBgPaint);
+                canvas.drawCircle(sx, sy, r, loadArrowPaint);
+                if (fz > 0) {
+                    // Out-of-plane toward viewer (+Z): Solid center dot
+                    canvas.drawCircle(sx, sy, 5f, loadArrowPaint);
+                } else {
+                    // Out-of-plane away from viewer (-Z / gravity): Cross "X"
+                    float cross = r * 0.65f;
+                    canvas.drawLine(sx - cross, sy - cross, sx + cross, sy + cross, loadArrowPaint);
+                    canvas.drawLine(sx - cross, sy + cross, sx + cross, sy - cross, loadArrowPaint);
+                }
+
+                String label = String.format(Locale.US, "Fz:%.1f kN", fz / 1000.0);
+                float textW = loadTextPaint.measureText(label);
+                float badgeCx = sx;
+                float badgeCy = sy - r - 18f;
+
+                RectF badgeRect = new RectF(badgeCx - textW / 2f - 8f, badgeCy - 16f, badgeCx + textW / 2f + 8f, badgeCy + 10f);
+                canvas.drawRoundRect(badgeRect, 6f, 6f, loadBadgeBgPaint);
+                canvas.drawRoundRect(badgeRect, 6f, 6f, loadBadgeBorderPaint);
+                canvas.drawText(label, badgeCx, badgeCy + 2f, loadTextPaint);
             }
-
-            float textW = loadTextPaint.measureText(label);
-            float badgeCx = startX - (float) ((ux / arrowLen) * 18.0);
-            float badgeCy = startY - (float) ((uy / arrowLen) * 18.0);
-
-            RectF badgeRect = new RectF(badgeCx - textW / 2f - 8f, badgeCy - 16f, badgeCx + textW / 2f + 8f, badgeCy + 10f);
-            canvas.drawRoundRect(badgeRect, 6f, 6f, loadBadgeBgPaint);
-            canvas.drawRoundRect(badgeRect, 6f, 6f, loadBadgeBorderPaint);
-            canvas.drawText(label, badgeCx, badgeCy + 2f, loadTextPaint);
         }
     }
 

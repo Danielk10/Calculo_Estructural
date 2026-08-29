@@ -966,6 +966,13 @@ public class PDFReportGenerator {
             panelForceWidths[8] = 519f - (50f + 55f + 64f + 100f + 65f + 65f + 60f + 60f); // 0f remainder
             ctx.y = drawTableHeader(ctx, panelForceHeaders, panelForceWidths);
 
+            Map<Integer, StructuralBeamDatParser.PanelForces> pMap = new HashMap<>();
+            if (result != null && result.panelForces != null) {
+                for (StructuralBeamDatParser.PanelForces pf : result.panelForces) {
+                    pMap.put(pf.panelId, pf);
+                }
+            }
+
             double totalLoadZ = 0.0;
             if (model.loads != null) {
                 for (StructuralModel.Load l : model.loads) {
@@ -977,11 +984,12 @@ public class PDFReportGenerator {
             for (StructuralModel.Panel p : model.panels) {
                 ctx.ensureSpace(14f);
                 double t_m = p.thickness > 0 ? p.thickness : 0.15;
-                // Approximate Wood-Armer plate bending envelope per panel tributary
-                double mx_kNm_m = (totalLoadZ / 1000.0) / (model.panels.size() * 4.0);
-                double my_kNm_m = mx_kNm_m * 0.85;
-                double mxy_kNm_m = mx_kNm_m * 0.15;
-                double vmax_kNm = (totalLoadZ / 1000.0) / (model.panels.size() * 2.0);
+                StructuralBeamDatParser.PanelForces pf = pMap.get(p.id);
+
+                double mx_kNm_m = pf != null ? pf.Mx : (totalLoadZ / 1000.0) / (model.panels.size() * 4.0);
+                double my_kNm_m = pf != null ? pf.My : mx_kNm_m * 0.85;
+                double mxy_kNm_m = pf != null ? pf.Mxy : mx_kNm_m * 0.15;
+                double vmax_kNm = pf != null ? pf.Vmax : (totalLoadZ / 1000.0) / (model.panels.size() * 2.0);
 
                 String[] row = {
                         "Panel " + p.id,

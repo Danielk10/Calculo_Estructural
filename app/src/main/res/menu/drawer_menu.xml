@@ -18,6 +18,10 @@
     <item android:title="@string/menu_support_tools">
         <menu>
             <item
+                android:id="@+id/nav_privacy_policy"
+                android:icon="@android:drawable/ic_menu_agenda"
+                android:title="@string/menu_privacy_policy" />
+            <item
                 android:id="@+id/nav_docs"
                 android:icon="@android:drawable/ic_menu_help"
                 android:title="@string/menu_documentation" />

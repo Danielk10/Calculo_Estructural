@@ -52,10 +52,23 @@ public class StructuralBeamDatParser {
         public double ux, uy, uz;
     }
 
+    public static class PanelForces {
+        public int panelId;
+        public String panelType;
+        public double Mx;   // kN·m/m
+        public double My;   // kN·m/m
+        public double Mxy;  // kN·m/m
+        public double Vmax; // kN/m
+        public double tauXY; // MPa
+        public double sigmaX; // MPa
+        public double sigmaY; // MPa
+    }
+
     /** Summary of the most extreme values found in the .dat */
     public static class ParseResult {
         public List<SectionForces> forces;
         public final List<NodeDisplacement> displacements = new ArrayList<>();
+        public final List<PanelForces> panelForces = new ArrayList<>();
         public double maxAbsN  = 0;
         public double maxAbsV2 = 0;
         public double maxAbsV3 = 0;

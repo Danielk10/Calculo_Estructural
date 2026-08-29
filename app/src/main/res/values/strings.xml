@@ -23,6 +23,11 @@
     <string name="menu_export_pdf">Export PDF Calculation Report</string>
     <string name="menu_export_all">Export All Simulation Artifacts</string>
     <string name="menu_about_licenses">About / Licenses</string>
+    <string name="menu_privacy_policy">Privacy Policy</string>
+    <string name="privacy_policy_title">Privacy Policy</string>
+    <string name="privacy_policy_loading">Loading Privacy Policy...</string>
+    <string name="privacy_policy_error">Unable to load Privacy Policy. Please check your internet connection.</string>
+    <string name="retry">Retry</string>
 
     <string name="about_dialog_title">About Structural Analysis FEA Advanced</string>
     <string name="about_dialog_message">Structural Analysis FEA Advanced v0.1.0\n\nHigh-performance 3D Solid &amp; Frame Finite Element Analysis (FEA) platform for Android.\nPowered by CalculiX (CCX 2.23), Gmsh 3D mesh generator (v5.0.0), and OpenCASCADE Technology (OCCT 8.0.0.p1).\n\nLead Developer: Daniel Diamon\nLocation: Tinaquillo, Cojedes, Venezuela\nLicense: GNU General Public License v3.0 (GPLv3)\nRepository: https://github.com/Danielk10/Calculo_Estructural</string>

@@ -212,4 +212,108 @@ public class FrameAnalysisEngineTest {
         assertEquals("Overhang M at node 2 = +30.0 kN*m", 30.0, e2.M1 / 1000.0, 0.01);
         assertEquals("Overhang M at tip = 0.0 kN*m", 0.0, e2.M2 / 1000.0, 0.01);
     }
+
+    @Test
+    public void testConcreteSlabPlateS4R_CenterPointLoad_40kN() {
+        StructuralModel model = new StructuralModel();
+        double w = 4.0, l = 4.0, t = 0.15;
+
+        // 3x3 grid (9 nodes)
+        model.nodes.add(new StructuralModel.Node(1, 0.0, 0.0, 0.0, StructuralModel.SupportType.PINNED));
+        model.nodes.add(new StructuralModel.Node(2, w / 2.0, 0.0, 0.0, StructuralModel.SupportType.ROLLER));
+        model.nodes.add(new StructuralModel.Node(3, w, 0.0, 0.0, StructuralModel.SupportType.PINNED));
+        model.nodes.add(new StructuralModel.Node(4, 0.0, l / 2.0, 0.0, StructuralModel.SupportType.ROLLER));
+        model.nodes.add(new StructuralModel.Node(5, w / 2.0, l / 2.0, 0.0, StructuralModel.SupportType.FREE));
+        model.nodes.add(new StructuralModel.Node(6, w, l / 2.0, 0.0, StructuralModel.SupportType.ROLLER));
+        model.nodes.add(new StructuralModel.Node(7, 0.0, l, 0.0, StructuralModel.SupportType.PINNED));
+        model.nodes.add(new StructuralModel.Node(8, w / 2.0, l, 0.0, StructuralModel.SupportType.ROLLER));
+        model.nodes.add(new StructuralModel.Node(9, w, l, 0.0, StructuralModel.SupportType.PINNED));
+
+        // Perimeter boundary beams
+        model.elements.add(new StructuralModel.Element(1, 1, 2, "Rect 200x300", "Concrete 25 MPa"));
+        model.elements.add(new StructuralModel.Element(2, 2, 3, "Rect 200x300", "Concrete 25 MPa"));
+        model.elements.add(new StructuralModel.Element(3, 3, 6, "Rect 200x300", "Concrete 25 MPa"));
+        model.elements.add(new StructuralModel.Element(4, 6, 9, "Rect 200x300", "Concrete 25 MPa"));
+        model.elements.add(new StructuralModel.Element(5, 9, 8, "Rect 200x300", "Concrete 25 MPa"));
+        model.elements.add(new StructuralModel.Element(6, 8, 7, "Rect 200x300", "Concrete 25 MPa"));
+        model.elements.add(new StructuralModel.Element(7, 7, 4, "Rect 200x300", "Concrete 25 MPa"));
+        model.elements.add(new StructuralModel.Element(8, 4, 1, "Rect 200x300", "Concrete 25 MPa"));
+
+        // 4 Quad Shell Panels (S4R)
+        model.panels.add(new StructuralModel.Panel(1, java.util.Arrays.asList(1, 2, 5, 4), t, "Concrete 25 MPa", "S4R"));
+        model.panels.add(new StructuralModel.Panel(2, java.util.Arrays.asList(2, 3, 6, 5), t, "Concrete 25 MPa", "S4R"));
+        model.panels.add(new StructuralModel.Panel(3, java.util.Arrays.asList(4, 5, 8, 7), t, "Concrete 25 MPa", "S4R"));
+        model.panels.add(new StructuralModel.Panel(4, java.util.Arrays.asList(5, 6, 9, 8), t, "Concrete 25 MPa", "S4R"));
+
+        // 40 kN concentrated load at center node 5
+        model.loads.add(new StructuralModel.Load(5, 0.0, 0.0, -40000.0));
+
+        FrameAnalysisEngine.AnalysisOutput out = FrameAnalysisEngine.analyze(model);
+        assertNotNull(out);
+        assertNotNull(out.parseResult);
+
+        // 1. Check Center Displacement Uz is physically realistic (~ -1.0 to -1.2 mm)
+        Map<Integer, StructuralBeamDatParser.NodeDisplacement> dispMap = new HashMap<>();
+        for (StructuralBeamDatParser.NodeDisplacement d : out.parseResult.displacements) {
+            dispMap.put(d.nodeId, d);
+        }
+
+        double uz5_mm = dispMap.get(5).uz * 1000.0;
+        assertTrue("Center node 5 vertical deflection must be ~ -1.08 mm (actual: " + uz5_mm + " mm)",
+                uz5_mm < -0.5 && uz5_mm > -2.0);
+
+        // 2. Check Static Equilibrium
+        assertEquals(-40000.0, out.sumAppliedFz, 1e-3);
+        assertEquals(40000.0, Math.abs(out.sumReactRz), 1e-1);
+        assertEquals(0.0, Math.abs(out.residualFz), 1e-1);
+
+        // 3. Check Panel Bending Moments
+        assertFalse(out.parseResult.panelForces.isEmpty());
+        StructuralBeamDatParser.PanelForces p1 = out.parseResult.panelForces.get(0);
+        assertEquals("Mx moment must be 2.50 kN*m/m", 2.50, p1.Mx, 0.05);
+        assertEquals("My moment must be 2.13 kN*m/m", 2.13, p1.My, 0.05);
+        assertEquals("Mxy moment must be 0.38 kN*m/m", 0.38, p1.Mxy, 0.05);
+        assertEquals("Vmax shear must be 5.00 kN/m", 5.00, p1.Vmax, 0.05);
+    }
+
+    @Test
+    public void testShearWallCPS4_LateralLoad_50kN() {
+        StructuralModel model = new StructuralModel();
+        double w = 3.0, h = 3.0, t = 0.20;
+
+        model.nodes.add(new StructuralModel.Node(1, 0.0, 0.0, 0.0, StructuralModel.SupportType.FIXED));
+        model.nodes.add(new StructuralModel.Node(2, w, 0.0, 0.0, StructuralModel.SupportType.FIXED));
+        model.nodes.add(new StructuralModel.Node(3, w, h, 0.0, StructuralModel.SupportType.FREE));
+        model.nodes.add(new StructuralModel.Node(4, 0.0, h, 0.0, StructuralModel.SupportType.FREE));
+
+        model.elements.add(new StructuralModel.Element(1, 1, 4, "Rect 300x400", "Concrete 25 MPa"));
+        model.elements.add(new StructuralModel.Element(2, 2, 3, "Rect 300x400", "Concrete 25 MPa"));
+        model.elements.add(new StructuralModel.Element(3, 4, 3, "Rect 300x400", "Concrete 25 MPa"));
+
+        model.panels.add(new StructuralModel.Panel(1, java.util.Arrays.asList(1, 2, 3, 4), t, "Concrete 25 MPa", "CPS4"));
+
+        // 50 kN lateral shear force at node 4
+        model.loads.add(new StructuralModel.Load(4, 50000.0, 0.0, 0.0));
+
+        FrameAnalysisEngine.AnalysisOutput out = FrameAnalysisEngine.analyze(model);
+        assertNotNull(out);
+        assertNotNull(out.parseResult);
+
+        Map<Integer, StructuralBeamDatParser.NodeDisplacement> dispMap = new HashMap<>();
+        for (StructuralBeamDatParser.NodeDisplacement d : out.parseResult.displacements) {
+            dispMap.put(d.nodeId, d);
+        }
+
+        double ux4_mm = dispMap.get(4).ux * 1000.0;
+        assertTrue("Top lateral displacement must be realistic (~0.02 to 0.08 mm, actual: " + ux4_mm + " mm)",
+                ux4_mm > 0.01 && ux4_mm < 0.15);
+
+        assertEquals(50000.0, out.sumAppliedFx, 1e-3);
+        assertEquals(50000.0, Math.abs(out.sumReactRx), 1e-1);
+
+        assertFalse(out.parseResult.panelForces.isEmpty());
+        StructuralBeamDatParser.PanelForces p1 = out.parseResult.panelForces.get(0);
+        assertEquals(20.00, p1.Vmax, 0.1);
+        assertEquals(10.00, p1.Mx, 0.1);
+    }
 }

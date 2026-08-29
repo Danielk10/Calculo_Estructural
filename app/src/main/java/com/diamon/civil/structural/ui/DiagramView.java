@@ -29,6 +29,8 @@ public class DiagramView extends View {
     private final Paint diagramPaint = new Paint();
     private final Paint textPaint = new Paint();
     private final Paint deformedPaint = new Paint(); // New improvement
+    private final Paint loadPaint = new Paint();
+    private final Paint loadHeadPaint = new Paint();
 
     public DiagramView(Context context) {
         this(context, null);
@@ -56,6 +58,13 @@ public class DiagramView extends View {
         deformedPaint.setStyle(Paint.Style.STROKE);
         deformedPaint.setStrokeWidth(4f);
         deformedPaint.setPathEffect(new android.graphics.DashPathEffect(new float[]{10, 10}, 0));
+
+        loadPaint.setColor(Color.parseColor("#FF1744"));
+        loadPaint.setStrokeWidth(4.5f);
+        loadPaint.setStyle(Paint.Style.STROKE);
+
+        loadHeadPaint.setColor(Color.parseColor("#FF1744"));
+        loadHeadPaint.setStyle(Paint.Style.FILL);
     }
 
     public void setModelAndResults(StructuralModel model, StructuralBeamDatParser.ParseResult results) {
@@ -149,6 +158,46 @@ public class DiagramView extends View {
                     
                     // Label
                     canvas.drawText(String.format("%.1f", value), (x1+x2)/2 + px*h, (y1+y2)/2 + py*h, textPaint);
+                }
+            }
+        }
+
+        // Draw Applied Load Arrows
+        if (model.loads != null) {
+            for (StructuralModel.Load l : model.loads) {
+                StructuralModel.Node n = nodeMap.get(l.nodeId);
+                if (n == null) continue;
+                float nx = (float) n.x * scale + offsetX;
+                float ny = (float) -n.y * scale + offsetY;
+
+                float fx = (float) l.fx;
+                float fy = (float) l.fy;
+                float mag = (float) Math.hypot(fx, fy);
+                if (mag >= 1e-4) {
+                    float arrowLen = 50f;
+                    float ux = (fx / mag) * arrowLen;
+                    float uy = -(fy / mag) * arrowLen;
+
+                    float startX = nx - ux;
+                    float startY = ny - uy;
+
+                    float headLen = 16f;
+                    float wingAngle = 0.42f;
+                    double angle = Math.atan2(-uy, -ux);
+
+                    float w1x = nx + (float) (headLen * Math.cos(angle + wingAngle));
+                    float w1y = ny + (float) (headLen * Math.sin(angle + wingAngle));
+                    float w2x = nx + (float) (headLen * Math.cos(angle - wingAngle));
+                    float w2y = ny + (float) (headLen * Math.sin(angle - wingAngle));
+
+                    canvas.drawLine(startX, startY, nx, ny, loadPaint);
+
+                    Path hp = new Path();
+                    hp.moveTo(nx, ny);
+                    hp.lineTo(w1x, w1y);
+                    hp.lineTo(w2x, w2y);
+                    hp.close();
+                    canvas.drawPath(hp, loadHeadPaint);
                 }
             }
         }

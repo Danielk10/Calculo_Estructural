@@ -18,4 +18,8 @@
         android:id="@+id/action_licenses"
         android:title="@string/menu_about_licenses"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_privacy_policy"
+        android:title="@string/menu_privacy_policy"
+        app:showAsAction="never" />
 </menu>

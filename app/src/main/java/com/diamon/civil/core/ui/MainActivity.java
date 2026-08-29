@@ -114,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             switchFragment(new SolidFragment(), getString(R.string.menu_solid_analysis));
         } else if (id == R.id.nav_terminal) {
             switchFragment(new TerminalFragment(), getString(R.string.menu_advanced_terminal));
+        } else if (id == R.id.nav_privacy_policy) {
+            startActivity(new Intent(this, PrivacyPolicyActivity.class));
         } else if (id == R.id.nav_docs) {
             try {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.dhondt.de/ccx_2.23.pdf")));
@@ -198,6 +200,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         } else if (id == R.id.action_licenses) {
             showLicensesDialog();
+            return true;
+        } else if (id == R.id.action_privacy_policy) {
+            startActivity(new Intent(this, PrivacyPolicyActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

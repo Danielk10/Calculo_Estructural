@@ -911,11 +911,11 @@ public class StructuralFragment extends Fragment {
                     firstConstraint = false;
                 } else if (node.supportType == StructuralModel.SupportType.PINNED) {
                     if (!firstConstraint) sb.append(",");
-                    sb.append("{\"nodeId\":").append(node.id).append(",\"dofs\":[1,2,3,4,5],\"value\":0}");
+                    sb.append("{\"nodeId\":").append(node.id).append(",\"dofs\":[1,2,3],\"value\":0}");
                     firstConstraint = false;
                 } else if (node.supportType == StructuralModel.SupportType.ROLLER) {
                     if (!firstConstraint) sb.append(",");
-                    sb.append("{\"nodeId\":").append(node.id).append(",\"dofs\":[2,3,4,5],\"value\":0}");
+                    sb.append("{\"nodeId\":").append(node.id).append(",\"dofs\":[2,3],\"value\":0}");
                     firstConstraint = false;
                 }
             }
@@ -1446,7 +1446,7 @@ public class StructuralFragment extends Fragment {
             }
         }
 
-        // 6. 3D Load Arrows
+        // 6. 3D Load Arrows (High-Definition 3D Vector Shafts & Conical Multi-Fin Arrowheads)
         java.util.List<Float> loadLines = new java.util.ArrayList<>();
         java.util.List<Float> loadColors = new java.util.ArrayList<>();
         for (StructuralModel.Load load : model.loads) {
@@ -1461,19 +1461,88 @@ public class StructuralFragment extends Fragment {
 
             int loadVertsBefore = loadLines.size() / 3;
 
-            float arrowLen = span * 0.16f;
-            float ux = fx / mag * arrowLen;
-            float uy = fy / mag * arrowLen;
-            float uz = fz / mag * arrowLen;
+            float arrowLen = Math.max(span * 0.18f, 0.75f);
+            float dx = fx / mag;
+            float dy = fy / mag;
+            float dz = fz / mag;
 
-            loadLines.add((float) n.x - ux); loadLines.add((float) n.y - uy); loadLines.add((float) n.z - uz);
-            loadLines.add((float) n.x); loadLines.add((float) n.y); loadLines.add((float) n.z);
+            float tipX = (float) n.x;
+            float tipY = (float) n.y;
+            float tipZ = (float) n.z;
 
-            loadLines.add((float) n.x); loadLines.add((float) n.y); loadLines.add((float) n.z);
-            loadLines.add((float) n.x - ux * 0.3f + uy * 0.2f); loadLines.add((float) n.y - uy * 0.3f - ux * 0.2f); loadLines.add((float) n.z);
+            float tailX = tipX - dx * arrowLen;
+            float tailY = tipY - dy * arrowLen;
+            float tailZ = tipZ - dz * arrowLen;
 
-            loadLines.add((float) n.x); loadLines.add((float) n.y); loadLines.add((float) n.z);
-            loadLines.add((float) n.x - ux * 0.3f - uy * 0.2f); loadLines.add((float) n.y - uy * 0.3f + ux * 0.2f); loadLines.add((float) n.z);
+            // Main Shaft
+            loadLines.add(tailX); loadLines.add(tailY); loadLines.add(tailZ);
+            loadLines.add(tipX); loadLines.add(tipY); loadLines.add(tipZ);
+
+            // Arrow Head parameters
+            float headLen = arrowLen * 0.28f;
+            float headRadius = headLen * 0.42f;
+            float baseCenterX = tipX - dx * headLen;
+            float baseCenterY = tipY - dy * headLen;
+            float baseCenterZ = tipZ - dz * headLen;
+
+            // Compute orthonormal vectors (ux, uy, uz) and (vx, vy, vz) perpendicular to (dx, dy, dz)
+            float upX = 0f, upY = 0f, upZ = 1f;
+            if (Math.abs(dz) > 0.88f) {
+                upX = 0f; upY = 1f; upZ = 0f;
+            }
+            // u = dir x up
+            float ux = dy * upZ - dz * upY;
+            float uy = dz * upX - dx * upZ;
+            float uz = dx * upY - dy * upX;
+            float uLen = (float) Math.sqrt(ux * ux + uy * uy + uz * uz);
+            if (uLen > 1e-5f) {
+                ux /= uLen; uy /= uLen; uz /= uLen;
+            } else {
+                ux = 1f; uy = 0f; uz = 0f;
+            }
+            // v = dir x u
+            float vx = dy * uz - dz * uy;
+            float vy = dz * ux - dx * uz;
+            float vz = dx * uy - dy * ux;
+            float vLen = (float) Math.sqrt(vx * vx + vy * vy + vz * vz);
+            if (vLen > 1e-5f) {
+                vx /= vLen; vy /= vLen; vz /= vLen;
+            }
+
+            // Generate 8 3D Conical Barbs / Fins and Base Ring
+            int numFins = 8;
+            float[] prevRim = null;
+            float[] firstRim = null;
+            for (int k = 0; k < numFins; k++) {
+                double angle = 2.0 * Math.PI * k / numFins;
+                float cosA = (float) Math.cos(angle);
+                float sinA = (float) Math.sin(angle);
+
+                float rimX = baseCenterX + (ux * cosA + vx * sinA) * headRadius;
+                float rimY = baseCenterY + (uy * cosA + vy * sinA) * headRadius;
+                float rimZ = baseCenterZ + (uz * cosA + vz * sinA) * headRadius;
+
+                // Barb from Tip to Rim
+                loadLines.add(tipX); loadLines.add(tipY); loadLines.add(tipZ);
+                loadLines.add(rimX); loadLines.add(rimY); loadLines.add(rimZ);
+
+                // Base connector from Rim to Base Center
+                loadLines.add(rimX); loadLines.add(rimY); loadLines.add(rimZ);
+                loadLines.add(baseCenterX); loadLines.add(baseCenterY); loadLines.add(baseCenterZ);
+
+                if (prevRim != null) {
+                    // Perimeter ring segment
+                    loadLines.add(prevRim[0]); loadLines.add(prevRim[1]); loadLines.add(prevRim[2]);
+                    loadLines.add(rimX); loadLines.add(rimY); loadLines.add(rimZ);
+                } else {
+                    firstRim = new float[]{rimX, rimY, rimZ};
+                }
+                prevRim = new float[]{rimX, rimY, rimZ};
+            }
+            if (prevRim != null && firstRim != null) {
+                loadLines.add(prevRim[0]); loadLines.add(prevRim[1]); loadLines.add(prevRim[2]);
+                loadLines.add(firstRim[0]); loadLines.add(firstRim[1]); loadLines.add(firstRim[2]);
+            }
 
             int loadVertsAdded = (loadLines.size() / 3) - loadVertsBefore;
             for (int k = 0; k < loadVertsAdded; k++) {
