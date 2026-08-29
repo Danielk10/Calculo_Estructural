@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class CalculixExecutor {
     private static final String TAG = "CalculixExecutor";
-    private final File workDir;
+    private volatile File workDir;
     private final File nativeLibDir;
     private final File filesDir;
 
@@ -28,6 +28,16 @@ public class CalculixExecutor {
         
         // The solver is a child process. Do not load the JNI/OCCT stack here: the
         // terminal must remain usable even when the optional 3D viewer is absent.
+    }
+
+    public void setWorkDir(File workDir) {
+        if (workDir != null) {
+            this.workDir = workDir;
+        }
+    }
+
+    public File getWorkDir() {
+        return this.workDir;
     }
 
     public interface OutputListener {

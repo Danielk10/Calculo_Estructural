@@ -59,9 +59,10 @@ public class TerminalFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         final Context appContext = requireContext().getApplicationContext();
-        File terminalDir = new File(appContext.getFilesDir(), "terminal");
+        File filesRoot = appContext.getFilesDir();
+        File terminalDir = new File(filesRoot, "terminal");
         if (!terminalDir.exists()) terminalDir.mkdirs();
-        terminalExecutor = new TerminalCommandExecutor(terminalDir);
+        terminalExecutor = new TerminalCommandExecutor(filesRoot, terminalDir);
 
         executor.execute(() -> {
             try {
@@ -278,7 +279,7 @@ public class TerminalFragment extends Fragment {
         binding.etCommand.setText("");
         keepInputFocus();
 
-        if (input.equalsIgnoreCase("clear") || input.equalsIgnoreCase("cls")) {
+        if (input.equalsIgnoreCase("clear")) {
             ModuleLogger.getGlobal().clear();
             keepInputFocus();
             return;
@@ -293,11 +294,15 @@ public class TerminalFragment extends Fragment {
         }
 
         executor.execute(() -> {
+            File currentDir = terminalExecutor.getCurrentDir();
+            if (calculixExecutor != null) {
+                calculixExecutor.setWorkDir(currentDir);
+            }
             String result = null;
 
             if (input.equalsIgnoreCase("test-gmsh") || input.equalsIgnoreCase("test_gmsh")) {
                 result = "Executing Gmsh Boolean Operation Test (Hollow Cylinder)...\n";
-                File geoFile = new File(filesDir, "boolean_test.geo");
+                File geoFile = new File(currentDir, "boolean_test.geo");
                 String script = "SetFactory(\"OpenCASCADE\");\n" +
                         "Cylinder(1) = {0, 0, 0, 0, 0, 5, 2};\n" +
                         "Sphere(2) = {0, 0, 2.5, 1.5};\n" +
@@ -322,22 +327,22 @@ public class TerminalFragment extends Fragment {
                 result += calculixExecutor.executeBinaryWithInput("DRAWEXE", drawScript, "-b");
             } else if (input.equalsIgnoreCase("test-calculix") || input.equalsIgnoreCase("test_calculix")) {
                 result = "Executing CalculiX Validation Test (test_calculix.inp)...\n";
-                copyAssetToFilesDir("test_calculix.inp");
+                copyAssetToFilesDir("test_calculix.inp", currentDir);
                 result += calculixExecutor.executeCalculix("test_calculix");
             } else if (input.equalsIgnoreCase("test-calculix-parallel") || input.equalsIgnoreCase("test_calculix_parallel")) {
                 int cores = Runtime.getRuntime().availableProcessors();
                 result = "Executing CalculiX Parallel Test (" + cores + " Cores / Multi-core)...\n";
-                copyAssetToFilesDir("test_calculix.inp");
+                copyAssetToFilesDir("test_calculix.inp", currentDir);
                 result += calculixExecutor.executeCalculix("test_calculix");
             } else if (input.equalsIgnoreCase("test-frame") || input.equalsIgnoreCase("test_frame")
                     || input.equalsIgnoreCase("test-portico") || input.equalsIgnoreCase("test_portico")) {
                 result = "Executing 2D Frame Structural Analysis Test (test_portico.inp)...\n";
-                copyAssetToFilesDir("test_portico.inp");
+                copyAssetToFilesDir("test_portico.inp", currentDir);
                 result += calculixExecutor.executeCalculix("test_portico");
             } else if (input.equalsIgnoreCase("test-frd-parser") || input.equalsIgnoreCase("test_frd_parser")) {
                 result = "Executing C++ JNI FRD Parser Test (test_calculix.frd)...\n";
-                File frdFile = new File(filesDir, "test_calculix.frd");
-                File glbFile = new File(filesDir, "test_calculix.glb");
+                File frdFile = new File(currentDir, "test_calculix.frd");
+                File glbFile = new File(currentDir, "test_calculix.glb");
                 if (frdFile.exists()) {
                     boolean ok = calculixExecutor.convertFrdToGlb(frdFile.getAbsolutePath(), glbFile.getAbsolutePath(), 1.0f);
                     result += "Conversion to GLB: " + (ok ? "SUCCESS" : "FAILED") + "\n";
@@ -347,7 +352,7 @@ public class TerminalFragment extends Fragment {
                 }
             } else if (input.equalsIgnoreCase("test-dat-parser") || input.equalsIgnoreCase("test_dat_parser")) {
                 result = "Executing Java DAT Parser Test (test_calculix.dat)...\n";
-                File datFile = new File(filesDir, "test_calculix.dat");
+                File datFile = new File(currentDir, "test_calculix.dat");
                 if (datFile.exists()) {
                     StructuralBeamDatParser parser = new StructuralBeamDatParser();
                     StructuralBeamDatParser.ParseResult parseRes = parser.parse(datFile);
@@ -362,13 +367,13 @@ public class TerminalFragment extends Fragment {
                 }
             } else if (input.equalsIgnoreCase("test-coordinate-fallback") || input.equalsIgnoreCase("test_coordinate_fallback")) {
                 result = "Executing Coordinate-Based Boundary Fallback Test...\n";
-                result += runStepTest("linkrods.step", "fallback_test");
+                result += runStepTest("linkrods.step", "fallback_test", currentDir);
             } else if (input.equalsIgnoreCase("test-step-solve") || input.equalsIgnoreCase("test_step_solve")) {
                 result = "Executing STEP Meshing & Solving Pipeline (linkrods.step)...\n";
-                result += runStepTest("linkrods.step", "linkrods");
+                result += runStepTest("linkrods.step", "linkrods", currentDir);
             } else if (input.equalsIgnoreCase("test-bracket-solve") || input.equalsIgnoreCase("test_bracket_solve")) {
                 result = "Executing Bracket Meshing & Solving Pipeline (bracket_simple.step)...\n";
-                result += runStepTest("bracket_simple.step", "bracket");
+                result += runStepTest("bracket_simple.step", "bracket", currentDir);
             } else if (input.equalsIgnoreCase("test-cad-solve") || input.equalsIgnoreCase("test_cad_solve")) {
                 result = "Executing Headless CAD Meshing & Solving Pipeline (OCCT + Gmsh + CalculiX)...\n";
                 String drawScript = "pload ALL\n" +
@@ -378,7 +383,7 @@ public class TerminalFragment extends Fragment {
                 result += "Step 1: Generating CAD geometry (bar.brep) with DRAWEXE...\n";
                 result += calculixExecutor.executeBinaryWithInput("DRAWEXE", drawScript, "-b") + "\n";
 
-                File geoFile = new File(filesDir, "bar.geo");
+                File geoFile = new File(currentDir, "bar.geo");
                 String geoScript = "SetFactory(\"OpenCASCADE\");\n" +
                         "Merge \"bar.brep\";\n" +
                         "Mesh.MeshSizeMax = 1.0;\n";
@@ -389,13 +394,13 @@ public class TerminalFragment extends Fragment {
                     result += gmshOut + "\n";
 
                     result += "Step 3: Assembling final 'bar.inp' using InpAssembler (Coordinate Fallback)...\n";
-                    SolidInpAssembler.assemble(filesDir, "bar", "Steel", 210000.0, 0.3, -500.0, "nonexistent_fixed", "nonexistent_load");
+                    SolidInpAssembler.assemble(currentDir, "bar", "Steel", 210000.0, 0.3, -500.0, "nonexistent_fixed", "nonexistent_load");
 
                     result += "Step 4: Executing CalculiX Solver (ccx -i bar)...\n";
                     String ccxOut = calculixExecutor.executeBinary("ccx", "-i", "bar");
                     result += ccxOut + "\n";
 
-                    File frdFile = new File(filesDir, "bar.frd");
+                    File frdFile = new File(currentDir, "bar.frd");
                     if (frdFile.exists()) {
                         result += "\nStep 5: Summarizing Engineering Results:\n";
                         result += SolidDisplacementFrdParser.parseAndSummarize(frdFile);
@@ -404,6 +409,31 @@ public class TerminalFragment extends Fragment {
                     }
                 } catch (Exception e) {
                     result += "Error running test: " + e.getMessage();
+                }
+            } else if (input.equalsIgnoreCase("run-sim-test") || input.equalsIgnoreCase("run_sim_test")) {
+                result = "Executing Automated Cantilever Simulation Test...\n";
+                try {
+                    File geoFile = com.diamon.civil.solids.engine.SampleSimulationCase.createCantileverGeo(currentDir);
+                    result += "Created 'cantilever.geo'. Running Gmsh...\n";
+                    String gmshOut = calculixExecutor.executeBinary("gmsh", "cantilever.geo", "-3", "-format", "inp", "-o", "cantilever_raw.inp");
+                    result += gmshOut + "\n";
+
+                    result += "Assembling 'cantilever.inp'...\n";
+                    SolidInpAssembler.assemble(currentDir, "cantilever", "Steel", 210000.0, 0.3, -100.0, "Fixed", "Loaded");
+
+                    result += "Running CalculiX Solver (ccx -i cantilever)...\n";
+                    String ccxOut = calculixExecutor.executeBinary("ccx", "-i", "cantilever");
+                    result += ccxOut + "\n";
+
+                    File frdFile = new File(currentDir, "cantilever.frd");
+                    if (frdFile.exists()) {
+                        result += "\n=== FINAL RESULTS SUMMARY (Cantilever Beam) ===\n";
+                        result += SolidDisplacementFrdParser.parseAndSummarize(frdFile);
+                    } else {
+                        result += "\nWarning: cantilever.frd not found.\n";
+                    }
+                } catch (Exception e) {
+                    result += "Error running simulation test: " + e.getMessage();
                 }
             } else {
                 result = terminalExecutor.execute(input);
@@ -450,11 +480,11 @@ public class TerminalFragment extends Fragment {
         });
     }
 
-    private void copyAssetToFilesDir(String filename) {
+    private void copyAssetToFilesDir(String filename, File destDir) {
         if (getContext() == null) return;
-        File filesDir = new File(requireContext().getFilesDir(), "terminal");
-        if (!filesDir.exists()) filesDir.mkdirs();
-        File outFile = new File(filesDir, filename);
+        if (destDir == null) destDir = new File(requireContext().getFilesDir(), "terminal");
+        if (!destDir.exists()) destDir.mkdirs();
+        File outFile = new File(destDir, filename);
         if (outFile.exists()) return;
         try (InputStream is = requireContext().getAssets().open(filename);
              FileOutputStream os = new FileOutputStream(outFile)) {
@@ -468,12 +498,12 @@ public class TerminalFragment extends Fragment {
         }
     }
 
-    private String runStepTest(String stepFileName, String baseName) {
+    private String runStepTest(String stepFileName, String baseName, File destDir) {
         StringBuilder sb = new StringBuilder();
         if (getContext() == null) return "Context is null";
-        File filesDir = new File(requireContext().getFilesDir(), "terminal");
-        if (!filesDir.exists()) filesDir.mkdirs();
-        File stepFile = new File(filesDir, stepFileName);
+        if (destDir == null) destDir = new File(requireContext().getFilesDir(), "terminal");
+        if (!destDir.exists()) destDir.mkdirs();
+        File stepFile = new File(destDir, stepFileName);
 
         sb.append("Step 1: Preparing STEP file... ");
         String assetPath = "data/data/com.diamon.civil/files/usr/share/opencascade/data/step/" + stepFileName;
@@ -489,7 +519,7 @@ public class TerminalFragment extends Fragment {
             return sb.append("FAILED (").append(assetPath).append("): ").append(e.getMessage()).append("\n").toString();
         }
 
-        File geoFile = new File(filesDir, baseName + ".geo");
+        File geoFile = new File(destDir, baseName + ".geo");
         String geoScript = "SetFactory(\"OpenCASCADE\");\n" +
                 "Merge \"" + stepFileName + "\";\n" +
                 "Mesh.MeshSizeMax = 2.0;\n";
@@ -500,13 +530,13 @@ public class TerminalFragment extends Fragment {
             sb.append(gmshOut).append("\n");
 
             sb.append("Step 3: Assembling final '").append(baseName).append(".inp'...\n");
-            SolidInpAssembler.assemble(filesDir, baseName, "Steel", 210000.0, 0.3, -100.0, "Fixed", "Loaded");
+            SolidInpAssembler.assemble(destDir, baseName, "Steel", 210000.0, 0.3, -100.0, "Fixed", "Loaded");
 
             sb.append("Step 4: Executing CalculiX Solver...\n");
             String ccxOut = calculixExecutor.executeBinary("ccx", "-i", baseName);
             sb.append(ccxOut).append("\n");
 
-            File frdFile = new File(filesDir, baseName + ".frd");
+            File frdFile = new File(destDir, baseName + ".frd");
             if (frdFile.exists()) {
                 sb.append("Step 5: Parsing results (.frd)...\n");
                 sb.append(SolidDisplacementFrdParser.parseAndSummarize(frdFile));

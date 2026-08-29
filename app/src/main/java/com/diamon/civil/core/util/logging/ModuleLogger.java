@@ -35,7 +35,7 @@ public class ModuleLogger {
         "  pwd                    - Show current directory path\n" +
         "  mkdir <name>           - Create new directory\n" +
         "  rm [-rf] <target>      - Delete file or directory\n" +
-        "  clear / cls            - Clear terminal screen\n" +
+        "  clear                  - Clear terminal screen\n" +
         "  help                   - Show this help message\n\n" +
         "Solvers & Direct Binaries:\n" +
         "  ccx <args>             - Run CalculiX CCX solver directly (or <jobname> to run ccx -i <jobname>)\n" +

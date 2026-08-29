@@ -21,8 +21,10 @@ public class SimulationTestManager {
             report.append("OK: cantilever.geo generated\n");
 
             // 2. Execute Gmsh
-            File gmsh = new File(nativeLibDir, "libgmsh.so"); // Use the correct executable binary
+            File gmsh = new File(nativeLibDir, "libgmsh.so");
             if (!gmsh.exists()) gmsh = new File(new File(workDir, "usr/bin"), "gmsh");
+            if (!gmsh.exists() && workDir.getParentFile() != null) gmsh = new File(new File(workDir.getParentFile(), "usr/bin"), "gmsh");
+            if (!gmsh.exists()) gmsh = new File("/usr/bin/gmsh");
             
             report.append("Running Gmsh...\n");
             report.append(executeBinary(gmsh.getAbsolutePath(), workDir, nativeLibDir, 
@@ -35,6 +37,12 @@ public class SimulationTestManager {
             // 3. Execute CalculiX
             File ccx = new File(nativeLibDir, "libccx.so");
             if (!ccx.exists()) ccx = new File(new File(workDir, "usr/bin"), "ccx");
+            if (!ccx.exists() && workDir.getParentFile() != null) ccx = new File(new File(workDir.getParentFile(), "usr/bin"), "ccx");
+            if (!ccx.exists()) {
+                String home = System.getProperty("user.home", "");
+                ccx = new File(home + "/.local/bin/ccx");
+            }
+            if (!ccx.exists()) ccx = new File("/usr/bin/ccx");
             
             report.append("\nRunning CalculiX Solver...\n");
             report.append(executeBinary(ccx.getAbsolutePath(), workDir, nativeLibDir, 
@@ -67,8 +75,11 @@ public class SimulationTestManager {
 
             Map<String, String> env = pb.environment();
             // Mirror the terminal environment
-            env.put("LD_LIBRARY_PATH", workDir.getAbsolutePath() + "/usr/lib:" + nativeLibDir.getAbsolutePath());
-            env.put("PATH", workDir.getAbsolutePath() + "/usr/bin:" + System.getenv("PATH"));
+            File parentDir = workDir.getParentFile();
+            String usrLib = (parentDir != null ? parentDir.getAbsolutePath() + "/usr/lib:" : "") + workDir.getAbsolutePath() + "/usr/lib:";
+            String usrBin = (parentDir != null ? parentDir.getAbsolutePath() + "/usr/bin:" : "") + workDir.getAbsolutePath() + "/usr/bin:";
+            env.put("LD_LIBRARY_PATH", usrLib + (nativeLibDir != null ? nativeLibDir.getAbsolutePath() : ""));
+            env.put("PATH", usrBin + System.getenv("PATH"));
             String numCores = String.valueOf(Runtime.getRuntime().availableProcessors());
             env.put("OMP_NUM_THREADS", numCores);
             env.put("CCX_NPROC_EQUATION_SOLVER", numCores);

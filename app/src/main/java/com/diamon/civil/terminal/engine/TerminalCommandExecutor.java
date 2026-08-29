@@ -7,16 +7,36 @@ import java.util.Arrays;
 
 public class TerminalCommandExecutor {
 
-    private final File rootDir;
+    /** Global sandbox boundary – user cannot cd above this (e.g. context.getFilesDir()). */
+    private final File globalRootDir;
+    /** Home directory – initial dir and target for "cd ~" / "cd" (e.g. filesDir/terminal). */
+    private final File homeDir;
     private File currentDir;
 
+    /**
+     * Constructor for global navigation.
+     * @param globalRootDir  sandbox boundary (context.getFilesDir())
+     * @param homeDir        initial working directory (filesDir/terminal)
+     */
+    public TerminalCommandExecutor(File globalRootDir, File homeDir) {
+        this.globalRootDir = globalRootDir;
+        this.homeDir = homeDir;
+        this.currentDir = homeDir;
+    }
+
+    /**
+     * Legacy single-arg constructor – root IS home (backward compatibility for tests).
+     */
     public TerminalCommandExecutor(File rootDir) {
-        this.rootDir = rootDir;
-        this.currentDir = rootDir;
+        this(rootDir, rootDir);
     }
 
     public File getCurrentDir() {
         return currentDir;
+    }
+
+    public File getHomeDir() {
+        return homeDir;
     }
 
     public String execute(String commandLine) {
@@ -40,6 +60,8 @@ public class TerminalCommandExecutor {
                 return readFile(parts);
             case "touch":
                 return touchFile(parts);
+            case "cp":
+                return copyFile(parts);
             case "test-gmsh":
             case "test_gmsh":
             case "test-draw":
@@ -69,7 +91,7 @@ public class TerminalCommandExecutor {
                 return null; // Intercepted and executed fully in TerminalFragment
             case "run-sim-test":
             case "run_sim_test":
-                return SimulationTestManager.runTest(rootDir, new File(System.getProperty("java.library.path")));
+                return SimulationTestManager.runTest(homeDir, new File(System.getProperty("java.library.path")));
             case "gmsh":
             case "ccx":
             case "drawexe":
@@ -82,31 +104,12 @@ public class TerminalCommandExecutor {
         }
     }
 
-    private String runGmshBooleanTest() {
-        File geoFile = new File(currentDir, "boolean_test.geo");
-        String script = "// Enable OpenCASCADE CAD kernel\n" +
-                "SetFactory(\"OpenCASCADE\");\n\n" +
-                "// Create primitive cylinder (Radius 2, Height 5)\n" +
-                "Cylinder(1) = {0, 0, 0, 0, 0, 5, 2};\n\n" +
-                "// Create primitive sphere at cylinder center (Radius 1.5)\n" +
-                "Sphere(2) = {0, 0, 2.5, 1.5};\n\n" +
-                "// Boolean Difference: Cut Sphere from Cylinder\n" +
-                "BooleanDifference(3) = { Volume{1}; Delete; } { Volume{2}; Delete; };\n\n" +
-                "// Set global tetrahedron mesh size\n" +
-                "Mesh.MeshSizeMax = 0.5;\n";
-
-        try (java.io.FileOutputStream fos = new java.io.FileOutputStream(geoFile)) {
-            fos.write(script.getBytes());
-            return "Script 'boolean_test.geo' created.\nRun 'gmsh boolean_test.geo -3 -format inp -o hollow_cylinder.inp' to generate the mesh.";
-        } catch (IOException e) {
-            return "Error creating script: " + e.getMessage();
-        }
-    }
-
     private String listFiles(String[] parts) {
         File dir = currentDir;
         if (parts.length > 1) {
-            dir = new File(currentDir, parts[1]);
+            File target = resolveTarget(parts[1]);
+            if (target != null) dir = target;
+            else return "Error: Path not found: " + parts[1];
         }
 
         if (!dir.exists()) return "Error: Path not found: " + dir.getName();
@@ -114,6 +117,14 @@ public class TerminalCommandExecutor {
 
         File[] files = dir.listFiles();
         if (files == null || files.length == 0) return "(empty)";
+
+        // Filter out system directories when listing the global root
+        boolean isGlobalRoot;
+        try {
+            isGlobalRoot = dir.getCanonicalPath().equals(globalRootDir.getCanonicalPath());
+        } catch (IOException e) {
+            isGlobalRoot = false;
+        }
 
         Arrays.sort(files, (a, b) -> {
             if (a.isDirectory() && !b.isDirectory()) return -1;
@@ -123,9 +134,22 @@ public class TerminalCommandExecutor {
 
         StringBuilder sb = new StringBuilder();
         for (File f : files) {
+            // Hide system directories from listings at the global root
+            if (isGlobalRoot && shouldHideFromListing(f)) continue;
             sb.append(f.isDirectory() ? "[DIR] " : "      ").append(f.getName()).append("\n");
         }
-        return sb.toString().trim();
+        String result = sb.toString().trim();
+        return result.isEmpty() ? "(empty)" : result;
+    }
+
+    /** Returns true for system/internal directories that should not be visible to the user. */
+    private boolean shouldHideFromListing(File f) {
+        if (!f.isDirectory()) return false;
+        String name = f.getName();
+        return name.equals("usr") || name.equals("fake_root") || name.equals("lib") ||
+               name.equals("include") || name.equals("share") || name.equals("bin") ||
+               name.equals("cache") || name.equals("code_cache") || name.equals("app_webview") ||
+               name.equals("databases") || name.equals("shared_prefs") || name.startsWith(".");
     }
 
     private String makeDirectory(String[] parts) {
@@ -164,17 +188,23 @@ public class TerminalCommandExecutor {
 
     private String changeDirectory(String[] parts) {
         if (parts.length < 2) {
-            currentDir = rootDir;
-            return "Current: /";
+            // cd with no args -> go home
+            currentDir = homeDir;
+            return "Current: " + getRelativePath(currentDir);
         }
 
         String path = parts[1];
         File newDir;
         
-        if (path.equals("/")) {
-            newDir = rootDir;
+        if (path.equals("~")) {
+            newDir = homeDir;
+        } else if (path.equals("/")) {
+            newDir = globalRootDir;
         } else if (path.equals("..")) {
             newDir = currentDir.getParentFile();
+        } else if (path.startsWith("/")) {
+            // Absolute path from globalRootDir
+            newDir = new File(globalRootDir, path.substring(1));
         } else {
             newDir = new File(currentDir, path);
         }
@@ -183,12 +213,12 @@ public class TerminalCommandExecutor {
             return "Error: Invalid directory: " + path;
         }
 
-        // Sandbox check: Prevent escaping rootDir
+        // Sandbox check: Prevent escaping globalRootDir
         try {
-            String rootPath = rootDir.getCanonicalPath();
+            String rootPath = globalRootDir.getCanonicalPath();
             String newPath = newDir.getCanonicalPath();
             if (!newPath.startsWith(rootPath)) {
-                currentDir = rootDir;
+                currentDir = globalRootDir;
                 return "Current: /";
             }
         } catch (IOException e) {
@@ -199,9 +229,30 @@ public class TerminalCommandExecutor {
         return "Current: " + getRelativePath(currentDir);
     }
 
+    /**
+     * Resolves a path argument relative to currentDir or as absolute from globalRoot.
+     */
+    private File resolveTarget(String path) {
+        File target;
+        if (path.startsWith("/")) {
+            target = new File(globalRootDir, path.substring(1));
+        } else {
+            target = new File(currentDir, path);
+        }
+        // Sandbox check
+        try {
+            String rootPath = globalRootDir.getCanonicalPath();
+            String targetPath = target.getCanonicalPath();
+            if (!targetPath.startsWith(rootPath)) return null;
+        } catch (IOException e) {
+            return null;
+        }
+        return target.exists() ? target : null;
+    }
+
     private String getRelativePath(File dir) {
         try {
-            String rootPath = rootDir.getCanonicalPath();
+            String rootPath = globalRootDir.getCanonicalPath();
             String dirPath = dir.getCanonicalPath();
             if (rootPath.equals(dirPath)) return "/";
             if (dirPath.startsWith(rootPath)) {
@@ -240,6 +291,33 @@ public class TerminalCommandExecutor {
             }
         } catch (Exception e) {
             return "Error: " + e.getMessage();
+        }
+    }
+
+    /**
+     * Simple file copy: cp <source> <destination>
+     * Allows copying files between module folders (e.g. from structural_analysis to terminal).
+     */
+    private String copyFile(String[] parts) {
+        if (parts.length < 3) return "Usage: cp <source> <destination>";
+        File src = new File(currentDir, parts[1]);
+        if (!src.exists()) {
+            // Try as absolute from root
+            File absSrc = resolveTarget(parts[1]);
+            if (absSrc != null) src = absSrc;
+            else return "Error: Source not found: " + parts[1];
+        }
+        if (src.isDirectory()) return "Error: Cannot copy directories (use individual files)";
+        
+        File dst = new File(currentDir, parts[2]);
+        if (dst.isDirectory()) {
+            dst = new File(dst, src.getName());
+        }
+        try {
+            java.nio.file.Files.copy(src.toPath(), dst.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            return "Copied: " + src.getName() + " -> " + dst.getName();
+        } catch (IOException e) {
+            return "Error copying file: " + e.getMessage();
         }
     }
 

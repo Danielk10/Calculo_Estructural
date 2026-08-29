@@ -27,18 +27,76 @@ std::string AnalysisModel::toInpString() const {
     std::stringstream elementsStream;
     std::vector<int> allElementIds;
 
+    // Helper to cache shared edge mid-side nodes for S8R quadratic shells
+    std::map<std::pair<int, int>, int> edgeMidNodes;
+    std::vector<BoundaryCondition> autoConstraints = constraints;
+
+    auto getEdgeMidNode = [&](int na, int nb) -> int {
+        int nMin = std::min(na, nb);
+        int nMax = std::max(na, nb);
+        auto key = std::make_pair(nMin, nMax);
+        auto it = edgeMidNodes.find(key);
+        if (it != edgeMidNodes.end()) return it->second;
+
+        auto itA = nodes.find(na);
+        auto itB = nodes.find(nb);
+        if (itA == nodes.end() || itB == nodes.end()) return na;
+
+        double mx = (itA->second.x + itB->second.x) / 2.0;
+        double my = (itA->second.y + itB->second.y) / 2.0;
+        double mz = (itA->second.z + itB->second.z) / 2.0;
+
+        int midId = nextNodeId++;
+        nodesStream << midId << ", " << std::fixed << std::setprecision(6)
+                    << mx << ", " << my << ", " << mz << "\n";
+        edgeMidNodes[key] = midId;
+
+        // Propagate common boundary constraints to edge midpoint
+        for (const auto& bcA : constraints) {
+            if (bcA.nodeId == na) {
+                for (const auto& bcB : constraints) {
+                    if (bcB.nodeId == nb) {
+                        std::vector<int> commonDofs;
+                        for (int da : bcA.dofs) {
+                            for (int db : bcB.dofs) {
+                                if (da == db) commonDofs.push_back(da);
+                            }
+                        }
+                        if (!commonDofs.empty()) {
+                            autoConstraints.push_back(BoundaryCondition{midId, commonDofs, bcA.value});
+                        }
+                    }
+                }
+            }
+        }
+        return midId;
+    };
+
     // Elements
     for (const auto& pair : elements) {
         const Element& e = pair.second;
         std::string elset = e.elset.empty() ? ("E" + std::to_string(e.id)) : e.elset;
-
         int eid = e.id > 0 ? e.id : nextElemId++;
-        elementsStream << "*ELEMENT, TYPE=" << e.type << ", ELSET=" << elset << "\n";
-        elementsStream << eid << ", ";
-        for (size_t i = 0; i < e.nodeIds.size(); ++i) {
-            elementsStream << e.nodeIds[i] << (i == e.nodeIds.size() - 1 ? "" : ", ");
+
+        // If 4-node quadrilateral shell/plate, auto-upgrade to S8R quadratic shell to eliminate shear locking
+        if (e.nodeIds.size() == 4 && (e.type == "S4R" || e.type == "S4" || e.type == "S8R" || e.type == "SHELL" || e.type == "PLATE")) {
+            int n1 = e.nodeIds[0], n2 = e.nodeIds[1], n3 = e.nodeIds[2], n4 = e.nodeIds[3];
+            int m12 = getEdgeMidNode(n1, n2);
+            int m23 = getEdgeMidNode(n2, n3);
+            int m34 = getEdgeMidNode(n3, n4);
+            int m41 = getEdgeMidNode(n4, n1);
+
+            elementsStream << "*ELEMENT, TYPE=S8R, ELSET=" << elset << "\n";
+            elementsStream << eid << ", " << n1 << ", " << n2 << ", " << n3 << ", " << n4 << ", "
+                           << m12 << ", " << m23 << ", " << m34 << ", " << m41 << "\n";
+        } else {
+            elementsStream << "*ELEMENT, TYPE=" << e.type << ", ELSET=" << elset << "\n";
+            elementsStream << eid << ", ";
+            for (size_t i = 0; i < e.nodeIds.size(); ++i) {
+                elementsStream << e.nodeIds[i] << (i == e.nodeIds.size() - 1 ? "" : ", ");
+            }
+            elementsStream << "\n";
         }
-        elementsStream << "\n";
         allElementIds.push_back(eid);
     }
 
@@ -156,7 +214,7 @@ std::string AnalysisModel::toInpString() const {
     // Boundary Conditions
     ss << "*STEP\n*STATIC\n";
     ss << "*BOUNDARY\n";
-    for (const auto& bc : constraints) {
+    for (const auto& bc : autoConstraints) {
         for (int dof : bc.dofs) {
             ss << bc.nodeId << ", " << dof << ", " << dof << ", " << bc.value << "\n";
         }

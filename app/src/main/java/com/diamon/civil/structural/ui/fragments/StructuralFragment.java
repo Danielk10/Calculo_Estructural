@@ -1509,40 +1509,22 @@ public class StructuralFragment extends Fragment {
                 vx /= vLen; vy /= vLen; vz /= vLen;
             }
 
-            // Generate 8 3D Conical Barbs / Fins and Base Ring
-            int numFins = 8;
-            float[] prevRim = null;
-            float[] firstRim = null;
-            for (int k = 0; k < numFins; k++) {
-                double angle = 2.0 * Math.PI * k / numFins;
-                float cosA = (float) Math.cos(angle);
-                float sinA = (float) Math.sin(angle);
+            // Standard Clean Arrowhead (Normal 2-wing arrowhead, no 3D bulky cone)
+            float wing1X = baseCenterX + ux * headRadius;
+            float wing1Y = baseCenterY + uy * headRadius;
+            float wing1Z = baseCenterZ + uz * headRadius;
 
-                float rimX = baseCenterX + (ux * cosA + vx * sinA) * headRadius;
-                float rimY = baseCenterY + (uy * cosA + vy * sinA) * headRadius;
-                float rimZ = baseCenterZ + (uz * cosA + vz * sinA) * headRadius;
+            float wing2X = baseCenterX - ux * headRadius;
+            float wing2Y = baseCenterY - uy * headRadius;
+            float wing2Z = baseCenterZ - uz * headRadius;
 
-                // Barb from Tip to Rim
-                loadLines.add(tipX); loadLines.add(tipY); loadLines.add(tipZ);
-                loadLines.add(rimX); loadLines.add(rimY); loadLines.add(rimZ);
+            // Wing 1 (Tip -> Wing1)
+            loadLines.add(tipX); loadLines.add(tipY); loadLines.add(tipZ);
+            loadLines.add(wing1X); loadLines.add(wing1Y); loadLines.add(wing1Z);
 
-                // Base connector from Rim to Base Center
-                loadLines.add(rimX); loadLines.add(rimY); loadLines.add(rimZ);
-                loadLines.add(baseCenterX); loadLines.add(baseCenterY); loadLines.add(baseCenterZ);
-
-                if (prevRim != null) {
-                    // Perimeter ring segment
-                    loadLines.add(prevRim[0]); loadLines.add(prevRim[1]); loadLines.add(prevRim[2]);
-                    loadLines.add(rimX); loadLines.add(rimY); loadLines.add(rimZ);
-                } else {
-                    firstRim = new float[]{rimX, rimY, rimZ};
-                }
-                prevRim = new float[]{rimX, rimY, rimZ};
-            }
-            if (prevRim != null && firstRim != null) {
-                loadLines.add(prevRim[0]); loadLines.add(prevRim[1]); loadLines.add(prevRim[2]);
-                loadLines.add(firstRim[0]); loadLines.add(firstRim[1]); loadLines.add(firstRim[2]);
-            }
+            // Wing 2 (Tip -> Wing2)
+            loadLines.add(tipX); loadLines.add(tipY); loadLines.add(tipZ);
+            loadLines.add(wing2X); loadLines.add(wing2Y); loadLines.add(wing2Z);
 
             int loadVertsAdded = (loadLines.size() / 3) - loadVertsBefore;
             for (int k = 0; k < loadVertsAdded; k++) {
