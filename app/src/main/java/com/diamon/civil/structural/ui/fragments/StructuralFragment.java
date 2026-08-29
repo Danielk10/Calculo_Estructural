@@ -348,9 +348,17 @@ public class StructuralFragment extends Fragment {
             binding.gridEditorView.setMode(GridEditorView.Mode.DRAW);
             updateModeButtons(GridEditorView.Mode.DRAW);
         });
-        binding.btnModeSelect.setOnClickListener(v -> {
-            binding.gridEditorView.setMode(GridEditorView.Mode.SELECT_MOVE);
-            updateModeButtons(GridEditorView.Mode.SELECT_MOVE);
+        binding.btnModePan.setOnClickListener(v -> {
+            binding.gridEditorView.setMode(GridEditorView.Mode.PAN);
+            updateModeButtons(GridEditorView.Mode.PAN);
+        });
+        binding.btnModeMoveNodes.setOnClickListener(v -> {
+            binding.gridEditorView.setMode(GridEditorView.Mode.MOVE_NODES);
+            updateModeButtons(GridEditorView.Mode.MOVE_NODES);
+        });
+        binding.btnModeInspect.setOnClickListener(v -> {
+            binding.gridEditorView.setMode(GridEditorView.Mode.INSPECT);
+            updateModeButtons(GridEditorView.Mode.INSPECT);
         });
         binding.btnModeSupport.setOnClickListener(v -> {
             binding.gridEditorView.setMode(GridEditorView.Mode.SUPPORT);
@@ -371,6 +379,13 @@ public class StructuralFragment extends Fragment {
         binding.gridEditorView.setOnNodeSelectedListener(this::showNodePropertiesDialog);
         binding.gridEditorView.setOnElementSelectedListener(this::showElementPropertiesDialog);
 
+        binding.gridEditorView.setOnComponentInspectedListener(infoText -> {
+            if (binding != null && binding.tvComponentInfo != null && isAdded()) {
+                binding.tvComponentInfo.setText(infoText);
+                binding.tvComponentInfo.setVisibility(View.VISIBLE);
+            }
+        });
+
         binding.gridEditorView.setOnModelChangeListener((nodeCount, elementCount) -> {
             if (binding != null && binding.tvGridStats != null && isAdded()) {
                 binding.tvGridStats.setText(getString(R.string.grid_stats_format, nodeCount, elementCount));
@@ -390,10 +405,21 @@ public class StructuralFragment extends Fragment {
         android.content.res.ColorStateList inactiveStroke = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#38BDF8"));
 
         setButtonModeStyle(binding.btnModeDraw, mode == GridEditorView.Mode.DRAW, activeTint, inactiveTint, activeText, inactiveText, activeStroke, inactiveStroke);
-        setButtonModeStyle(binding.btnModeSelect, mode == GridEditorView.Mode.SELECT_MOVE, activeTint, inactiveTint, activeText, inactiveText, activeStroke, inactiveStroke);
+        setButtonModeStyle(binding.btnModePan, mode == GridEditorView.Mode.PAN, activeTint, inactiveTint, activeText, inactiveText, activeStroke, inactiveStroke);
+        setButtonModeStyle(binding.btnModeMoveNodes, mode == GridEditorView.Mode.MOVE_NODES || mode == GridEditorView.Mode.SELECT_MOVE, activeTint, inactiveTint, activeText, inactiveText, activeStroke, inactiveStroke);
+        setButtonModeStyle(binding.btnModeInspect, mode == GridEditorView.Mode.INSPECT, activeTint, inactiveTint, activeText, inactiveText, activeStroke, inactiveStroke);
         setButtonModeStyle(binding.btnModeSupport, mode == GridEditorView.Mode.SUPPORT, activeTint, inactiveTint, activeText, inactiveText, activeStroke, inactiveStroke);
         setButtonModeStyle(binding.btnModeLoad, mode == GridEditorView.Mode.LOAD, activeTint, inactiveTint, activeText, inactiveText, activeStroke, inactiveStroke);
         setButtonModeStyle(binding.btnModeDelete, mode == GridEditorView.Mode.DELETE, activeTint, inactiveTint, activeText, inactiveText, activeStroke, inactiveStroke);
+
+        if (binding.tvComponentInfo != null) {
+            if (mode == GridEditorView.Mode.INSPECT) {
+                binding.tvComponentInfo.setVisibility(View.VISIBLE);
+                binding.tvComponentInfo.setText(binding.gridEditorView.getDetailedComponentInfo());
+            } else {
+                binding.tvComponentInfo.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void setButtonModeStyle(com.google.android.material.button.MaterialButton btn, boolean isActive,

@@ -24,7 +24,10 @@ public class GridEditorView extends View {
 
     public enum Mode {
         DRAW,           // Draw beams / columns with magnetic snapping
-        SELECT_MOVE,    // Select and reposition nodes/elements
+        PAN,            // Move/Pan camera with single-finger drag without modifying entities
+        MOVE_NODES,     // Select and drag nodes geometrically
+        INSPECT,        // Select node/element/support/panel to inspect all technical properties
+        SELECT_MOVE,    // Legacy alias for MOVE_NODES
         SUPPORT,        // Toggle support conditions (Fixed / Pinned / Roller / Free)
         LOAD,           // Assign / edit point loads (Fx, Fy)
         DELETE          // Tap node/element to delete
@@ -62,6 +65,7 @@ public class GridEditorView extends View {
     private StructuralModel.Node hoveredNode = null;
     private StructuralModel.Element selectedElement = null;
     private StructuralModel.Node selectedNode = null;
+    private StructuralModel.Panel selectedPanel = null;
     private boolean activeNodeIsPending = false;
 
     private float currentDragX, currentDragY;
@@ -114,9 +118,14 @@ public class GridEditorView extends View {
         void onElementSelected(StructuralModel.Element element);
     }
 
+    public interface OnComponentInspectedListener {
+        void onComponentInspected(String infoText);
+    }
+
     private OnModelChangeListener modelChangeListener;
     private OnNodeSelectedListener nodeSelectedListener;
     private OnElementSelectedListener elementSelectedListener;
+    private OnComponentInspectedListener componentInspectedListener;
 
     public GridEditorView(Context context) {
         super(context);
@@ -306,6 +315,41 @@ public class GridEditorView extends View {
         this.elementSelectedListener = listener;
     }
 
+    public void setOnComponentInspectedListener(OnComponentInspectedListener listener) {
+        this.componentInspectedListener = listener;
+    }
+
+    public String getDetailedComponentInfo() {
+        if (selectedNode != null) {
+            StructuralModel.Load ld = getLoadForNode(selectedNode.id);
+            String loadStr = (ld != null && (Math.abs(ld.fx) > 1e-3 || Math.abs(ld.fy) > 1e-3 || Math.abs(ld.fz) > 1e-3))
+                    ? String.format(Locale.US, " | Load: [Fx=%.1fkN, Fy=%.1fkN]", ld.fx / 1000.0, ld.fy / 1000.0)
+                    : " | Load: None";
+            return String.format(Locale.US, "NODE %d: Coords: (X=%.2fm, Y=%.2fm) | Support: %s%s",
+                    selectedNode.id, selectedNode.x, selectedNode.y, selectedNode.supportType, loadStr);
+        } else if (selectedElement != null) {
+            StructuralModel.Node n1 = findNode(selectedElement.node1Id);
+            StructuralModel.Node n2 = findNode(selectedElement.node2Id);
+            double len = (n1 != null && n2 != null) ? Math.hypot(n2.x - n1.x, n2.y - n1.y) : 0.0;
+            return String.format(Locale.US, "MEMBER %d: Span (N%d -> N%d) | Length: %.2fm | Profile: %s | Material: %s",
+                    selectedElement.id, selectedElement.node1Id, selectedElement.node2Id, len,
+                    selectedElement.sectionName != null ? selectedElement.sectionName : defaultSection,
+                    selectedElement.materialName != null ? selectedElement.materialName : defaultMaterial);
+        } else if (selectedPanel != null) {
+            return String.format(Locale.US, "PANEL %d: Type: %s | Nodes: %s | Thickness: %.2fm | Material: %s",
+                    selectedPanel.id, selectedPanel.elementType, selectedPanel.nodeIds.toString(), selectedPanel.thickness,
+                    selectedPanel.materialName != null ? selectedPanel.materialName : defaultMaterial);
+        }
+        return "Select any node, member, or panel to inspect technical properties";
+    }
+
+    public void notifyComponentInspected() {
+        String info = getDetailedComponentInfo();
+        if (componentInspectedListener != null) {
+            componentInspectedListener.onComponentInspected(info);
+        }
+    }
+
     private void notifyModelChange() {
         if (modelChangeListener != null) {
             modelChangeListener.onModelChanged(nodes.size(), elements.size());
@@ -316,6 +360,7 @@ public class GridEditorView extends View {
         this.currentMode = mode;
         this.activeNode = null;
         this.isDragging = false;
+        notifyComponentInspected();
         invalidate();
     }
 
@@ -1438,8 +1483,15 @@ public class GridEditorView extends View {
             case DRAW:
                 modeName = "DRAW";
                 break;
+            case PAN:
+                modeName = "PAN VIEW";
+                break;
+            case MOVE_NODES:
             case SELECT_MOVE:
-                modeName = "SELECT";
+                modeName = "MOVE NODES";
+                break;
+            case INSPECT:
+                modeName = "INSPECT";
                 break;
             case SUPPORT:
                 modeName = "SUPPORT";
@@ -1455,10 +1507,15 @@ public class GridEditorView extends View {
                 break;
         }
 
-        double curX = hasSnappedTarget ? snappedGridX : (isDragging ? screenToWorldX(currentDragX) : 0.0);
-        double curY = hasSnappedTarget ? snappedGridY : (isDragging ? screenToWorldY(currentDragY, getHeight()) : 0.0);
+        String infoText;
+        if (currentMode == Mode.INSPECT && (selectedNode != null || selectedElement != null || selectedPanel != null)) {
+            infoText = "[" + modeName + "] " + getDetailedComponentInfo();
+        } else {
+            double curX = hasSnappedTarget ? snappedGridX : (isDragging ? screenToWorldX(currentDragX) : 0.0);
+            double curY = hasSnappedTarget ? snappedGridY : (isDragging ? screenToWorldY(currentDragY, getHeight()) : 0.0);
+            infoText = String.format(Locale.US, "[%s] Snap: 0.5m | X: %.2fm  Y: %.2fm", modeName, curX, curY);
+        }
 
-        String infoText = String.format(Locale.US, "[%s] Snap: 0.5m | X: %.2fm  Y: %.2fm", modeName, curX, curY);
         float textW = hudTextPaint.measureText(infoText);
         RectF hudRect = new RectF(12f, 12f, 12f + textW + 20f, 44f);
         canvas.drawRoundRect(hudRect, 8f, 8f, hudBgPaint);
@@ -1555,7 +1612,10 @@ public class GridEditorView extends View {
                 lastTouchX = x;
                 lastTouchY = y;
 
-                if (currentMode == Mode.DRAW) {
+                if (currentMode == Mode.PAN) {
+                    isDragging = true;
+                    return true;
+                } else if (currentMode == Mode.DRAW) {
                     if (hoveredNode != null) {
                         activeNode = hoveredNode;
                         activeNodeIsPending = false;
@@ -1573,26 +1633,38 @@ public class GridEditorView extends View {
                 } else if (currentMode == Mode.LOAD) {
                     selectedNode = getNodeNearScreen(x, y, 45f);
                     selectedElement = (selectedNode == null) ? getElementNearScreen(x, y, 30f) : null;
+                    selectedPanel = (selectedNode == null && selectedElement == null) ? getPanelNearScreen(x, y) : null;
                     if (selectedNode != null) {
                         if (nodeSelectedListener != null) {
                             nodeSelectedListener.onNodeSelected(selectedNode, getLoadForNode(selectedNode.id));
                         }
+                        notifyComponentInspected();
                         invalidate();
                         return true;
                     } else if (selectedElement != null) {
                         if (elementSelectedListener != null) {
                             elementSelectedListener.onElementSelected(selectedElement);
                         }
+                        notifyComponentInspected();
                         invalidate();
                         return true;
                     }
-                } else if (currentMode == Mode.SELECT_MOVE) {
+                } else if (currentMode == Mode.MOVE_NODES || currentMode == Mode.SELECT_MOVE) {
                     selectedNode = getNodeNearScreen(x, y, 45f);
                     selectedElement = (selectedNode == null) ? getElementNearScreen(x, y, 30f) : null;
+                    selectedPanel = (selectedNode == null && selectedElement == null) ? getPanelNearScreen(x, y) : null;
                     if (selectedNode != null) {
                         isDragging = true;
                         hasMovedNodeInDrag = false;
                     }
+                    notifyComponentInspected();
+                    invalidate();
+                    return true;
+                } else if (currentMode == Mode.INSPECT) {
+                    selectedNode = getNodeNearScreen(x, y, 45f);
+                    selectedElement = (selectedNode == null) ? getElementNearScreen(x, y, 30f) : null;
+                    selectedPanel = (selectedNode == null && selectedElement == null) ? getPanelNearScreen(x, y) : null;
+                    notifyComponentInspected();
                     invalidate();
                     return true;
                 } else if (currentMode == Mode.SUPPORT) {
@@ -1633,11 +1705,18 @@ public class GridEditorView extends View {
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                if (isDragging && currentMode == Mode.DRAW) {
+                if (currentMode == Mode.PAN && isDragging) {
+                    offsetX += (x - lastTouchX);
+                    offsetY -= (y - lastTouchY);
+                    lastTouchX = x;
+                    lastTouchY = y;
+                    invalidate();
+                    return true;
+                } else if (isDragging && currentMode == Mode.DRAW) {
                     currentDragX = x;
                     currentDragY = y;
                     invalidate();
-                } else if (isDragging && currentMode == Mode.SELECT_MOVE && selectedNode != null) {
+                } else if (isDragging && (currentMode == Mode.MOVE_NODES || currentMode == Mode.SELECT_MOVE) && selectedNode != null) {
                     if (Math.abs(snappedGridX - selectedNode.x) > 1e-3 || Math.abs(snappedGridY - selectedNode.y) > 1e-3) {
                         if (!hasMovedNodeInDrag) {
                             saveSnapshot();
@@ -1645,13 +1724,17 @@ public class GridEditorView extends View {
                         }
                         selectedNode.x = snappedGridX;
                         selectedNode.y = snappedGridY;
+                        notifyComponentInspected();
                         invalidate();
                     }
                 }
                 return true;
 
             case MotionEvent.ACTION_UP:
-                if (isDragging && currentMode == Mode.DRAW && activeNode != null) {
+                if (currentMode == Mode.PAN) {
+                    isDragging = false;
+                    return true;
+                } else if (isDragging && currentMode == Mode.DRAW && activeNode != null) {
                     isDragging = false;
                     
                     boolean dragged = (Math.hypot(snappedGridX - activeNode.x, snappedGridY - activeNode.y) > 0.15);
@@ -1714,7 +1797,7 @@ public class GridEditorView extends View {
                     activeNodeIsPending = false;
                     invalidate();
                     return true;
-                } else if (isDragging && currentMode == Mode.SELECT_MOVE) {
+                } else if (isDragging && (currentMode == Mode.MOVE_NODES || currentMode == Mode.SELECT_MOVE)) {
                     isDragging = false;
                     if (hasMovedNodeInDrag) {
                         notifyModelChange();
