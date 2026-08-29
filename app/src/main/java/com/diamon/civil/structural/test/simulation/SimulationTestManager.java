@@ -69,7 +69,9 @@ public class SimulationTestManager {
             // Mirror the terminal environment
             env.put("LD_LIBRARY_PATH", workDir.getAbsolutePath() + "/usr/lib:" + nativeLibDir.getAbsolutePath());
             env.put("PATH", workDir.getAbsolutePath() + "/usr/bin:" + System.getenv("PATH"));
-            env.put("OMP_NUM_THREADS", "4");
+            String numCores = String.valueOf(Runtime.getRuntime().availableProcessors());
+            env.put("OMP_NUM_THREADS", numCores);
+            env.put("CCX_NPROC_EQUATION_SOLVER", numCores);
             
             Process process = pb.start();
             StringBuilder output = new StringBuilder();

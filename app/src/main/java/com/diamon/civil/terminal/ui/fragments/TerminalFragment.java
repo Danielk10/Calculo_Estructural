@@ -325,7 +325,8 @@ public class TerminalFragment extends Fragment {
                 copyAssetToFilesDir("test_calculix.inp");
                 result += calculixExecutor.executeCalculix("test_calculix");
             } else if (input.equalsIgnoreCase("test-calculix-parallel") || input.equalsIgnoreCase("test_calculix_parallel")) {
-                result = "Executing CalculiX Parallel Test (4 Cores)...\n";
+                int cores = Runtime.getRuntime().availableProcessors();
+                result = "Executing CalculiX Parallel Test (" + cores + " Cores / Multi-core)...\n";
                 copyAssetToFilesDir("test_calculix.inp");
                 result += calculixExecutor.executeCalculix("test_calculix");
             } else if (input.equalsIgnoreCase("test-frame") || input.equalsIgnoreCase("test_frame")

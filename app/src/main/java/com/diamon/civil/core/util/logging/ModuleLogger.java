@@ -20,7 +20,7 @@ public class ModuleLogger {
         "  test-gmsh              - Run 3D CAD Boolean subtraction & mesh test (Gmsh + OCCT)\n" +
         "  test-draw              - Run OpenCASCADE DRAWEXE headless primitive box test (OCCT)\n" +
         "  test-calculix          - Run CalculiX validation test (test_calculix.inp)\n" +
-        "  test-calculix-parallel - Run CalculiX test with multi-threading (4 cores)\n" +
+        "  test-calculix-parallel - Run CalculiX test with multi-threading (multi-core)\n" +
         "  test-frame             - Run 2D Frame structural analysis test (test_portico.inp)\n" +
         "  test-frd-parser        - Run C++ JNI parser test on test_calculix.frd\n" +
         "  test-dat-parser        - Run Java DAT parser test on test_calculix.dat\n" +
