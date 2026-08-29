@@ -15,7 +15,7 @@ Structural Analysis FEA 3D
 
 ### 📌 Descripción Corta (Máximo 80 caracteres)
 ```text
-Análisis estructural 2D/3D y elementos finitos FEA profesional en tu móvil.
+Análisis estructural 2D/3D y elementos finitos FEA en tu móvil.
 ```
 *(Longitud exacta: 75 caracteres)*
 
@@ -24,7 +24,7 @@ Análisis estructural 2D/3D y elementos finitos FEA profesional en tu móvil.
 ### 📄 Descripción Completa (Máximo 4000 caracteres)
 
 ```text
-Structural Analysis FEA Advanced es una potente plataforma de ingeniería civil, mecánica y estructural diseñada para modelar, calcular y simular estructuras reticulares y componentes tridimensionales directamente en tu dispositivo móvil.
+Structural Structural Analysis FEA 3D es una potente herramienta de ingeniería civil, mecánica y estructural diseñada para modelar, calcular y simular estructuras reticulares y componentes tridimensionales directamente en tu dispositivo móvil.
 
 Diseñada para ingenieros civiles, calculistas, mecánicos, arquitectos y estudiantes, permite resolver vigas, pórticos espaciales, cerchas, losas, muros de cortante y piezas mecánicas 3D con máxima precisión y rapidez.
 
