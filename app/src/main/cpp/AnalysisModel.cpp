@@ -255,12 +255,20 @@ void AnalysisModel::fromJson(const std::string& jsonStr) {
     }
 
     if (j.contains("elements")) {
+        int maxElemId = 0;
+        for (const auto& item : j["elements"]) {
+            int id = item.value("id", 0);
+            if (id > maxElemId) maxElemId = id;
+        }
         for (const auto& item : j["elements"]) {
             Element e;
-            e.id = item["id"];
+            e.id = item.value("id", 0);
             e.type = item["type"];
             e.elset = item.value("elset", "");
             e.nodeIds = item["nodes"].get<std::vector<int>>();
+            if (e.id <= 0 || elements.find(e.id) != elements.end()) {
+                e.id = ++maxElemId;
+            }
             elements[e.id] = e;
         }
     }

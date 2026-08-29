@@ -833,8 +833,10 @@ public class StructuralFragment extends Fragment {
 
         sb.append("], \"elements\": [");
         boolean firstElement = true;
+        int maxElemId = 0;
         for (int i = 0; i < model.elements.size(); i++) {
             StructuralModel.Element e = model.elements.get(i);
+            if (e.id > maxElemId) maxElemId = e.id;
             if (!firstElement) sb.append(",");
             String elset = elementElsetMap.get(String.valueOf(e.id));
             if (elset == null) elset = "Eall";
@@ -842,11 +844,13 @@ public class StructuralFragment extends Fragment {
             firstElement = false;
         }
 
-        // Add 2D Planar Panels (Shells/Plates/Slabs/Shear Walls)
+        // Add 2D Planar Panels (Shells/Plates/Slabs/Shear Walls) with strictly unique element IDs
+        int nextUniqueElemId = maxElemId + 1;
         for (int i = 0; i < model.panels.size(); i++) {
             StructuralModel.Panel p = model.panels.get(i);
+            int panelElemId = nextUniqueElemId++;
             if (!firstElement) sb.append(",");
-            sb.append(String.format(java.util.Locale.US, "{\"id\":%d,\"type\":\"%s\",\"elset\":\"Eslab%d\",\"nodes\":[", p.id, p.elementType, p.id));
+            sb.append(String.format(java.util.Locale.US, "{\"id\":%d,\"type\":\"%s\",\"elset\":\"Eslab%d\",\"nodes\":[", panelElemId, p.elementType, p.id));
             for (int k = 0; k < p.nodeIds.size(); k++) {
                 sb.append(p.nodeIds.get(k));
                 if (k < p.nodeIds.size() - 1) sb.append(",");
