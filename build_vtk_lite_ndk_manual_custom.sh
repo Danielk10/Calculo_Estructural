@@ -81,7 +81,8 @@ require_file "$NATIVE_GLUE_DIR/android_native_app_glue.h"
 require_file "$NATIVE_GLUE_DIR/android_native_app_glue.c"
 
 echo "=== Compilando android_native_app_glue.c con clang de Termux ==="
-clang -c -fPIC -fPIE -O2 -I"$NATIVE_GLUE_DIR" \
+# CORRECCIÓN: Se elimina -fPIE para permitir su uso en librerías compartidas
+clang -c -fPIC -O2 -I"$NATIVE_GLUE_DIR" \
   "$NATIVE_GLUE_DIR/android_native_app_glue.c" \
   -o "$HOME/native_app_glue.o"
 
@@ -95,14 +96,24 @@ void android_main(struct android_app* app) {
     (void)app;
 }
 EOF
-clang -c -fPIC -fPIE -O2 -I"$NATIVE_GLUE_DIR" \
+# CORRECCIÓN: Se elimina -fPIE aquí también
+clang -c -fPIC -O2 -I"$NATIVE_GLUE_DIR" \
   "$HOME/android_main_impl.c" -o "$HOME/android_main_impl.o"
 
+echo "=== Empaquetando en libreria estatica ==="
+# CORRECCIÓN: Empaquetar en .a para evitar inyectar código no deseado en HDF5
+llvm-ar rcs "$HOME/libandroid_glue.a" "$HOME/native_app_glue.o" "$HOME/android_main_impl.o"
+
 export CPPFLAGS="-I$NATIVE_GLUE_DIR -I$HOME/vtk_compat -I$FAKE_USR/include -I$TMX_PREFIX/include"
-export CFLAGS="-fPIC -fPIE -Oz -Wno-implicit-function-declaration -ffile-prefix-map=$DESTDIR="
-export CXXFLAGS="-fPIC -fPIE -Oz -Wno-implicit-function-declaration -ffile-prefix-map=$DESTDIR="
-export LDFLAGS="-pie -Wl,-z,max-page-size=16384 -lm -L$FAKE_USR/lib -L$TMX_PREFIX/lib -llog -landroid"
-export SHARED_LDFLAGS="-Wl,-z,max-page-size=16384 -lm -L$FAKE_USR/lib -L$TMX_PREFIX/lib -llog -landroid $HOME/native_app_glue.o $HOME/android_main_impl.o"
+
+# CORRECCIÓN: Se elimina -fPIE de las flags globales
+export CFLAGS="-fPIC -Oz -Wno-implicit-function-declaration -ffile-prefix-map=$DESTDIR="
+export CXXFLAGS="-fPIC -Oz -Wno-implicit-function-declaration -ffile-prefix-map=$DESTDIR="
+
+# CORRECCIÓN: Se elimina -L/system/lib64 y se enlaza la librería estática limpiamente
+export LDFLAGS="-pie -Wl,-z,max-page-size=16384 -lm -L$FAKE_USR/lib -L$TMX_PREFIX/lib -L$HOME -landroid_glue -llog -landroid"
+export SHARED_LDFLAGS="-Wl,-z,max-page-size=16384 -lm -L$FAKE_USR/lib -L$TMX_PREFIX/lib -L$HOME -landroid_glue -llog -landroid"
+
 export PKG_CONFIG_PATH="$FAKE_USR/lib/pkgconfig:$TMX_PREFIX/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
 export LD_LIBRARY_PATH="$FAKE_USR/lib:$TMX_PREFIX/lib:${LD_LIBRARY_PATH:-}"
 
@@ -117,9 +128,9 @@ cd "$HOME/vtk" || exit 1
 # ==============================================================================
 
 # --- Parche netcdf: Bionic ya declara mremap en <sys/mman.h> ---
-if grep -q "extern void *mremap" ThirdParty/netcdf/vtknetcdf/libsrc/mmapio.c; then
-  sed -i '/extern void *mremap/i #ifndef __BIONIC__' ThirdParty/netcdf/vtknetcdf/libsrc/mmapio.c
-  sed -i '/extern void *mremap/a #endif' ThirdParty/netcdf/vtknetcdf/libsrc/mmapio.c
+if grep -q "extern void \*mremap" ThirdParty/netcdf/vtknetcdf/libsrc/mmapio.c; then
+  sed -i '/extern void \*mremap/i #ifndef __BIONIC__' ThirdParty/netcdf/vtknetcdf/libsrc/mmapio.c
+  sed -i '/extern void \*mremap/a #endif' ThirdParty/netcdf/vtknetcdf/libsrc/mmapio.c
 fi
 
 # --- Parche ioss: Bionic no tiene <sys/termios.h>, usar shim de include ---
@@ -133,7 +144,7 @@ EOF
 mkdir -p build && cd build || exit 1
 rm -rf ./*
 
-echo "=== Configurando VTK COMPLETO (sin desactivar ANDROID ni RenderingUI, sin CMAKE_ANDROID_NDK) ==="
+echo "=== Configurando VTK COMPLETO (sin desactivar ANDROID ni RenderingUI) ==="
 cmake .. \
   -DCMAKE_INSTALL_PREFIX="$APP_PREFIX" \
   -DCMAKE_BUILD_TYPE=Release \
@@ -200,7 +211,7 @@ export PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export VTK_BUILD_DIR="$HOME/vtk/build"
 EOF
-echo "=== Entorno guardado en $HOME/vtk_env/vtk_build_env.sh ==="
+echo "=== Entorno guardado en \$HOME/vtk_env/vtk_build_env.sh ==="
 
 cmake --build . --parallel "$(nproc)"
 DESTDIR="$DESTDIR" cmake --install .
@@ -213,8 +224,8 @@ echo ""
 echo "=== Verificando enlace con OpenGL ES (no OpenGL desktop) ==="
 VTKGL=$(find "$FAKE_USR/lib" -maxdepth 1 -name 'libvtkRenderingOpenGL2*.so*' | head -n1)
 if [ -n "$VTKGL" ]; then
-  readelf -d "$VTKGL" | grep -i "libGLESv2|libGLESv3" && echo "  [OK] Enlazado con GLES" || echo "  [AVISO] No se detecto libGLESv2/v3 en NEEDED"
-  readelf -d "$VTKGL" | grep -i "libGL.so" && echo "  [AVISO] Se detecto libGL.so (OpenGL desktop) - revisar VTK_OPENGL_USE_GLES" || echo "  [OK] No enlaza contra libGL.so de escritorio"
+  readelf -d "$VTKGL" | grep -i "libGLESv2\|libGLESv3" && echo "  [OK] Enlazado con GLES" || echo "  [AVISO] No se detecto libGLESv2/v3 en NEEDED"
+  readelf -d "$VTKGL" | grep -i "libGL\.so" && echo "  [AVISO] Se detecto libGL.so (OpenGL desktop) - revisar VTK_OPENGL_USE_GLES" || echo "  [OK] No enlaza contra libGL.so de escritorio"
   readelf -d "$VTKGL" | grep -i "libEGL" && echo "  [OK] Enlazado con EGL (nativo Android)" || echo "  [AVISO] No se detecto libEGL en NEEDED"
 fi
 
