@@ -53,13 +53,6 @@ test -f "$FAKE_USR/include/tbb/tbb.h" && test -f "$FAKE_USR/lib/libtbb.so" || { 
 echo "Verificando Draco..."
 test -f "$FAKE_USR/include/draco/compression/decode.h" && test -f "$FAKE_USR/lib/libdraco.so" || { echo "Error: Draco no encontrado."; exit 1; }
 
-echo "Verificando VTK..."
-VTK_CMAKE_DIR="$(find "$FAKE_USR/lib/cmake" -maxdepth 1 -iname 'vtk-*' 2>/dev/null | head -n1)"
-if [ -z "$VTK_CMAKE_DIR" ] || [ ! -f "$VTK_CMAKE_DIR/VTKConfig.cmake" ]; then
-  echo "Error: VTKConfig.cmake no encontrado en fake_root."
-  exit 1
-fi
-echo "VTK encontrado en: $VTK_CMAKE_DIR"
 
 export COMMON_CFLAGS="-fPIC -fPIE -Oz -ffile-prefix-map=$DESTDIR= -I$FAKE_USR/include -I$FREETYPE_PREFIX/include/freetype2 -I$TMX_PREFIX/include"
 export COMMON_CXXFLAGS="-fPIC -fPIE -Oz -ffile-prefix-map=$DESTDIR= -I$FAKE_USR/include -I$FREETYPE_PREFIX/include/freetype2 -I$TMX_PREFIX/include"
@@ -147,7 +140,7 @@ cmake .. \
   -DUSE_RAPIDJSON=ON \
   -DUSE_TBB=ON \
   -DUSE_DRACO=ON \
-  -DUSE_VTK=ON \
+  -DUSE_VTK=OFF \
   -DUSE_GLX=OFF \
   -DUSE_OPENGL=OFF \
   -DUSE_GLES2=ON \
@@ -175,8 +168,6 @@ cmake .. \
   -D3RDPARTY_DRACO_DIR="$FAKE_USR" \
   -D3RDPARTY_DRACO_INCLUDE_DIR="$FAKE_USR/include" \
   -D3RDPARTY_DRACO_LIBRARY_DIR="$FAKE_USR/lib" \
-  -D3RDPARTY_VTK_DIR="$VTK_CMAKE_DIR" \
-  -DVTK_DIR="$VTK_CMAKE_DIR" \
   -DINSTALL_TCL=ON \
   -DINSTALL_TK=ON \
   -DINSTALL_FREETYPE=ON \
