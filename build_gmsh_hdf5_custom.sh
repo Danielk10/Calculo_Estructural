@@ -43,15 +43,6 @@ test -f "$FAKE_USR/include/med.h"
 echo "Verificando OpenBLAS propio en fake_root..."
 test -f "$FAKE_USR/lib/libopenblas.so"
 
-echo "Verificando VTK..."
-VTK_CMAKE_DIR="$(find "$FAKE_USR/lib/cmake" -maxdepth 1 -iname 'vtk-*' 2>/dev/null | head -n1)"
-if [ -n "$VTK_CMAKE_DIR" ] && [ -f "$VTK_CMAKE_DIR/VTKConfig.cmake" ]; then
-  echo "VTK detectado en: $VTK_CMAKE_DIR"
-  USE_VTK_FLAG="-DENABLE_VTK=ON -DVTK_DIR=$VTK_CMAKE_DIR"
-else
-  echo "Aviso: VTK no encontrado en fake_root, se desactivará el módulo VTK en Gmsh."
-  USE_VTK_FLAG="-DENABLE_VTK=OFF"
-fi
 
 echo "Clonando repositorio de Gmsh..."
 rm -rf "$HOME/gmsh"
@@ -84,7 +75,7 @@ cmake .. \
   -DMEDFILE_ROOT_DIR="$FAKE_USR" \
   -DMEDFILE_INCLUDE_DIR="$FAKE_USR/include" \
   -DMEDFILE_LIBRARY="$FAKE_USR/lib/libmedC.so" \
-  $USE_VTK_FLAG \
+  -DENABLE_VTK=OFF \
   -DENABLE_BLAS_LAPACK=ON \
   -DBLAS_LIBRARIES="$FAKE_USR/lib/libopenblas.so" \
   -DLAPACK_LIBRARIES="$FAKE_USR/lib/libopenblas.so" \
@@ -130,4 +121,4 @@ readelf -d "$FAKE_USR/lib/libgmsh.so" | grep NEEDED || true
 
 echo
 echo "=== Verificación de módulos habilitados en libgmsh.so ==="
-readelf -d "$FAKE_USR/lib/libgmsh.so" | grep -E -i "hdf5|med|TK|vtk|omp|cgns|openblas" || true
+readelf -d "$FAKE_USR/lib/libgmsh.so" | grep -E -i "hdf5|med|TK|omp|cgns|openblas" || true
