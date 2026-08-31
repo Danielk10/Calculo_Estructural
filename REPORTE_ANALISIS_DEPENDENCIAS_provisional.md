@@ -128,48 +128,6 @@
 | libm.so | Sistema Android | No |
 | libc.so | Sistema Android | No |
 
-### gmsh_bin
-| Dependencia | Clasificación | Presente en carpeta? |
-|---|---|---|
-| libgmsh.so.5.0 | Externa | Sí |
-| libmedC.so.14 | Externa | Sí |
-| libhdf5.so.1000 | Externa | Sí |
-| libsz.so.2 | Externa | Sí |
-| libz.so.1 | Sistema Android | Sí |
-| libTKXCAF.so. | Externa | Sí |
-| libTKLCAF.so. | Externa | Sí |
-| libTKVCAF.so. | Externa | Sí |
-| libTKCAF.so. | Externa | Sí |
-| libTKV3d.so. | Externa | Sí |
-| libTKService.so. | Externa | Sí |
-| libTKCDF.so. | Externa | Sí |
-| libfreetype.so | Externa | Sí |
-| libTKDESTEP.so. | Externa | Sí |
-| libTKDEIGES.so. | Externa | Sí |
-| libTKXSBase.so. | Externa | Sí |
-| libTKOffset.so. | Externa | Sí |
-| libTKFeat.so. | Externa | Sí |
-| libTKFillet.so. | Externa | Sí |
-| libTKBool.so. | Externa | Sí |
-| libTKMesh.so. | Externa | Sí |
-| libTKHLR.so. | Externa | Sí |
-| libTKBO.so. | Externa | Sí |
-| libTKPrim.so. | Externa | Sí |
-| libTKShHealing.so. | Externa | Sí |
-| libTKTopAlgo.so. | Externa | Sí |
-| libTKGeomAlgo.so. | Externa | Sí |
-| libTKBRep.so. | Externa | Sí |
-| libTKGeomBase.so. | Externa | Sí |
-| libTKG3d.so. | Externa | Sí |
-| libTKG2d.so. | Externa | Sí |
-| libTKMath.so. | Externa | Sí |
-| libTKernel.so. | Externa | Sí |
-| libdl.so | Sistema Android | No |
-| libopenblas.so | Externa | Sí |
-| libc++_shared.so | Externa | Sí |
-| libm.so | Sistema Android | No |
-| libc.so | Sistema Android | No |
-
 ### h5clear
 | Dependencia | Clasificación | Presente en carpeta? |
 |---|---|---|
