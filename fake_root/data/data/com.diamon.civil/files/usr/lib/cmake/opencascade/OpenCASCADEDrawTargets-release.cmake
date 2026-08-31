@@ -105,6 +105,16 @@ set_target_properties(TKXSDRAWDE PROPERTIES
 list(APPEND _cmake_import_check_targets TKXSDRAWDE )
 list(APPEND _cmake_import_check_files_for_TKXSDRAWDE "${_IMPORT_PREFIX}/lib/libTKXSDRAWDE.so.8.0.0" )
 
+# Import target "TKXSDRAWGLTF" for configuration "Release"
+set_property(TARGET TKXSDRAWGLTF APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(TKXSDRAWGLTF PROPERTIES
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/libTKXSDRAWGLTF.so.8.0.0"
+  IMPORTED_SONAME_RELEASE "libTKXSDRAWGLTF.so."
+  )
+
+list(APPEND _cmake_import_check_targets TKXSDRAWGLTF )
+list(APPEND _cmake_import_check_files_for_TKXSDRAWGLTF "${_IMPORT_PREFIX}/lib/libTKXSDRAWGLTF.so.8.0.0" )
+
 # Import target "TKXSDRAWIGES" for configuration "Release"
 set_property(TARGET TKXSDRAWIGES APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(TKXSDRAWIGES PROPERTIES

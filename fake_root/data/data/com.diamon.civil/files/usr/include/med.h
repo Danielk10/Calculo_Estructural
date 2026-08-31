@@ -29,9 +29,9 @@ extern "C" {
 #endif
 
 /* This is the minimum hdf version med must have  */
-#define HDF_VERSION_REF         "2.2.0"
+#define HDF_VERSION_REF         "2.3.0"
 #define HDF_VERSION_MAJOR_REF   2
-#define HDF_VERSION_MINOR_REF   2
+#define HDF_VERSION_MINOR_REF   3
 #define HDF_VERSION_RELEASE_REF 0
 #define HDF_VERSION_NUM_REF     (HDF_VERSION_MAJOR_REF * 10000 + HDF_VERSION_MINOR_REF * 100  + HDF_VERSION_RELEASE_REF )
 

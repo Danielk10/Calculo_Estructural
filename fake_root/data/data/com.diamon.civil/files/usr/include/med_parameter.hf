@@ -206,7 +206,7 @@
       integer HDF_VERSION_RELEASE_REF, HDF_VERSION_MAJOR_REF
       integer HDF_VERSION_MINOR_REF
       character*16 HDF_VERSION_REF
-      parameter(HDF_VERSION_REF='2.2.0')
+      parameter(HDF_VERSION_REF='2.3.0')
       parameter(HDF_VERSION_MAJOR_REF=2)
-      parameter(HDF_VERSION_MINOR_REF=2)
+      parameter(HDF_VERSION_MINOR_REF=3)
       parameter(HDF_VERSION_RELEASE_REF=0)

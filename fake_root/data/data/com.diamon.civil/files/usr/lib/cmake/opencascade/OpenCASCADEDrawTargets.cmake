@@ -7,7 +7,7 @@ if(CMAKE_VERSION VERSION_LESS "2.8.12")
    message(FATAL_ERROR "CMake >= 2.8.12 required")
 endif()
 cmake_policy(PUSH)
-cmake_policy(VERSION 2.8.12...4.1)
+cmake_policy(VERSION 2.8.12...4.2)
 #----------------------------------------------------------------
 # Generated CMake target import file.
 #----------------------------------------------------------------
@@ -19,7 +19,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_cmake_targets_defined "")
 set(_cmake_targets_not_defined "")
 set(_cmake_expected_targets "")
-foreach(_cmake_expected_target IN ITEMS TKDraw TKTopTest TKViewerTest TKOpenGlesTest TKXSDRAW TKDCAF TKXDEDRAW TKTObjDRAW TKQADraw TKXSDRAWDE TKXSDRAWIGES TKXSDRAWOBJ TKXSDRAWPLY TKXSDRAWSTEP TKXSDRAWSTL TKXSDRAWVRML)
+foreach(_cmake_expected_target IN ITEMS TKDraw TKTopTest TKViewerTest TKOpenGlesTest TKXSDRAW TKDCAF TKXDEDRAW TKTObjDRAW TKQADraw TKXSDRAWDE TKXSDRAWGLTF TKXSDRAWIGES TKXSDRAWOBJ TKXSDRAWPLY TKXSDRAWSTEP TKXSDRAWSTL TKXSDRAWVRML)
   list(APPEND _cmake_expected_targets "${_cmake_expected_target}")
   if(TARGET "${_cmake_expected_target}")
     list(APPEND _cmake_targets_defined "${_cmake_expected_target}")
@@ -135,6 +135,14 @@ set_target_properties(TKXSDRAWDE PROPERTIES
   INTERFACE_LINK_LIBRARIES "TKBRep;TKV3d;TKMath;TKernel;TKService;TKXSBase;TKMeshVS;TKG3d;TKViewerTest;TKG2d;TKTopAlgo;TKGeomBase;TKGeomAlgo;TKMesh;TKDraw;TKLCAF;TKDCAF;TKXCAF;TKRWMesh;TKXSBase;TKDECascade;TKDE;TKXSDRAW"
 )
 
+# Create imported target TKXSDRAWGLTF
+add_library(TKXSDRAWGLTF SHARED IMPORTED)
+
+set_target_properties(TKXSDRAWGLTF PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include/opencascade"
+  INTERFACE_LINK_LIBRARIES "TKBRep;TKV3d;TKMath;TKernel;TKService;TKXSBase;TKMeshVS;TKG3d;TKViewerTest;TKG2d;TKTopAlgo;TKGeomBase;TKGeomAlgo;TKMesh;TKDraw;TKLCAF;TKDCAF;TKXCAF;TKRWMesh;TKDEGLTF;TKXSDRAW"
+)
+
 # Create imported target TKXSDRAWIGES
 add_library(TKXSDRAWIGES SHARED IMPORTED)
 
@@ -222,7 +230,7 @@ unset(_cmake_import_check_targets)
 # Make sure the targets which have been exported in some other
 # export set exist.
 unset(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets)
-foreach(_target "TKernel" "TKG2d" "TKGeomBase" "TKG3d" "TKMath" "TKBRep" "TKGeomAlgo" "TKShHealing" "TKMesh" "TKService" "TKHLR" "TKTopAlgo" "TKBO" "TKV3d" "TKFillet" "TKPrim" "TKBool" "TKOffset" "TKFeat" "TKHelix" "TKOpenGles" "TKXSBase" "TKMeshVS" "TKLCAF" "TKXCAF" "TKCDF" "TKCAF" "TKVCAF" "TKStd" "TKStdL" "TKBin" "TKBinL" "TKXml" "TKXmlL" "TKDE" "TKBinXCAF" "TKXmlXCAF" "TKTObj" "TKBinTObj" "TKXmlTObj" "TKDEIGES" "TKDESTEP" "TKDESTL" "TKExpress" "TKRWMesh" "TKDECascade" "TKDEOBJ" "TKDEPLY" "TKDEVRML" )
+foreach(_target "TKernel" "TKG2d" "TKGeomBase" "TKG3d" "TKMath" "TKBRep" "TKGeomAlgo" "TKShHealing" "TKMesh" "TKService" "TKHLR" "TKTopAlgo" "TKBO" "TKV3d" "TKFillet" "TKPrim" "TKBool" "TKOffset" "TKFeat" "TKHelix" "TKOpenGles" "TKXSBase" "TKMeshVS" "TKLCAF" "TKXCAF" "TKCDF" "TKCAF" "TKVCAF" "TKStd" "TKStdL" "TKBin" "TKBinL" "TKXml" "TKXmlL" "TKDE" "TKBinXCAF" "TKXmlXCAF" "TKTObj" "TKBinTObj" "TKXmlTObj" "TKDEIGES" "TKDESTEP" "TKDESTL" "TKExpress" "TKRWMesh" "TKDECascade" "TKDEGLTF" "TKDEOBJ" "TKDEPLY" "TKDEVRML" )
   if(NOT TARGET "${_target}" )
     set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets "${${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets} ${_target}")
   endif()

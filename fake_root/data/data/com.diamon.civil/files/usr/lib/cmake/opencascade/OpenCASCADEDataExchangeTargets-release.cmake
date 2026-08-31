@@ -125,6 +125,16 @@ set_target_properties(TKDEOBJ PROPERTIES
 list(APPEND _cmake_import_check_targets TKDEOBJ )
 list(APPEND _cmake_import_check_files_for_TKDEOBJ "${_IMPORT_PREFIX}/lib/libTKDEOBJ.so.8.0.0" )
 
+# Import target "TKDEGLTF" for configuration "Release"
+set_property(TARGET TKDEGLTF APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(TKDEGLTF PROPERTIES
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/libTKDEGLTF.so.8.0.0"
+  IMPORTED_SONAME_RELEASE "libTKDEGLTF.so."
+  )
+
+list(APPEND _cmake_import_check_targets TKDEGLTF )
+list(APPEND _cmake_import_check_files_for_TKDEGLTF "${_IMPORT_PREFIX}/lib/libTKDEGLTF.so.8.0.0" )
+
 # Import target "TKDEPLY" for configuration "Release"
 set_property(TARGET TKDEPLY APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(TKDEPLY PROPERTIES

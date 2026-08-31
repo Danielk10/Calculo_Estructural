@@ -76,10 +76,10 @@ SET_AND_CHECK(MEDFILE_ROOT_DIR_EXP "${PACKAGE_PREFIX_DIR}")
 
 # If HDF5 was found in CONFIG mode, we need to include its targets so that
 # dependent projects can compile
-SET(_hdf5_path "HDF5_DIR-NOTFOUND")
+SET(_hdf5_path "/data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr/lib/cmake/hdf5")
 IF(_hdf5_path)
   FIND_PACKAGE(HDF5 REQUIRED COMPONENTS C 
-         NO_MODULE PATHS "HDF5_DIR-NOTFOUND" NO_DEFAULT_PATH) 
+         NO_MODULE PATHS "/data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr/lib/cmake/hdf5" NO_DEFAULT_PATH) 
 ENDIF()
 
 #### Now the specificities

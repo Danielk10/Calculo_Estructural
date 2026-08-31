@@ -7,7 +7,7 @@ if(CMAKE_VERSION VERSION_LESS "2.8.12")
    message(FATAL_ERROR "CMake >= 2.8.12 required")
 endif()
 cmake_policy(PUSH)
-cmake_policy(VERSION 2.8.12...4.1)
+cmake_policy(VERSION 2.8.12...4.2)
 #----------------------------------------------------------------
 # Generated CMake target import file.
 #----------------------------------------------------------------
@@ -59,7 +59,7 @@ endif()
 add_library(medC SHARED IMPORTED)
 
 set_target_properties(medC PROPERTIES
-  INTERFACE_LINK_LIBRARIES "/data/data/com.termux/files/home/fake_root/data/data/com.diamon.civil/files/usr/lib/libhdf5.so"
+  INTERFACE_LINK_LIBRARIES "hdf5-shared"
 )
 
 # Create imported target medfwrap

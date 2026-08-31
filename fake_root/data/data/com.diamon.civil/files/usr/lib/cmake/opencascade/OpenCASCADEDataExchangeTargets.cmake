@@ -7,7 +7,7 @@ if(CMAKE_VERSION VERSION_LESS "2.8.12")
    message(FATAL_ERROR "CMake >= 2.8.12 required")
 endif()
 cmake_policy(PUSH)
-cmake_policy(VERSION 2.8.12...4.1)
+cmake_policy(VERSION 2.8.12...4.2)
 #----------------------------------------------------------------
 # Generated CMake target import file.
 #----------------------------------------------------------------
@@ -19,7 +19,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_cmake_targets_defined "")
 set(_cmake_targets_not_defined "")
 set(_cmake_expected_targets "")
-foreach(_cmake_expected_target IN ITEMS TKDE TKXSBase TKDESTEP TKXCAF TKDEIGES TKDESTL TKDEVRML TKRWMesh TKDECascade TKBinXCAF TKXmlXCAF TKDEOBJ TKDEPLY)
+foreach(_cmake_expected_target IN ITEMS TKDE TKXSBase TKDESTEP TKXCAF TKDEIGES TKDESTL TKDEVRML TKRWMesh TKDECascade TKBinXCAF TKXmlXCAF TKDEOBJ TKDEGLTF TKDEPLY)
   list(APPEND _cmake_expected_targets "${_cmake_expected_target}")
   if(TARGET "${_cmake_expected_target}")
     list(APPEND _cmake_targets_defined "${_cmake_expected_target}")
@@ -147,6 +147,14 @@ set_target_properties(TKXmlXCAF PROPERTIES
 add_library(TKDEOBJ SHARED IMPORTED)
 
 set_target_properties(TKDEOBJ PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include/opencascade"
+  INTERFACE_LINK_LIBRARIES "TKernel;TKMath;TKMesh;TKXCAF;TKLCAF;TKV3d;TKBRep;TKG3d;TKDE;TKService;TKRWMesh"
+)
+
+# Create imported target TKDEGLTF
+add_library(TKDEGLTF SHARED IMPORTED)
+
+set_target_properties(TKDEGLTF PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include/opencascade"
   INTERFACE_LINK_LIBRARIES "TKernel;TKMath;TKMesh;TKXCAF;TKLCAF;TKV3d;TKBRep;TKG3d;TKDE;TKService;TKRWMesh"
 )
