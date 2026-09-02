@@ -326,14 +326,14 @@ public class TerminalFragment extends Fragment {
                 result = "Executing Headless DRAWEXE Test (OCCT Box Primitive)...\n";
                 result += calculixExecutor.executeBinaryWithInput("DRAWEXE", drawScript, "-b");
             } else if (input.equalsIgnoreCase("test-calculix") || input.equalsIgnoreCase("test_calculix")) {
-                result = "Executing CalculiX Validation Test (test_calculix.inp)...\n";
+                result = "Executing CalculiX Sequential Test (1 Thread / Single-core: test_calculix.inp)...\n";
                 copyAssetToFilesDir("test_calculix.inp", currentDir);
-                result += calculixExecutor.executeCalculix("test_calculix");
+                result += calculixExecutor.executeCalculix("test_calculix", 1);
             } else if (input.equalsIgnoreCase("test-calculix-parallel") || input.equalsIgnoreCase("test_calculix_parallel")) {
                 int cores = Runtime.getRuntime().availableProcessors();
-                result = "Executing CalculiX Parallel Test (" + cores + " Cores / Multi-core)...\n";
+                result = "Executing CalculiX Parallel Test (" + cores + " Cores / Multi-thread: test_calculix.inp)...\n";
                 copyAssetToFilesDir("test_calculix.inp", currentDir);
-                result += calculixExecutor.executeCalculix("test_calculix");
+                result += calculixExecutor.executeCalculix("test_calculix", cores);
             } else if (input.equalsIgnoreCase("test-frame") || input.equalsIgnoreCase("test_frame")
                     || input.equalsIgnoreCase("test-portico") || input.equalsIgnoreCase("test_portico")) {
                 result = "Executing 2D Frame Structural Analysis Test (test_portico.inp)...\n";

@@ -68,10 +68,18 @@ public class CalculixExecutor {
     }
 
     public String executeCalculix(String jobName) {
-        return executeCalculix(jobName, null);
+        return executeCalculix(jobName, null, 0);
+    }
+
+    public String executeCalculix(String jobName, int numThreads) {
+        return executeCalculix(jobName, null, numThreads);
     }
 
     public String executeCalculix(String jobName, OutputListener listener) {
+        return executeCalculix(jobName, listener, 0);
+    }
+
+    public String executeCalculix(String jobName, OutputListener listener, int numThreads) {
         if (jobName == null || jobName.trim().isEmpty()) {
             return "Execution Error: CalculiX job name is empty";
         }
@@ -79,7 +87,7 @@ public class CalculixExecutor {
                 ? jobName.substring(0, jobName.length() - ".inp".length())
                 : jobName;
         File inputBase = new File(workDir, baseName);
-        return executeBinaryWithStreaming("ccx", listener, null, "-i", inputBase.getAbsolutePath());
+        return executeBinaryWithStreaming("ccx", listener, null, numThreads, "-i", inputBase.getAbsolutePath());
     }
 
     public String runGmsh(String inputPath, String outputPath, double meshSize) {
@@ -87,14 +95,18 @@ public class CalculixExecutor {
     }
 
     public String executeBinary(String binaryName, String... args) {
-        return executeBinaryWithStreaming(binaryName, null, null, args);
+        return executeBinaryWithStreaming(binaryName, null, null, 0, args);
     }
 
     public String executeBinaryWithInput(String binaryName, String input, String... args) {
-        return executeBinaryWithStreaming(binaryName, null, input, args);
+        return executeBinaryWithStreaming(binaryName, null, input, 0, args);
     }
 
     public String executeBinaryWithStreaming(String binaryName, OutputListener listener, String input, String... args) {
+        return executeBinaryWithStreaming(binaryName, listener, input, 0, args);
+    }
+
+    public String executeBinaryWithStreaming(String binaryName, OutputListener listener, String input, int numThreads, String... args) {
         File binary;
         File packagedBinary = new File(nativeLibDir, "lib" + binaryName + ".so");
         if (packagedBinary.exists()) {
@@ -120,10 +132,13 @@ public class CalculixExecutor {
 
             Map<String, String> env = pb.environment();
 
-            String numCores = String.valueOf(Runtime.getRuntime().availableProcessors());
-            env.put("OMP_NUM_THREADS", numCores);
+            int availableCores = Runtime.getRuntime().availableProcessors();
+            int threadsToUse = (numThreads > 0) ? numThreads : availableCores;
+            String threadsStr = String.valueOf(threadsToUse);
+
+            env.put("OMP_NUM_THREADS", threadsStr);
             env.put("OMP_STACKSIZE", "64M");
-            env.put("CCX_NPROC_EQUATION_SOLVER", numCores);
+            env.put("CCX_NPROC_EQUATION_SOLVER", threadsStr);
 
             File usrLib = new File(filesDir, "usr/lib");
             File usrBin = new File(filesDir, "usr/bin");
