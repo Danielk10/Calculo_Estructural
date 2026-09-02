@@ -35,9 +35,13 @@ interface OnHitListener {
 private val currentModelPath = mutableStateOf<String?>(null)
 private val modelRevision = mutableIntStateOf(0)
 
-fun setSceneViewContent(composeView: ComposeView, modelPath: String?, listener: OnHitListener?) {
+@JvmOverloads
+fun setSceneViewContent(composeView: ComposeView, modelPath: String?, listener: OnHitListener?, forceReload: Boolean = false) {
+    val pathChanged = currentModelPath.value != modelPath
     currentModelPath.value = modelPath
-    modelRevision.intValue++
+    if (pathChanged || forceReload) {
+        modelRevision.intValue++
+    }
 
     if (composeView.tag != "scene_view_initialized") {
         composeView.tag = "scene_view_initialized"

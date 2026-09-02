@@ -627,7 +627,7 @@ public class SolidFragment extends Fragment {
                 }
 
                 // Ensure clean workspace so previous simulation results never leak
-                String[] staleFiles = {"job_solid.inp", "job_solid_clean.inp", "nsets.inp", "job_solid.frd", "job_solid.dat", "job_solid.sta", "job_solid.cvg", "job_solid.12d", "job_solid.glb"};
+                String[] staleFiles = {"job_solid.inp", "job_solid_clean.inp", "nsets.inp", "job_solid.frd", "job_solid.dat", "job_solid.sta", "job_solid.cvg", "job_solid.12d"};
                 for (String sf : staleFiles) {
                     File staleFile = new File(workDir, sf);
                     if (staleFile.exists()) staleFile.delete();
@@ -993,7 +993,7 @@ public class SolidFragment extends Fragment {
         if (!workDir.exists()) workDir.mkdirs();
 
         // Ensure clean workspace so previous simulation results never leak into subsequent runs
-        String[] staleFiles = {"job_solid_raw.inp", "job_solid.inp", "job_solid_clean.inp", "nsets.inp", "job_solid.frd", "job_solid.dat", "job_solid.sta", "job_solid.cvg", "job_solid.12d", "job_solid.glb"};
+        String[] staleFiles = {"job_solid_raw.inp", "job_solid.inp", "job_solid_clean.inp", "nsets.inp", "job_solid.frd", "job_solid.dat", "job_solid.sta", "job_solid.cvg", "job_solid.12d"};
         for (String sf : staleFiles) {
             File staleFile = new File(workDir, sf);
             if (staleFile.exists()) staleFile.delete();
@@ -1058,7 +1058,7 @@ public class SolidFragment extends Fragment {
                                 if (activity != null) {
                                     activity.runOnUiThread(() -> {
                                         if (binding != null) {
-                                            showModelInViewer();
+                                            showModelInViewer(true);
                                         }
                                     });
                                 }
@@ -1113,12 +1113,22 @@ public class SolidFragment extends Fragment {
 
     /** Initializes SceneView only when the user opens the viewer or a result exists. */
     private void showModelInViewer() {
+        showModelInViewer(false);
+    }
+
+    /**
+     * Loads the current modelPath into the 3D viewer.
+     * @param forceReload if true, forces a full model reload even if the path hasn't changed
+     *                    (needed after recalculation where the file content changes but path stays the same).
+     */
+    private void showModelInViewer(boolean forceReload) {
         if (!isAdded() || binding == null || !(getActivity() instanceof MainActivity)) return;
         try {
             SceneViewBridgeKt.setSceneViewContent(
                     binding.solidSceneViewContainer,
                     modelPath,
-                    (MainActivity) getActivity());
+                    (MainActivity) getActivity(),
+                    forceReload);
         } catch (Throwable error) {
             logger.error("SceneView Error: " + error.getMessage());
         }
