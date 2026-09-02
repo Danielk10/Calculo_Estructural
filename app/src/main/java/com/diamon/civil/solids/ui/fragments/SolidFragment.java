@@ -626,6 +626,13 @@ public class SolidFragment extends Fragment {
                     calculixExecutor = new CalculixExecutor(appContext, workDir);
                 }
 
+                // Ensure clean workspace so previous simulation results never leak
+                String[] staleFiles = {"job_solid.inp", "job_solid_clean.inp", "nsets.inp", "job_solid.frd", "job_solid.dat", "job_solid.sta", "job_solid.cvg", "job_solid.12d", "job_solid.glb"};
+                for (String sf : staleFiles) {
+                    File staleFile = new File(workDir, sf);
+                    if (staleFile.exists()) staleFile.delete();
+                }
+
                 if (isFullyAssembledInp(inpFile)) {
                     logger.info("Detected Pre-assembled CalculiX Deck (" + inpFile.getName() + "). Running CalculiX Solver directly...");
                     File targetJobInp = new File(workDir, "job_solid.inp");
@@ -649,10 +656,12 @@ public class SolidFragment extends Fragment {
                             ? binding.spinnerFixedRegion.getSelectedItem().toString() : "AUTO";
                     String loadRegion = (binding != null && binding.spinnerLoadRegion.getSelectedItem() != null)
                             ? binding.spinnerLoadRegion.getSelectedItem().toString() : "AUTO";
+                    String elemType = (binding != null && binding.spinnerElementType.getSelectedItem() != null)
+                            ? binding.spinnerElementType.getSelectedItem().toString() : "C3D10";
                     int loadDirPos = (binding != null) ? binding.spinnerLoadDirection.getSelectedItemPosition() : 0;
                     int loadDof = (loadDirPos == 1) ? 1 : (loadDirPos == 2) ? 3 : 2;
 
-                    com.diamon.civil.solids.engine.SolidInpAssembler.assemble(workDir, "job_solid", materialName, E, nu, currentDynamicLoadValue, loadDof, fixedRegion, loadRegion);
+                    com.diamon.civil.solids.engine.SolidInpAssembler.assemble(workDir, "job_solid", materialName, E, nu, currentDynamicLoadValue, loadDof, fixedRegion, loadRegion, elemType);
                 }
 
                 logger.info("Step: Running CalculiX Solver ccx...");
@@ -982,6 +991,14 @@ public class SolidFragment extends Fragment {
 
         final File workDir = new File(getContext().getFilesDir(), "3d_solid_analysis");
         if (!workDir.exists()) workDir.mkdirs();
+
+        // Ensure clean workspace so previous simulation results never leak into subsequent runs
+        String[] staleFiles = {"job_solid_raw.inp", "job_solid.inp", "job_solid_clean.inp", "nsets.inp", "job_solid.frd", "job_solid.dat", "job_solid.sta", "job_solid.cvg", "job_solid.12d", "job_solid.glb"};
+        for (String sf : staleFiles) {
+            File staleFile = new File(workDir, sf);
+            if (staleFile.exists()) staleFile.delete();
+        }
+
         final File cadFile = activeSimulationGeometry;
         final android.content.Context appContext = getContext().getApplicationContext();
 

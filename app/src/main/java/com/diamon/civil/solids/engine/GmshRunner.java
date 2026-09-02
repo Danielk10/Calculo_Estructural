@@ -185,8 +185,9 @@ public class GmshRunner {
         command.add(outputMsh.getAbsolutePath());
         command.add("-format");
         command.add("inp");                        // Use INP for CalculiX compatibility
-        command.add("-v");
-        command.add("0");                          // Quiet mode
+        if (outputMsh.exists()) {
+            outputMsh.delete();
+        }
 
         try {
             ProcessBuilder pb = new ProcessBuilder(command);
