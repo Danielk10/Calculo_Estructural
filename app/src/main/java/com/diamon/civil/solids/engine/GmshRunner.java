@@ -112,6 +112,9 @@ public class GmshRunner {
             File drawexeBin = findDrawexeBinary();
             if (drawexeBin != null && drawexeBin.exists()) {
                 File sewnBrep = new File(workDir, stripExtension(inputFile.getName()) + "_sewn.brep");
+                if (sewnBrep.exists()) {
+                    sewnBrep.delete();
+                }
                 String tclScript = "pload ALL\n" +
                         "igesread \"" + inputFile.getAbsolutePath() + "\" ig *\n" +
                         "sewing s 0.05 ig\n" +
@@ -145,6 +148,13 @@ public class GmshRunner {
             nameLower.endsWith(".brep")) {
 
             File geoDriver = new File(workDir, "gmsh_cad_driver.geo");
+            if (geoDriver.exists()) {
+                geoDriver.delete();
+            }
+            File geoUnrolled = new File(workDir, "gmsh_cad_driver.geo_unrolled");
+            if (geoUnrolled.exists()) {
+                geoUnrolled.delete();
+            }
             try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(geoDriver))) {
                 pw.println("// OpenCASCADE CAD Driver for Gmsh");
                 pw.println("SetFactory(\"OpenCASCADE\");");

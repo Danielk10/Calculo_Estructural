@@ -626,12 +626,7 @@ public class SolidFragment extends Fragment {
                     calculixExecutor = new CalculixExecutor(appContext, workDir);
                 }
 
-                // Ensure clean workspace so previous simulation results never leak
-                String[] staleFiles = {"job_solid.inp", "job_solid_clean.inp", "nsets.inp", "job_solid.frd", "job_solid.dat", "job_solid.sta", "job_solid.cvg", "job_solid.12d"};
-                for (String sf : staleFiles) {
-                    File staleFile = new File(workDir, sf);
-                    if (staleFile.exists()) staleFile.delete();
-                }
+                cleanSimulationWorkspace(workDir, modelPath);
 
                 if (isFullyAssembledInp(inpFile)) {
                     logger.info("Detected Pre-assembled CalculiX Deck (" + inpFile.getName() + "). Running CalculiX Solver directly...");
@@ -672,23 +667,37 @@ public class SolidFragment extends Fragment {
                 }
 
                 File frdFile = new File(workDir, "job_solid.frd");
-                if (frdFile.exists()) {
+                if (frdFile.exists() && frdFile.length() > 0) {
                     logger.info("Step: Converting FRD results to 3D solid model...");
-                    File glbFile = new File(workDir, "job_solid.glb");
+                    String newGlbName = "job_solid_" + System.currentTimeMillis() + ".glb";
+                    File newGlbFile = new File(workDir, newGlbName);
                     float deformScale = 1.0f;
                     boolean isSphere = inpFile.getName().toLowerCase(java.util.Locale.US).contains("sphere");
-                    if (calculixExecutor.convertFrdToGlb(frdFile.getAbsolutePath(), glbFile.getAbsolutePath(), deformScale, isSphere)) {
-                        logger.info("Step: 3D Visualization Model ready! Open the 3D Viewer tab to inspect results.");
-                        modelPath = glbFile.getAbsolutePath();
+                    if (calculixExecutor.convertFrdToGlb(frdFile.getAbsolutePath(), newGlbFile.getAbsolutePath(), deformScale, isSphere)) {
+                        if (newGlbFile.exists() && newGlbFile.length() > 0) {
+                            logger.info("Step: 3D Visualization Model ready! Open the 3D Viewer tab to inspect results.");
+                            String oldGlbPath = modelPath;
+                            modelPath = newGlbFile.getAbsolutePath();
 
-                        if (activity != null) {
-                            activity.runOnUiThread(() -> {
-                                if (binding != null && isAdded()) {
-                                    binding.pbSolid.setVisibility(View.GONE);
-                                    binding.btnRunSolidAnalysis.setEnabled(true);
-                                    Toast.makeText(appContext, R.string.toast_simulation_complete, Toast.LENGTH_SHORT).show();
+                            if (activity != null) {
+                                activity.runOnUiThread(() -> {
+                                    if (binding != null && isAdded()) {
+                                        showModelInViewer(true);
+                                        binding.pbSolid.setVisibility(View.GONE);
+                                        binding.btnRunSolidAnalysis.setEnabled(true);
+                                        Toast.makeText(appContext, R.string.toast_simulation_complete, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+
+                            if (oldGlbPath != null && !oldGlbPath.equals(newGlbFile.getAbsolutePath())) {
+                                File oldGlb = new File(oldGlbPath);
+                                if (oldGlb.exists() && oldGlb.getName().startsWith("job_solid_")) {
+                                    oldGlb.delete();
                                 }
-                            });
+                            }
+                        } else {
+                            logger.error("FRD to GLB conversion output file is empty");
                         }
                     } else {
                         logger.error("FRD to GLB conversion failed for imported INP");
@@ -993,11 +1002,7 @@ public class SolidFragment extends Fragment {
         if (!workDir.exists()) workDir.mkdirs();
 
         // Ensure clean workspace so previous simulation results never leak into subsequent runs
-        String[] staleFiles = {"job_solid_raw.inp", "job_solid.inp", "job_solid_clean.inp", "nsets.inp", "job_solid.frd", "job_solid.dat", "job_solid.sta", "job_solid.cvg", "job_solid.12d"};
-        for (String sf : staleFiles) {
-            File staleFile = new File(workDir, sf);
-            if (staleFile.exists()) staleFile.delete();
-        }
+        cleanSimulationWorkspace(workDir, modelPath);
 
         final File cadFile = activeSimulationGeometry;
         final android.content.Context appContext = getContext().getApplicationContext();
@@ -1045,22 +1050,34 @@ public class SolidFragment extends Fragment {
                         }
 
                         File frdFile = new File(workDir, "job_solid.frd");
-                        if (frdFile.exists()) {
+                        if (frdFile.exists() && frdFile.length() > 0) {
                             logger.info("Step 4: Converting FRD results to 3D model...");
 
-                            File glbFile = new File(workDir, "job_solid.glb");
+                            String newGlbName = "job_solid_" + System.currentTimeMillis() + ".glb";
+                            File newGlbFile = new File(workDir, newGlbName);
                             float deformScale = 1.0f;
                             boolean isSphere = cadFile != null && cadFile.getName().toLowerCase().contains("sphere");
-                            if (calculixExecutor.convertFrdToGlb(frdFile.getAbsolutePath(), glbFile.getAbsolutePath(), deformScale, isSphere)) {
-                                logger.info("Step 5: Loading 3D visualization...");
-                                modelPath = glbFile.getAbsolutePath();
-                                android.app.Activity activity = getActivity();
-                                if (activity != null) {
-                                    activity.runOnUiThread(() -> {
-                                        if (binding != null) {
-                                            showModelInViewer(true);
+                            if (calculixExecutor.convertFrdToGlb(frdFile.getAbsolutePath(), newGlbFile.getAbsolutePath(), deformScale, isSphere)) {
+                                if (newGlbFile.exists() && newGlbFile.length() > 0) {
+                                    logger.info("Step 5: Loading 3D visualization...");
+                                    String oldGlbPath = modelPath;
+                                    modelPath = newGlbFile.getAbsolutePath();
+                                    android.app.Activity activity = getActivity();
+                                    if (activity != null) {
+                                        activity.runOnUiThread(() -> {
+                                            if (binding != null) {
+                                                showModelInViewer(true);
+                                            }
+                                        });
+                                    }
+                                    if (oldGlbPath != null && !oldGlbPath.equals(newGlbFile.getAbsolutePath())) {
+                                        File oldGlb = new File(oldGlbPath);
+                                        if (oldGlb.exists() && oldGlb.getName().startsWith("job_solid_")) {
+                                            oldGlb.delete();
                                         }
-                                    });
+                                    }
+                                } else {
+                                    logger.error("FRD to GLB conversion output file is empty");
                                 }
                             } else {
                                 logger.error("FRD to GLB conversion failed");
@@ -1109,6 +1126,42 @@ public class SolidFragment extends Fragment {
                 }
             }
         });
+    }
+
+    /**
+     * Cleans all temporary simulation files in workDir (intermediate meshes, solver output, decks),
+     * while preserving source CAD models and the currently displayed GLB model.
+     */
+    private void cleanSimulationWorkspace(File targetDir, String currentGlbToKeep) {
+        if (targetDir == null || !targetDir.exists()) return;
+        File[] files = targetDir.listFiles();
+        if (files == null) return;
+        for (File f : files) {
+            String name = f.getName();
+            // Preserve user-created CAD models and primitives
+            if (name.endsWith(".step") || name.endsWith(".stp") || name.endsWith(".geo") ||
+                name.endsWith(".iges") || name.endsWith(".igs") ||
+                name.equals("box.brep") || name.equals("cylinder.brep") || name.equals("sphere.brep") ||
+                name.startsWith("operated_")) {
+                continue;
+            }
+            // Keep the active GLB currently displayed in the 3D viewer
+            if (currentGlbToKeep != null && f.getAbsolutePath().equals(currentGlbToKeep)) {
+                continue;
+            }
+            // Delete all intermediate calculation artifacts and stale results
+            if (name.startsWith("job_solid") || name.startsWith("nsets") ||
+                name.startsWith("gmsh_cad_driver") || name.endsWith("_sewn.brep") ||
+                name.endsWith(".frd") || name.endsWith(".dat") || name.endsWith(".sta") ||
+                name.endsWith(".cvg") || name.endsWith(".12d") || name.endsWith(".rout") ||
+                name.endsWith(".nam") || name.endsWith(".mesh") || name.endsWith(".msh") ||
+                name.endsWith(".fdb") || name.endsWith(".f06") || name.endsWith(".f04") ||
+                (name.endsWith(".glb") && name.startsWith("job_solid_"))) {
+                try {
+                    f.delete();
+                } catch (Exception ignored) {}
+            }
+        }
     }
 
     /** Initializes SceneView only when the user opens the viewer or a result exists. */
