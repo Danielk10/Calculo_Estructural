@@ -1,6 +1,6 @@
-# Notas de Versión - Structural Analysis FEA Advanced
+# Notas de Versión - Structural Analysis FEA 3D
 
-## 📦 Structural Analysis FEA Advanced v0.2.0 (Pre-Release)
+## 📦 Structural Analysis FEA 3D v0.2.0 (Pre-Release)
 
 ### 🚀 Novedades, Motores FEA, Visualización 2D/3D y Correcciones Físicas
 
@@ -44,7 +44,7 @@
 
 ---
 
-## 📦 Structural Analysis FEA Advanced v0.1.0 (Pre-Release)
+## 📦 Structural Analysis FEA 3D v0.1.0 (Pre-Release)
 
 ### 🚀 Novedades, Mejoras de UI, Motores FEA y Correcciones de la Versión
 
@@ -58,7 +58,36 @@
 
 #### 2. Depuración y Estandarización de Comandos de Terminal
 - **Estandarización de Limpieza de Pantalla:**
-  - Se eliminó el comando `cls`, manteniendo exclusivamente el estándar POSIX `clear` tanto en ejecución como en el menú de ayuda (`help`).
+  - Los comandos `clear` y `cls` ahora limpian completamente la pantalla en lugar de únicamente el búfer de texto, restableciendo el banner inicial de bienvenida.
+- **Comando `history` y Atajos de Teclado:**
+  - Incorporación del comando `history` en el intérprete y soporte en UI de botones dedicados (flechas arriba/abajo) para navegar por el historial de comandos ejecutados en tiempo real.
+- **Comandos de Prueba de Solvers Especiales:**
+  - Incorporación y prueba automatizada de comandos directos: `test-gmsh`, `test-draw`, `test-calculix`, `test-calculix-parallel`, `test-frame`, `test-frd-parser`, `test-dat-parser`, `test-coordinate-fallback`, `test-step-solve`, `test-bracket-solve`, `test-cad-solve` y `run-sim-test`.
+
+#### 3. Soporte Integral de Formatos CAD y Malla Volumétrica
+- **Importación de Mallas INP:**
+  - Detección inteligente del tipo de archivo INP (`*ELEMENT, TYPE=C3D*` vs `*ELEMENT, TYPE=B3* / T3*`):
+    - Mallas de sólidos se cargan directamente en el Módulo de Sólidos 3D.
+    - Mallas de pórticos/barras se cargan directamente en el Módulo Estructural con reconstrucción completa de nodos y elementos.
+    - En el módulo Terminal, los archivos INP se importan en el espacio de trabajo local para cálculo directo.
+- **Importación y Modelado CAD (STEP / IGES / BREP / GEO):**
+  - Soporte para importación de geometrías externas e integración de primitivas paramétricas 3D (Cubo, Cilindro, Esfera) con operaciones de Redondeo (Fillet), Chaflán (Chamfer), Extrusión y Operaciones Booleanas (Unión, Corte, Intersección) impulsadas por OpenCASCADE Technology (OCCT 8.0.0.p1).
+
+#### 4. Motor de Renderizado 3D de Alta Fidelidad
+- **Migración a SceneView v4.18.0 / Google Filament:**
+  - Renderizado PBR con iluminación física, soporte para sombreadores custom unlit con Vertex Colors, visualización de mapas de color de tensiones de Von Mises y deformadas elásticas en tiempo real.
+  - Generador y exportador nativo de archivos **GLB (glTF Binary)** para visualización tridimensional optimizada en dispositivos móviles.
+
+#### 5. Módulo Estructural y Memorias de Cálculo PDF
+- **Generación de Reportes Técnicos Formales:**
+  - Exportación automática a la carpeta pública de descargas de reportes en PDF con formato profesional (portada ejecutiva, parámetros de cálculo, diagramas de esfuerzos de vigas Timoshenko, desplazamientos nodales y verificación de estados límite).
+
+#### 6. Conformidad Legal, Políticas y Documentación
+- **Cumplimiento de Licencias Copyleft (GPL v3.0 / LGPL v2.1):**
+  - Declaración formal en `README.md` del cumplimiento de la licencia GPL v3.0 para CalculiX 2.23 y Gmsh 5.0.0, permitiendo monetización comercial con total apertura y disponibilidad del código fuente.
+- **Pantalla de Política de Privacidad (`PrivacyPolicyActivity`):**
+  - Actividad nativa responsiva con WebView para la visualización de la Política de Privacidad de la aplicación conforme a las directrices de Google Play Console.
+  - Archivo oficial HTML5 generado: `politica_privacidad_structural_analysis_fea_3d.html` cargado desde `https://todoandroid.42web.io/politica_privacidad_structural_analysis_fea_3d.html`.
 - **Corrección Integral de `run-sim-test`:**
   - Corrección de la resolución de rutas de binarios para `gmsh` y `ccx` en `SimulationTestManager` y `TerminalFragment`. Ahora genera `cantilever.geo`, ejecuta Gmsh para crear `cantilever_raw.inp`, ensambla el modelo de elementos finitos y resuelve con CalculiX ccx de principio a fin, mostrando el resumen de desplazamientos y tensiones elásticas en la consola sin errores.
 
@@ -89,7 +118,7 @@
 #### 6. Política de Privacidad en Línea y Permisos de Red
 - **Actividad Responsiva `PrivacyPolicyActivity`:**
   - Integración de WebView con soporte de JavaScript, barra de progreso de carga y pantalla de reintento ante desconexión.
-  - Archivo oficial HTML5 generado: `politica_privacidad_structural_analysis_fea_advanced.html` cargado desde `https://todoandroid.42web.io/politica_privacidad_structural_analysis_fea_advanced.html`.
+  - Archivo oficial HTML5 generado: `politica_privacidad_structural_analysis_fea_3d.html` cargado desde `https://todoandroid.42web.io/politica_privacidad_structural_analysis_fea_3d.html`.
   - Acceso directo a la Política de Privacidad desde el Menú de Opciones Superior y el Menú Lateral (*Navigation Drawer*).
   - Permisos `INTERNET` y `ACCESS_NETWORK_STATE` declarados en `AndroidManifest.xml`.
   - Ficha de metadatos de Google Play Store creada en `GOOGLE_PLAY_STORE_LISTING.md`.

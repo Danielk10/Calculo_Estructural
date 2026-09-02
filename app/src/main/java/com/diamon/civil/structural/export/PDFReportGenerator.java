@@ -407,7 +407,7 @@ public class PDFReportGenerator {
         topHeaderPaint.setColor(Color.parseColor("#1A237E"));
         topHeaderPaint.setTextSize(7.5f);
         topHeaderPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        canvas.drawText("STRUCTURAL ANALYSIS FEA ADVANCED — CALCULATION REPORT", MARGIN_LEFT, 28f, topHeaderPaint);
+        canvas.drawText("STRUCTURAL ANALYSIS FEA 3D — CALCULATION REPORT", MARGIN_LEFT, 28f, topHeaderPaint);
 
         Paint subTopPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         subTopPaint.setColor(Color.parseColor("#757575"));
@@ -420,7 +420,7 @@ public class PDFReportGenerator {
         // Bottom Footer Bar
         canvas.drawLine(MARGIN_LEFT, PAGE_HEIGHT - 32f, PAGE_WIDTH - MARGIN_RIGHT, PAGE_HEIGHT - 32f, linePaint);
 
-        String footerLeft = String.format(Locale.US, "Structural Analysis FEA Advanced (CalculiX ccx 2.23) | Executive Structural Report | Page %d", pageNumber);
+        String footerLeft = String.format(Locale.US, "Structural Analysis FEA 3D (CalculiX ccx 2.23) | Executive Structural Report | Page %d", pageNumber);
         canvas.drawText(footerLeft, MARGIN_LEFT, PAGE_HEIGHT - 20f, footerPaint);
 
         String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(new Date());
@@ -461,7 +461,7 @@ public class PDFReportGenerator {
                 {"Project Title:", projectName != null ? projectName : "Space Frame Structural Calculation"},
                 {"Engineer of Record (EOR):", engineerName != null ? engineerName : "Lead Structural Engineer (PE)"},
                 {"Issuance Date & Time:", new SimpleDateFormat("MMMM dd, yyyy — HH:mm:ss z", Locale.US).format(new Date())},
-                {"Software Application:", "Structural Analysis FEA Advanced"},
+                {"Software Application:", "Structural Analysis FEA 3D"},
                 {"Computational Solver Engine:", "CalculiX Finite Element Solver (ccx 2.23 MT / Spooles)"},
                 {"Element Formulations:", "Timoshenko 3D Beams (B31/B32) & Mindlin-Reissner Shells (S4R)"},
                 {"Design Codes & Specifications:", "AISC 360-22 (LRFD / ASD), ACI 318-19, ASCE 7-22, NSR-10, EC2/3"},

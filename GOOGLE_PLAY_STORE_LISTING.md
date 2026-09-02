@@ -1,4 +1,4 @@
-# 📱 Ficha de Google Play Store — Structural Analysis FEA Advanced
+# 📱 Ficha de Google Play Store — Structural Analysis FEA 3D
 
 Este documento contiene los textos optimizados para la ficha de publicación en **Google Play Store**, redactados en estricto cumplimiento con las políticas de metadatos de Google Play (sin *keyword stuffing*, sin nombres de librerías de terceros por derechos de autor y enfocados 100% en las funcionalidades, herramientas y valor de ingeniería que ofrece la aplicación).
 
@@ -24,7 +24,7 @@ Análisis estructural 2D/3D y elementos finitos FEA en tu móvil.
 ### 📄 Descripción Completa (Máximo 4000 caracteres)
 
 ```text
-Structural Structural Analysis FEA 3D es una potente herramienta de ingeniería civil, mecánica y estructural diseñada para modelar, calcular y simular estructuras reticulares y componentes tridimensionales directamente en tu dispositivo móvil.
+Structural Analysis FEA 3D es una potente herramienta de ingeniería civil, mecánica y estructural diseñada para modelar, calcular y simular estructuras reticulares y componentes tridimensionales directamente en tu dispositivo móvil.
 
 Diseñada para ingenieros civiles, calculistas, mecánicos, arquitectos y estudiantes, permite resolver vigas, pórticos espaciales, cerchas, losas, muros de cortante y piezas mecánicas 3D con máxima precisión y rapidez.
 
@@ -82,7 +82,7 @@ Professional 2D/3D structural analysis and FEA finite element suite on mobile.
 ### 📄 Full Description (Max 4000 characters)
 
 ```text
-Structural Analysis FEA Advanced is a comprehensive engineering platform designed to model, calculate, and simulate skeletal structures and 3D mechanical components directly on your mobile device.
+Structural Analysis FEA 3D is a comprehensive engineering platform designed to model, calculate, and simulate skeletal structures and 3D mechanical components directly on your mobile device.
 
 Engineered for civil, structural, and mechanical engineers, architects, and students, this app allows you to analyze continuous beams, space frames, trusses, slabs, shear walls, and 3D solid parts with speed and precision.
 

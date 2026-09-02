@@ -1,6 +1,6 @@
-# 📘 Manual de Usuario — Cálculo Estructural (FEA Suite)
+# 📘 Manual de Usuario — Structural Analysis FEA 3D
 
-Bienvenido a la suite de **Cálculo Estructural y Análisis de Elementos Finitos (FEA)** para Android (`com.diamon.civil`). Esta plataforma profesional permite modelar, simular y analizar estructuras reticulares, pórticos espaciales y componentes mecánicos tridimensionales directamente en dispositivos móviles mediante los motores industriales **CalculiX CCX 2.23**, **OpenCASCADE (OCCT 8.0.0.p1)** y **Gmsh**.
+Bienvenido a la suite de **Structural Analysis FEA 3D** para Android (`com.diamon.civil`). Esta plataforma profesional permite modelar, simular y analizar estructuras reticulares, pórticos espaciales y componentes mecánicos tridimensionales directamente en dispositivos móviles mediante los motores industriales **CalculiX CCX 2.23**, **OpenCASCADE (OCCT 8.0.0.p1)** y **Gmsh**.
 
 ---
 

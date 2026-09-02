@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 4.1.2)
 
-project("calculoestructural")
+project("structural_analysis_fea_3d")
 
 add_library(${CMAKE_PROJECT_NAME} SHARED
         native-lib.cpp

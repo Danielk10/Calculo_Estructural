@@ -170,7 +170,7 @@ public class SolidPDFReportGenerator {
     }
 
     private void finishPage(PdfDocument document, Canvas canvas) {
-        String footer = String.format(Locale.US, "Structural Analysis FEA Advanced | 3D Solid Analysis | Page %d", pageNumber);
+        String footer = String.format(Locale.US, "Structural Analysis FEA 3D | 3D Solid Analysis | Page %d", pageNumber);
         canvas.drawText(footer, MARGIN_LEFT, PAGE_HEIGHT - 20f, footerPaint);
 
         String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(new Date());
@@ -202,7 +202,7 @@ public class SolidPDFReportGenerator {
 
         String[][] info = {
                 {"Project:", projectName != null ? projectName : "3D Solid Analysis"},
-                {"Software:", "Structural Analysis FEA Advanced"},
+                {"Software:", "Structural Analysis FEA 3D"},
                 {"Date:", new SimpleDateFormat("MMMM dd, yyyy", Locale.US).format(new Date())},
                 {"Engine:", "CalculiX FEA (ccx 2.23)"},
                 {"Mesher:", "Gmsh 3D Solid Mesh Generator (Gmsh 5.0.0)"},

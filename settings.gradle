@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Structural Analysis FEA Advanced"
+rootProject.name = "Structural Analysis FEA 3D"
 include ':app'

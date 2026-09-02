@@ -22,12 +22,12 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 
 /**
- * PrivacyPolicyActivity — Displays the official Privacy Policy for Structural Analysis FEA Advanced
+ * PrivacyPolicyActivity — Displays the official Privacy Policy for Structural Analysis FEA 3D
  * inside a responsive WebView loaded from the server.
  */
 public class PrivacyPolicyActivity extends AppCompatActivity {
 
-    public static final String PRIVACY_POLICY_URL = "https://todoandroid.42web.io/politica_privacidad_structural_analysis_fea_advanced.html";
+    public static final String PRIVACY_POLICY_URL = "https://todoandroid.42web.io/politica_privacidad_structural_analysis_fea_3d.html";
 
     private WebView webView;
     private ProgressBar progressBar;

@@ -1,6 +1,6 @@
 # Análisis Científico de Validación Estructural: CalculiX vs OpenSees vs Teoría Clásica
 
-Este documento presenta el análisis técnico integral, la formulación físico-matemática y la contrastación numérica de todos los modelos y presets estructurales integrados en la aplicación **Cálculo Estructural**, comparando los resultados de **CalculiX (`ccx`)**, **OpenSees (`openseespy`)** y las **soluciones analíticas exactas de la Resistencia de Materiales**.
+Este documento presenta el análisis técnico integral, la formulación físico-matemática y la contrastación numérica de todos los modelos y presets estructurales integrados en la aplicación **Structural Analysis FEA 3D**, comparando los resultados de **CalculiX (`ccx`)**, **OpenSees (`openseespy`)** y las **soluciones analíticas exactas de la Resistencia de Materiales**.
 
 ---
 

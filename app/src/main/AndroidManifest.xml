@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CalculoEstructural.NoActionBar">
+        android:theme="@style/Theme.StructuralAnalysisFEA3D.NoActionBar">
         <activity
             android:name=".core.ui.MainActivity"
             android:exported="true"

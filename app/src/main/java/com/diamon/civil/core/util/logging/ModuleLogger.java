@@ -10,7 +10,7 @@ public class ModuleLogger {
     private static final ModuleLogger GLOBAL_LOGGER = new ModuleLogger("Global");
 
     public static final String WELCOME_BANNER =
-        "--- FEA Advanced Terminal System ---\n" +
+        "--- Structural Analysis FEA 3D Terminal System ---\n" +
         "Type 'help' to see list of available commands.\n";
 
     public static final String HELP_TEXT =

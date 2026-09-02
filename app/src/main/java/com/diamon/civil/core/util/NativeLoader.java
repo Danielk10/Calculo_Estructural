@@ -41,7 +41,7 @@ public class NativeLoader {
         LIBRARY_MAP.put("TKFeat", "TKFeat");
         LIBRARY_MAP.put("TKHLR", "TKHLR");
         LIBRARY_MAP.put("gmsh", "gmsh");
-        LIBRARY_MAP.put("calculoestructural", "calculoestructural");
+        LIBRARY_MAP.put("structural_analysis_fea_3d", "structural_analysis_fea_3d");
         LIBRARY_MAP.put("med", "med_v14");
         LIBRARY_MAP.put("medC", "medC_v14");
         LIBRARY_MAP.put("hdf5", "hdf5_v1000");

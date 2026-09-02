@@ -48,7 +48,7 @@ public class ExportManager {
         }
 
         String displayName = sourceFile.getName();
-        String targetSubDir = "Structural_Analysis_FEA_Advanced" + 
+        String targetSubDir = "Structural_Analysis_FEA_3D" + 
                 (subFolder != null && !subFolder.trim().isEmpty() ? "/" + subFolder.trim() : "");
         String relativePath = Environment.DIRECTORY_DOWNLOADS + "/" + targetSubDir;
 

@@ -15,7 +15,7 @@ public class NativeFeaCore {
             "c++_shared",
             "TKernel", "TKMath", "TKG2d", "TKG3d", "TKGeomBase",
             "TKBRep", "TKGeomAlgo", "TKTopAlgo", "TKPrim", "TKShHealing", "TKBO", "TKBool", "TKFillet",
-            "calculoestructural"
+            "structural_analysis_fea_3d"
     };
 
     public static synchronized void loadLibraries() {

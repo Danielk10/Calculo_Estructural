@@ -1,6 +1,6 @@
 # Instrucciones de Compilación, SDK y Automatización
 
-Este documento describe la configuración del SDK de Android, compilación, firma y publicación del proyecto **Calculo Estructural** (`com.diamon.civil`).
+Este documento describe la configuración del SDK de Android, compilación, firma y publicación del proyecto **Structural Analysis FEA 3D** (`com.diamon.civil`).
 
 ---
 

@@ -1,4 +1,4 @@
-# Structural Analysis FEA Advanced
+# Structural Analysis FEA 3D
 
 [![Android](https://img.shields.io/badge/Android-7.0%2B%20(API%2024--37)-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
 [![Architecture](https://img.shields.io/badge/Architecture-ARM64--v8a-blue?logo=arm&logoColor=white)](https://developer.android.com/ndk)
@@ -9,7 +9,7 @@
 [![Gradle](https://img.shields.io/badge/Gradle-9.6.0-02303A?logo=gradle&logoColor=white)](https://gradle.org)
 [![AGP](https://img.shields.io/badge/AGP-9.2.1-green)](https://developer.android.com/build)
 
-**Structural Analysis FEA Advanced** (`com.diamon.civil`) es una plataforma profesional de cálculo estructural y análisis por elementos finitos (FEA 3D) para Android. Integra de forma nativa los motores computacionales industriales **CalculiX (`ccx 2.23`)**, **OpenCASCADE Technology (`OCCT 8.0.0.p1`)** y **Gmsh** a través del **Android NDK (ARM64-v8a)** con enlaces de alto rendimiento en **Java, Kotlin y C++ (JNI)**.
+**Structural Analysis FEA 3D** (`com.diamon.civil`) es una plataforma profesional de cálculo estructural y análisis por elementos finitos (FEA 3D) para Android. Integra de forma nativa los motores computacionales industriales **CalculiX (`ccx 2.23`)**, **OpenCASCADE Technology (`OCCT 8.0.0.p1`)** y **Gmsh** a través del **Android NDK (ARM64-v8a)** con enlaces de alto rendimiento en **Java, Kotlin y C++ (JNI)**.
 
 ---
 
@@ -192,7 +192,7 @@ the Free Software Foundation; see gpl.htm.
 
 | Parámetro | Configuración / Versión |
 | :--- | :--- |
-| **Nombre de la Aplicación** | Structural Analysis FEA Advanced |
+| **Nombre de la Aplicación** | Structural Analysis FEA 3D |
 | **ID de Paquete (Package Name)** | `com.diamon.civil` |
 | **Versión de la Aplicación** | `v0.1.0` (VersionCode: `1`) |
 | **SDK de Compilación (Compile SDK)** | **API 37** (Android 15 / 16 Preview) |
