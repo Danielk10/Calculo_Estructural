@@ -14,8 +14,6 @@ public class ModuleLogger {
         "Type 'help' to see list of available commands.\n";
 
     public static final String HELP_TEXT =
-        "--- FEA Advanced Terminal System ---\n" +
-        "Type 'help' to see list of available commands.\n\n" +
         "Special Test & Pipeline Commands:\n" +
         "  test-gmsh              - Run 3D CAD Boolean subtraction & mesh test (Gmsh + OCCT)\n" +
         "  test-draw              - Run OpenCASCADE DRAWEXE headless primitive box test (OCCT)\n" +

@@ -35,7 +35,7 @@ public class ExportManager {
             boolean success = true;
             if (children != null) {
                 for (File child : children) {
-                    if (child.getName().startsWith(".")) continue;
+                    if (ProjectExporter.shouldIgnore(child)) continue;
                     String nextSubFolder = (subFolder == null || subFolder.isEmpty())
                             ? sourceFile.getName()
                             : subFolder + "/" + sourceFile.getName();

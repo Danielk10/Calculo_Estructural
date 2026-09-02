@@ -37,8 +37,13 @@ public class ProjectExporter {
         });
     }
 
-    private boolean shouldIgnore(File f) {
+    public static boolean shouldIgnore(File f) {
+        if (f == null) return true;
         String name = f.getName();
+        if (name.startsWith(".")) return true;
+        if (name.equalsIgnoreCase("profileInstalled") || name.toLowerCase().startsWith("profileinstaller")) {
+            return true;
+        }
         if (f.isDirectory()) {
             if (name.equalsIgnoreCase("3d_solid_analysis") ||
                 name.equalsIgnoreCase("structural_analysis") ||
@@ -57,7 +62,7 @@ public class ProjectExporter {
                name.equalsIgnoreCase("app_webview") ||
                name.equalsIgnoreCase("databases") ||
                name.equalsIgnoreCase("shared_prefs") ||
-               name.startsWith(".");
+               name.equalsIgnoreCase("system");
     }
 
     public void shutdown() {

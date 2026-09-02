@@ -71,7 +71,7 @@ public class TerminalCommandExecutorTest {
         // 9. help
         String helpRes = executor.execute("help");
         assertNotNull(helpRes);
-        assertTrue(helpRes.contains("FEA Advanced Terminal System"));
+        assertTrue(helpRes.contains("Special Test & Pipeline Commands"));
     }
 
     @Test
@@ -81,51 +81,54 @@ public class TerminalCommandExecutorTest {
         File structDir = new File(globalRoot, "structural_analysis");
         File solidsDir = new File(globalRoot, "3d_solid_analysis");
         File usrDir = new File(globalRoot, "usr"); // Internal system folder
+        File binDir = new File(globalRoot, "bin"); // Internal system folder
+        File profileFile = new File(globalRoot, "profileInstalled");
+        File profileData = new File(globalRoot, "profileinstaller_profileWrittenFor_lastUpdateTime.dat");
         assertTrue(terminalHome.mkdirs());
         assertTrue(structDir.mkdirs());
         assertTrue(solidsDir.mkdirs());
         assertTrue(usrDir.mkdirs());
+        assertTrue(binDir.mkdirs());
+        assertTrue(profileFile.createNewFile());
+        assertTrue(profileData.createNewFile());
 
         // Create a model file in structural_analysis
         File structModel = new File(structDir, "model.json");
         java.nio.file.Files.write(structModel.toPath(), "{\"model\":\"frame\"}".getBytes());
 
-        TerminalCommandExecutor globalExecutor = new TerminalCommandExecutor(globalRoot, terminalHome);
+        TerminalCommandExecutor globalExecutor = new TerminalCommandExecutor(globalRoot, globalRoot);
 
-        // 1. Initial directory should be /terminal
-        assertEquals("/terminal", globalExecutor.execute("pwd"));
-
-        // 2. cd / should go to global root
-        String cdRoot = globalExecutor.execute("cd /");
-        assertTrue(cdRoot.contains("/"));
+        // 1. Initial directory should be / (global root)
         assertEquals("/", globalExecutor.execute("pwd"));
 
-        // 3. ls at root should show module folders and hide internal system folders (usr)
+        // 2. ls at root should show module folders, files, and hide internal system folders (usr, bin)
         String lsRoot = globalExecutor.execute("ls");
         assertTrue(lsRoot.contains("structural_analysis"));
         assertTrue(lsRoot.contains("3d_solid_analysis"));
         assertTrue(lsRoot.contains("terminal"));
+        assertTrue("Files like .dat should be listed", lsRoot.contains("profileinstaller_profileWrittenFor_lastUpdateTime.dat"));
         assertFalse("Internal usr folder should be hidden", lsRoot.contains("usr"));
+        assertFalse("Internal bin folder should be hidden", lsRoot.contains("bin"));
 
-        // 4. cd into structural_analysis
+        // 3. cd into structural_analysis
         String cdStruct = globalExecutor.execute("cd /structural_analysis");
         assertTrue(cdStruct.contains("/structural_analysis"));
         assertEquals("/structural_analysis", globalExecutor.execute("pwd"));
 
-        // 5. ls in structural_analysis should show model.json
+        // 4. ls in structural_analysis should show model.json
         String lsStruct = globalExecutor.execute("ls");
         assertTrue(lsStruct.contains("model.json"));
 
-        // 6. cat model.json
+        // 5. cat model.json
         String catStruct = globalExecutor.execute("cat model.json");
         assertTrue(catStruct.contains("frame"));
 
-        // 7. cd ~ should return to terminal home
+        // 6. cd ~ should return to global home (/)
         String cdHome = globalExecutor.execute("cd ~");
-        assertTrue(cdHome.contains("/terminal"));
-        assertEquals("/terminal", globalExecutor.execute("pwd"));
+        assertTrue(cdHome.contains("/"));
+        assertEquals("/", globalExecutor.execute("pwd"));
 
-        // 8. Sandbox check: cannot cd ../../ outside global root
+        // 7. Sandbox check: cannot cd ../../ outside global root
         globalExecutor.execute("cd ../../..");
         assertEquals("/", globalExecutor.execute("pwd"));
     }

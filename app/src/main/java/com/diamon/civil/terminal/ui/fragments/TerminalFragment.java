@@ -60,13 +60,11 @@ public class TerminalFragment extends Fragment {
 
         final Context appContext = requireContext().getApplicationContext();
         File filesRoot = appContext.getFilesDir();
-        File terminalDir = new File(filesRoot, "terminal");
-        if (!terminalDir.exists()) terminalDir.mkdirs();
-        terminalExecutor = new TerminalCommandExecutor(filesRoot, terminalDir);
+        terminalExecutor = new TerminalCommandExecutor(filesRoot, filesRoot);
 
         executor.execute(() -> {
             try {
-                calculixExecutor = new CalculixExecutor(appContext, terminalDir);
+                calculixExecutor = new CalculixExecutor(appContext, filesRoot);
             } catch (Exception e) {
                 // Ignore or log error
             }
@@ -219,15 +217,19 @@ public class TerminalFragment extends Fragment {
         }
     }
 
+    public File getCurrentWorkDir() {
+        return terminalExecutor != null ? terminalExecutor.getCurrentDir() : (getContext() != null ? getContext().getFilesDir() : null);
+    }
+
     public void onInpImported(File inpFile) {
         if (inpFile == null) return;
-        ModuleLogger.getGlobal().log("[INP IMPORTED] " + inpFile.getName() + " saved to terminal workspace.");
+        ModuleLogger.getGlobal().log("[INP IMPORTED] " + inpFile.getName() + " saved to workspace.");
     }
 
     public void exportResults() {
         if (getContext() == null || binding == null) return;
         final Context ctx = getContext();
-        final File workDir = new File(ctx.getFilesDir(), "terminal");
+        final File workDir = getCurrentWorkDir() != null ? getCurrentWorkDir() : ctx.getFilesDir();
         if (!workDir.exists()) workDir.mkdirs();
         final File reportFile = new File(workDir, "Terminal_Analysis_Report.pdf");
         final String logText = binding.tvLog != null ? binding.tvLog.getText().toString() : "";
@@ -266,8 +268,6 @@ public class TerminalFragment extends Fragment {
 
     private void sendCommand() {
         if (getContext() == null || binding == null) return;
-        final File filesDir = new File(getContext().getApplicationContext().getFilesDir(), "terminal");
-        if (!filesDir.exists()) filesDir.mkdirs();
         String input = binding.etCommand.getText().toString().trim();
         if (input.isEmpty()) return;
 
@@ -482,7 +482,7 @@ public class TerminalFragment extends Fragment {
 
     private void copyAssetToFilesDir(String filename, File destDir) {
         if (getContext() == null) return;
-        if (destDir == null) destDir = new File(requireContext().getFilesDir(), "terminal");
+        if (destDir == null) destDir = getCurrentWorkDir() != null ? getCurrentWorkDir() : requireContext().getFilesDir();
         if (!destDir.exists()) destDir.mkdirs();
         File outFile = new File(destDir, filename);
         if (outFile.exists()) return;
@@ -501,7 +501,7 @@ public class TerminalFragment extends Fragment {
     private String runStepTest(String stepFileName, String baseName, File destDir) {
         StringBuilder sb = new StringBuilder();
         if (getContext() == null) return "Context is null";
-        if (destDir == null) destDir = new File(requireContext().getFilesDir(), "terminal");
+        if (destDir == null) destDir = getCurrentWorkDir() != null ? getCurrentWorkDir() : requireContext().getFilesDir();
         if (!destDir.exists()) destDir.mkdirs();
         File stepFile = new File(destDir, stepFileName);
 

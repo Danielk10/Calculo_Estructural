@@ -142,14 +142,15 @@ public class TerminalCommandExecutor {
         return result.isEmpty() ? "(empty)" : result;
     }
 
-    /** Returns true for system/internal directories that should not be visible to the user. */
+    /** Returns true for system/internal directories that should not be visible to the user at root. */
     private boolean shouldHideFromListing(File f) {
-        if (!f.isDirectory()) return false;
         String name = f.getName();
+        if (name.startsWith(".")) return true;
+        if (!f.isDirectory()) return false;
         return name.equals("usr") || name.equals("fake_root") || name.equals("lib") ||
                name.equals("include") || name.equals("share") || name.equals("bin") ||
                name.equals("cache") || name.equals("code_cache") || name.equals("app_webview") ||
-               name.equals("databases") || name.equals("shared_prefs") || name.startsWith(".");
+               name.equals("databases") || name.equals("shared_prefs") || name.equals("system");
     }
 
     private String makeDirectory(String[] parts) {
