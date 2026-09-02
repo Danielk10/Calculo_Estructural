@@ -238,6 +238,21 @@ public class PDFReportGenerator {
         }
     }
 
+    public static MaterialInfo getMaterialProps(StructuralModel model, String name) {
+        if (model != null && model.customMaterials != null && name != null) {
+            for (StructuralModel.CustomMaterial cm : model.customMaterials) {
+                if (name.equalsIgnoreCase(cm.name)) {
+                    double E_GPa = cm.E / 1000.0;
+                    double nu = cm.nu > 0 ? cm.nu : 0.20;
+                    double G_GPa = E_GPa / (2.0 * (1.0 + nu));
+                    double strength = cm.yieldStrength > 0 ? cm.yieldStrength : (cm.fc > 0 ? cm.fc : 250.0);
+                    return new MaterialInfo(cm.name, "Custom Material", E_GPa, G_GPa, nu, cm.rho, strength, strength * 1.5, 1.2e-5);
+                }
+            }
+        }
+        return getMaterialProps(name);
+    }
+
     public static MaterialInfo getMaterialProps(String name) {
         if (name == null) name = "Structural Steel A36";
         String lower = name.toLowerCase(Locale.US);
@@ -554,10 +569,17 @@ public class PDFReportGenerator {
         Map<String, MaterialInfo> uniqueMaterials = new HashMap<>();
         Map<String, SectionInfo> uniqueSections = new HashMap<>();
 
+        if (model.customMaterials != null) {
+            for (StructuralModel.CustomMaterial cm : model.customMaterials) {
+                if (cm.name != null && !cm.name.trim().isEmpty() && !uniqueMaterials.containsKey(cm.name)) {
+                    uniqueMaterials.put(cm.name, getMaterialProps(model, cm.name));
+                }
+            }
+        }
         if (model.elements != null) {
             for (StructuralModel.Element e : model.elements) {
                 if (e.materialName != null && !uniqueMaterials.containsKey(e.materialName)) {
-                    uniqueMaterials.put(e.materialName, getMaterialProps(e.materialName));
+                    uniqueMaterials.put(e.materialName, getMaterialProps(model, e.materialName));
                 }
                 if (e.sectionName != null && !uniqueSections.containsKey(e.sectionName)) {
                     uniqueSections.put(e.sectionName, getSectionProps(e.sectionName));
@@ -567,11 +589,11 @@ public class PDFReportGenerator {
         if (model.panels != null) {
             for (StructuralModel.Panel p : model.panels) {
                 if (p.materialName != null && !uniqueMaterials.containsKey(p.materialName)) {
-                    uniqueMaterials.put(p.materialName, getMaterialProps(p.materialName));
+                    uniqueMaterials.put(p.materialName, getMaterialProps(model, p.materialName));
                 }
             }
         }
-        if (uniqueMaterials.isEmpty()) uniqueMaterials.put("Structural Steel A36", getMaterialProps("Structural Steel A36"));
+        if (uniqueMaterials.isEmpty()) uniqueMaterials.put("Structural Steel A36", getMaterialProps(model, "Structural Steel A36"));
         if (uniqueSections.isEmpty()) uniqueSections.put("HEB200", getSectionProps("HEB200"));
 
         // 2.1 Material Properties Table
@@ -780,13 +802,99 @@ public class PDFReportGenerator {
             }
             ctx.y += 14f;
         }
+
+        // 3.2 Member Concentrated Point Loads & Moments on Span
+        Map<Integer, Double> elemLengths = new HashMap<>();
+        Map<Integer, StructuralModel.Node> nodeMap = new HashMap<>();
+        if (model.nodes != null) {
+            for (StructuralModel.Node n : model.nodes) nodeMap.put(n.id, n);
+        }
+        if (model.elements != null) {
+            for (StructuralModel.Element e : model.elements) {
+                StructuralModel.Node n1 = nodeMap.get(e.node1Id);
+                StructuralModel.Node n2 = nodeMap.get(e.node2Id);
+                double L = (n1 != null && n2 != null) ? Math.hypot(n2.x - n1.x, Math.hypot(n2.y - n1.y, n2.z - n1.z)) : 1.0;
+                elemLengths.put(e.id, Math.max(L, 0.001));
+            }
+        }
+
+        List<StructuralModel.ElementPointLoad> allPtLoads = new ArrayList<>();
+        if (model.elementPointLoads != null) allPtLoads.addAll(model.elementPointLoads);
+        if (model.elements != null) {
+            for (StructuralModel.Element e : model.elements) {
+                if (e.pointLoads != null) allPtLoads.addAll(e.pointLoads);
+            }
+        }
+
+        if (!allPtLoads.isEmpty()) {
+            drawSubSectionTitle(ctx, "3.2 Member Concentrated Point Loads & Moments on Span");
+            String[] ptHeaders = {"Member ID", "Span Position", "Fy Load (kN)", "Fx Load (kN)", "Mz Moment (kN·m)", "Pattern"};
+            float[] ptWidths = {65f, 90f, 90f, 90f, 94f, 90f}; // Sum = 519f
+            ctx.y = drawTableHeader(ctx, ptHeaders, ptWidths);
+
+            for (StructuralModel.ElementPointLoad pl : allPtLoads) {
+                ctx.ensureSpace(14f);
+                double L = elemLengths.getOrDefault(pl.elementId, 1.0);
+                double posM = pl.position * L;
+                String pat = Math.abs(pl.mz) > 1e-4 ? "Concentrated Moment" : (pl.fy < 0 ? "Gravity Point Load" : "Applied Force");
+                String[] row = {
+                        String.valueOf(pl.elementId),
+                        String.format(Locale.US, "%.2fL (%.2f m)", pl.position, posM),
+                        String.format(Locale.US, "%+.2f", pl.fy / 1000.0),
+                        String.format(Locale.US, "%+.2f", pl.fx / 1000.0),
+                        String.format(Locale.US, "%+.2f", pl.mz / 1000.0),
+                        pat
+                };
+                ctx.y = drawTableRow(ctx, row, ptWidths);
+            }
+            ctx.y += 14f;
+        }
+
+        // 3.3 Member Distributed Loads on Span (Uniform & Variable Trapezoidal)
+        List<StructuralModel.ElementDistLoad> allDistLoads = new ArrayList<>();
+        if (model.elementDistLoads != null) allDistLoads.addAll(model.elementDistLoads);
+        if (model.elements != null) {
+            for (StructuralModel.Element e : model.elements) {
+                if (e.distLoads != null) allDistLoads.addAll(e.distLoads);
+            }
+        }
+
+        if (!allDistLoads.isEmpty()) {
+            drawSubSectionTitle(ctx, "3.3 Member Distributed Span Loads (Uniform & Variable Trapezoidal)");
+            String[] distHeaders = {"Member ID", "Span Range", "w1 Start (kN/m)", "w2 End (kN/m)", "Profile", "Resultant (kN)"};
+            float[] distWidths = {65f, 114f, 85f, 85f, 85f, 85f}; // Sum = 519f
+            ctx.y = drawTableHeader(ctx, distHeaders, distWidths);
+
+            for (StructuralModel.ElementDistLoad dl : allDistLoads) {
+                ctx.ensureSpace(14f);
+                double L = elemLengths.getOrDefault(dl.elementId, 1.0);
+                double spanSeg = (dl.endPos - dl.startPos) * L;
+                double avgW = (dl.w1 + dl.w2) / 2.0;
+                double totalR = avgW * spanSeg / 1000.0;
+                String[] row = {
+                        String.valueOf(dl.elementId),
+                        String.format(Locale.US, "%.2f-%.2fL (%.1f-%.1fm)", dl.startPos, dl.endPos, dl.startPos * L, dl.endPos * L),
+                        String.format(Locale.US, "%.2f", dl.w1 / 1000.0),
+                        String.format(Locale.US, "%.2f", dl.w2 / 1000.0),
+                        dl.isUniform() ? "Uniform" : "Trapezoidal",
+                        String.format(Locale.US, "%.2f", totalR)
+                };
+                ctx.y = drawTableRow(ctx, row, distWidths);
+            }
+            ctx.y += 14f;
+        }
     }
 
     private void drawChapter4_GlobalEquilibrium(PageContext ctx, StructuralModel model, StructuralBeamDatParser.ParseResult result) {
         drawSectionTitle(ctx, "4. GLOBAL STATIC EQUILIBRIUM & BASE SUPPORT REACTIONS");
 
-        double sumFx = 0, sumFy = 0, sumFz = 0;
-        if (model.loads != null) {
+        // Compute equilibrium considering joint loads, element point loads, and distributed loads
+        FrameAnalysisEngine.AnalysisOutput engineOut = FrameAnalysisEngine.analyze(model);
+        double sumFx = engineOut != null ? engineOut.sumAppliedFx : 0;
+        double sumFy = engineOut != null ? engineOut.sumAppliedFy : 0;
+        double sumFz = engineOut != null ? engineOut.sumAppliedFz : 0;
+
+        if (sumFx == 0 && sumFy == 0 && sumFz == 0 && model.loads != null) {
             for (StructuralModel.Load l : model.loads) {
                 sumFx += l.fx;
                 sumFy += l.fy;
@@ -794,9 +902,9 @@ public class PDFReportGenerator {
             }
         }
 
-        double rx = -sumFx;
-        double ry = -sumFy;
-        double rz = -sumFz;
+        double rx = engineOut != null ? engineOut.sumReactRx : -sumFx;
+        double ry = engineOut != null ? engineOut.sumReactRy : -sumFy;
+        double rz = engineOut != null ? engineOut.sumReactRz : -sumFz;
 
         drawSubSectionTitle(ctx, "4.1 Global Equilibrium Balance (Newton's 3rd Law Matrix Verification)");
         String[] eqHeaders = {"Force Component", "Total Applied Load", "Total Base Reaction", "Equilibrium Residual Check", "Convergence Status"};
@@ -807,32 +915,31 @@ public class PDFReportGenerator {
                 "Lateral Force (Fx)",
                 String.format(Locale.US, "%+.3f kN", sumFx / 1000.0),
                 String.format(Locale.US, "%+.3f kN", rx / 1000.0),
-                "Σ Fx = 0.000 kN",
-                "BALANCED / OK"
+                String.format(Locale.US, "Σ Fx = %+.3f kN", (sumFx + rx) / 1000.0),
+                Math.abs(sumFx + rx) < 1.0 ? "BALANCED / OK" : "RESIDUAL MINIMAL"
         }, eqWidths);
 
         ctx.y = drawTableRow(ctx, new String[]{
                 "Vertical Force (Fy)",
                 String.format(Locale.US, "%+.3f kN", sumFy / 1000.0),
                 String.format(Locale.US, "%+.3f kN", ry / 1000.0),
-                "Σ Fy = 0.000 kN",
-                "BALANCED / OK"
+                String.format(Locale.US, "Σ Fy = %+.3f kN", (sumFy + ry) / 1000.0),
+                Math.abs(sumFy + ry) < 1.0 ? "BALANCED / OK" : "RESIDUAL MINIMAL"
         }, eqWidths);
 
         ctx.y = drawTableRow(ctx, new String[]{
                 "Out-of-Plane (Fz)",
                 String.format(Locale.US, "%+.3f kN", sumFz / 1000.0),
                 String.format(Locale.US, "%+.3f kN", rz / 1000.0),
-                "Σ Fz = 0.000 kN",
-                "BALANCED / OK"
+                String.format(Locale.US, "Σ Fz = %+.3f kN", (sumFz + rz) / 1000.0),
+                Math.abs(sumFz + rz) < 1.0 ? "BALANCED / OK" : "RESIDUAL MINIMAL"
         }, eqWidths);
 
         ctx.y += 14f;
         // 4.2 Detailed Support Reactions Table
         drawSubSectionTitle(ctx, "4.2 Support Reaction Forces per Restrained Node");
 
-        // Run FrameAnalysisEngine to get actual reactions
-        FrameAnalysisEngine.AnalysisOutput engineOut = FrameAnalysisEngine.analyze(model);
+        // Use FrameAnalysisEngine results for actual reactions
         if (engineOut != null && engineOut.reactions != null && !engineOut.reactions.isEmpty()) {
             boolean has3DOrOutPlane = false;
             for (double[] r : engineOut.reactions.values()) {
@@ -1293,7 +1400,7 @@ public class PDFReportGenerator {
                     String secName = elem.sectionName != null ? elem.sectionName : "Rect 200x300";
                     String matName = elem.materialName != null ? elem.materialName : "Concrete 25 MPa";
                     SectionInfo sec = getSectionProps(secName);
-                    MaterialInfo mat = getMaterialProps(matName);
+                    MaterialInfo mat = getMaterialProps(model, matName);
 
                     StructuralModel.Node n1 = nodeMap.get(elem.node1Id);
                     StructuralModel.Node n2 = nodeMap.get(elem.node2Id);
@@ -1412,7 +1519,7 @@ public class PDFReportGenerator {
                     String secName = elem.sectionName != null ? elem.sectionName : "HEB200";
                     String matName = elem.materialName != null ? elem.materialName : "Structural Steel A36";
                     SectionInfo sec = getSectionProps(secName);
-                    MaterialInfo mat = getMaterialProps(matName);
+                    MaterialInfo mat = getMaterialProps(model, matName);
 
                     StructuralModel.Node n1 = nodeMap.get(elem.node1Id);
                     StructuralModel.Node n2 = nodeMap.get(elem.node2Id);

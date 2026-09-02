@@ -637,13 +637,29 @@ public class StructuralFragment extends Fragment {
             if (etDistLoadEndPos != null) etDistLoadEndPos.setText(String.format(java.util.Locale.US, "%.2f", dl.endPos));
         }
 
-        // Pre-populate point load from element if exists
+        // Pre-populate point load(s) from element if exists (supports multiple)
         if (!element.pointLoads.isEmpty()) {
-            StructuralModel.ElementPointLoad pl = element.pointLoads.get(0);
-            if (etPtLoad != null) etPtLoad.setText(String.format(java.util.Locale.US, "%.2f", pl.fy / 1000.0));
-            if (etPtLoadPos != null) etPtLoadPos.setText(String.format(java.util.Locale.US, "%.2f", pl.position));
-            if (etPtLoadFx != null) etPtLoadFx.setText(String.format(java.util.Locale.US, "%.2f", pl.fx / 1000.0));
-            if (etPtLoadMz != null) etPtLoadMz.setText(String.format(java.util.Locale.US, "%.2f", pl.mz / 1000.0));
+            StringBuilder sbFy = new StringBuilder();
+            StringBuilder sbPos = new StringBuilder();
+            StringBuilder sbFx = new StringBuilder();
+            StringBuilder sbMz = new StringBuilder();
+            for (int i = 0; i < element.pointLoads.size(); i++) {
+                StructuralModel.ElementPointLoad pl = element.pointLoads.get(i);
+                if (i > 0) {
+                    sbFy.append(", ");
+                    sbPos.append(", ");
+                    sbFx.append(", ");
+                    sbMz.append(", ");
+                }
+                sbFy.append(String.format(java.util.Locale.US, "%.2f", pl.fy / 1000.0));
+                sbPos.append(String.format(java.util.Locale.US, "%.2f", pl.position));
+                sbFx.append(String.format(java.util.Locale.US, "%.2f", pl.fx / 1000.0));
+                sbMz.append(String.format(java.util.Locale.US, "%.2f", pl.mz / 1000.0));
+            }
+            if (etPtLoad != null) etPtLoad.setText(sbFy.toString());
+            if (etPtLoadPos != null) etPtLoadPos.setText(sbPos.toString());
+            if (etPtLoadFx != null) etPtLoadFx.setText(sbFx.toString());
+            if (etPtLoadMz != null) etPtLoadMz.setText(sbMz.toString());
         }
 
         new MaterialAlertDialogBuilder(requireContext())
@@ -723,6 +739,13 @@ public class StructuralFragment extends Fragment {
                             dEndPos = Double.parseDouble(etDistLoadEndPos.getText().toString());
                         }
                     } catch (Exception ignored) {}
+                    // Convert positions entered in absolute meters to fractional ratio
+                    if (dStartPos > 1.0 && length > 1.0 && dStartPos <= length) {
+                        dStartPos = dStartPos / length;
+                    }
+                    if (dEndPos > 1.0 && length > 1.0 && dEndPos <= length) {
+                        dEndPos = dEndPos / length;
+                    }
                     if (Math.abs(w1) > 1e-4 || Math.abs(w2) > 1e-4) {
                         dStartPos = Math.max(0.0, Math.min(1.0, dStartPos));
                         dEndPos = Math.max(dStartPos + 0.001, Math.min(1.0, dEndPos));
@@ -730,33 +753,47 @@ public class StructuralFragment extends Fragment {
                                 element.id, dStartPos, dEndPos, w1 * 1000.0, w2 * 1000.0));
                     }
 
-                    // Process point load on span
+                    // Process point load(s) on span (supports multiple point loads & moments)
                     element.pointLoads.clear();
-                    double pFy = 0.0, pFx = 0.0, pMz = 0.0, pPos = 0.5;
-                    try {
-                        if (etPtLoad != null && etPtLoad.getText() != null && etPtLoad.getText().length() > 0) {
-                            pFy = Double.parseDouble(etPtLoad.getText().toString());
+                    String posStr = etPtLoadPos != null && etPtLoadPos.getText() != null ? etPtLoadPos.getText().toString().trim() : "";
+                    String fyStr = etPtLoad != null && etPtLoad.getText() != null ? etPtLoad.getText().toString().trim() : "";
+                    String fxStr = etPtLoadFx != null && etPtLoadFx.getText() != null ? etPtLoadFx.getText().toString().trim() : "";
+                    String mzStr = etPtLoadMz != null && etPtLoadMz.getText() != null ? etPtLoadMz.getText().toString().trim() : "";
+
+                    if (!posStr.isEmpty() || !fyStr.isEmpty() || !fxStr.isEmpty() || !mzStr.isEmpty()) {
+                        String[] posParts = !posStr.isEmpty() ? posStr.split("[,;\\s]+") : new String[0];
+                        String[] fyParts = !fyStr.isEmpty() ? fyStr.split("[,;\\s]+") : new String[0];
+                        String[] fxParts = !fxStr.isEmpty() ? fxStr.split("[,;\\s]+") : new String[0];
+                        String[] mzParts = !mzStr.isEmpty() ? mzStr.split("[,;\\s]+") : new String[0];
+
+                        int maxLoads = Math.max(posParts.length, Math.max(fyParts.length, Math.max(fxParts.length, mzParts.length)));
+                        for (int k = 0; k < maxLoads; k++) {
+                            double pPos = 0.5;
+                            double pFy = 0.0, pFx = 0.0, pMz = 0.0;
+                            if (k < posParts.length) {
+                                try { pPos = Double.parseDouble(posParts[k].trim()); } catch (Exception ignored) {}
+                            }
+                            if (k < fyParts.length) {
+                                try { pFy = Double.parseDouble(fyParts[k].trim()); } catch (Exception ignored) {}
+                            }
+                            if (k < fxParts.length) {
+                                try { pFx = Double.parseDouble(fxParts[k].trim()); } catch (Exception ignored) {}
+                            }
+                            if (k < mzParts.length) {
+                                try { pMz = Double.parseDouble(mzParts[k].trim()); } catch (Exception ignored) {}
+                            }
+
+                            // If entered in meters > 1.0 and <= length, convert to ratio
+                            if (pPos > 1.0 && length > 1.0 && pPos <= length) {
+                                pPos = pPos / length;
+                            }
+                            pPos = Math.max(0.0, Math.min(1.0, pPos));
+
+                            if (Math.abs(pFy) > 1e-4 || Math.abs(pFx) > 1e-4 || Math.abs(pMz) > 1e-4) {
+                                element.pointLoads.add(new StructuralModel.ElementPointLoad(
+                                        element.id, pPos, pFy * 1000.0, pFx * 1000.0, pMz * 1000.0));
+                            }
                         }
-                    } catch (Exception ignored) {}
-                    try {
-                        if (etPtLoadFx != null && etPtLoadFx.getText() != null && etPtLoadFx.getText().length() > 0) {
-                            pFx = Double.parseDouble(etPtLoadFx.getText().toString());
-                        }
-                    } catch (Exception ignored) {}
-                    try {
-                        if (etPtLoadMz != null && etPtLoadMz.getText() != null && etPtLoadMz.getText().length() > 0) {
-                            pMz = Double.parseDouble(etPtLoadMz.getText().toString());
-                        }
-                    } catch (Exception ignored) {}
-                    try {
-                        if (etPtLoadPos != null && etPtLoadPos.getText() != null && etPtLoadPos.getText().length() > 0) {
-                            pPos = Double.parseDouble(etPtLoadPos.getText().toString());
-                        }
-                    } catch (Exception ignored) {}
-                    if (Math.abs(pFy) > 1e-4 || Math.abs(pFx) > 1e-4 || Math.abs(pMz) > 1e-4) {
-                        pPos = Math.max(0.0, Math.min(1.0, pPos));
-                        element.pointLoads.add(new StructuralModel.ElementPointLoad(
-                                element.id, pPos, pFy * 1000.0, pFx * 1000.0, pMz * 1000.0));
                     }
 
                     // Also apply equivalent tributary nodal loads for compatibility with existing display
