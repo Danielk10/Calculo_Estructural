@@ -1243,11 +1243,11 @@ public class PDFReportGenerator {
 
                     StructuralBeamDatParser.SectionForces sf = forceMap.get(elem.id);
                     double maxN = sf != null ? sf.N : 0.0;
-                    double maxV2 = sf != null ? sf.V2 : 0.0;
-                    double maxM = sf != null ? Math.max(Math.abs(sf.M1), Math.abs(sf.M2)) : 0.0;
+                    double maxV = sf != null ? Math.max(Math.abs(sf.V2), Math.abs(sf.V3)) : 0.0;
+                    double maxM = sf != null ? Math.max(Math.max(Math.abs(sf.M1), Math.abs(sf.M2)), Math.abs(sf.M3)) : 0.0;
 
                     double Pu_kN = Math.abs(maxN) / 1000.0;
-                    double Vu_kN = Math.abs(maxV2) / 1000.0;
+                    double Vu_kN = maxV / 1000.0;
                     double Mu_kNm = maxM / 1000.0;
 
                     double fc = mat.strength_MPa > 0 ? mat.strength_MPa : 25.0; // MPa
@@ -1362,11 +1362,11 @@ public class PDFReportGenerator {
 
                     StructuralBeamDatParser.SectionForces sf = forceMap.get(elem.id);
                     double maxN = sf != null ? sf.N : 0.0;
-                    double maxV2 = sf != null ? sf.V2 : 0.0;
-                    double maxM = sf != null ? Math.max(Math.abs(sf.M1), Math.abs(sf.M2)) : 0.0;
+                    double maxV = sf != null ? Math.max(Math.abs(sf.V2), Math.abs(sf.V3)) : 0.0;
+                    double maxM = sf != null ? Math.max(Math.max(Math.abs(sf.M1), Math.abs(sf.M2)), Math.abs(sf.M3)) : 0.0;
 
                     double Pu_kN = Math.abs(maxN) / 1000.0;
-                    double Vu2_kN = Math.abs(maxV2) / 1000.0;
+                    double Vu2_kN = maxV / 1000.0;
                     double Mu3_kNm = maxM / 1000.0;
                     double Mu2_kNm = 0.0;
 

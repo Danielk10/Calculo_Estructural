@@ -893,27 +893,30 @@ public class StructuralFragment extends Fragment {
         }
 
         // Reactions table
-        report.append("\n── Support Reaction Forces ──\n");
-        report.append(String.format(java.util.Locale.US, "%-8s %-12s %-12s %-12s\n",
-                "Node", "Rx (kN)", "Ry (kN)", "Mz (kN·m)"));
-        report.append("─────────────────────────────────────────────────\n");
+        report.append("\n── Support Reaction Forces (6-DOF Spatial Matrix) ──\n");
+        report.append(String.format(java.util.Locale.US, "%-8s %-10s %-10s %-10s %-10s %-10s %-10s\n",
+                "Node", "Rx (kN)", "Ry (kN)", "Rz (kN)", "Mx (kN·m)", "My (kN·m)", "Mz (kN·m)"));
+        report.append("───────────────────────────────────────────────────────────────────────────\n");
         if (engineOutput.reactions != null) {
             for (Map.Entry<Integer, double[]> entry : engineOutput.reactions.entrySet()) {
                 double[] r = entry.getValue();
-                report.append(String.format(java.util.Locale.US, "%-8d %-12.3f %-12.3f %-12.3f\n",
-                        entry.getKey(), r[0] / 1000.0, r[1] / 1000.0, r[5] / 1000.0));
+                double rx = r.length > 0 ? r[0] / 1000.0 : 0.0;
+                double ry = r.length > 1 ? r[1] / 1000.0 : 0.0;
+                double rz = r.length > 2 ? r[2] / 1000.0 : 0.0;
+                double mx = r.length > 3 ? r[3] / 1000.0 : 0.0;
+                double my = r.length > 4 ? r[4] / 1000.0 : 0.0;
+                double mz = r.length > 5 ? r[5] / 1000.0 : 0.0;
+                report.append(String.format(java.util.Locale.US, "%-8d %-10.3f %-10.3f %-10.3f %-10.3f %-10.3f %-10.3f\n",
+                        entry.getKey(), rx, ry, rz, mx, my, mz));
             }
         }
 
         // Equilibrium check
         report.append("\n── Global Equilibrium Verification ──\n");
-        report.append(String.format(java.util.Locale.US, "ΣFx Applied = %.3f kN\n", engineOutput.sumAppliedFx / 1000.0));
-        report.append(String.format(java.util.Locale.US, "ΣFy Applied = %.3f kN\n", engineOutput.sumAppliedFy / 1000.0));
-        report.append(String.format(java.util.Locale.US, "ΣRx         = %.3f kN\n", engineOutput.sumReactRx / 1000.0));
-        report.append(String.format(java.util.Locale.US, "ΣRy         = %.3f kN\n", engineOutput.sumReactRy / 1000.0));
-        report.append(String.format(java.util.Locale.US, "Residual Fx = %.6f kN\n", engineOutput.residualFx / 1000.0));
-        report.append(String.format(java.util.Locale.US, "Residual Fy = %.6f kN\n", engineOutput.residualFy / 1000.0));
-        boolean equilibrium = Math.abs(engineOutput.residualFx) < 1.0 && Math.abs(engineOutput.residualFy) < 1.0;
+        report.append(String.format(java.util.Locale.US, "ΣFx Applied = %10.3f kN | ΣRx Reacted = %10.3f kN | Residual = %.6f kN\n", engineOutput.sumAppliedFx / 1000.0, engineOutput.sumReactRx / 1000.0, engineOutput.residualFx / 1000.0));
+        report.append(String.format(java.util.Locale.US, "ΣFy Applied = %10.3f kN | ΣRy Reacted = %10.3f kN | Residual = %.6f kN\n", engineOutput.sumAppliedFy / 1000.0, engineOutput.sumReactRy / 1000.0, engineOutput.residualFy / 1000.0));
+        report.append(String.format(java.util.Locale.US, "ΣFz Applied = %10.3f kN | ΣRz Reacted = %10.3f kN | Residual = %.6f kN\n", engineOutput.sumAppliedFz / 1000.0, engineOutput.sumReactRz / 1000.0, engineOutput.residualFz / 1000.0));
+        boolean equilibrium = Math.abs(engineOutput.residualFx) < 1.0 && Math.abs(engineOutput.residualFy) < 1.0 && Math.abs(engineOutput.residualFz) < 1.0;
         report.append(String.format(java.util.Locale.US, "Status: %s\n", equilibrium ? "✅ EQUILIBRIUM VERIFIED" : "⚠️ EQUILIBRIUM NOT SATISFIED"));
 
         // Element releases summary
