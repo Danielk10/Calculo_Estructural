@@ -330,57 +330,133 @@ public class SolidInpAssembler {
         double dy = Math.max(maxY - minY, 1e-6);
         double dz = Math.max(maxZ - minZ, 1e-6);
 
-        // Precise planar tolerance (0.1% or max 0.005 mm) to strictly select boundary surface nodes and NEVER internal volume nodes
-        double tolX = Math.max(dx * 0.001, 1e-3);
-        double tolY = Math.max(dy * 0.001, 1e-3);
-        double tolZ = Math.max(dz * 0.001, 1e-3);
+        // Adaptive tolerance: start tight (0.1%) and progressively widen
+        // to capture at least 3 non-collinear nodes for kinematic stability.
+        // For 3D continuum elements (C3D4/C3D10) with only translational DOFs,
+        // at least 3 non-collinear nodes are required to fully restrain
+        // all 6 rigid body modes (3 translations + 3 rotations).
+        double[] toleranceFactors = {0.001, 0.005, 0.01, 0.02, 0.05, 0.10};
 
-        if (faceType.equals("X_MIN")) {
-            for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
-                if (e.getValue()[0] <= minX + tolX) result.add(e.getKey());
-            }
-        } else if (faceType.equals("X_MAX")) {
-            for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
-                if (e.getValue()[0] >= maxX - tolX) result.add(e.getKey());
-            }
-        } else if (faceType.equals("Y_MIN")) {
-            for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
-                if (e.getValue()[1] <= minY + tolY) result.add(e.getKey());
-            }
-        } else if (faceType.equals("Y_MAX")) {
-            for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
-                if (e.getValue()[1] >= maxY - tolY) result.add(e.getKey());
-            }
-        } else if (faceType.equals("Z_MIN")) {
-            for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
-                if (e.getValue()[2] <= minZ + tolZ) result.add(e.getKey());
-            }
-        } else if (faceType.equals("Z_MAX")) {
-            for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
-                if (e.getValue()[2] >= maxZ - tolZ) result.add(e.getKey());
-            }
-        } else {
-            // AUTO selection along longest dimension
-            int axis = 0;
-            double minVal = minX, maxVal = maxX, tol = tolX;
-            if (dy > dx && dy >= dz) {
-                axis = 1; minVal = minY; maxVal = maxY; tol = tolY;
-            } else if (dz > dx && dz > dy) {
-                axis = 2; minVal = minZ; maxVal = maxZ; tol = tolZ;
-            }
+        for (double factor : toleranceFactors) {
+            double tolX = Math.max(dx * factor, 1e-3);
+            double tolY = Math.max(dy * factor, 1e-3);
+            double tolZ = Math.max(dz * factor, 1e-3);
 
-            boolean wantMin = faceType.equals("AUTO_MIN");
-            for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
-                double val = e.getValue()[axis];
-                if (wantMin && val <= minVal + tol) {
-                    result.add(e.getKey());
-                } else if (!wantMin && val >= maxVal - tol) {
-                    result.add(e.getKey());
+            result.clear();
+
+            if (faceType.equals("X_MIN")) {
+                for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
+                    if (e.getValue()[0] <= minX + tolX) result.add(e.getKey());
                 }
+            } else if (faceType.equals("X_MAX")) {
+                for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
+                    if (e.getValue()[0] >= maxX - tolX) result.add(e.getKey());
+                }
+            } else if (faceType.equals("Y_MIN")) {
+                for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
+                    if (e.getValue()[1] <= minY + tolY) result.add(e.getKey());
+                }
+            } else if (faceType.equals("Y_MAX")) {
+                for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
+                    if (e.getValue()[1] >= maxY - tolY) result.add(e.getKey());
+                }
+            } else if (faceType.equals("Z_MIN")) {
+                for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
+                    if (e.getValue()[2] <= minZ + tolZ) result.add(e.getKey());
+                }
+            } else if (faceType.equals("Z_MAX")) {
+                for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
+                    if (e.getValue()[2] >= maxZ - tolZ) result.add(e.getKey());
+                }
+            } else {
+                // AUTO selection along longest dimension
+                int axis = 0;
+                double minVal = minX, maxVal = maxX, tol = tolX;
+                if (dy > dx && dy >= dz) {
+                    axis = 1; minVal = minY; maxVal = maxY; tol = tolY;
+                } else if (dz > dx && dz > dy) {
+                    axis = 2; minVal = minZ; maxVal = maxZ; tol = tolZ;
+                }
+
+                boolean wantMin = faceType.equals("AUTO_MIN");
+                for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
+                    double val = e.getValue()[axis];
+                    if (wantMin && val <= minVal + tol) {
+                        result.add(e.getKey());
+                    } else if (!wantMin && val >= maxVal - tol) {
+                        result.add(e.getKey());
+                    }
+                }
+            }
+
+            // Check kinematic sufficiency: need >= 3 non-collinear nodes
+            // to prevent rigid body rotation around any axis
+            if (areNodesKinematicallySufficient(result, nodeCoords)) {
+                break; // Current tolerance captures enough well-distributed nodes
             }
         }
 
         return result;
+    }
+
+    /**
+     * Checks whether the selected node set is kinematically sufficient to
+     * prevent all rigid body modes when used as a fixed boundary condition
+     * on 3D continuum elements (which only have translational DOFs).
+     *
+     * Requirements:
+     * - At least 3 nodes (to provide 9 SPCs, more than the 6 needed)
+     * - The 3 nodes must NOT be collinear (otherwise rotation around the
+     *   line they define remains unconstrained)
+     *
+     * The collinearity check uses the cross product of two edge vectors:
+     * if ||AB × AC|| / (||AB|| · ||AC||) > epsilon, the nodes span a 2D
+     * area and all rotations are restrained.
+     */
+    private static boolean areNodesKinematicallySufficient(Set<Integer> nodeIds, Map<Integer, double[]> nodeCoords) {
+        if (nodeIds.size() < 3) return false;
+
+        // Collect coordinates of selected nodes
+        List<double[]> pts = new ArrayList<>();
+        for (int id : nodeIds) {
+            double[] c = nodeCoords.get(id);
+            if (c != null) pts.add(c);
+            if (pts.size() >= 20) break; // Sample is sufficient
+        }
+        if (pts.size() < 3) return false;
+
+        // Check non-collinearity: find max cross-product magnitude
+        // among combinations of the first node with subsequent pairs
+        double[] a = pts.get(0);
+        double maxCrossNorm = 0.0;
+        for (int i = 1; i < pts.size() - 1; i++) {
+            double[] b = pts.get(i);
+            double abx = b[0] - a[0], aby = b[1] - a[1], abz = b[2] - a[2];
+            double abLen = Math.sqrt(abx * abx + aby * aby + abz * abz);
+            if (abLen < 1e-10) continue;
+
+            for (int j = i + 1; j < pts.size(); j++) {
+                double[] c = pts.get(j);
+                double acx = c[0] - a[0], acy = c[1] - a[1], acz = c[2] - a[2];
+                double acLen = Math.sqrt(acx * acx + acy * acy + acz * acz);
+                if (acLen < 1e-10) continue;
+
+                // Cross product AB × AC
+                double cx = aby * acz - abz * acy;
+                double cy = abz * acx - abx * acz;
+                double cz = abx * acy - aby * acx;
+                double crossNorm = Math.sqrt(cx * cx + cy * cy + cz * cz);
+
+                // Normalize by edge lengths to get sin(angle)
+                double sinAngle = crossNorm / (abLen * acLen);
+                maxCrossNorm = Math.max(maxCrossNorm, sinAngle);
+
+                // If sin(angle) > 0.01 (~0.57°), nodes are clearly non-collinear
+                if (sinAngle > 0.01) return true;
+            }
+        }
+
+        return maxCrossNorm > 0.01;
     }
 
     private static Set<Integer> extractNodesFromPhysical(List<String> lines, String setName) {

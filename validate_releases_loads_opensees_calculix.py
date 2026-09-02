@@ -23,8 +23,10 @@ def run_calculix(inp_text):
         with open(inp_path, "w") as f:
             f.write(inp_text)
         
-        ccx_cmd = "ccx"
-        result = subprocess.run([ccx_cmd, "-i", jobname], cwd=tmpdir, capture_output=True, text=True)
+        ccx_cmd = os.path.expanduser("~/.local/bin/ccx")
+        if not os.path.exists(ccx_cmd):
+            ccx_cmd = "ccx"
+        result = subprocess.run([ccx_cmd, jobname], cwd=tmpdir, capture_output=True, text=True)
         
         dat_path = os.path.join(tmpdir, f"{jobname}.dat")
         if not os.path.exists(dat_path):
@@ -55,19 +57,21 @@ def test_case_1_point_load_span():
     R1_exact = P * (b**2) * (3.0 * a + b) / (L**3)
     R2_exact = P * (a**2) * (a + 3.0 * b) / (L**3)
     
-    # OpenSees Model
+    # OpenSees Model: 2 elements with intermediate load node at x=a
     ops.wipe()
     ops.model('basic', '-ndm', 2, '-ndf', 3)
     ops.node(1, 0.0, 0.0)
     ops.node(2, L, 0.0)
+    ops.node(3, a, 0.0)
     ops.fix(1, 1, 1, 1)
     ops.fix(2, 1, 1, 1)
     ops.geomTransf('Linear', 1)
-    ops.element('elasticBeamColumn', 1, 1, 2, A, E, I, 1)
+    ops.element('elasticBeamColumn', 1, 1, 3, A, E, I, 1)
+    ops.element('elasticBeamColumn', 2, 3, 2, A, E, I, 1)
     
     ops.timeSeries('Constant', 1)
     ops.pattern('Plain', 1, 1)
-    ops.eleLoad('-ele', 1, '-type', '-beamPoint', -P, a/L)
+    ops.load(3, 0.0, -P, 0.0)
     
     ops.system('BandGeneral')
     ops.numberer('RCM')
