@@ -96,13 +96,29 @@ Este módulo está dedicado al modelado tridimensional continuo de piezas y comp
 
 ## 💻 3. Terminal Avanzada de Ingeniería
 
-La aplicación incluye un intérprete de comandos Unix integrado en su sandbox para usuarios avanzados y desarrolladores:
-- `ls`: Listar archivos de simulación (`.inp`, `.dat`, `.frd`, `.glb`, `.pdf`).
-- `pwd`: Consultar la ruta del directorio de trabajo interno.
-- `test-gmsh`: Prueba automatizada de operaciones booleanas con OpenCASCADE y mallado 3D.
-- `test-draw`: Prueba de ejecución de `DRAWEXE` en modo headless.
-- `<nombre_archivo>`: Ejecuta directamente CalculiX `ccx` sobre cualquier archivo `.inp` presente en el directorio.
-- **Portapapeles:** Tocar los registros de la consola copia automáticamente todo el log para análisis externo.
+La aplicación incluye un intérprete de comandos Unix integrado en su sandbox local para usuarios avanzados, investigadores e ingenieros. Permite ejecutar simulaciones directas, automatizaciones y comprobaciones de integridad físico-matemática:
+
+### 3.1 Comandos de Validación y Pipelines Especiales
+- **`test-calculix`:** Validación de elasticidad lineal 3D (Cubo unitario C3D8 sometido a $P = 400\text{ N}$). Muestra la tensión axial exacta $\sigma_z = 400\text{ MPa}$, la deformación de Hooke $\delta_z = +0.001905\text{ mm}$ y la contracción de Poisson $\delta_x = \delta_y = -0.000571\text{ mm}$ con $0.0000\%$ de error analítico.
+- **`test-calculix-parallel`:** Ejecuta la simulación anterior con aceleración multi-núcleo OpenMP en todos los núcleos de la CPU, comprobando determinismo numérico del $100\%$.
+- **`test-frame` / `test-portico`:** Análisis estructural completo de un pórtico plano 2D con elementos viga B31. Reporta el equilibrio estático global (cortante basal $\sum R_x = -10\text{ kN}$, momento de vuelco $40\text{ kN}\cdot\text{m}$, reacciones axiales $\pm 8\text{ kN}$) y la deriva elástica de entrepiso.
+- **`run-sim-test`:** Simulación automatizada de viga en voladizo ($100 \times 10 \times 10\text{ mm}$, $P = -100\text{ N}$). Muestra el mallado tetraédrico C3D4, la deflexión en la punta ($\delta = 0.1679\text{ mm}$) y la comparación contra la teoría analítica de Euler-Bernoulli ($\delta = 0.1905\text{ mm}$).
+- **`test-cad-solve`:** Pipeline completo sin interfaz: crea una barra sólida $2 \times 2 \times 10\text{ mm}$ en `DRAWEXE`, genera la malla en `Gmsh`, asigna condiciones de contorno y calcula la respuesta elástica en CalculiX.
+- **`test-step-solve` / `test-bracket-solve`:** Pipeline de importación de modelos industriales en formato STEP (`linkrods.step`, `bracket_simple.step`), con detección espacial automática de caras de anclaje y carga.
+- **`test-coordinate-fallback`:** Prueba el algoritmo de detección geométrica de planos de apoyo en geometrías sin grupos nombrados.
+- **`test-gmsh`:** Comprueba la integración de operaciones booleanas CSG (Cilindro $-$ Esfera) y generación de malla tetraédrica 3D ($V_{\text{teórico}} = 48.69\text{ mm}^3$).
+- **`test-draw`:** Prueba la inicialización de OpenCASCADE en modo headless generando un prisma ortoédrico de $10 \times 10 \times 10\text{ mm}$ ($1\,000\text{ mm}^3$).
+- **`test-dat-parser` / `test-frd-parser`:** Valida la extracción de desplazamientos y fuerzas internas desde los archivos de resultados `.dat` y `.frd`.
+
+### 3.2 Comandos de Sistema y Gestión de Archivos
+- `ls [ruta]`: Listar archivos de simulación en el sandbox (`.inp`, `.dat`, `.frd`, `.glb`, `.pdf`).
+- `cd <directorio>`: Navegar entre directorios internos del espacio de trabajo.
+- `pwd`: Consultar la ruta del directorio activo actual.
+- `cat <archivo>`: Visualizar el contenido de archivos de texto o decks `.inp` directamente en pantalla.
+- `mkdir <nombre>` / `rm [-rf] <archivo/carpeta>`: Crear o eliminar directorios y archivos.
+- `ccx <nombre_deck>`: Ejecuta directamente CalculiX `ccx -i <nombre_deck>` sobre cualquier archivo `.inp`.
+- `gmsh <argumentos>` / `DRAWEXE <argumentos>`: Invocar directamente los binarios nativos con parámetros personalizados.
+- **Exportar Reporte / Copiar Log:** Botones dedicados en la barra superior para exportar el registro completo a PDF o copiarlo al portapapeles.
 
 ---
 
