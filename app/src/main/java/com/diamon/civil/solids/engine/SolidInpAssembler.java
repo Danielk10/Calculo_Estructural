@@ -213,7 +213,7 @@ public class SolidInpAssembler {
         }
 
         if (elementCount == 0) {
-            throw new IOException("Mesh generation produced 0 3D solid continuum elements (C3D4/C3D10/C3D8/C3D6). The CAD model could not be discretized as a 3D solid volume.");
+            throw new IOException("Mesh generation produced 0 3D solid continuum elements (C3D4/C3D10/C3D8/C3D8R/C3D20/C3D20R/C3D6/C3D15). The CAD model could not be discretized as a 3D solid volume.");
         }
 
         // 3. Assemble final INP with professional engineering logic
