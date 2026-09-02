@@ -1,5 +1,35 @@
 # Notas de Versión - Structural Analysis FEA 3D
 
+## 📦 Structural Analysis FEA 3D v0.3.0 (Pre-Release)
+
+### 🚀 Novedades, Rebranding Oficial, Control de Hilos y Optimización de Solvers
+
+#### 1. Renombrado Oficial e Integral de la Plataforma a "Structural Analysis FEA 3D"
+- **Recursos y UI de la Aplicación:**
+  - Actualización completa de `app_name`, títulos y mensajes de diálogos informativos, licencias y avisos flotantes (*toasts*).
+  - Actualización del tema de la aplicación a `Theme.StructuralAnalysisFEA3D.NoActionBar` en `themes.xml` y `AndroidManifest.xml`.
+- **Capa Nativa C++ / CMake y Carga JNI:**
+  - Renombrado del proyecto CMake a `structural_analysis_fea_3d`, generando `libstructural_analysis_fea_3d.so`.
+  - Sincronización transparente de las dependencias nativas en `NativeLoader` y `NativeFeaCore`.
+- **Exportación y Memorias de Cálculo PDF:**
+  - Directorio público de descargas configurado en `Downloads/Structural_Analysis_FEA_3D/`.
+  - Actualización formal de membretes, metadatos y pies de página en `PDFReportGenerator` y `SolidPDFReportGenerator`.
+- **Política de Privacidad y Documentación:**
+  - Archivo oficial renombrado a `politica_privacidad_structural_analysis_fea_3d.html` y cargado dinámicamente desde el servidor.
+  - Sincronización total de manuales técnicos, ficha de Google Play Store (`GOOGLE_PLAY_STORE_LISTING.md`) y `README.md`.
+
+#### 2. Control de Concurrencia y Hilos en el Solucionador CalculiX (Secuencial vs Paralelo)
+- **Soporte Dinámico de Hilos en `CalculixExecutor`:**
+  - Se implementó la parametrización de hilos mediante inyección de variables de entorno OpenMP (`OMP_NUM_THREADS` y `CCX_NPROC_EQUATION_SOLVER`).
+- **Prueba Base Secuencial (`test-calculix`):**
+  - Configurada para ejecutarse estrictamente a **1 solo hilo** (`OMP_NUM_THREADS=1`), garantizando la validación determinista y secuencial en cualquier dispositivo independiente de su número de núcleos.
+- **Prueba Paralela Multiprocesador (`test-calculix-parallel`):**
+  - Utiliza el 100% de los núcleos disponibles de la CPU del dispositivo móvil con aceleración multihilo OpenMP y SPOOLES.
+- **Módulos de Simulación 3D y Estructural:**
+  - Todos los cálculos del módulo estructural y de sólidos continúan ejecutándose automáticamente con paralelismo total para máxima velocidad.
+
+---
+
 ## 📦 Structural Analysis FEA 3D v0.2.0 (Pre-Release)
 
 ### 🚀 Novedades, Motores FEA, Visualización 2D/3D y Correcciones Físicas
