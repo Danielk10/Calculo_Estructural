@@ -62,6 +62,8 @@ public class StructuralBeamDatParser {
         public double tauXY; // MPa
         public double sigmaX; // MPa
         public double sigmaY; // MPa
+        public double sigmaVM; // MPa
+        public double Vshear_total; // kN
     }
 
     /** Summary of the most extreme values found in the .dat */

@@ -271,6 +271,14 @@ public class StructuralFragment extends Fragment {
         binding.btnResetCamera.setOnClickListener(v -> {
             binding.frameGLView.resetCamera();
         });
+
+        if (binding.btnCustomMaterial != null) {
+            binding.btnCustomMaterial.setOnClickListener(v -> showCustomMaterialDialog());
+        }
+
+        if (binding.btnViewReactions != null) {
+            binding.btnViewReactions.setOnClickListener(v -> exportReactionsReport());
+        }
         
         binding.tvStructuralLog.setOnClickListener(v -> copyToClipboard(logger.getFullLog()));
 
@@ -441,6 +449,7 @@ public class StructuralFragment extends Fragment {
         Spinner spSupport = dialogView.findViewById(R.id.spDialogSupport);
         TextInputEditText etFx = dialogView.findViewById(R.id.etDialogFx);
         TextInputEditText etFy = dialogView.findViewById(R.id.etDialogFy);
+        TextInputEditText etMz = dialogView.findViewById(R.id.etDialogMz);
 
         tvBadge.setText(String.format(java.util.Locale.US, "Node #%d", node.id));
         tvCoords.setText(String.format(java.util.Locale.US, "Coordinates: X = %.2f m, Y = %.2f m", node.x, node.y));
@@ -466,8 +475,10 @@ public class StructuralFragment extends Fragment {
 
         double curFx = (load != null) ? (load.fx / 1000.0) : 0.0;
         double curFy = (load != null) ? (load.fy / 1000.0) : 0.0;
+        double curMz = (load != null) ? (load.mz / 1000.0) : 0.0;
         if (Math.abs(curFx) > 1e-4) etFx.setText(String.format(java.util.Locale.US, "%.2f", curFx));
         if (Math.abs(curFy) > 1e-4) etFy.setText(String.format(java.util.Locale.US, "%.2f", curFy));
+        if (etMz != null && Math.abs(curMz) > 1e-4) etMz.setText(String.format(java.util.Locale.US, "%.2f", curMz));
 
         new MaterialAlertDialogBuilder(requireContext())
                 .setView(dialogView)
@@ -483,7 +494,7 @@ public class StructuralFragment extends Fragment {
                         node.supportType = StructuralModel.SupportType.FREE;
                     }
 
-                    double fx = 0.0, fy = 0.0;
+                    double fx = 0.0, fy = 0.0, mz = 0.0;
                     try {
                         if (etFx.getText() != null && etFx.getText().length() > 0) {
                             fx = Double.parseDouble(etFx.getText().toString());
@@ -494,9 +505,15 @@ public class StructuralFragment extends Fragment {
                             fy = Double.parseDouble(etFy.getText().toString());
                         }
                     } catch (Exception ignored) {}
+                    try {
+                        if (etMz != null && etMz.getText() != null && etMz.getText().length() > 0) {
+                            mz = Double.parseDouble(etMz.getText().toString());
+                        }
+                    } catch (Exception ignored) {}
 
-                    binding.gridEditorView.assignPointLoad(node.id, fx * 1000.0, fy * 1000.0, 0.0);
-                    Toast.makeText(requireContext(), String.format(java.util.Locale.US, "Node #%d: Restraints & Loads updated (Fx=%.1f kN, Fy=%.1f kN)", node.id, fx, fy), Toast.LENGTH_SHORT).show();
+                    // Assign nodal load including moment (convert kN to N, kN·m to N·m)
+                    binding.gridEditorView.assignPointLoadWithMoment(node.id, fx * 1000.0, fy * 1000.0, 0.0, mz * 1000.0);
+                    Toast.makeText(requireContext(), String.format(java.util.Locale.US, "Node #%d: Updated (Fx=%.1f kN, Fy=%.1f kN, Mz=%.2f kN·m)", node.id, fx, fy, mz), Toast.LENGTH_SHORT).show();
                 })
                 .setNeutralButton("Clear Load", (dialog, which) -> {
                     binding.gridEditorView.assignPointLoad(node.id, 0.0, 0.0, 0.0);
@@ -516,12 +533,33 @@ public class StructuralFragment extends Fragment {
         TextView tvSpan = dialogView.findViewById(R.id.tvDialogMemberSpan);
         Spinner spSec = dialogView.findViewById(R.id.spDialogSection);
         Spinner spMat = dialogView.findViewById(R.id.spDialogMaterial);
+
+        // Enhanced load fields
         TextInputEditText etDistLoad = dialogView.findViewById(R.id.etDialogDistLoad);
+        TextInputEditText etDistLoadW2 = dialogView.findViewById(R.id.etDistLoadW2);
+        TextInputEditText etDistLoadStartPos = dialogView.findViewById(R.id.etDistLoadStartPos);
+        TextInputEditText etDistLoadEndPos = dialogView.findViewById(R.id.etDistLoadEndPos);
         TextInputEditText etPtLoad = dialogView.findViewById(R.id.etDialogPointLoad);
+        TextInputEditText etPtLoadPos = dialogView.findViewById(R.id.etPointLoadPos);
+        TextInputEditText etPtLoadFx = dialogView.findViewById(R.id.etPointLoadFx);
+        TextInputEditText etPtLoadMz = dialogView.findViewById(R.id.etPointLoadMz);
+
+        // Release checkboxes
+        android.widget.CheckBox cbStartM33 = dialogView.findViewById(R.id.cbReleaseStartM33);
+        android.widget.CheckBox cbStartM22 = dialogView.findViewById(R.id.cbReleaseStartM22);
+        android.widget.CheckBox cbStartM11 = dialogView.findViewById(R.id.cbReleaseStartM11);
+        android.widget.CheckBox cbEndM33 = dialogView.findViewById(R.id.cbReleaseEndM33);
+        android.widget.CheckBox cbEndM22 = dialogView.findViewById(R.id.cbReleaseEndM22);
+        android.widget.CheckBox cbEndM11 = dialogView.findViewById(R.id.cbReleaseEndM11);
+        View tilStartStiffness = dialogView.findViewById(R.id.tilReleaseStartStiffness);
+        View tilEndStiffness = dialogView.findViewById(R.id.tilReleaseEndStiffness);
+        TextInputEditText etStartStiffness = dialogView.findViewById(R.id.etReleaseStartStiffness);
+        TextInputEditText etEndStiffness = dialogView.findViewById(R.id.etReleaseEndStiffness);
 
         tvBadge.setText(String.format(java.util.Locale.US, "Member #%d", element.id));
         tvSpan.setText(String.format(java.util.Locale.US, "Node %d ➔ Node %d | Span Length L = %.2f m", element.node1Id, element.node2Id, length));
 
+        // Populate section spinner
         List<String> secNames = new ArrayList<>();
         if (sectionLibrary != null && !sectionLibrary.getSections().isEmpty()) {
             for (SectionLibrary.Section s : sectionLibrary.getSections()) secNames.add(s.name);
@@ -536,6 +574,7 @@ public class StructuralFragment extends Fragment {
             if (idx >= 0) spSec.setSelection(idx);
         }
 
+        // Populate material spinner (include custom materials)
         List<String> matNames = new ArrayList<>();
         if (materialDatabase != null && !materialDatabase.getMaterials().isEmpty()) {
             for (MaterialDatabase.Material m : materialDatabase.getMaterials()) matNames.add(m.name);
@@ -550,6 +589,72 @@ public class StructuralFragment extends Fragment {
             if (idx >= 0) spMat.setSelection(idx);
         }
 
+        // Pre-populate release checkboxes from element data
+        if (element.releaseStart != null) {
+            if (cbStartM33 != null) cbStartM33.setChecked(element.releaseStart.m33Released);
+            if (cbStartM22 != null) cbStartM22.setChecked(element.releaseStart.m22Released);
+            if (cbStartM11 != null) cbStartM11.setChecked(element.releaseStart.m11Released);
+            if (element.releaseStart.hasAnyRelease() && tilStartStiffness != null) {
+                tilStartStiffness.setVisibility(View.VISIBLE);
+                if (etStartStiffness != null && element.releaseStart.m33Stiffness > 0) {
+                    etStartStiffness.setText(String.format(java.util.Locale.US, "%.1f", element.releaseStart.m33Stiffness / 1000.0));
+                }
+            }
+        }
+        if (element.releaseEnd != null) {
+            if (cbEndM33 != null) cbEndM33.setChecked(element.releaseEnd.m33Released);
+            if (cbEndM22 != null) cbEndM22.setChecked(element.releaseEnd.m22Released);
+            if (cbEndM11 != null) cbEndM11.setChecked(element.releaseEnd.m11Released);
+            if (element.releaseEnd.hasAnyRelease() && tilEndStiffness != null) {
+                tilEndStiffness.setVisibility(View.VISIBLE);
+                if (etEndStiffness != null && element.releaseEnd.m33Stiffness > 0) {
+                    etEndStiffness.setText(String.format(java.util.Locale.US, "%.1f", element.releaseEnd.m33Stiffness / 1000.0));
+                }
+            }
+        }
+
+        // Show/hide stiffness input when any release checkbox is toggled
+        android.widget.CompoundButton.OnCheckedChangeListener startReleaseListener = (buttonView, isChecked) -> {
+            if (tilStartStiffness != null) {
+                boolean anyChecked = (cbStartM33 != null && cbStartM33.isChecked()) ||
+                        (cbStartM22 != null && cbStartM22.isChecked()) ||
+                        (cbStartM11 != null && cbStartM11.isChecked());
+                tilStartStiffness.setVisibility(anyChecked ? View.VISIBLE : View.GONE);
+            }
+        };
+        android.widget.CompoundButton.OnCheckedChangeListener endReleaseListener = (buttonView, isChecked) -> {
+            if (tilEndStiffness != null) {
+                boolean anyChecked = (cbEndM33 != null && cbEndM33.isChecked()) ||
+                        (cbEndM22 != null && cbEndM22.isChecked()) ||
+                        (cbEndM11 != null && cbEndM11.isChecked());
+                tilEndStiffness.setVisibility(anyChecked ? View.VISIBLE : View.GONE);
+            }
+        };
+        if (cbStartM33 != null) cbStartM33.setOnCheckedChangeListener(startReleaseListener);
+        if (cbStartM22 != null) cbStartM22.setOnCheckedChangeListener(startReleaseListener);
+        if (cbStartM11 != null) cbStartM11.setOnCheckedChangeListener(startReleaseListener);
+        if (cbEndM33 != null) cbEndM33.setOnCheckedChangeListener(endReleaseListener);
+        if (cbEndM22 != null) cbEndM22.setOnCheckedChangeListener(endReleaseListener);
+        if (cbEndM11 != null) cbEndM11.setOnCheckedChangeListener(endReleaseListener);
+
+        // Pre-populate distributed load from element if exists
+        if (!element.distLoads.isEmpty()) {
+            StructuralModel.ElementDistLoad dl = element.distLoads.get(0);
+            if (etDistLoad != null) etDistLoad.setText(String.format(java.util.Locale.US, "%.2f", dl.w1 / 1000.0));
+            if (etDistLoadW2 != null) etDistLoadW2.setText(String.format(java.util.Locale.US, "%.2f", dl.w2 / 1000.0));
+            if (etDistLoadStartPos != null) etDistLoadStartPos.setText(String.format(java.util.Locale.US, "%.2f", dl.startPos));
+            if (etDistLoadEndPos != null) etDistLoadEndPos.setText(String.format(java.util.Locale.US, "%.2f", dl.endPos));
+        }
+
+        // Pre-populate point load from element if exists
+        if (!element.pointLoads.isEmpty()) {
+            StructuralModel.ElementPointLoad pl = element.pointLoads.get(0);
+            if (etPtLoad != null) etPtLoad.setText(String.format(java.util.Locale.US, "%.2f", pl.fy / 1000.0));
+            if (etPtLoadPos != null) etPtLoadPos.setText(String.format(java.util.Locale.US, "%.2f", pl.position));
+            if (etPtLoadFx != null) etPtLoadFx.setText(String.format(java.util.Locale.US, "%.2f", pl.fx / 1000.0));
+            if (etPtLoadMz != null) etPtLoadMz.setText(String.format(java.util.Locale.US, "%.2f", pl.mz / 1000.0));
+        }
+
         new MaterialAlertDialogBuilder(requireContext())
                 .setView(dialogView)
                 .setPositiveButton(R.string.apply, (dialog, which) -> {
@@ -560,30 +665,310 @@ public class StructuralFragment extends Fragment {
                         element.materialName = spMat.getSelectedItem().toString();
                     }
 
-                    double w = 0.0, p = 0.0;
-                    try {
-                        if (etDistLoad.getText() != null && etDistLoad.getText().length() > 0) {
-                            w = Double.parseDouble(etDistLoad.getText().toString());
-                        }
-                    } catch (Exception ignored) {}
-                    try {
-                        if (etPtLoad.getText() != null && etPtLoad.getText().length() > 0) {
-                            p = Double.parseDouble(etPtLoad.getText().toString());
-                        }
-                    } catch (Exception ignored) {}
-
-                    if (Math.abs(w) > 1e-4 || Math.abs(p) > 1e-4) {
-                        binding.gridEditorView.assignDistributedLoadToElement(element, w, p);
-                        Toast.makeText(requireContext(), String.format(java.util.Locale.US, "Member #%d: Properties & Tributary Loads assigned (w=%.1f kN/m, P=%.1f kN)", element.id, w, p), Toast.LENGTH_SHORT).show();
+                    // Process releases for start node (I-end)
+                    if (element.releaseStart == null) element.releaseStart = new StructuralModel.EndRelease();
+                    element.releaseStart.m33Released = (cbStartM33 != null && cbStartM33.isChecked());
+                    element.releaseStart.m22Released = (cbStartM22 != null && cbStartM22.isChecked());
+                    element.releaseStart.m11Released = (cbStartM11 != null && cbStartM11.isChecked());
+                    if (element.releaseStart.hasAnyRelease()) {
+                        double kTheta = 0.0; // Default = pinned (free rotation)
+                        try {
+                            if (etStartStiffness != null && etStartStiffness.getText() != null && etStartStiffness.getText().length() > 0) {
+                                kTheta = Double.parseDouble(etStartStiffness.getText().toString()) * 1000.0; // kN·m/rad to N·m/rad
+                            }
+                        } catch (Exception ignored) {}
+                        if (element.releaseStart.m33Released) element.releaseStart.m33Stiffness = kTheta;
+                        if (element.releaseStart.m22Released) element.releaseStart.m22Stiffness = kTheta;
+                        if (element.releaseStart.m11Released) element.releaseStart.m11Stiffness = kTheta;
                     } else {
-                        binding.gridEditorView.invalidate();
-                        Toast.makeText(requireContext(), "Member properties updated", Toast.LENGTH_SHORT).show();
+                        element.releaseStart.m33Stiffness = -1.0;
+                        element.releaseStart.m22Stiffness = -1.0;
+                        element.releaseStart.m11Stiffness = -1.0;
                     }
+
+                    // Process releases for end node (J-end)
+                    if (element.releaseEnd == null) element.releaseEnd = new StructuralModel.EndRelease();
+                    element.releaseEnd.m33Released = (cbEndM33 != null && cbEndM33.isChecked());
+                    element.releaseEnd.m22Released = (cbEndM22 != null && cbEndM22.isChecked());
+                    element.releaseEnd.m11Released = (cbEndM11 != null && cbEndM11.isChecked());
+                    if (element.releaseEnd.hasAnyRelease()) {
+                        double kTheta = 0.0;
+                        try {
+                            if (etEndStiffness != null && etEndStiffness.getText() != null && etEndStiffness.getText().length() > 0) {
+                                kTheta = Double.parseDouble(etEndStiffness.getText().toString()) * 1000.0;
+                            }
+                        } catch (Exception ignored) {}
+                        if (element.releaseEnd.m33Released) element.releaseEnd.m33Stiffness = kTheta;
+                        if (element.releaseEnd.m22Released) element.releaseEnd.m22Stiffness = kTheta;
+                        if (element.releaseEnd.m11Released) element.releaseEnd.m11Stiffness = kTheta;
+                    } else {
+                        element.releaseEnd.m33Stiffness = -1.0;
+                        element.releaseEnd.m22Stiffness = -1.0;
+                        element.releaseEnd.m11Stiffness = -1.0;
+                    }
+
+                    // Process distributed load
+                    element.distLoads.clear();
+                    double w1 = 0.0, w2 = 0.0, dStartPos = 0.0, dEndPos = 1.0;
+                    try {
+                        if (etDistLoad != null && etDistLoad.getText() != null && etDistLoad.getText().length() > 0) {
+                            w1 = Double.parseDouble(etDistLoad.getText().toString());
+                        }
+                    } catch (Exception ignored) {}
+                    try {
+                        if (etDistLoadW2 != null && etDistLoadW2.getText() != null && etDistLoadW2.getText().length() > 0) {
+                            w2 = Double.parseDouble(etDistLoadW2.getText().toString());
+                        } else {
+                            w2 = w1; // If w2 not specified, assume uniform
+                        }
+                    } catch (Exception ignored) { w2 = w1; }
+                    try {
+                        if (etDistLoadStartPos != null && etDistLoadStartPos.getText() != null && etDistLoadStartPos.getText().length() > 0) {
+                            dStartPos = Double.parseDouble(etDistLoadStartPos.getText().toString());
+                        }
+                    } catch (Exception ignored) {}
+                    try {
+                        if (etDistLoadEndPos != null && etDistLoadEndPos.getText() != null && etDistLoadEndPos.getText().length() > 0) {
+                            dEndPos = Double.parseDouble(etDistLoadEndPos.getText().toString());
+                        }
+                    } catch (Exception ignored) {}
+                    if (Math.abs(w1) > 1e-4 || Math.abs(w2) > 1e-4) {
+                        dStartPos = Math.max(0.0, Math.min(1.0, dStartPos));
+                        dEndPos = Math.max(dStartPos + 0.001, Math.min(1.0, dEndPos));
+                        element.distLoads.add(new StructuralModel.ElementDistLoad(
+                                element.id, dStartPos, dEndPos, w1 * 1000.0, w2 * 1000.0));
+                    }
+
+                    // Process point load on span
+                    element.pointLoads.clear();
+                    double pFy = 0.0, pFx = 0.0, pMz = 0.0, pPos = 0.5;
+                    try {
+                        if (etPtLoad != null && etPtLoad.getText() != null && etPtLoad.getText().length() > 0) {
+                            pFy = Double.parseDouble(etPtLoad.getText().toString());
+                        }
+                    } catch (Exception ignored) {}
+                    try {
+                        if (etPtLoadFx != null && etPtLoadFx.getText() != null && etPtLoadFx.getText().length() > 0) {
+                            pFx = Double.parseDouble(etPtLoadFx.getText().toString());
+                        }
+                    } catch (Exception ignored) {}
+                    try {
+                        if (etPtLoadMz != null && etPtLoadMz.getText() != null && etPtLoadMz.getText().length() > 0) {
+                            pMz = Double.parseDouble(etPtLoadMz.getText().toString());
+                        }
+                    } catch (Exception ignored) {}
+                    try {
+                        if (etPtLoadPos != null && etPtLoadPos.getText() != null && etPtLoadPos.getText().length() > 0) {
+                            pPos = Double.parseDouble(etPtLoadPos.getText().toString());
+                        }
+                    } catch (Exception ignored) {}
+                    if (Math.abs(pFy) > 1e-4 || Math.abs(pFx) > 1e-4 || Math.abs(pMz) > 1e-4) {
+                        pPos = Math.max(0.0, Math.min(1.0, pPos));
+                        element.pointLoads.add(new StructuralModel.ElementPointLoad(
+                                element.id, pPos, pFy * 1000.0, pFx * 1000.0, pMz * 1000.0));
+                    }
+
+                    // Also apply equivalent tributary nodal loads for compatibility with existing display
+                    if (!element.distLoads.isEmpty() || !element.pointLoads.isEmpty()) {
+                        double totalEquivW = 0.0, totalEquivP = 0.0;
+                        for (StructuralModel.ElementDistLoad dl : element.distLoads) {
+                            totalEquivW += ((dl.w1 + dl.w2) / 2.0) * (dl.endPos - dl.startPos) * length / 1000.0;
+                        }
+                        for (StructuralModel.ElementPointLoad pl : element.pointLoads) {
+                            totalEquivP += pl.fy / 1000.0;
+                        }
+                        binding.gridEditorView.assignDistributedLoadToElement(element, totalEquivW / length, totalEquivP);
+                    }
+
+                    // Build release status string for toast
+                    StringBuilder releaseInfo = new StringBuilder();
+                    if (element.hasReleases()) {
+                        releaseInfo.append(" | Releases: ");
+                        if (element.releaseStart.hasAnyRelease()) {
+                            releaseInfo.append("I[");
+                            if (element.releaseStart.m33Released) releaseInfo.append("M33");
+                            if (element.releaseStart.m22Released) releaseInfo.append(",M22");
+                            if (element.releaseStart.m11Released) releaseInfo.append(",M11");
+                            releaseInfo.append("]");
+                        }
+                        if (element.releaseEnd.hasAnyRelease()) {
+                            releaseInfo.append(" J[");
+                            if (element.releaseEnd.m33Released) releaseInfo.append("M33");
+                            if (element.releaseEnd.m22Released) releaseInfo.append(",M22");
+                            if (element.releaseEnd.m11Released) releaseInfo.append(",M11");
+                            releaseInfo.append("]");
+                        }
+                    }
+
+                    Toast.makeText(requireContext(), String.format(java.util.Locale.US,
+                            "Member #%d: Properties updated%s", element.id, releaseInfo.toString()),
+                            Toast.LENGTH_SHORT).show();
+                    binding.gridEditorView.invalidate();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 
+    /**
+     * Shows a dialog for defining a custom material with all engineering properties.
+     * The custom material is added to both the MaterialDatabase and the StructuralModel.
+     */
+    public void showCustomMaterialDialog() {
+        if (getContext() == null || !isAdded()) return;
+
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_custom_material, null);
+        TextInputEditText etName = dialogView.findViewById(R.id.etCustomMatName);
+        TextInputEditText etE = dialogView.findViewById(R.id.etCustomMatE);
+        TextInputEditText etNu = dialogView.findViewById(R.id.etCustomMatNu);
+        TextInputEditText etRho = dialogView.findViewById(R.id.etCustomMatRho);
+        TextInputEditText etFy = dialogView.findViewById(R.id.etCustomMatFy);
+        TextInputEditText etFc = dialogView.findViewById(R.id.etCustomMatFc);
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setView(dialogView)
+                .setPositiveButton("Add Material", (dialog, which) -> {
+                    String name = "";
+                    double E = 0, nu = 0, rho = 0, fy = 0, fc = 0;
+                    try { if (etName != null && etName.getText() != null) name = etName.getText().toString().trim(); } catch (Exception ignored) {}
+                    try { if (etE != null && etE.getText() != null && etE.getText().length() > 0) E = Double.parseDouble(etE.getText().toString()); } catch (Exception ignored) {}
+                    try { if (etNu != null && etNu.getText() != null && etNu.getText().length() > 0) nu = Double.parseDouble(etNu.getText().toString()); } catch (Exception ignored) {}
+                    try { if (etRho != null && etRho.getText() != null && etRho.getText().length() > 0) rho = Double.parseDouble(etRho.getText().toString()); } catch (Exception ignored) {}
+                    try { if (etFy != null && etFy.getText() != null && etFy.getText().length() > 0) fy = Double.parseDouble(etFy.getText().toString()); } catch (Exception ignored) {}
+                    try { if (etFc != null && etFc.getText() != null && etFc.getText().length() > 0) fc = Double.parseDouble(etFc.getText().toString()); } catch (Exception ignored) {}
+
+                    if (name.isEmpty() || E <= 0) {
+                        Toast.makeText(requireContext(), "Material name and E are required", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Add to MaterialDatabase
+                    if (materialDatabase != null) {
+                        materialDatabase.addCustomMaterial(name, E, nu, rho, fy, fc);
+                    }
+
+                    // Also store in the StructuralModel for persistence
+                    if (currentModel != null) {
+                        currentModel.customMaterials.add(new StructuralModel.CustomMaterial(name, E, nu, rho, fy, fc));
+                    }
+
+                    // Update material spinners
+                    if (binding != null && binding.spinnerMaterialStructural != null) {
+                        List<String> matNames = new ArrayList<>();
+                        for (MaterialDatabase.Material m : materialDatabase.getMaterials()) matNames.add(m.name);
+                        ArrayAdapter<String> matAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_spinner_compact, matNames);
+                        matAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown_compact);
+                        binding.spinnerMaterialStructural.setAdapter(matAdapter);
+                        int idx = matNames.indexOf(name);
+                        if (idx >= 0) binding.spinnerMaterialStructural.setSelection(idx);
+                    }
+
+                    Toast.makeText(requireContext(), String.format(java.util.Locale.US,
+                            "Custom Material '%s' added (E=%.0f MPa, ν=%.3f, ρ=%.0f kg/m³)",
+                            name, E, nu, rho), Toast.LENGTH_LONG).show();
+                    logger.info(String.format(java.util.Locale.US,
+                            "Custom Material defined: %s | E=%.0f MPa | ν=%.3f | ρ=%.0f kg/m³ | Fy=%.0f MPa | f'c=%.0f MPa",
+                            name, E, nu, rho, fy, fc));
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    /**
+     * Exports a text report of all support reactions and external constraints
+     * to the solver log and clipboard. Available after analysis is complete.
+     */
+    public void exportReactionsReport() {
+        if (currentModel == null || currentResult == null) {
+            if (getContext() != null)
+                Toast.makeText(getContext(), "Run analysis first to view reactions", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Get reactions from the last FrameAnalysisEngine run
+        com.diamon.civil.structural.engine.FrameAnalysisEngine.AnalysisOutput engineOutput =
+                com.diamon.civil.structural.engine.FrameAnalysisEngine.analyze(currentModel);
+
+        StringBuilder report = new StringBuilder();
+        report.append("═══════════════════════════════════════════════════════\n");
+        report.append("  SUPPORT REACTIONS & EXTERNAL CONSTRAINTS REPORT\n");
+        report.append("═══════════════════════════════════════════════════════\n\n");
+
+        // Node constraints table
+        report.append("── External Constraints (Boundary Conditions) ──\n");
+        report.append(String.format(java.util.Locale.US, "%-8s %-12s %-10s %-10s %-10s\n",
+                "Node", "Support", "X (m)", "Y (m)", "Z (m)"));
+        report.append("─────────────────────────────────────────────────\n");
+        for (StructuralModel.Node n : currentModel.nodes) {
+            if (n.supportType != StructuralModel.SupportType.FREE) {
+                report.append(String.format(java.util.Locale.US, "%-8d %-12s %-10.3f %-10.3f %-10.3f\n",
+                        n.id, n.supportType.name(), n.x, n.y, n.z));
+            }
+        }
+
+        // Reactions table
+        report.append("\n── Support Reaction Forces ──\n");
+        report.append(String.format(java.util.Locale.US, "%-8s %-12s %-12s %-12s\n",
+                "Node", "Rx (kN)", "Ry (kN)", "Mz (kN·m)"));
+        report.append("─────────────────────────────────────────────────\n");
+        if (engineOutput.reactions != null) {
+            for (Map.Entry<Integer, double[]> entry : engineOutput.reactions.entrySet()) {
+                double[] r = entry.getValue();
+                report.append(String.format(java.util.Locale.US, "%-8d %-12.3f %-12.3f %-12.3f\n",
+                        entry.getKey(), r[0] / 1000.0, r[1] / 1000.0, r[5] / 1000.0));
+            }
+        }
+
+        // Equilibrium check
+        report.append("\n── Global Equilibrium Verification ──\n");
+        report.append(String.format(java.util.Locale.US, "ΣFx Applied = %.3f kN\n", engineOutput.sumAppliedFx / 1000.0));
+        report.append(String.format(java.util.Locale.US, "ΣFy Applied = %.3f kN\n", engineOutput.sumAppliedFy / 1000.0));
+        report.append(String.format(java.util.Locale.US, "ΣRx         = %.3f kN\n", engineOutput.sumReactRx / 1000.0));
+        report.append(String.format(java.util.Locale.US, "ΣRy         = %.3f kN\n", engineOutput.sumReactRy / 1000.0));
+        report.append(String.format(java.util.Locale.US, "Residual Fx = %.6f kN\n", engineOutput.residualFx / 1000.0));
+        report.append(String.format(java.util.Locale.US, "Residual Fy = %.6f kN\n", engineOutput.residualFy / 1000.0));
+        boolean equilibrium = Math.abs(engineOutput.residualFx) < 1.0 && Math.abs(engineOutput.residualFy) < 1.0;
+        report.append(String.format(java.util.Locale.US, "Status: %s\n", equilibrium ? "✅ EQUILIBRIUM VERIFIED" : "⚠️ EQUILIBRIUM NOT SATISFIED"));
+
+        // Element releases summary
+        report.append("\n── Member End Releases ──\n");
+        report.append(String.format(java.util.Locale.US, "%-8s %-20s %-20s\n", "Member", "I-End Releases", "J-End Releases"));
+        report.append("─────────────────────────────────────────────────\n");
+        for (StructuralModel.Element elem : currentModel.elements) {
+            String iRel = elem.releaseStart != null && elem.releaseStart.hasAnyRelease() ?
+                    buildReleaseString(elem.releaseStart) : "Continuous";
+            String jRel = elem.releaseEnd != null && elem.releaseEnd.hasAnyRelease() ?
+                    buildReleaseString(elem.releaseEnd) : "Continuous";
+            report.append(String.format(java.util.Locale.US, "%-8d %-20s %-20s\n", elem.id, iRel, jRel));
+        }
+
+        report.append("\n═══════════════════════════════════════════════════════\n");
+
+        String reportStr = report.toString();
+        logger.log(reportStr);
+        copyToClipboard(reportStr);
+        if (getContext() != null) {
+            Toast.makeText(getContext(), "Reactions report copied to clipboard & logged", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String buildReleaseString(StructuralModel.EndRelease rel) {
+        StringBuilder sb = new StringBuilder();
+        if (rel.m33Released) {
+            sb.append("M33");
+            if (rel.m33Stiffness > 0) sb.append(String.format(java.util.Locale.US, "(%.0f)", rel.m33Stiffness));
+            sb.append(" ");
+        }
+        if (rel.m22Released) {
+            sb.append("M22");
+            if (rel.m22Stiffness > 0) sb.append(String.format(java.util.Locale.US, "(%.0f)", rel.m22Stiffness));
+            sb.append(" ");
+        }
+        if (rel.m11Released) {
+            sb.append("M11");
+            if (rel.m11Stiffness > 0) sb.append(String.format(java.util.Locale.US, "(%.0f)", rel.m11Stiffness));
+        }
+        return sb.toString().trim();
+    }
 
     private void copyToClipboard(String text) {
         if (getContext() == null) return;
@@ -1446,9 +1831,12 @@ public class StructuralFragment extends Fragment {
             }
         }
 
-        // 6. 3D Load Arrows (High-Definition 3D Vector Shafts & Conical Multi-Fin Arrowheads)
+        // 6. 3D Load Arrows (Nodal point loads, moments, element point loads & distributed loads)
         java.util.List<Float> loadLines = new java.util.ArrayList<>();
         java.util.List<Float> loadColors = new java.util.ArrayList<>();
+        float defaultArrowLen = Math.max(span * 0.18f, 0.75f);
+
+        // 6.1 Nodal Point Loads & Moments
         for (StructuralModel.Load load : model.loads) {
             StructuralModel.Node n = findNodeInModel(model, load.nodeId);
             if (n == null) continue;
@@ -1457,78 +1845,150 @@ public class StructuralFragment extends Fragment {
             float fy = (float) load.fy;
             float fz = (float) load.fz;
             float mag = (float) Math.sqrt(fx * fx + fy * fy + fz * fz);
-            if (mag < 1e-6) continue;
-
-            int loadVertsBefore = loadLines.size() / 3;
-
-            float arrowLen = Math.max(span * 0.18f, 0.75f);
-            float dx = fx / mag;
-            float dy = fy / mag;
-            float dz = fz / mag;
-
-            float tipX = (float) n.x;
-            float tipY = (float) n.y;
-            float tipZ = (float) n.z;
-
-            float tailX = tipX - dx * arrowLen;
-            float tailY = tipY - dy * arrowLen;
-            float tailZ = tipZ - dz * arrowLen;
-
-            // Main Shaft
-            loadLines.add(tailX); loadLines.add(tailY); loadLines.add(tailZ);
-            loadLines.add(tipX); loadLines.add(tipY); loadLines.add(tipZ);
-
-            // Arrow Head parameters
-            float headLen = arrowLen * 0.28f;
-            float headRadius = headLen * 0.42f;
-            float baseCenterX = tipX - dx * headLen;
-            float baseCenterY = tipY - dy * headLen;
-            float baseCenterZ = tipZ - dz * headLen;
-
-            // Compute orthonormal vectors (ux, uy, uz) and (vx, vy, vz) perpendicular to (dx, dy, dz)
-            float upX = 0f, upY = 0f, upZ = 1f;
-            if (Math.abs(dz) > 0.88f) {
-                upX = 0f; upY = 1f; upZ = 0f;
-            }
-            // u = dir x up
-            float ux = dy * upZ - dz * upY;
-            float uy = dz * upX - dx * upZ;
-            float uz = dx * upY - dy * upX;
-            float uLen = (float) Math.sqrt(ux * ux + uy * uy + uz * uz);
-            if (uLen > 1e-5f) {
-                ux /= uLen; uy /= uLen; uz /= uLen;
-            } else {
-                ux = 1f; uy = 0f; uz = 0f;
-            }
-            // v = dir x u
-            float vx = dy * uz - dz * uy;
-            float vy = dz * ux - dx * uz;
-            float vz = dx * uy - dy * ux;
-            float vLen = (float) Math.sqrt(vx * vx + vy * vy + vz * vz);
-            if (vLen > 1e-5f) {
-                vx /= vLen; vy /= vLen; vz /= vLen;
+            if (mag >= 1e-6) {
+                float dx = fx / mag;
+                float dy = fy / mag;
+                float dz = fz / mag;
+                add3DArrow(loadLines, loadColors, (float) n.x, (float) n.y, (float) n.z, dx, dy, dz, defaultArrowLen);
             }
 
-            // Standard Clean Arrowhead (Normal 2-wing arrowhead, no 3D bulky cone)
-            float wing1X = baseCenterX + ux * headRadius;
-            float wing1Y = baseCenterY + uy * headRadius;
-            float wing1Z = baseCenterZ + uz * headRadius;
+            if (Math.abs(load.mz) >= 1e-4) {
+                add3DMomentLoop(loadLines, loadColors, (float) n.x, (float) n.y, (float) n.z, defaultArrowLen * 0.35f, load.mz);
+            }
+        }
 
-            float wing2X = baseCenterX - ux * headRadius;
-            float wing2Y = baseCenterY - uy * headRadius;
-            float wing2Z = baseCenterZ - uz * headRadius;
+        // 6.2 Element Loads (Distributed & Point loads on span)
+        if (model.elements != null) {
+            for (StructuralModel.Element elem : model.elements) {
+                StructuralModel.Node n1 = findNodeInModel(model, elem.node1Id);
+                StructuralModel.Node n2 = findNodeInModel(model, elem.node2Id);
+                if (n1 == null || n2 == null) continue;
 
-            // Wing 1 (Tip -> Wing1)
-            loadLines.add(tipX); loadLines.add(tipY); loadLines.add(tipZ);
-            loadLines.add(wing1X); loadLines.add(wing1Y); loadLines.add(wing1Z);
+                double dx = n2.x - n1.x;
+                double dy = n2.y - n1.y;
+                double dz = n2.z - n1.z;
+                double L = Math.hypot(dx, Math.hypot(dy, dz));
+                if (L < 1e-6) continue;
 
-            // Wing 2 (Tip -> Wing2)
-            loadLines.add(tipX); loadLines.add(tipY); loadLines.add(tipZ);
-            loadLines.add(wing2X); loadLines.add(wing2Y); loadLines.add(wing2Z);
+                float uDirX = (float) (dx / L);
+                float uDirY = (float) (dy / L);
+                float uDirZ = (float) (dz / L);
 
-            int loadVertsAdded = (loadLines.size() / 3) - loadVertsBefore;
-            for (int k = 0; k < loadVertsAdded; k++) {
-                loadColors.add(1.0f); loadColors.add(0.18f); loadColors.add(0.18f); loadColors.add(1.0f); // Vivid Crimson Red load arrow
+                // Perpendicular normal in XY plane
+                float uNormX = -uDirY;
+                float uNormY = uDirX;
+                float uNormZ = 0f;
+
+                // A) Member End Releases in 3D (Golden diamond glyphs at released ends)
+                if (elem.releaseStart != null && elem.releaseStart.hasAnyRelease()) {
+                    float hx = (float) n1.x + uDirX * (span * 0.035f);
+                    float hy = (float) n1.y + uDirY * (span * 0.035f);
+                    float hz = (float) n1.z + uDirZ * (span * 0.035f);
+                    float rH = span * 0.015f;
+                    supLines.add(hx - rH); supLines.add(hy); supLines.add(hz); supLines.add(hx); supLines.add(hy + rH); supLines.add(hz);
+                    supLines.add(hx); supLines.add(hy + rH); supLines.add(hz); supLines.add(hx + rH); supLines.add(hy); supLines.add(hz);
+                    supLines.add(hx + rH); supLines.add(hy); supLines.add(hz); supLines.add(hx); supLines.add(hy - rH); supLines.add(hz);
+                    supLines.add(hx); supLines.add(hy - rH); supLines.add(hz); supLines.add(hx - rH); supLines.add(hy); supLines.add(hz);
+                    for (int k = 0; k < 8; k++) {
+                        supColors.add(1.0f); supColors.add(0.85f); supColors.add(0.0f); supColors.add(1.0f);
+                    }
+                }
+                if (elem.releaseEnd != null && elem.releaseEnd.hasAnyRelease()) {
+                    float hx = (float) n2.x - uDirX * (span * 0.035f);
+                    float hy = (float) n2.y - uDirY * (span * 0.035f);
+                    float hz = (float) n2.z - uDirZ * (span * 0.035f);
+                    float rH = span * 0.015f;
+                    supLines.add(hx - rH); supLines.add(hy); supLines.add(hz); supLines.add(hx); supLines.add(hy + rH); supLines.add(hz);
+                    supLines.add(hx); supLines.add(hy + rH); supLines.add(hz); supLines.add(hx + rH); supLines.add(hy); supLines.add(hz);
+                    supLines.add(hx + rH); supLines.add(hy); supLines.add(hz); supLines.add(hx); supLines.add(hy - rH); supLines.add(hz);
+                    supLines.add(hx); supLines.add(hy - rH); supLines.add(hz); supLines.add(hx - rH); supLines.add(hy); supLines.add(hz);
+                    for (int k = 0; k < 8; k++) {
+                        supColors.add(1.0f); supColors.add(0.85f); supColors.add(0.0f); supColors.add(1.0f);
+                    }
+                }
+
+                // B) Element Span Point Loads
+                if (elem.pointLoads != null) {
+                    for (StructuralModel.ElementPointLoad pl : elem.pointLoads) {
+                        float px = (float) (n1.x + dx * pl.position);
+                        float py = (float) (n1.y + dy * pl.position);
+                        float pz = (float) (n1.z + dz * pl.position);
+
+                        if (Math.abs(pl.fy) >= 1e-4) {
+                            float sign = (pl.fy < 0) ? -1f : 1f;
+                            float aDx = uNormX * sign;
+                            float aDy = uNormY * sign;
+                            float aDz = uNormZ * sign;
+                            add3DArrow(loadLines, loadColors, px, py, pz, aDx, aDy, aDz, defaultArrowLen);
+                        }
+                        if (Math.abs(pl.fx) >= 1e-4) {
+                            float sign = (pl.fx > 0) ? 1f : -1f;
+                            add3DArrow(loadLines, loadColors, px, py, pz, uDirX * sign, uDirY * sign, uDirZ * sign, defaultArrowLen);
+                        }
+                        if (Math.abs(pl.mz) >= 1e-4) {
+                            add3DMomentLoop(loadLines, loadColors, px, py, pz, defaultArrowLen * 0.35f, pl.mz);
+                        }
+                    }
+                }
+
+                // C) Element Distributed Loads
+                if (elem.distLoads != null) {
+                    for (StructuralModel.ElementDistLoad dl : elem.distLoads) {
+                        if (Math.abs(dl.w1) < 1e-4 && Math.abs(dl.w2) < 1e-4) continue;
+
+                        float sPos = (float) dl.startPos;
+                        float ePos = (float) dl.endPos;
+
+                        float pAx = (float) (n1.x + dx * sPos);
+                        float pAy = (float) (n1.y + dy * sPos);
+                        float pAz = (float) (n1.z + dz * sPos);
+
+                        float pBx = (float) (n1.x + dx * ePos);
+                        float pBy = (float) (n1.y + dy * ePos);
+                        float pBz = (float) (n1.z + dz * ePos);
+
+                        float maxH = span * 0.12f;
+                        float h1 = (float) (Math.signum(dl.w1) * Math.min(maxH, Math.max(span * 0.035f, Math.abs(dl.w1 / 1000.0) * 0.004 * span)));
+                        float h2 = (float) (Math.signum(dl.w2) * Math.min(maxH, Math.max(span * 0.035f, Math.abs(dl.w2 / 1000.0) * 0.004 * span)));
+
+                        float tAx = pAx - uNormX * h1;
+                        float tAy = pAy - uNormY * h1;
+                        float tAz = pAz;
+
+                        float tBx = pBx - uNormX * h2;
+                        float tBy = pBy - uNormY * h2;
+                        float tBz = pBz;
+
+                        // Top boundary line
+                        loadLines.add(tAx); loadLines.add(tAy); loadLines.add(tAz);
+                        loadLines.add(tBx); loadLines.add(tBy); loadLines.add(tBz);
+                        for (int k = 0; k < 2; k++) {
+                            loadColors.add(1.0f); loadColors.add(0.20f); loadColors.add(0.20f); loadColors.add(1.0f);
+                        }
+
+                        // Distributed load arrows along the span
+                        double distSeg = Math.hypot(pBx - pAx, Math.hypot(pBy - pAy, pBz - pAz));
+                        int numArrows = Math.max(2, (int) (distSeg / (span * 0.05)));
+                        for (int k = 0; k <= numArrows; k++) {
+                            float frac = (float) k / numArrows;
+                            float curPx = pAx + (pBx - pAx) * frac;
+                            float curPy = pAy + (pBy - pAy) * frac;
+                            float curPz = pAz + (pBz - pAz) * frac;
+
+                            float curTx = tAx + (tBx - tAx) * frac;
+                            float curTy = tAy + (tBy - tAy) * frac;
+                            float curTz = tAz + (tBz - tAz) * frac;
+
+                            float aLen = (float) Math.hypot(curTx - curPx, Math.hypot(curTy - curPy, curTz - curPz));
+                            if (aLen > 1e-4) {
+                                float aDx = (curPx - curTx) / aLen;
+                                float aDy = (curPy - curTy) / aLen;
+                                float aDz = (curPz - curTz) / aLen;
+                                add3DArrow(loadLines, loadColors, curPx, curPy, curPz, aDx, aDy, aDz, aLen);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -1558,6 +2018,85 @@ public class StructuralFragment extends Fragment {
                     binding.frameGLView.setShowLoads(true);
                 }
             });
+        }
+    }
+
+    private void add3DArrow(java.util.List<Float> loadLines, java.util.List<Float> loadColors,
+                            float tipX, float tipY, float tipZ, float dirX, float dirY, float dirZ, float arrowLen) {
+        int loadVertsBefore = loadLines.size() / 3;
+        float tailX = tipX - dirX * arrowLen;
+        float tailY = tipY - dirY * arrowLen;
+        float tailZ = tipZ - dirZ * arrowLen;
+
+        loadLines.add(tailX); loadLines.add(tailY); loadLines.add(tailZ);
+        loadLines.add(tipX); loadLines.add(tipY); loadLines.add(tipZ);
+
+        float headLen = arrowLen * 0.28f;
+        float headRadius = headLen * 0.42f;
+        float baseCenterX = tipX - dirX * headLen;
+        float baseCenterY = tipY - dirY * headLen;
+        float baseCenterZ = tipZ - dirZ * headLen;
+
+        float upX = 0f, upY = 0f, upZ = 1f;
+        if (Math.abs(dirZ) > 0.88f) { upX = 0f; upY = 1f; upZ = 0f; }
+        float ux = dirY * upZ - dirZ * upY;
+        float uy = dirZ * upX - dirX * upZ;
+        float uz = dirX * upY - dirY * upX;
+        float uLen = (float) Math.sqrt(ux * ux + uy * uy + uz * uz);
+        if (uLen > 1e-5f) { ux /= uLen; uy /= uLen; uz /= uLen; } else { ux = 1f; uy = 0f; uz = 0f; }
+
+        float wing1X = baseCenterX + ux * headRadius;
+        float wing1Y = baseCenterY + uy * headRadius;
+        float wing1Z = baseCenterZ + uz * headRadius;
+
+        float wing2X = baseCenterX - ux * headRadius;
+        float wing2Y = baseCenterY - uy * headRadius;
+        float wing2Z = baseCenterZ - uz * headRadius;
+
+        loadLines.add(tipX); loadLines.add(tipY); loadLines.add(tipZ);
+        loadLines.add(wing1X); loadLines.add(wing1Y); loadLines.add(wing1Z);
+
+        loadLines.add(tipX); loadLines.add(tipY); loadLines.add(tipZ);
+        loadLines.add(wing2X); loadLines.add(wing2Y); loadLines.add(wing2Z);
+
+        int added = (loadLines.size() / 3) - loadVertsBefore;
+        for (int k = 0; k < added; k++) {
+            loadColors.add(1.0f); loadColors.add(0.18f); loadColors.add(0.18f); loadColors.add(1.0f);
+        }
+    }
+
+    private void add3DMomentLoop(java.util.List<Float> loadLines, java.util.List<Float> loadColors,
+                                 float cx, float cy, float cz, float radius, double mz) {
+        int vertsBefore = loadLines.size() / 3;
+        int segments = 16;
+        float sweep = (mz > 0) ? (float) (1.5 * Math.PI) : (float) (-1.5 * Math.PI);
+        for (int i = 0; i < segments; i++) {
+            double a1 = (double) i / segments * sweep;
+            double a2 = (double) (i + 1) / segments * sweep;
+            loadLines.add(cx + (float) (radius * Math.cos(a1)));
+            loadLines.add(cy + (float) (radius * Math.sin(a1)));
+            loadLines.add(cz);
+            loadLines.add(cx + (float) (radius * Math.cos(a2)));
+            loadLines.add(cy + (float) (radius * Math.sin(a2)));
+            loadLines.add(cz);
+        }
+        double endAngle = sweep;
+        float tipX = cx + (float) (radius * Math.cos(endAngle));
+        float tipY = cy + (float) (radius * Math.sin(endAngle));
+        double tanAngle = endAngle + ((mz > 0) ? Math.PI / 2.0 : -Math.PI / 2.0);
+        float hLen = radius * 0.45f;
+        float w1x = tipX - (float) (hLen * Math.cos(tanAngle - 0.5));
+        float w1y = tipY - (float) (hLen * Math.sin(tanAngle - 0.5));
+        float w2x = tipX - (float) (hLen * Math.cos(tanAngle + 0.5));
+        float w2y = tipY - (float) (hLen * Math.sin(tanAngle + 0.5));
+        loadLines.add(tipX); loadLines.add(tipY); loadLines.add(cz);
+        loadLines.add(w1x); loadLines.add(w1y); loadLines.add(cz);
+        loadLines.add(tipX); loadLines.add(tipY); loadLines.add(cz);
+        loadLines.add(w2x); loadLines.add(w2y); loadLines.add(cz);
+
+        int added = (loadLines.size() / 3) - vertsBefore;
+        for (int k = 0; k < added; k++) {
+            loadColors.add(1.0f); loadColors.add(0.18f); loadColors.add(0.18f); loadColors.add(1.0f);
         }
     }
 

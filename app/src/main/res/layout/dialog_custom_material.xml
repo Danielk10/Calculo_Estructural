@@ -24,17 +24,16 @@
             android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/tvDialogNodeTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Joint Boundary &amp; Loads"
+                android:text="Custom Material Definition"
                 android:textColor="@android:color/white"
                 android:textSize="17sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvDialogNodeBadge"
+                android:id="@+id/tvCustomMaterialBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#1E293B"
@@ -42,21 +41,12 @@
                 android:paddingEnd="10dp"
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
-                android:text="Node #1"
+                android:text="Custom"
                 android:textColor="#38BDF8"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:fontFamily="monospace" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvDialogNodeCoords"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Coordinates: X = 0.00 m, Y = 0.00 m"
-            android:textColor="#94A3B8"
-            android:textSize="12.5sp" />
     </LinearLayout>
 
     <!-- Dialog Body Content -->
@@ -70,45 +60,11 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Section 1: Restraints / Supports -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Boundary Support Restraint (SPC)"
-                android:textColor="#1E293B"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <Spinner
-                android:id="@+id/spDialogSupport"
-                android:layout_width="match_parent"
-                android:layout_height="38dp"
-                android:layout_marginTop="6dp"
-                android:background="@drawable/spinner_compact_bg"
-                android:gravity="center_vertical" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:background="#E2E8F0" />
-
-            <!-- Section 2: Applied Point Loads -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Applied Concentrated Point Loads"
-                android:textColor="#1E293B"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <!-- Fx Horizontal Load -->
+            <!-- Material Name -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="Horizontal Force Fx (kN)"
+                android:hint="Material Name"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
@@ -117,19 +73,19 @@
                 app:boxStrokeColor="#1976D2">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etDialogFx"
+                    android:id="@+id/etCustomMatName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal|numberSigned"
+                    android:inputType="text"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Fy Vertical Load -->
+            <!-- Young's Modulus E -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Vertical Force Fy (kN) [negative = gravity]"
+                android:hint="Young's Modulus E (MPa)"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
@@ -138,19 +94,19 @@
                 app:boxStrokeColor="#1976D2">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etDialogFy"
+                    android:id="@+id/etCustomMatE"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal|numberSigned"
+                    android:inputType="numberDecimal"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Mz Applied Moment -->
+            <!-- Poisson's Ratio ν -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Applied Moment Mz (kN·m) [+ = CCW]"
+                android:hint="Poisson's Ratio ν"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
@@ -159,10 +115,73 @@
                 app:boxStrokeColor="#1976D2">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etDialogMz"
+                    android:id="@+id/etCustomMatNu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal|numberSigned"
+                    android:inputType="numberDecimal"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Density ρ -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="Density ρ (kg/m³)"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="#1976D2">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCustomMatRho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Yield Strength Fy -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="Yield Strength Fy (MPa)"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="#1976D2">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCustomMatFy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Compressive Strength f'c -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="Compressive Strength f'c (MPa)"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="#1976D2">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCustomMatFc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 

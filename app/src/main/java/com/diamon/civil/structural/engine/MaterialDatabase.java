@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import com.diamon.civil.structural.engine.StructuralModel;
 
 /**
  * C4: MaterialDatabase — Manages the library of materials.
@@ -77,6 +78,37 @@ public class MaterialDatabase {
             if (!loaded.isEmpty()) {
                 materials.clear();
                 materials.addAll(loaded);
+            }
+        }
+    }
+
+    /**
+     * Adds a custom user-defined material to the database.
+     * If a material with the same name already exists, it will be replaced.
+     */
+    public void addCustomMaterial(String name, double E, double nu, double rho, double yieldStrength, double fc) {
+        // Remove existing material with same name if any
+        materials.removeIf(m -> m.name.equalsIgnoreCase(name));
+        materials.add(new Material(name, E, nu, rho, yieldStrength, fc));
+    }
+
+    /**
+     * Removes a material by name.
+     * @return true if the material was found and removed
+     */
+    public boolean removeMaterial(String name) {
+        return materials.removeIf(m -> m.name.equalsIgnoreCase(name));
+    }
+
+    /**
+     * Loads custom materials from a StructuralModel's custom material list.
+     * These are added to the existing materials without clearing defaults.
+     */
+    public void loadCustomMaterials(List<StructuralModel.CustomMaterial> customMaterials) {
+        if (customMaterials == null) return;
+        for (StructuralModel.CustomMaterial cm : customMaterials) {
+            if (cm.name != null && !cm.name.trim().isEmpty()) {
+                addCustomMaterial(cm.name, cm.E, cm.nu, cm.rho, cm.yieldStrength, cm.fc);
             }
         }
     }

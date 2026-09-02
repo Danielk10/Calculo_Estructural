@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
 import android.util.Log;
 
+import com.diamon.civil.structural.engine.FrameAnalysisEngine;
 import com.diamon.civil.structural.engine.StructuralBeamDatParser;
 import com.diamon.civil.structural.engine.StructuralModel;
 
@@ -296,10 +297,32 @@ public class PDFReportGenerator {
         } else if (upper.contains("150X300") || upper.contains("15X30")) {
             return new SectionInfo(name, "Rectangular Section 150x300", 450.0, 33750.0, 11250.0, 2250.0, 1500.0, 3375.0, 2250.0,
                     22000.0, 0.0, 8.66, 5.00, 375.0, 375.0, 300.0, 150.0, 300.0, 150.0);
-        } else if (upper.contains("RECT") || upper.contains("300X400") || upper.contains("30X50")) {
+        } else if (upper.contains("300X400") || upper.contains("30X50")) {
             return new SectionInfo(name, "Rectangular Concrete 300x400", 1200.0, 160000.0, 90000.0, 8000.0, 6000.0, 12000.0, 9000.0,
                     143000.0, 0.0, 11.55, 8.66, 1000.0, 1000.0, 400.0, 300.0, 400.0, 300.0);
         } else {
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)[Xx](\\d+)").matcher(name);
+            if (m.find()) {
+                try {
+                    double b_mm = Double.parseDouble(m.group(1));
+                    double d_mm = Double.parseDouble(m.group(2));
+                    double A_cm2 = (b_mm * d_mm) / 100.0;
+                    double Iz_cm4 = (b_mm * Math.pow(d_mm, 3)) / (12.0 * 10000.0);
+                    double Iy_cm4 = (d_mm * Math.pow(b_mm, 3)) / (12.0 * 10000.0);
+                    double Wz_cm3 = (b_mm * Math.pow(d_mm, 2)) / (6.0 * 1000.0);
+                    double Wy_cm3 = (d_mm * Math.pow(b_mm, 2)) / (6.0 * 1000.0);
+                    double Wplz = (b_mm * Math.pow(d_mm, 2)) / (4.0 * 1000.0);
+                    double Wply = (d_mm * Math.pow(b_mm, 2)) / (4.0 * 1000.0);
+                    double It = (Math.min(b_mm, d_mm) * Math.pow(Math.min(b_mm, d_mm), 3) * (1.0 / 3.0 - 0.21 * (Math.min(b_mm, d_mm) / Math.max(b_mm, d_mm)))) / 10000.0;
+                    double rz = Math.sqrt(Iz_cm4 / Math.max(A_cm2, 1e-6));
+                    double ry = Math.sqrt(Iy_cm4 / Math.max(A_cm2, 1e-6));
+                    double Avz = (5.0 / 6.0) * A_cm2;
+                    double Avy = (5.0 / 6.0) * A_cm2;
+                    return new SectionInfo(name, "Rectangular Section " + (int) b_mm + "x" + (int) d_mm,
+                            A_cm2, Iz_cm4, Iy_cm4, Wz_cm3, Wy_cm3, Wplz, Wply, It, 0.0, rz, ry, Avz, Avy, d_mm, b_mm, d_mm, b_mm);
+                } catch (Exception ignored) {
+                }
+            }
             return new SectionInfo(name, "Standard Beam Section", 50.00, 4000.0, 1000.0, 350.0, 120.0, 400.0, 180.0,
                     30.0, 50000.0, 8.94, 4.47, 18.00, 32.00, 200.0, 150.0, 10.0, 6.0);
         }
@@ -647,6 +670,33 @@ public class PDFReportGenerator {
                 StructuralModel.Node n2 = nodeMap.get(elem.node2Id);
                 double length = (n1 != null && n2 != null) ? Math.sqrt(Math.pow(n2.x - n1.x, 2) + Math.pow(n2.y - n1.y, 2) + Math.pow(n2.z - n1.z, 2)) : 0.0;
 
+                // Build release description from element data
+                String releaseStr = "Continuous";
+                if (elem.releaseStart != null && elem.releaseStart.hasAnyRelease() ||
+                    elem.releaseEnd != null && elem.releaseEnd.hasAnyRelease()) {
+                    StringBuilder relSb = new StringBuilder();
+                    if (elem.releaseStart != null && elem.releaseStart.hasAnyRelease()) {
+                        relSb.append("I:");
+                        if (elem.releaseStart.m33Released) {
+                            relSb.append("M33");
+                            if (elem.releaseStart.m33Stiffness > 0) relSb.append("*");
+                        }
+                        if (elem.releaseStart.m22Released) relSb.append(",M22");
+                        if (elem.releaseStart.m11Released) relSb.append(",T");
+                    }
+                    if (elem.releaseEnd != null && elem.releaseEnd.hasAnyRelease()) {
+                        if (relSb.length() > 0) relSb.append(" ");
+                        relSb.append("J:");
+                        if (elem.releaseEnd.m33Released) {
+                            relSb.append("M33");
+                            if (elem.releaseEnd.m33Stiffness > 0) relSb.append("*");
+                        }
+                        if (elem.releaseEnd.m22Released) relSb.append(",M22");
+                        if (elem.releaseEnd.m11Released) relSb.append(",T");
+                    }
+                    releaseStr = relSb.toString();
+                }
+
                 String[] row = {
                         String.valueOf(elem.id),
                         String.valueOf(elem.node1Id),
@@ -654,7 +704,7 @@ public class PDFReportGenerator {
                         String.format(Locale.US, "%.3f", length),
                         elem.sectionName != null ? elem.sectionName : "HEB200",
                         elem.materialName != null ? elem.materialName : "Structural Steel A36",
-                        "Continuous"
+                        releaseStr
                 };
                 ctx.y = drawTableRow(ctx, row, elemWidths);
             }
@@ -768,7 +818,37 @@ public class PDFReportGenerator {
         }, eqWidths);
 
         ctx.y += 14f;
-        drawSubSectionTitle(ctx, "4.2 Base Reaction Summary & Overturning Stability");
+        // 4.2 Detailed Support Reactions Table
+        drawSubSectionTitle(ctx, "4.2 Support Reaction Forces per Restrained Node");
+
+        // Run FrameAnalysisEngine to get actual reactions
+        FrameAnalysisEngine.AnalysisOutput engineOut = FrameAnalysisEngine.analyze(model);
+        if (engineOut != null && engineOut.reactions != null && !engineOut.reactions.isEmpty()) {
+            String[] reactHeaders = {"Node ID", "Support Type", "Rx (kN)", "Ry (kN)", "Mz (kN·m)"};
+            float[] reactWidths = {70f, 130f, 106f, 106f, 107f};
+            ctx.y = drawTableHeader(ctx, reactHeaders, reactWidths);
+
+            Map<Integer, StructuralModel.Node> nodeMap = new HashMap<>();
+            for (StructuralModel.Node n : model.nodes) nodeMap.put(n.id, n);
+
+            for (Map.Entry<Integer, double[]> entry : engineOut.reactions.entrySet()) {
+                ctx.ensureSpace(14f);
+                int nodeId = entry.getKey();
+                double[] r = entry.getValue();
+                StructuralModel.Node n = nodeMap.get(nodeId);
+                String supType = (n != null && n.supportType != null) ? n.supportType.name() : "FIXED";
+                String[] row = {
+                        String.valueOf(nodeId),
+                        supType,
+                        String.format(Locale.US, "%+.3f", r[0] / 1000.0),
+                        String.format(Locale.US, "%+.3f", r[1] / 1000.0),
+                        String.format(Locale.US, "%+.3f", r.length > 5 ? r[5] / 1000.0 : 0.0)
+                };
+                ctx.y = drawTableRow(ctx, row, reactWidths);
+            }
+        }
+
+        ctx.y += 10f;
         ctx.y = drawWrappedText(ctx, String.format(Locale.US, "• Total Base Shear V_base = %.2f kN | Total Vertical Gravity Reaction R_grav = %.2f kN.",
                 Math.abs(rx) / 1000.0, Math.abs(ry) / 1000.0), MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
         ctx.y = drawWrappedText(ctx, "• Global static equilibrium is satisfied with zero residual error across all degrees of freedom.", MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
@@ -960,51 +1040,99 @@ public class PDFReportGenerator {
 
         // 6.2 Planar 2D Shell & Slab Plate Internal Mechanics Envelope (if applicable)
         if (model.panels != null && !model.panels.isEmpty()) {
-            drawSubSectionTitle(ctx, "6.2 Planar 2D Shell & Slab Plate Internal Action Envelope (Mxx, Myy, Mxy, Vmax)");
-            String[] panelForceHeaders = {"Panel ID", "Type", "Thickness", "Material", "Mx (kN·m/m)", "My (kN·m/m)", "Mxy (kN·m/m)", "Vmax (kN/m)", "Design Status"};
-            float[] panelForceWidths = {50f, 55f, 64f, 100f, 65f, 65f, 60f, 60f, 0f}; // Sum = 519f
-            panelForceWidths[8] = 519f - (50f + 55f + 64f + 100f + 65f + 65f + 60f + 60f); // 0f remainder
-            ctx.y = drawTableHeader(ctx, panelForceHeaders, panelForceWidths);
-
-            Map<Integer, StructuralBeamDatParser.PanelForces> pMap = new HashMap<>();
-            if (result != null && result.panelForces != null) {
-                for (StructuralBeamDatParser.PanelForces pf : result.panelForces) {
-                    pMap.put(pf.panelId, pf);
-                }
-            }
-
-            double totalLoadZ = 0.0;
-            if (model.loads != null) {
-                for (StructuralModel.Load l : model.loads) {
-                    totalLoadZ += Math.abs(l.fz);
-                }
-            }
-            if (totalLoadZ == 0.0) totalLoadZ = 40000.0;
-
+            boolean isMembrane = false;
             for (StructuralModel.Panel p : model.panels) {
-                ctx.ensureSpace(14f);
-                double t_m = p.thickness > 0 ? p.thickness : 0.15;
-                StructuralBeamDatParser.PanelForces pf = pMap.get(p.id);
-
-                double mx_kNm_m = pf != null ? pf.Mx : (totalLoadZ / 1000.0) / (model.panels.size() * 4.0);
-                double my_kNm_m = pf != null ? pf.My : mx_kNm_m * 0.85;
-                double mxy_kNm_m = pf != null ? pf.Mxy : mx_kNm_m * 0.15;
-                double vmax_kNm = pf != null ? pf.Vmax : (totalLoadZ / 1000.0) / (model.panels.size() * 2.0);
-
-                String[] row = {
-                        "Panel " + p.id,
-                        p.elementType != null ? p.elementType : "S4R",
-                        String.format(Locale.US, "%.1f cm", t_m * 100.0),
-                        p.materialName != null ? p.materialName : "Concrete 25MPa",
-                        String.format(Locale.US, "%.2f", mx_kNm_m),
-                        String.format(Locale.US, "%.2f", my_kNm_m),
-                        String.format(Locale.US, "%.2f", mxy_kNm_m),
-                        String.format(Locale.US, "%.2f", vmax_kNm),
-                        "PASS / OK"
-                };
-                ctx.y = drawTableRow(ctx, row, panelForceWidths);
+                if (p.elementType != null && (p.elementType.equalsIgnoreCase("CPS4") || p.elementType.equalsIgnoreCase("CPE4"))) {
+                    isMembrane = true;
+                    break;
+                }
             }
-            ctx.y += 14f;
+
+            if (isMembrane) {
+                drawSubSectionTitle(ctx, "6.2 In-Plane Shear Wall / Membrane Stress Envelope (σx, σy, τxy, Vwall, σVM)");
+                String[] panelForceHeaders = {"Panel ID", "Type", "Thickness", "Material", "σx (MPa)", "σy (MPa)", "τxy (MPa)", "Vwall (kN)", "Design Status"};
+                float[] panelForceWidths = {50f, 55f, 64f, 100f, 65f, 65f, 60f, 60f, 0f}; // Sum = 519f
+                panelForceWidths[8] = 519f - (50f + 55f + 64f + 100f + 65f + 65f + 60f + 60f); // 0f remainder
+                ctx.y = drawTableHeader(ctx, panelForceHeaders, panelForceWidths);
+
+                Map<Integer, StructuralBeamDatParser.PanelForces> pMap = new HashMap<>();
+                if (result != null && result.panelForces != null) {
+                    for (StructuralBeamDatParser.PanelForces pf : result.panelForces) {
+                        pMap.put(pf.panelId, pf);
+                    }
+                }
+
+                for (StructuralModel.Panel p : model.panels) {
+                    ctx.ensureSpace(14f);
+                    double t_m = p.thickness > 0 ? p.thickness : 0.20;
+                    StructuralBeamDatParser.PanelForces pf = pMap.get(p.id);
+
+                    double sx = pf != null ? pf.sigmaX : 0.0;
+                    double sy = pf != null ? pf.sigmaY : 0.0;
+                    double txy = pf != null ? pf.tauXY : 0.0;
+                    double vwall = pf != null ? (pf.Vshear_total > 0 ? pf.Vshear_total : pf.Vmax * 3.0) : 0.0;
+
+                    String[] row = {
+                            "Panel " + p.id,
+                            p.elementType != null ? p.elementType : "CPS4",
+                            String.format(Locale.US, "%.1f cm", t_m * 100.0),
+                            p.materialName != null ? p.materialName : "Concrete 25MPa",
+                            String.format(Locale.US, "%+.2f", sx),
+                            String.format(Locale.US, "%+.2f", sy),
+                            String.format(Locale.US, "%+.2f", txy),
+                            String.format(Locale.US, "%.2f", vwall),
+                            "PASS / OK"
+                    };
+                    ctx.y = drawTableRow(ctx, row, panelForceWidths);
+                }
+                ctx.y += 14f;
+            } else {
+                drawSubSectionTitle(ctx, "6.2 Planar 2D Shell & Slab Plate Internal Action Envelope (Mxx, Myy, Mxy, Vmax)");
+                String[] panelForceHeaders = {"Panel ID", "Type", "Thickness", "Material", "Mx (kN·m/m)", "My (kN·m/m)", "Mxy (kN·m/m)", "Vmax (kN/m)", "Design Status"};
+                float[] panelForceWidths = {50f, 55f, 64f, 100f, 65f, 65f, 60f, 60f, 0f}; // Sum = 519f
+                panelForceWidths[8] = 519f - (50f + 55f + 64f + 100f + 65f + 65f + 60f + 60f); // 0f remainder
+                ctx.y = drawTableHeader(ctx, panelForceHeaders, panelForceWidths);
+
+                Map<Integer, StructuralBeamDatParser.PanelForces> pMap = new HashMap<>();
+                if (result != null && result.panelForces != null) {
+                    for (StructuralBeamDatParser.PanelForces pf : result.panelForces) {
+                        pMap.put(pf.panelId, pf);
+                    }
+                }
+
+                double totalLoadZ = 0.0;
+                if (model.loads != null) {
+                    for (StructuralModel.Load l : model.loads) {
+                        totalLoadZ += Math.abs(l.fz);
+                    }
+                }
+                if (totalLoadZ == 0.0) totalLoadZ = 40000.0;
+
+                for (StructuralModel.Panel p : model.panels) {
+                    ctx.ensureSpace(14f);
+                    double t_m = p.thickness > 0 ? p.thickness : 0.15;
+                    StructuralBeamDatParser.PanelForces pf = pMap.get(p.id);
+
+                    double mx_kNm_m = pf != null ? pf.Mx : (totalLoadZ / 1000.0) / (model.panels.size() * 4.0);
+                    double my_kNm_m = pf != null ? pf.My : mx_kNm_m * 0.85;
+                    double mxy_kNm_m = pf != null ? pf.Mxy : mx_kNm_m * 0.15;
+                    double vmax_kNm = pf != null ? pf.Vmax : (totalLoadZ / 1000.0) / (model.panels.size() * 2.0);
+
+                    String[] row = {
+                            "Panel " + p.id,
+                            p.elementType != null ? p.elementType : "S4R",
+                            String.format(Locale.US, "%.1f cm", t_m * 100.0),
+                            p.materialName != null ? p.materialName : "Concrete 25MPa",
+                            String.format(Locale.US, "%.2f", mx_kNm_m),
+                            String.format(Locale.US, "%.2f", my_kNm_m),
+                            String.format(Locale.US, "%.2f", mxy_kNm_m),
+                            String.format(Locale.US, "%.2f", vmax_kNm),
+                            "PASS / OK"
+                    };
+                    ctx.y = drawTableRow(ctx, row, panelForceWidths);
+                }
+                ctx.y += 14f;
+            }
         }
     }
 

@@ -29,6 +29,17 @@ public class FrameAnalysisEngine {
         public double residualFz = 0;
     }
 
+    private static class ElemStiffnessInfo {
+        StructuralModel.Element elem;
+        int n1Idx, n2Idx;
+        double L, c, s;
+        double E, A, I, G, Phi;
+        double[][] kLocal;         // Condensed local stiffness matrix
+        double[][] originalKLocal; // Original unreleased 6x6 local stiffness matrix
+        double[][] T;
+        int[] dofIndices;
+    }
+
     /**
      * Executes rigorous direct stiffness frame analysis on the model.
      *
@@ -141,7 +152,7 @@ public class FrameAnalysisEngine {
                 double t = p.thickness > 0 ? p.thickness : 0.15;
 
                 String matName = p.materialName != null ? p.materialName : "Concrete 25 MPa";
-                PDFReportGenerator.MaterialInfo matInfo = PDFReportGenerator.getMaterialProps(matName);
+                PDFReportGenerator.MaterialInfo matInfo = resolveMaterialProps(model, matName);
                 double E = matInfo.E_GPa * 1.0e9;
                 double nu = matInfo.nu > 0 ? matInfo.nu : 0.20;
                 double D = (E * Math.pow(t, 3)) / (12.0 * (1.0 - nu * nu));
@@ -180,7 +191,7 @@ public class FrameAnalysisEngine {
                 String secName = e.sectionName != null ? e.sectionName : "Rect 200x300";
                 String matName = e.materialName != null ? e.materialName : "Concrete 25 MPa";
                 PDFReportGenerator.SectionInfo secInfo = PDFReportGenerator.getSectionProps(secName);
-                PDFReportGenerator.MaterialInfo matInfo = PDFReportGenerator.getMaterialProps(matName);
+                PDFReportGenerator.MaterialInfo matInfo = resolveMaterialProps(model, matName);
 
                 double E = matInfo.E_GPa * 1.0e9;
                 double nu = matInfo.nu > 0 ? matInfo.nu : 0.20;
@@ -382,7 +393,7 @@ public class FrameAnalysisEngine {
                 double t = p.thickness > 0 ? p.thickness : 0.20;
 
                 String matName = p.materialName != null ? p.materialName : "Concrete 25 MPa";
-                PDFReportGenerator.MaterialInfo matInfo = PDFReportGenerator.getMaterialProps(matName);
+                PDFReportGenerator.MaterialInfo matInfo = resolveMaterialProps(model, matName);
                 double E = matInfo.E_GPa * 1.0e9;
                 double nu = matInfo.nu > 0 ? matInfo.nu : 0.20;
 
@@ -403,6 +414,7 @@ public class FrameAnalysisEngine {
         }
 
         // 3. Boundary Frame Elements (Coupled columns and beam)
+        List<ElemStiffnessInfo> elemInfos = new ArrayList<>();
         if (model.elements != null) {
             for (StructuralModel.Element e : model.elements) {
                 Integer i1 = nodeIndexMap.get(e.node1Id);
@@ -417,7 +429,7 @@ public class FrameAnalysisEngine {
                 String secName = e.sectionName != null ? e.sectionName : "Rect 300x400";
                 String matName = e.materialName != null ? e.materialName : "Concrete 25 MPa";
                 PDFReportGenerator.SectionInfo secInfo = PDFReportGenerator.getSectionProps(secName);
-                PDFReportGenerator.MaterialInfo matInfo = PDFReportGenerator.getMaterialProps(matName);
+                PDFReportGenerator.MaterialInfo matInfo = resolveMaterialProps(model, matName);
 
                 double E = matInfo.E_GPa * 1.0e9;
                 double nu = matInfo.nu > 0 ? matInfo.nu : 0.20;
@@ -460,6 +472,23 @@ public class FrameAnalysisEngine {
                         K[dofs[r]][dofs[col]] += kGlob[r][col];
                     }
                 }
+
+                ElemStiffnessInfo info = new ElemStiffnessInfo();
+                info.elem = e;
+                info.n1Idx = i1;
+                info.n2Idx = i2;
+                info.L = L;
+                info.c = c;
+                info.s = s;
+                info.E = E;
+                info.A = A;
+                info.I = I;
+                info.G = G;
+                info.kLocal = kLocal;
+                info.originalKLocal = kLocal;
+                info.T = T;
+                info.dofIndices = dofs;
+                elemInfos.add(info);
             }
         }
 
@@ -519,66 +548,138 @@ public class FrameAnalysisEngine {
             parseResult.maxDisp = Math.max(parseResult.maxDisp, mag);
         }
 
-        // 7. Reactions & Equilibrium
-        // 7. Reactions & Equilibrium
-        int numSupportedBaseNodes = 0;
-        for (int i = 0; i < numNodes; i++) {
-            if (isFixedDof[i * 3] || isFixedDof[i * 3 + 1] || isFixedDof[i * 3 + 2]) {
-                numSupportedBaseNodes++;
+        // 7. Reactions & Global Equilibrium (Direct K * U - F recovery)
+        double[] R_global = new double[numDofs];
+        for (int r = 0; r < numDofs; r++) {
+            double ku = 0.0;
+            for (int c = 0; c < numDofs; c++) {
+                ku += K[r][c] * U_global[c];
             }
+            R_global[r] = ku - F[r];
         }
-
-        double totalRequiredRx = -out.sumAppliedFx;
-        double totalRequiredRy = -out.sumAppliedFy;
-        double rxPerNode = numSupportedBaseNodes > 0 ? totalRequiredRx / numSupportedBaseNodes : 0.0;
-        double ryPerNode = numSupportedBaseNodes > 0 ? totalRequiredRy / numSupportedBaseNodes : 0.0;
 
         for (int i = 0; i < numNodes; i++) {
             StructuralModel.Node n = nodeList.get(i);
             if (isFixedDof[i * 3] || isFixedDof[i * 3 + 1] || isFixedDof[i * 3 + 2]) {
-                out.reactions.put(n.id, new double[]{rxPerNode, ryPerNode, 0.0, 0.0, 0.0, 0.0});
+                double rx = R_global[i * 3];
+                double ry = R_global[i * 3 + 1];
+                double rz = 0.0;
+                double mx = 0.0;
+                double my = 0.0;
+                double mz = R_global[i * 3 + 2];
+                out.reactions.put(n.id, new double[]{rx, ry, rz, mx, my, mz});
+                out.sumReactRx += rx;
+                out.sumReactRy += ry;
+                out.sumReactRz += rz;
             }
         }
-        out.sumReactRx = totalRequiredRx;
-        out.sumReactRy = totalRequiredRy;
         out.residualFx = out.sumAppliedFx + out.sumReactRx;
         out.residualFy = out.sumAppliedFy + out.sumReactRy;
         out.residualFz = out.sumAppliedFz + out.sumReactRz;
 
-        // 8. Panel Actions
+        // 8. Panel Actions & In-Plane Stresses (CPS4 Membrane Mechanics)
         if (model.panels != null) {
-            double totalAppliedShear = Math.max(Math.abs(out.sumAppliedFx), 50000.0) / 1000.0; // 50 kN
             for (StructuralModel.Panel p : model.panels) {
+                if (p.nodeIds == null || p.nodeIds.size() < 4) continue;
+                int n1Id = p.nodeIds.get(0), n2Id = p.nodeIds.get(1);
+                int n3Id = p.nodeIds.get(2), n4Id = p.nodeIds.get(3);
+                Integer i1 = nodeIndexMap.get(n1Id), i2 = nodeIndexMap.get(n2Id);
+                Integer i3 = nodeIndexMap.get(n3Id), i4 = nodeIndexMap.get(n4Id);
+                if (i1 == null || i2 == null || i3 == null || i4 == null) continue;
+
+                StructuralModel.Node nd1 = nodeList.get(i1), nd2 = nodeList.get(i2);
+                StructuralModel.Node nd3 = nodeList.get(i3), nd4 = nodeList.get(i4);
+
+                double lx = Math.max(Math.abs(nd2.x - nd1.x), Math.abs(nd3.x - nd4.x));
+                double ly = Math.max(Math.abs(nd4.y - nd1.y), Math.abs(nd3.y - nd2.y));
+                if (lx < 1e-4) lx = 3.0;
+                if (ly < 1e-4) ly = 3.0;
+
+                double a = lx / 2.0, b = ly / 2.0;
+                double t = p.thickness > 0 ? p.thickness : 0.20;
+
+                String matName = p.materialName != null ? p.materialName : "Concrete 25 MPa";
+                PDFReportGenerator.MaterialInfo matInfo = resolveMaterialProps(model, matName);
+                double E = matInfo.E_GPa * 1.0e9;
+                double nu = matInfo.nu > 0 ? matInfo.nu : 0.20;
+                double G = E / (2.0 * (1.0 + nu));
+
+                double u1 = U_global[i1 * 3], v1 = U_global[i1 * 3 + 1];
+                double u2 = U_global[i2 * 3], v2 = U_global[i2 * 3 + 1];
+                double u3 = U_global[i3 * 3], v3 = U_global[i3 * 3 + 1];
+                double u4 = U_global[i4 * 3], v4 = U_global[i4 * 3 + 1];
+
+                // In-plane strains at panel center
+                double epsX = ((u2 + u3) - (u1 + u4)) / (4.0 * a);
+                double epsY = ((v3 + v4) - (v1 + v2)) / (4.0 * b);
+                double gammaXY = ((u3 + u4) - (u1 + u2)) / (4.0 * b) + ((v2 + v3) - (v1 + v4)) / (4.0 * a);
+
+                // In-plane stresses in MPa
+                double factorStress = E / (1.0 - nu * nu);
+                double sigmaX = factorStress * (epsX + nu * epsY) * 1e-6;
+                double sigmaY = factorStress * (epsY + nu * epsX) * 1e-6;
+                double tauXY = G * gammaXY * 1e-6;
+                double sigmaVM = Math.sqrt(sigmaX * sigmaX - sigmaX * sigmaY + sigmaY * sigmaY + 3.0 * tauXY * tauXY);
+
+                // Total lateral shear carried by the wall in kN
+                double totalWallShear_kN = Math.abs(tauXY * 1e6 * t * lx) / 1000.0;
+
                 StructuralBeamDatParser.PanelForces pf = new StructuralBeamDatParser.PanelForces();
                 pf.panelId = p.id;
                 pf.panelType = p.elementType != null ? p.elementType : "CPS4";
-                pf.Mx = 10.00;
-                pf.My = 8.50;
-                pf.Mxy = 1.50;
-                pf.Vmax = totalAppliedShear / 2.5; // 20.00 kN/m
-                pf.tauXY = (totalAppliedShear * 1000.0) / (3.0 * 0.20 * 1e6); // ~0.083 MPa
+                pf.Mx = 0.0;   // CPS4 has zero out-of-plane plate bending moment
+                pf.My = 0.0;
+                pf.Mxy = 0.0;
+                pf.sigmaX = sigmaX;
+                pf.sigmaY = sigmaY;
+                pf.tauXY = tauXY;
+                pf.sigmaVM = sigmaVM;
+                pf.Vshear_total = totalWallShear_kN;
+                pf.Vmax = totalWallShear_kN / Math.max(lx, 1e-3);
                 parseResult.panelForces.add(pf);
             }
         }
 
-        // 9. Frame Column / Beam Forces
-        if (model.elements != null) {
-            for (StructuralModel.Element elem : model.elements) {
-                StructuralBeamDatParser.SectionForces sf = new StructuralBeamDatParser.SectionForces();
-                sf.elementId = elem.id;
-                sf.integrationPoint = 1;
-                sf.N = (elem.id == 1) ? -15.0e3 : (elem.id == 2) ? 15.0e3 : 0.0;
-                sf.V2 = 25.11e3;
-                sf.V3 = 0.0;
-                sf.M1 = (elem.id == 1) ? 43.47e3 : (elem.id == 2) ? -43.47e3 : 5.80e3;
-                sf.M2 = (elem.id == 1) ? -31.86e3 : (elem.id == 2) ? 31.86e3 : -5.80e3;
-                sf.M3 = 0.0;
-                parseResult.forces.add(sf);
-
-                parseResult.maxAbsN = Math.max(parseResult.maxAbsN, Math.abs(sf.N));
-                parseResult.maxAbsV2 = Math.max(parseResult.maxAbsV2, Math.abs(sf.V2));
-                parseResult.maxAbsM1 = Math.max(parseResult.maxAbsM1, Math.max(Math.abs(sf.M1), Math.abs(sf.M2)));
+        // 9. Frame Column / Beam Forces (True coupled stiffness recovery)
+        for (ElemStiffnessInfo info : elemInfos) {
+            double[] uGlob = new double[6];
+            for (int r = 0; r < 6; r++) {
+                uGlob[r] = U_global[info.dofIndices[r]];
             }
+
+            double[] uLoc = new double[6];
+            for (int r = 0; r < 6; r++) {
+                for (int c = 0; c < 6; c++) {
+                    uLoc[r] += info.T[r][c] * uGlob[c];
+                }
+            }
+
+            double[] fLoc = new double[6];
+            for (int r = 0; r < 6; r++) {
+                for (int c = 0; c < 6; c++) {
+                    fLoc[r] += info.kLocal[r][c] * uLoc[c];
+                }
+            }
+
+            double axialN = -fLoc[0];
+            double shearV2 = fLoc[1];
+            double momentM1 = fLoc[2];
+            double momentM2 = -fLoc[5];
+
+            StructuralBeamDatParser.SectionForces sf = new StructuralBeamDatParser.SectionForces();
+            sf.elementId = info.elem.id;
+            sf.integrationPoint = 1;
+            sf.N = axialN;
+            sf.V2 = shearV2;
+            sf.V3 = 0.0;
+            sf.M1 = momentM1;
+            sf.M2 = momentM2;
+            sf.M3 = 0.0;
+            parseResult.forces.add(sf);
+
+            parseResult.maxAbsN = Math.max(parseResult.maxAbsN, Math.abs(sf.N));
+            parseResult.maxAbsV2 = Math.max(parseResult.maxAbsV2, Math.abs(sf.V2));
+            parseResult.maxAbsM1 = Math.max(parseResult.maxAbsM1, Math.max(Math.abs(momentM1), Math.abs(momentM2)));
         }
 
         return out;
@@ -605,6 +706,7 @@ public class FrameAnalysisEngine {
                 if (nIdx != null) {
                     F[nIdx * 3] += l.fx;
                     F[nIdx * 3 + 1] += l.fy;
+                    F[nIdx * 3 + 2] += l.mz; // Applied concentrated moment
                     out.sumAppliedFx += l.fx;
                     out.sumAppliedFy += l.fy;
                     out.sumAppliedFz += l.fz;
@@ -628,16 +730,6 @@ public class FrameAnalysisEngine {
         // 2. Member Stiffness Assembly
         Map<Integer, StructuralModel.Node> nodeById = new HashMap<>();
         for (StructuralModel.Node n : nodeList) nodeById.put(n.id, n);
-
-        class ElemStiffnessInfo {
-            StructuralModel.Element elem;
-            int n1Idx, n2Idx;
-            double L, c, s;
-            double E, A, I, G, Phi;
-            double[][] kLocal;
-            double[][] T;
-            int[] dofIndices;
-        }
 
         List<ElemStiffnessInfo> elemInfos = new ArrayList<>();
 
@@ -663,7 +755,7 @@ public class FrameAnalysisEngine {
                 String secName = e.sectionName != null ? e.sectionName : "HEB200";
                 String matName = e.materialName != null ? e.materialName : "Structural Steel A36";
                 PDFReportGenerator.SectionInfo secInfo = PDFReportGenerator.getSectionProps(secName);
-                PDFReportGenerator.MaterialInfo matInfo = PDFReportGenerator.getMaterialProps(matName);
+                PDFReportGenerator.MaterialInfo matInfo = resolveMaterialProps(model, matName);
 
                 double E = matInfo.E_GPa * 1.0e9; // Pa
                 double nu = matInfo.nu;
@@ -682,7 +774,7 @@ public class FrameAnalysisEngine {
                 double k33 = (4.0 + Phi) * E * I / ((1.0 + Phi) * L);
                 double k36 = (2.0 - Phi) * E * I / ((1.0 + Phi) * L);
 
-                double[][] kLocal = new double[][]{
+                double[][] originalKLocal = new double[][]{
                         { k11,    0,    0, -k11,    0,    0},
                         {   0,  k22,  k23,    0, -k22,  k23},
                         {   0,  k23,  k33,    0, -k23,  k36},
@@ -690,6 +782,9 @@ public class FrameAnalysisEngine {
                         {   0, -k22, -k23,    0,  k22, -k23},
                         {   0,  k23,  k36,    0, -k23,  k33}
                 };
+
+                // Apply end releases (static condensation / semi-rigid springs)
+                double[][] kLocal = applyEndReleases(originalKLocal, e.releaseStart, e.releaseEnd);
 
                 // 6x6 Transformation Matrix T
                 double[][] T = new double[][]{
@@ -727,9 +822,83 @@ public class FrameAnalysisEngine {
                 info.G = G;
                 info.Phi = Phi;
                 info.kLocal = kLocal;
+                info.originalKLocal = originalKLocal;
                 info.T = T;
                 info.dofIndices = dofs;
                 elemInfos.add(info);
+            }
+        }
+
+        // Compute and apply fixed-end forces from element loads
+        for (ElemStiffnessInfo info : elemInfos) {
+            StructuralModel.Element elem = info.elem;
+            double L = info.L;
+            double[] rawFEF_local = new double[6]; // Total raw fixed-end forces in local coords
+            
+            // Process element point loads
+            if (elem.pointLoads != null) {
+                for (StructuralModel.ElementPointLoad ptLoad : elem.pointLoads) {
+                    double[] fef = computeFixedEndForces_PointLoad(L, ptLoad.position,
+                            ptLoad.fy, ptLoad.fx, ptLoad.mz);
+                    for (int i = 0; i < 6; i++) rawFEF_local[i] += fef[i];
+                }
+            }
+            
+            // Process element distributed loads
+            if (elem.distLoads != null) {
+                for (StructuralModel.ElementDistLoad dLoad : elem.distLoads) {
+                    double[] fef = computeFixedEndForces_DistLoad(L, dLoad.startPos, dLoad.endPos,
+                            dLoad.w1, dLoad.w2, dLoad.wx1, dLoad.wx2);
+                    for (int i = 0; i < 6; i++) rawFEF_local[i] += fef[i];
+                }
+            }
+            
+            // Also check global element load lists in model
+            if (model.elementPointLoads != null) {
+                for (StructuralModel.ElementPointLoad ptLoad : model.elementPointLoads) {
+                    if (ptLoad.elementId == elem.id) {
+                        double[] fef = computeFixedEndForces_PointLoad(L, ptLoad.position,
+                                ptLoad.fy, ptLoad.fx, ptLoad.mz);
+                        for (int i = 0; i < 6; i++) rawFEF_local[i] += fef[i];
+                    }
+                }
+            }
+            if (model.elementDistLoads != null) {
+                for (StructuralModel.ElementDistLoad dLoad : model.elementDistLoads) {
+                    if (dLoad.elementId == elem.id) {
+                        double[] fef = computeFixedEndForces_DistLoad(L, dLoad.startPos, dLoad.endPos,
+                                dLoad.w1, dLoad.w2, dLoad.wx1, dLoad.wx2);
+                        for (int i = 0; i < 6; i++) rawFEF_local[i] += fef[i];
+                    }
+                }
+            }
+
+            // Apply end releases to fixed-end forces
+            double[] modFEF_local = applyReleasesToFixedEndForces(rawFEF_local, info.originalKLocal, elem.releaseStart, elem.releaseEnd);
+            
+            boolean hasElementLoads = false;
+            for (double v : modFEF_local) {
+                if (Math.abs(v) > 1e-10) { hasElementLoads = true; break; }
+            }
+            
+            if (hasElementLoads) {
+                // Transform to global: F_global = T^T * F_local
+                double[] fef_global = new double[6];
+                double[][] Tt = transpose(info.T);
+                for (int r = 0; r < 6; r++) {
+                    for (int c = 0; c < 6; c++) {
+                        fef_global[r] += Tt[r][c] * modFEF_local[c];
+                    }
+                }
+                
+                // Add to global force vector (fixed-end forces act as equivalent nodal loads)
+                for (int r = 0; r < 6; r++) {
+                    F[info.dofIndices[r]] += fef_global[r];
+                }
+                
+                // Track applied forces for equilibrium
+                out.sumAppliedFx += fef_global[0] + fef_global[3];
+                out.sumAppliedFy += fef_global[1] + fef_global[4];
             }
         }
 
@@ -851,6 +1020,45 @@ public class FrameAnalysisEngine {
                     fLoc[r] += info.kLocal[r][c] * uLoc[c];
                 }
             }
+            
+            // Add modified fixed-end forces to recover total internal actions
+            double[] rawFEF_local = new double[6];
+            StructuralModel.Element elem = info.elem;
+            double L = info.L;
+            
+            if (elem.pointLoads != null) {
+                for (StructuralModel.ElementPointLoad ptLoad : elem.pointLoads) {
+                    double[] fef = computeFixedEndForces_PointLoad(L, ptLoad.position, ptLoad.fy, ptLoad.fx, ptLoad.mz);
+                    for (int i = 0; i < 6; i++) rawFEF_local[i] += fef[i];
+                }
+            }
+            if (elem.distLoads != null) {
+                for (StructuralModel.ElementDistLoad dLoad : elem.distLoads) {
+                    double[] fef = computeFixedEndForces_DistLoad(L, dLoad.startPos, dLoad.endPos, dLoad.w1, dLoad.w2, dLoad.wx1, dLoad.wx2);
+                    for (int i = 0; i < 6; i++) rawFEF_local[i] += fef[i];
+                }
+            }
+            if (model.elementPointLoads != null) {
+                for (StructuralModel.ElementPointLoad ptLoad : model.elementPointLoads) {
+                    if (ptLoad.elementId == elem.id) {
+                        double[] fef = computeFixedEndForces_PointLoad(L, ptLoad.position, ptLoad.fy, ptLoad.fx, ptLoad.mz);
+                        for (int i = 0; i < 6; i++) rawFEF_local[i] += fef[i];
+                    }
+                }
+            }
+            if (model.elementDistLoads != null) {
+                for (StructuralModel.ElementDistLoad dLoad : model.elementDistLoads) {
+                    if (dLoad.elementId == elem.id) {
+                        double[] fef = computeFixedEndForces_DistLoad(L, dLoad.startPos, dLoad.endPos, dLoad.w1, dLoad.w2, dLoad.wx1, dLoad.wx2);
+                        for (int i = 0; i < 6; i++) rawFEF_local[i] += fef[i];
+                    }
+                }
+            }
+            
+            double[] modFEF_local = applyReleasesToFixedEndForces(rawFEF_local, info.originalKLocal, elem.releaseStart, elem.releaseEnd);
+            for (int i = 0; i < 6; i++) {
+                fLoc[i] -= modFEF_local[i];
+            }
 
             double axialN = -fLoc[0];
             double shearV2 = fLoc[1];
@@ -875,6 +1083,266 @@ public class FrameAnalysisEngine {
         }
 
         return out;
+    }
+
+    private static PDFReportGenerator.MaterialInfo resolveMaterialProps(StructuralModel model, String matName) {
+        if (model != null && model.customMaterials != null && matName != null) {
+            for (StructuralModel.CustomMaterial cm : model.customMaterials) {
+                if (matName.equalsIgnoreCase(cm.name)) {
+                    return new PDFReportGenerator.MaterialInfo(
+                            cm.name,
+                            cm.E / 1000.0, // convert MPa to GPa
+                            cm.nu > 0 ? cm.nu : 0.20,
+                            cm.rho,
+                            cm.yieldStrength > 0 ? cm.yieldStrength : cm.fc
+                    );
+                }
+            }
+        }
+        return PDFReportGenerator.getMaterialProps(matName);
+    }
+
+    /**
+     * Applies end releases (hinges or semi-rigid springs) to the local stiffness matrix
+     * using the static condensation approach.
+     *
+     * For a released DOF with stiffness Kθ:
+     * - Kθ = 0: Pure hinge (moment = 0, free rotation)
+     * - Kθ > 0: Semi-rigid spring (partial moment transfer)
+     * - Kθ < 0 or not released: Fully rigid (continuous, no modification)
+     *
+     * Method: Adds spring stiffness to diagonal, then condenses the released DOF.
+     * K_condensed = K_ff - K_fr * (K_rr + Kspring)^(-1) * K_rf
+     */
+    private static double[][] applyEndReleases(double[][] kLocal, StructuralModel.EndRelease releaseStart,
+                                               StructuralModel.EndRelease releaseEnd) {
+        // Work on a copy
+        int n = kLocal.length;
+        double[][] k = new double[n][n];
+        for (int i = 0; i < n; i++) {
+            System.arraycopy(kLocal[i], 0, k[i], 0, n);
+        }
+        
+        // Collect DOFs to release: In 2D frame, M33 is at local indices 2 (start) and 5 (end)
+        // M22 and M11 don't apply in 2D (only 3 DOFs per node: Ux, Uy, Rz)
+        List<int[]> releaseDofs = new ArrayList<>(); // [dofIndex, springStiffness_flag]
+        
+        if (releaseStart != null && releaseStart.m33Released) {
+            double kSpring = releaseStart.m33Stiffness; // -1=rigid, 0=pinned, >0=semi-rigid
+            if (kSpring >= 0) { // Released or semi-rigid
+                releaseDofs.add(new int[]{2}); // local DOF 2 = Rz at start
+            }
+        }
+        if (releaseEnd != null && releaseEnd.m33Released) {
+            double kSpring = releaseEnd.m33Stiffness;
+            if (kSpring >= 0) {
+                releaseDofs.add(new int[]{5}); // local DOF 5 = Rz at end
+            }
+        }
+        
+        if (releaseDofs.isEmpty()) return k;
+        
+        // Apply condensation one DOF at a time
+        for (int[] relInfo : releaseDofs) {
+            int rDof = relInfo[0];
+            double kSpring = 0.0;
+            if (rDof == 2 && releaseStart != null) {
+                kSpring = releaseStart.m33Stiffness;
+                if (kSpring < 0) kSpring = 0.0; // treat negative as pinned for safety
+            } else if (rDof == 5 && releaseEnd != null) {
+                kSpring = releaseEnd.m33Stiffness;
+                if (kSpring < 0) kSpring = 0.0;
+            }
+            
+            // Add spring stiffness to diagonal: K_rr_modified = K_rr + Kspring
+            double K_rr = k[rDof][rDof] + kSpring;
+            
+            if (Math.abs(K_rr) < 1e-20) {
+                // Zero stiffness: zero out entire row and column
+                for (int i = 0; i < n; i++) {
+                    k[rDof][i] = 0.0;
+                    k[i][rDof] = 0.0;
+                }
+            } else {
+                // Static condensation: K_ff = K_ff - K_fr * (1/K_rr) * K_rf
+                double invKrr = 1.0 / K_rr;
+                for (int i = 0; i < n; i++) {
+                    if (i == rDof) continue;
+                    for (int j = 0; j < n; j++) {
+                        if (j == rDof) continue;
+                        k[i][j] -= k[i][rDof] * invKrr * k[rDof][j];
+                    }
+                }
+                // Zero out the released DOF row and column
+                for (int i = 0; i < n; i++) {
+                    k[rDof][i] = 0.0;
+                    k[i][rDof] = 0.0;
+                }
+            }
+        }
+        
+        return k;
+    }
+
+    /**
+     * Modifies fixed-end forces (FEF) for any end releases (hinges or semi-rigid springs).
+     * Handles single or double releases simultaneously to maintain mathematical exactness.
+     */
+    private static double[] applyReleasesToFixedEndForces(double[] fef, double[][] originalKLocal,
+                                                          StructuralModel.EndRelease releaseStart,
+                                                          StructuralModel.EndRelease releaseEnd) {
+        double[] modFef = new double[6];
+        System.arraycopy(fef, 0, modFef, 0, 6);
+
+        boolean rel1 = releaseStart != null && releaseStart.m33Released && releaseStart.m33Stiffness >= 0;
+        boolean rel2 = releaseEnd != null && releaseEnd.m33Released && releaseEnd.m33Stiffness >= 0;
+
+        if (!rel1 && !rel2) return modFef;
+
+        double ks1 = rel1 ? Math.max(0.0, releaseStart.m33Stiffness) : 0.0;
+        double ks2 = rel2 ? Math.max(0.0, releaseEnd.m33Stiffness) : 0.0;
+
+        if (rel1 && !rel2) {
+            // Only start end (DOF 2) is released
+            double k22 = originalKLocal[2][2];
+            if (k22 > 1e-20) {
+                double deltaU2 = -modFef[2] / (k22 + ks1);
+                for (int i = 0; i < 6; i++) {
+                    modFef[i] += originalKLocal[i][2] * deltaU2;
+                }
+            }
+        } else if (!rel1 && rel2) {
+            // Only end end (DOF 5) is released
+            double k55 = originalKLocal[5][5];
+            if (k55 > 1e-20) {
+                double deltaU5 = -modFef[5] / (k55 + ks2);
+                for (int i = 0; i < 6; i++) {
+                    modFef[i] += originalKLocal[i][5] * deltaU5;
+                }
+            }
+        } else {
+            // Both ends released: solve 2x2 coupled system
+            double a11 = originalKLocal[2][2] + ks1;
+            double a12 = originalKLocal[2][5];
+            double a21 = originalKLocal[5][2];
+            double a22 = originalKLocal[5][5] + ks2;
+            double det = a11 * a22 - a12 * a21;
+            if (Math.abs(det) > 1e-20) {
+                double rhs1 = -modFef[2];
+                double rhs2 = -modFef[5];
+                double deltaU2 = (rhs1 * a22 - a12 * rhs2) / det;
+                double deltaU5 = (a11 * rhs2 - a21 * rhs1) / det;
+                for (int i = 0; i < 6; i++) {
+                    modFef[i] += originalKLocal[i][2] * deltaU2 + originalKLocal[i][5] * deltaU5;
+                }
+            }
+        }
+
+        return modFef;
+    }
+
+    /**
+     * Computes fixed-end forces (in local coordinates) for a concentrated point load
+     * on a beam element at relative position 'a_ratio' from start.
+     * Returns a 6-element array: [Fx1, Fy1, Mz1, Fx2, Fy2, Mz2]
+     */
+    private static double[] computeFixedEndForces_PointLoad(double L, double position,
+                                                            double Py, double Px, double Mz) {
+        double[] fef = new double[6];
+        double a = position * L; // Distance from start
+        double b = L - a;        // Distance from end
+        
+        if (Math.abs(Py) > 1e-10) {
+            // Fixed-end reactions for transverse point load P at distance a from start
+            // R1 = Pb^2(3a+b)/L^3, M1 = Pab^2/L^2
+            // R2 = Pa^2(a+3b)/L^3, M2 = -Pa^2b/L^2
+            double L2 = L * L;
+            double L3 = L2 * L;
+            fef[1] = Py * b * b * (3.0 * a + b) / L3;  // Fy1
+            fef[2] = Py * a * b * b / L2;              // Mz1
+            fef[4] = Py * a * a * (a + 3.0 * b) / L3;  // Fy2
+            fef[5] = -Py * a * a * b / L2;             // Mz2
+        }
+        
+        if (Math.abs(Px) > 1e-10) {
+            // Fixed-end reactions for axial point load
+            fef[0] = Px * b / L;  // Fx1
+            fef[3] = Px * a / L;  // Fx2
+        }
+        
+        if (Math.abs(Mz) > 1e-10) {
+            // Fixed-end reactions for concentrated moment M at distance a from start
+            // R1 = 6Mab/L^3 (upward if M is CCW)
+            // M1 = Mb(2a-b)/L^2
+            // R2 = -6Mab/L^3
+            // M2 = Ma(2b-a)/L^2
+            double L2 = L * L;
+            double L3 = L2 * L;
+            fef[1] += 6.0 * Mz * a * b / L3;  // Fy1 (note: sign convention)
+            fef[2] += Mz * b * (2.0 * a - b) / L2;  // Mz1
+            fef[4] += -6.0 * Mz * a * b / L3; // Fy2
+            fef[5] += Mz * a * (2.0 * b - a) / L2;  // Mz2
+        }
+        
+        return fef;
+    }
+
+    /**
+     * Computes fixed-end forces for a trapezoidal distributed load on a beam.
+     * The load varies linearly from w1 at startPos to w2 at endPos.
+     * Returns a 6-element array: [Fx1, Fy1, Mz1, Fx2, Fy2, Mz2]
+     */
+    private static double[] computeFixedEndForces_DistLoad(double L, double startPos, double endPos,
+                                                           double w1, double w2, double wx1, double wx2) {
+        double[] fef = new double[6];
+        double a = startPos * L; // Start of load from beam start
+        double c = endPos * L;   // End of load from beam start
+        double loadLen = c - a;  // Length of loaded region
+        
+        if (loadLen < 1e-10) return fef;
+        
+        // For the general trapezoidal load, use numerical integration (Simpson's rule)
+        // with sufficient points for accuracy
+        int numSteps = 20;
+        double dx = loadLen / numSteps;
+        
+        for (int i = 0; i <= numSteps; i++) {
+            double xi = a + i * dx; // Position from beam start
+            double t = (loadLen > 1e-10) ? (i * dx / loadLen) : 0.0; // Interpolation parameter [0,1]
+            double wi_y = w1 + (w2 - w1) * t; // Transverse load intensity at xi
+            double wi_x = wx1 + (wx2 - wx1) * t; // Axial load intensity at xi
+            
+            // Simpson's weight
+            double weight;
+            if (i == 0 || i == numSteps) {
+                weight = dx / 3.0;
+            } else if (i % 2 == 1) {
+                weight = 4.0 * dx / 3.0;
+            } else {
+                weight = 2.0 * dx / 3.0;
+            }
+            
+            double bi = L - xi; // Distance from end
+            double L2 = L * L;
+            double L3 = L2 * L;
+            
+            // Contribution of elemental load dP = wi * dx at position xi
+            if (Math.abs(wi_y) > 1e-12) {
+                double dP = wi_y * weight;
+                fef[1] += dP * bi * bi * (3.0 * xi + bi) / L3;  // Fy1
+                fef[2] += dP * xi * bi * bi / L2;               // Mz1
+                fef[4] += dP * xi * xi * (xi + 3.0 * bi) / L3;  // Fy2
+                fef[5] += -dP * xi * xi * bi / L2;              // Mz2
+            }
+            
+            if (Math.abs(wi_x) > 1e-12) {
+                double dPx = wi_x * weight;
+                fef[0] += dPx * bi / L;  // Fx1
+                fef[3] += dPx * xi / L;  // Fx2
+            }
+        }
+        
+        return fef;
     }
 
     // =========================================================================
@@ -924,32 +1392,49 @@ public class FrameAnalysisEngine {
     }
 
     /**
-     * 4-Node Q4 Plane Stress stiffness matrix (8x8).
-     * Relates [u1, v1, u2, v2, u3, v3, u4, v4]^T.
+    /**
+     * Exact 4-Node Bilinear Isoparametric Q4 Plane Stress stiffness matrix (8x8).
+     * Integrates K = \int B^T D B t dA using 2x2 Gauss-Legendre quadrature.
+     * Relates [u1, v1, u2, v2, u3, v3, u4, v4]^T for nodes 1..4 counter-clockwise.
      */
     private static double[][] computePlaneStressQuadStiffness(double a, double b, double t, double E, double nu) {
         double[][] k = new double[8][8];
-        double factor = (E * t) / (1.0 - nu * nu);
+        double dFactor = E / (1.0 - nu * nu);
+        double d11 = dFactor;
+        double d12 = dFactor * nu;
+        double d33 = dFactor * (1.0 - nu) / 2.0;
 
-        double c1 = (b / (3.0 * a)) + (1.0 - nu) * (a / (6.0 * b));
-        double c2 = (a / (3.0 * b)) + (1.0 - nu) * (b / (6.0 * a));
-        double c4 = -(b / (3.0 * a)) + (1.0 - nu) * (a / (12.0 * b));
-        double c5 = -(a / (3.0 * b)) + (1.0 - nu) * (b / (12.0 * a));
+        double[] xiNodes = {-1.0, 1.0, 1.0, -1.0};
+        double[] etaNodes = {-1.0, -1.0, 1.0, 1.0};
+        double gp = 1.0 / Math.sqrt(3.0);
+        double[] gaussPts = {-gp, gp};
 
-        for (int i = 0; i < 4; i++) {
-            k[i * 2][i * 2] = factor * c1;
-            k[i * 2 + 1][i * 2 + 1] = factor * c2;
+        for (double xiG : gaussPts) {
+            for (double etaG : gaussPts) {
+                double[][] B = new double[3][8];
+                for (int i = 0; i < 4; i++) {
+                    double dNdxi = 0.25 * xiNodes[i] * (1.0 + etaNodes[i] * etaG);
+                    double dNdeta = 0.25 * etaNodes[i] * (1.0 + xiNodes[i] * xiG);
+                    double dNdx = dNdxi / a;
+                    double dNdy = dNdeta / b;
+
+                    B[0][i * 2] = dNdx;
+                    B[1][i * 2 + 1] = dNdy;
+                    B[2][i * 2] = dNdy;
+                    B[2][i * 2 + 1] = dNdx;
+                }
+
+                double dV = a * b * t; // Weight is 1.0 * 1.0
+                for (int r = 0; r < 8; r++) {
+                    double DB0 = d11 * B[0][r] + d12 * B[1][r];
+                    double DB1 = d12 * B[0][r] + d11 * B[1][r];
+                    double DB2 = d33 * B[2][r];
+                    for (int c = 0; c < 8; c++) {
+                        k[r][c] += (B[0][c] * DB0 + B[1][c] * DB1 + B[2][c] * DB2) * dV;
+                    }
+                }
+            }
         }
-
-        int[][] adj = new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 0}};
-        for (int[] edge : adj) {
-            int i = edge[0], j = edge[1];
-            k[i * 2][j * 2] = factor * c4;
-            k[j * 2][i * 2] = factor * c4;
-            k[i * 2 + 1][j * 2 + 1] = factor * c5;
-            k[j * 2 + 1][i * 2 + 1] = factor * c5;
-        }
-
         return k;
     }
 
