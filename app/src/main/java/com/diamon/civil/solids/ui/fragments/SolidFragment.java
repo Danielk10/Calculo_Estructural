@@ -381,10 +381,11 @@ public class SolidFragment extends Fragment {
     public static boolean isSupportedCadFormat(String fileName) {
         if (fileName == null || fileName.trim().isEmpty()) return false;
         String name = fileName.toLowerCase(java.util.Locale.US).trim();
+        if (name.equals("gmsh_cad_driver.geo") || name.startsWith("job_") || name.startsWith(".")) return false;
         return name.endsWith(".step") || name.endsWith(".stp")
                 || name.endsWith(".brep")
                 || name.endsWith(".iges") || name.endsWith(".igs")
-                || (name.endsWith(".geo") && !name.startsWith("job_"));
+                || name.endsWith(".geo");
     }
 
     private void refreshGeometrySpinner(File selectFile) {
@@ -408,7 +409,7 @@ public class SolidFragment extends Fragment {
                 if (files != null) {
                     for (File f : files) {
                         String name = f.getName().toLowerCase(java.util.Locale.US);
-                        if (name.equals("cantilever.geo") || name.equals("cantilever_benchmark.geo")) continue;
+                        if (name.equals("cantilever.geo") || name.equals("cantilever_benchmark.geo") || name.equals("gmsh_cad_driver.geo")) continue;
                         if (isSupportedCadFormat(name)) {
                             availableGeometries.add(f);
                             if (name.equals("box.brep")) displayNames.add(getString(R.string.geo_item_box));

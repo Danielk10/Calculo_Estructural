@@ -84,6 +84,7 @@ public class TerminalCommandExecutorTest {
         File binDir = new File(globalRoot, "bin"); // Internal system folder
         File profileFile = new File(globalRoot, "profileInstalled");
         File profileData = new File(globalRoot, "profileinstaller_profileWrittenFor_lastUpdateTime.dat");
+        File userDatFile = new File(globalRoot, "output.dat");
         assertTrue(terminalHome.mkdirs());
         assertTrue(structDir.mkdirs());
         assertTrue(solidsDir.mkdirs());
@@ -91,6 +92,7 @@ public class TerminalCommandExecutorTest {
         assertTrue(binDir.mkdirs());
         assertTrue(profileFile.createNewFile());
         assertTrue(profileData.createNewFile());
+        assertTrue(userDatFile.createNewFile());
 
         // Create a model file in structural_analysis
         File structModel = new File(structDir, "model.json");
@@ -101,12 +103,14 @@ public class TerminalCommandExecutorTest {
         // 1. Initial directory should be / (global root)
         assertEquals("/", globalExecutor.execute("pwd"));
 
-        // 2. ls at root should show module folders, files, and hide internal system folders (usr, bin)
+        // 2. ls at root should show module folders, user files, and hide internal system folders & profileinstaller files
         String lsRoot = globalExecutor.execute("ls");
         assertTrue(lsRoot.contains("structural_analysis"));
         assertTrue(lsRoot.contains("3d_solid_analysis"));
         assertTrue(lsRoot.contains("terminal"));
-        assertTrue("Files like .dat should be listed", lsRoot.contains("profileinstaller_profileWrittenFor_lastUpdateTime.dat"));
+        assertTrue("Legitimate user .dat files should be listed", lsRoot.contains("output.dat"));
+        assertFalse("profileInstalled should be hidden", lsRoot.contains("profileInstalled"));
+        assertFalse("profileinstaller .dat should be hidden", lsRoot.contains("profileinstaller_profileWrittenFor_lastUpdateTime.dat"));
         assertFalse("Internal usr folder should be hidden", lsRoot.contains("usr"));
         assertFalse("Internal bin folder should be hidden", lsRoot.contains("bin"));
 

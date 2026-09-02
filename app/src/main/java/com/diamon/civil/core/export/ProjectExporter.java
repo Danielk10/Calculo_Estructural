@@ -41,7 +41,9 @@ public class ProjectExporter {
         if (f == null) return true;
         String name = f.getName();
         if (name.startsWith(".")) return true;
-        if (name.equalsIgnoreCase("profileInstalled") || name.toLowerCase().startsWith("profileinstaller")) {
+        if (name.equalsIgnoreCase("profileInstalled") || 
+            name.toLowerCase().startsWith("profileinstaller") || 
+            name.equalsIgnoreCase("gmsh_cad_driver.geo")) {
             return true;
         }
         if (f.isDirectory()) {

@@ -1104,11 +1104,15 @@ public class StructuralFragment extends Fragment {
                 if (parseResult == null || parseResult.displacements == null || parseResult.displacements.isEmpty()) {
                     parseResult = engineOutput.parseResult;
                 } else {
-                    // If CalculiX datResult has displacements but needs supplemental frame member forces
+                    // If CalculiX datResult has displacements but needs supplemental frame member forces or panel forces
                     if ((parseResult.forces == null || parseResult.forces.isEmpty()) &&
                             engineOutput.parseResult != null && engineOutput.parseResult.forces != null && !engineOutput.parseResult.forces.isEmpty()) {
                         parseResult.forces = engineOutput.parseResult.forces;
                         parseResult.recalculateMaxForces();
+                    }
+                    if ((parseResult.panelForces == null || parseResult.panelForces.isEmpty()) &&
+                            engineOutput.parseResult != null && engineOutput.parseResult.panelForces != null && !engineOutput.parseResult.panelForces.isEmpty()) {
+                        parseResult.panelForces.addAll(engineOutput.parseResult.panelForces);
                     }
                 }
 

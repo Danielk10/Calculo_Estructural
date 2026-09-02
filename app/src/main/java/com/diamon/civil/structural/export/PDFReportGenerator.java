@@ -824,27 +824,60 @@ public class PDFReportGenerator {
         // Run FrameAnalysisEngine to get actual reactions
         FrameAnalysisEngine.AnalysisOutput engineOut = FrameAnalysisEngine.analyze(model);
         if (engineOut != null && engineOut.reactions != null && !engineOut.reactions.isEmpty()) {
-            String[] reactHeaders = {"Node ID", "Support Type", "Rx (kN)", "Ry (kN)", "Mz (kN·m)"};
-            float[] reactWidths = {70f, 130f, 106f, 106f, 107f};
-            ctx.y = drawTableHeader(ctx, reactHeaders, reactWidths);
+            boolean has3DOrOutPlane = false;
+            for (double[] r : engineOut.reactions.values()) {
+                if (Math.abs(r[2]) > 1e-3 || Math.abs(r[3]) > 1e-3 || Math.abs(r[4]) > 1e-3) {
+                    has3DOrOutPlane = true;
+                    break;
+                }
+            }
 
             Map<Integer, StructuralModel.Node> nodeMap = new HashMap<>();
             for (StructuralModel.Node n : model.nodes) nodeMap.put(n.id, n);
 
-            for (Map.Entry<Integer, double[]> entry : engineOut.reactions.entrySet()) {
-                ctx.ensureSpace(14f);
-                int nodeId = entry.getKey();
-                double[] r = entry.getValue();
-                StructuralModel.Node n = nodeMap.get(nodeId);
-                String supType = (n != null && n.supportType != null) ? n.supportType.name() : "FIXED";
-                String[] row = {
-                        String.valueOf(nodeId),
-                        supType,
-                        String.format(Locale.US, "%+.3f", r[0] / 1000.0),
-                        String.format(Locale.US, "%+.3f", r[1] / 1000.0),
-                        String.format(Locale.US, "%+.3f", r.length > 5 ? r[5] / 1000.0 : 0.0)
-                };
-                ctx.y = drawTableRow(ctx, row, reactWidths);
+            if (has3DOrOutPlane || (model.panels != null && !model.panels.isEmpty())) {
+                String[] reactHeaders = {"Node ID", "Support Type", "Rx (kN)", "Ry (kN)", "Rz (kN)", "Mx (kN·m)", "My (kN·m)", "Mz (kN·m)"};
+                float[] reactWidths = {45f, 74f, 65f, 65f, 70f, 65f, 65f, 70f}; // Sum = 519f
+                ctx.y = drawTableHeader(ctx, reactHeaders, reactWidths);
+
+                for (Map.Entry<Integer, double[]> entry : engineOut.reactions.entrySet()) {
+                    ctx.ensureSpace(14f);
+                    int nodeId = entry.getKey();
+                    double[] r = entry.getValue();
+                    StructuralModel.Node n = nodeMap.get(nodeId);
+                    String supType = (n != null && n.supportType != null) ? n.supportType.name() : "FIXED";
+                    String[] row = {
+                            String.valueOf(nodeId),
+                            supType,
+                            String.format(Locale.US, "%+.3f", r[0] / 1000.0),
+                            String.format(Locale.US, "%+.3f", r[1] / 1000.0),
+                            String.format(Locale.US, "%+.3f", r[2] / 1000.0),
+                            String.format(Locale.US, "%+.3f", r[3] / 1000.0),
+                            String.format(Locale.US, "%+.3f", r[4] / 1000.0),
+                            String.format(Locale.US, "%+.3f", r.length > 5 ? r[5] / 1000.0 : 0.0)
+                    };
+                    ctx.y = drawTableRow(ctx, row, reactWidths);
+                }
+            } else {
+                String[] reactHeaders = {"Node ID", "Support Type", "Rx (kN)", "Ry (kN)", "Mz (kN·m)"};
+                float[] reactWidths = {70f, 130f, 106f, 106f, 107f};
+                ctx.y = drawTableHeader(ctx, reactHeaders, reactWidths);
+
+                for (Map.Entry<Integer, double[]> entry : engineOut.reactions.entrySet()) {
+                    ctx.ensureSpace(14f);
+                    int nodeId = entry.getKey();
+                    double[] r = entry.getValue();
+                    StructuralModel.Node n = nodeMap.get(nodeId);
+                    String supType = (n != null && n.supportType != null) ? n.supportType.name() : "FIXED";
+                    String[] row = {
+                            String.valueOf(nodeId),
+                            supType,
+                            String.format(Locale.US, "%+.3f", r[0] / 1000.0),
+                            String.format(Locale.US, "%+.3f", r[1] / 1000.0),
+                            String.format(Locale.US, "%+.3f", r.length > 5 ? r[5] / 1000.0 : 0.0)
+                    };
+                    ctx.y = drawTableRow(ctx, row, reactWidths);
+                }
             }
         }
 
@@ -1056,9 +1089,17 @@ public class PDFReportGenerator {
                 ctx.y = drawTableHeader(ctx, panelForceHeaders, panelForceWidths);
 
                 Map<Integer, StructuralBeamDatParser.PanelForces> pMap = new HashMap<>();
-                if (result != null && result.panelForces != null) {
+                if (result != null && result.panelForces != null && !result.panelForces.isEmpty()) {
                     for (StructuralBeamDatParser.PanelForces pf : result.panelForces) {
                         pMap.put(pf.panelId, pf);
+                    }
+                }
+                if (pMap.isEmpty()) {
+                    FrameAnalysisEngine.AnalysisOutput engineOut = FrameAnalysisEngine.analyze(model);
+                    if (engineOut != null && engineOut.parseResult != null && engineOut.parseResult.panelForces != null) {
+                        for (StructuralBeamDatParser.PanelForces pf : engineOut.parseResult.panelForces) {
+                            pMap.put(pf.panelId, pf);
+                        }
                     }
                 }
 
@@ -1076,7 +1117,7 @@ public class PDFReportGenerator {
                             "Panel " + p.id,
                             p.elementType != null ? p.elementType : "CPS4",
                             String.format(Locale.US, "%.1f cm", t_m * 100.0),
-                            p.materialName != null ? p.materialName : "Concrete 25MPa",
+                            p.materialName != null ? p.materialName : "Concrete 25 MPa",
                             String.format(Locale.US, "%+.2f", sx),
                             String.format(Locale.US, "%+.2f", sy),
                             String.format(Locale.US, "%+.2f", txy),
@@ -1094,9 +1135,17 @@ public class PDFReportGenerator {
                 ctx.y = drawTableHeader(ctx, panelForceHeaders, panelForceWidths);
 
                 Map<Integer, StructuralBeamDatParser.PanelForces> pMap = new HashMap<>();
-                if (result != null && result.panelForces != null) {
+                if (result != null && result.panelForces != null && !result.panelForces.isEmpty()) {
                     for (StructuralBeamDatParser.PanelForces pf : result.panelForces) {
                         pMap.put(pf.panelId, pf);
+                    }
+                }
+                if (pMap.isEmpty()) {
+                    FrameAnalysisEngine.AnalysisOutput engineOut = FrameAnalysisEngine.analyze(model);
+                    if (engineOut != null && engineOut.parseResult != null && engineOut.parseResult.panelForces != null) {
+                        for (StructuralBeamDatParser.PanelForces pf : engineOut.parseResult.panelForces) {
+                            pMap.put(pf.panelId, pf);
+                        }
                     }
                 }
 
@@ -1122,7 +1171,7 @@ public class PDFReportGenerator {
                             "Panel " + p.id,
                             p.elementType != null ? p.elementType : "S4R",
                             String.format(Locale.US, "%.1f cm", t_m * 100.0),
-                            p.materialName != null ? p.materialName : "Concrete 25MPa",
+                            p.materialName != null ? p.materialName : "Concrete 25 MPa",
                             String.format(Locale.US, "%.2f", mx_kNm_m),
                             String.format(Locale.US, "%.2f", my_kNm_m),
                             String.format(Locale.US, "%.2f", mxy_kNm_m),
@@ -1144,116 +1193,250 @@ public class PDFReportGenerator {
     private boolean lastDriftExceeds = false;
 
     private void drawChapter7_AiscDesignAndStability(PageContext ctx, StructuralModel model, StructuralBeamDatParser.ParseResult result) {
-        drawSectionTitle(ctx, "7. AISC 360-22 LRFD / ASD STRUCTURAL MEMBER DESIGN & STABILITY CHECK");
-
-        drawSubSectionTitle(ctx, "7.1 Structural Steel Frame Design Summary (PMM Interaction & Capacity Table)");
-        String[] designHeaders = {"Member", "Section", "Station", "Critical Combo", "D/C PMM", "D/C Shear", "Code Status", "K33/K22", "Lb (m)", "Cb", "B1/B2", "Compactness"};
-        float[] designWidths = {42f, 48f, 38f, 55f, 44f, 44f, 54f, 44f, 36f, 32f, 40f, 42f}; // Sum = 519f
-        ctx.y = drawTableHeader(ctx, designHeaders, designWidths);
-
-        Map<Integer, StructuralModel.Node> nodeMap = new HashMap<>();
-        if (model.nodes != null) {
-            for (StructuralModel.Node n : model.nodes) nodeMap.put(n.id, n);
-        }
-
-        Map<Integer, StructuralBeamDatParser.SectionForces> forceMap = new HashMap<>();
-        if (result.forces != null) {
-            for (StructuralBeamDatParser.SectionForces sf : result.forces) {
-                forceMap.put(sf.elementId, sf);
-            }
-        }
-
-        lastOverstressedCount = 0;
-        lastMaxGoverningDC = 0.0;
-
+        boolean hasConcrete = false;
+        boolean hasSteel = false;
         if (model.elements != null) {
             for (StructuralModel.Element elem : model.elements) {
-                ctx.ensureSpace(14f);
-                String secName = elem.sectionName != null ? elem.sectionName : "HEB200";
-                String matName = elem.materialName != null ? elem.materialName : "Structural Steel A36";
-                SectionInfo sec = getSectionProps(secName);
-                MaterialInfo mat = getMaterialProps(matName);
-
-                StructuralModel.Node n1 = nodeMap.get(elem.node1Id);
-                StructuralModel.Node n2 = nodeMap.get(elem.node2Id);
-                double length = (n1 != null && n2 != null) ? Math.hypot(n2.x - n1.x, n2.y - n1.y) : 3.0;
-
-                StructuralBeamDatParser.SectionForces sf = forceMap.get(elem.id);
-                double maxN = sf != null ? sf.N : 0.0;
-                double maxV2 = sf != null ? sf.V2 : 0.0;
-                double maxM = sf != null ? Math.max(Math.abs(sf.M1), Math.abs(sf.M2)) : 0.0;
-
-                double Pu_kN = Math.abs(maxN) / 1000.0;
-                double Vu2_kN = Math.abs(maxV2) / 1000.0;
-                double Mu3_kNm = maxM / 1000.0;
-                double Mu2_kNm = 0.0;
-
-                // Member capacities per AISC 360-22 Chapter E and F
-                double Fy = mat.strength_MPa;
-                double E = mat.E_GPa * 1000.0; // MPa
-                double Ag_mm2 = sec.A_cm2 * 100.0;
-                double Z33_mm3 = sec.Zz_cm3 * 1000.0;
-                double Z22_mm3 = sec.Zy_cm3 * 1000.0;
-                double r_min_mm = Math.min(sec.r33_cm, sec.r22_cm) * 10.0;
-
-                // Effective length & slenderness
-                double K = 1.0;
-                double L_mm = length * 1000.0;
-                double KL_r = (r_min_mm > 0) ? (K * L_mm / r_min_mm) : 50.0;
-                double Fe = (Math.PI * Math.PI * E) / (KL_r * KL_r);
-                double Fcr = (KL_r <= 4.71 * Math.sqrt(E / Fy)) ? Math.pow(0.658, Fy / Fe) * Fy : 0.877 * Fe;
-
-                double phi_c_Pn_kN = 0.90 * (Fcr * Ag_mm2) / 1000.0;
-                double phi_b_Mn3_kNm = 0.90 * (Fy * Z33_mm3) / 1.0e6;
-                double phi_b_Mn2_kNm = 0.90 * (Fy * Z22_mm3) / 1.0e6;
-                double phi_v_Vn_kN = 0.90 * (0.60 * Fy * sec.Av2_cm2 * 100.0) / 1000.0;
-
-                // AISC 360-22 Equation H1-1a / H1-1b
-                double p_ratio = (phi_c_Pn_kN > 0) ? (Pu_kN / phi_c_Pn_kN) : 0.0;
-                double m_ratio = (phi_b_Mn3_kNm > 0 ? (Mu3_kNm / phi_b_Mn3_kNm) : 0.0) +
-                                 (phi_b_Mn2_kNm > 0 ? (Mu2_kNm / phi_b_Mn2_kNm) : 0.0);
-
-                double dc_pmm = (p_ratio >= 0.20) ? (p_ratio + (8.0 / 9.0) * m_ratio) : (p_ratio / 2.0 + m_ratio);
-                double dc_v = (phi_v_Vn_kN > 0) ? (Vu2_kN / phi_v_Vn_kN) : 0.0;
-
-                double governingDC = Math.max(dc_pmm, dc_v);
-                if (governingDC > lastMaxGoverningDC) {
-                    lastMaxGoverningDC = governingDC;
+                String matName = elem.materialName != null ? elem.materialName.toLowerCase(Locale.US) : "";
+                String secName = elem.sectionName != null ? elem.sectionName.toLowerCase(Locale.US) : "";
+                if (matName.contains("concrete") || matName.contains("hormig") || secName.startsWith("rect") || secName.startsWith("circ")) {
+                    hasConcrete = true;
+                } else {
+                    hasSteel = true;
                 }
-
-                boolean isOverstressed = (dc_pmm > 1.0 || dc_v > 1.0);
-                if (isOverstressed) {
-                    lastOverstressedCount++;
-                }
-
-                String status = !isOverstressed ? "PASS / OK" : "OVERSTRESS";
-
-                String[] row = {
-                        "Elem " + elem.id,
-                        sec.name,
-                        "0.000",
-                        "LRFD_COMB",
-                        String.format(Locale.US, "%.3f", dc_pmm),
-                        String.format(Locale.US, "%.3f", dc_v),
-                        status,
-                        "1.0/1.0",
-                        String.format(Locale.US, "%.2f", length),
-                        "1.14",
-                        "1.02/1.0",
-                        "Compact"
-                };
-                ctx.y = drawTableRow(ctx, row, designWidths);
             }
-            ctx.y += 14f;
         }
 
-        drawSubSectionTitle(ctx, "7.2 AISC 360-22 Design Equations & Stability Formulations");
-        ctx.y = drawWrappedText(ctx, "• Combined Axial Compression & Biaxial Flexure Interaction (AISC Chapter H):", MARGIN_LEFT, USABLE_WIDTH, 11.5f, boldBodyPaint);
-        ctx.y = drawWrappedText(ctx, "  For Pu / (φc·Pn) >= 0.20:  Pu / (φc·Pn) + (8/9) · [ (B1·Mu3)/(φb·Mn3) + (Mu2)/(φb·Mn2) ] <= 1.0  (Eq. H1-1a)", MARGIN_LEFT, USABLE_WIDTH, 11f, tablePaint);
-        ctx.y = drawWrappedText(ctx, "  For Pu / (φc·Pn) < 0.20:   Pu / (2·φc·Pn) + [ (B1·Mu3)/(φb·Mn3) + (Mu2)/(φb·Mn2) ] <= 1.0       (Eq. H1-1b)", MARGIN_LEFT, USABLE_WIDTH, 11f, tablePaint);
-        ctx.y = drawWrappedText(ctx, "• Second-Order Moment Magnification: B1 = Cm / [ 1 - α·(Pr / Pe1) ] >= 1.0 with Euler critical buckling load Pe1 = π²·E·I / (K1·L)².", MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
-        ctx.y = drawWrappedText(ctx, "• Lateral Torsional Buckling (LTB) Moment Gradient Factor Cb = 12.5·Mmax / [ 2.5·Mmax + 3·MA + 4·MB + 3·MC ] <= 3.0.", MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
-        ctx.y += 14f;
+        if (hasConcrete && !hasSteel) {
+            drawSectionTitle(ctx, "7. ACI 318-19 REINFORCED CONCRETE STRUCTURAL MEMBER DESIGN & CAPACITY CHECK");
+            drawSubSectionTitle(ctx, "7.1 Concrete Member Flexural, Shear & P-M-M Capacity Table (ACI 318-19 LRFD)");
+            String[] designHeaders = {"Member", "Section", "Station", "Critical Combo", "D/C Flexure", "D/C Shear", "Code Status", "As req (cm²)", "Av/s (cm²/m)", "ρ (%)", "φPn (kN)", "φMn (kN·m)"};
+            float[] designWidths = {42f, 52f, 36f, 55f, 44f, 44f, 50f, 46f, 46f, 32f, 36f, 36f}; // Sum = 519f
+            ctx.y = drawTableHeader(ctx, designHeaders, designWidths);
+
+            Map<Integer, StructuralModel.Node> nodeMap = new HashMap<>();
+            if (model.nodes != null) {
+                for (StructuralModel.Node n : model.nodes) nodeMap.put(n.id, n);
+            }
+
+            Map<Integer, StructuralBeamDatParser.SectionForces> forceMap = new HashMap<>();
+            if (result.forces != null) {
+                for (StructuralBeamDatParser.SectionForces sf : result.forces) {
+                    forceMap.put(sf.elementId, sf);
+                }
+            }
+
+            lastOverstressedCount = 0;
+            lastMaxGoverningDC = 0.0;
+
+            if (model.elements != null) {
+                for (StructuralModel.Element elem : model.elements) {
+                    ctx.ensureSpace(14f);
+                    String secName = elem.sectionName != null ? elem.sectionName : "Rect 200x300";
+                    String matName = elem.materialName != null ? elem.materialName : "Concrete 25 MPa";
+                    SectionInfo sec = getSectionProps(secName);
+                    MaterialInfo mat = getMaterialProps(matName);
+
+                    StructuralModel.Node n1 = nodeMap.get(elem.node1Id);
+                    StructuralModel.Node n2 = nodeMap.get(elem.node2Id);
+                    double length = (n1 != null && n2 != null) ? Math.hypot(n2.x - n1.x, n2.y - n1.y) : 3.0;
+
+                    StructuralBeamDatParser.SectionForces sf = forceMap.get(elem.id);
+                    double maxN = sf != null ? sf.N : 0.0;
+                    double maxV2 = sf != null ? sf.V2 : 0.0;
+                    double maxM = sf != null ? Math.max(Math.abs(sf.M1), Math.abs(sf.M2)) : 0.0;
+
+                    double Pu_kN = Math.abs(maxN) / 1000.0;
+                    double Vu_kN = Math.abs(maxV2) / 1000.0;
+                    double Mu_kNm = maxM / 1000.0;
+
+                    double fc = mat.strength_MPa > 0 ? mat.strength_MPa : 25.0; // MPa
+                    double fy = 420.0; // Grade 60 rebar (MPa)
+                    double b_mm = sec.b_mm > 0 ? sec.b_mm : 200.0;
+                    double h_mm = sec.d_mm > 0 ? sec.d_mm : 300.0;
+                    double d_mm = Math.max(50.0, h_mm - 40.0); // Effective depth
+                    double Ag_mm2 = b_mm * h_mm;
+
+                    // Flexural reinforcement design (ACI 318-19 Chapter 22)
+                    double Mu_Nmm = Mu_kNm * 1.0e6;
+                    double Rn = (Mu_Nmm > 0) ? (Mu_Nmm / (0.90 * b_mm * d_mm * d_mm)) : 0.0;
+                    double rho_calc = (Rn > 0 && Rn < 0.85 * fc / 2.0) ? (0.85 * fc / fy) * (1.0 - Math.sqrt(Math.max(0.01, 1.0 - 2.0 * Rn / (0.85 * fc)))) : 0.0033;
+                    double rho_min = Math.max(0.25 * Math.sqrt(fc) / fy, 1.4 / fy);
+                    double rho = Math.max(rho_calc, rho_min);
+                    double As_mm2 = rho * b_mm * d_mm;
+                    double As_cm2 = As_mm2 / 100.0;
+
+                    // Flexural nominal capacity
+                    double a_mm = (As_mm2 * fy) / (0.85 * fc * b_mm);
+                    double phi_Mn_kNm = 0.90 * (As_mm2 * fy * (d_mm - a_mm / 2.0)) / 1.0e6;
+
+                    // Concrete shear capacity (ACI 318-19 Section 22.5)
+                    double Vc_kN = (0.17 * Math.sqrt(fc) * b_mm * d_mm) / 1000.0;
+                    double phi_Vc_kN = 0.75 * Vc_kN;
+                    double Vs_kN = Math.max(0.0, (Vu_kN / 0.75) - Vc_kN);
+                    double Av_s_cm2_m = (Vs_kN > 0.0) ? ((Vs_kN * 1000.0 / (fy * d_mm)) * 1000.0 / 100.0) : 0.0;
+                    double phi_Vn_kN = 0.75 * (Vc_kN + Vs_kN);
+
+                    // Axial compressive capacity (ACI 318-19 Section 22.4 - Tied column)
+                    double Ast_mm2 = 0.015 * Ag_mm2; // 1.5% longitudinal steel
+                    double phi_Pn_kN = 0.65 * 0.80 * (0.85 * fc * (Ag_mm2 - Ast_mm2) + fy * Ast_mm2) / 1000.0;
+
+                    // Demand-to-Capacity ratios
+                    double dc_flex = (phi_Mn_kNm > 0) ? (Mu_kNm / phi_Mn_kNm) : 0.0;
+                    double dc_v = (phi_Vn_kN > 0) ? (Vu_kN / phi_Vn_kN) : 0.0;
+                    double dc_pmm = (phi_Pn_kN > 0 ? (Pu_kN / phi_Pn_kN) : 0.0) + dc_flex;
+
+                    double governingDC = Math.max(dc_pmm, dc_v);
+                    if (governingDC > lastMaxGoverningDC) {
+                        lastMaxGoverningDC = governingDC;
+                    }
+
+                    boolean isOverstressed = (dc_pmm > 1.0 || dc_v > 1.0);
+                    if (isOverstressed) {
+                        lastOverstressedCount++;
+                    }
+
+                    String status = !isOverstressed ? "PASS / OK" : "OVERSTRESS";
+
+                    String[] row = {
+                            "Elem " + elem.id,
+                            sec.name,
+                            "0.000",
+                            "ACI_LRFD",
+                            String.format(Locale.US, "%.3f", dc_pmm),
+                            String.format(Locale.US, "%.3f", dc_v),
+                            status,
+                            String.format(Locale.US, "%.2f", As_cm2),
+                            String.format(Locale.US, "%.2f", Av_s_cm2_m),
+                            String.format(Locale.US, "%.2f", rho * 100.0),
+                            String.format(Locale.US, "%.1f", phi_Pn_kN),
+                            String.format(Locale.US, "%.1f", phi_Mn_kNm)
+                    };
+                    ctx.y = drawTableRow(ctx, row, designWidths);
+                }
+                ctx.y += 14f;
+            }
+
+            drawSubSectionTitle(ctx, "7.2 ACI 318-19 Design Equations & Reinforcement Formulations");
+            ctx.y = drawWrappedText(ctx, "• Flexural Design Strength (ACI 318-19 Chapter 22): φ·Mn = φ · As · fy · (d - a/2) with φ = 0.90 (tension-controlled), depth of equivalent Whitney stress block a = As·fy / (0.85·f'c·b).", MARGIN_LEFT, USABLE_WIDTH, 11.5f, boldBodyPaint);
+            ctx.y = drawWrappedText(ctx, "• Concrete Shear Strength: φ·Vc = φ · 0.17 · λ · √(f'c) · bw · d with strength reduction factor φ = 0.75.", MARGIN_LEFT, USABLE_WIDTH, 11f, tablePaint);
+            ctx.y = drawWrappedText(ctx, "• Transverse Shear Reinforcement: Required stirrup demand Av/s = (Vu/φ - Vc) / (fyt · d) >= 0.062 · √(f'c) · bw / fyt.", MARGIN_LEFT, USABLE_WIDTH, 11f, tablePaint);
+            ctx.y = drawWrappedText(ctx, "• Factored Axial Compression Capacity: φ·Pn,max = 0.80 · φ · [ 0.85·f'c·(Ag - Ast) + fy·Ast ] with φ = 0.65 for tied members.", MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
+            ctx.y += 14f;
+
+        } else {
+            // AISC 360-22 Structural Steel Design
+            drawSectionTitle(ctx, "7. AISC 360-22 LRFD / ASD STRUCTURAL MEMBER DESIGN & STABILITY CHECK");
+
+            drawSubSectionTitle(ctx, "7.1 Structural Steel Frame Design Summary (PMM Interaction & Capacity Table)");
+            String[] designHeaders = {"Member", "Section", "Station", "Critical Combo", "D/C PMM", "D/C Shear", "Code Status", "K33/K22", "Lb (m)", "Cb", "B1/B2", "Compactness"};
+            float[] designWidths = {42f, 48f, 38f, 55f, 44f, 44f, 54f, 44f, 36f, 32f, 40f, 42f}; // Sum = 519f
+            ctx.y = drawTableHeader(ctx, designHeaders, designWidths);
+
+            Map<Integer, StructuralModel.Node> nodeMap = new HashMap<>();
+            if (model.nodes != null) {
+                for (StructuralModel.Node n : model.nodes) nodeMap.put(n.id, n);
+            }
+
+            Map<Integer, StructuralBeamDatParser.SectionForces> forceMap = new HashMap<>();
+            if (result.forces != null) {
+                for (StructuralBeamDatParser.SectionForces sf : result.forces) {
+                    forceMap.put(sf.elementId, sf);
+                }
+            }
+
+            lastOverstressedCount = 0;
+            lastMaxGoverningDC = 0.0;
+
+            if (model.elements != null) {
+                for (StructuralModel.Element elem : model.elements) {
+                    ctx.ensureSpace(14f);
+                    String secName = elem.sectionName != null ? elem.sectionName : "HEB200";
+                    String matName = elem.materialName != null ? elem.materialName : "Structural Steel A36";
+                    SectionInfo sec = getSectionProps(secName);
+                    MaterialInfo mat = getMaterialProps(matName);
+
+                    StructuralModel.Node n1 = nodeMap.get(elem.node1Id);
+                    StructuralModel.Node n2 = nodeMap.get(elem.node2Id);
+                    double length = (n1 != null && n2 != null) ? Math.hypot(n2.x - n1.x, n2.y - n1.y) : 3.0;
+
+                    StructuralBeamDatParser.SectionForces sf = forceMap.get(elem.id);
+                    double maxN = sf != null ? sf.N : 0.0;
+                    double maxV2 = sf != null ? sf.V2 : 0.0;
+                    double maxM = sf != null ? Math.max(Math.abs(sf.M1), Math.abs(sf.M2)) : 0.0;
+
+                    double Pu_kN = Math.abs(maxN) / 1000.0;
+                    double Vu2_kN = Math.abs(maxV2) / 1000.0;
+                    double Mu3_kNm = maxM / 1000.0;
+                    double Mu2_kNm = 0.0;
+
+                    // Member capacities per AISC 360-22 Chapter E and F
+                    double Fy = mat.strength_MPa;
+                    double E = mat.E_GPa * 1000.0; // MPa
+                    double Ag_mm2 = sec.A_cm2 * 100.0;
+                    double Z33_mm3 = sec.Zz_cm3 * 1000.0;
+                    double Z22_mm3 = sec.Zy_cm3 * 1000.0;
+                    double r_min_mm = Math.min(sec.r33_cm, sec.r22_cm) * 10.0;
+
+                    // Effective length & slenderness
+                    double K = 1.0;
+                    double L_mm = length * 1000.0;
+                    double KL_r = (r_min_mm > 0) ? (K * L_mm / r_min_mm) : 50.0;
+                    double Fe = (Math.PI * Math.PI * E) / (KL_r * KL_r);
+                    double Fcr = (KL_r <= 4.71 * Math.sqrt(E / Fy)) ? Math.pow(0.658, Fy / Fe) * Fy : 0.877 * Fe;
+
+                    double phi_c_Pn_kN = 0.90 * (Fcr * Ag_mm2) / 1000.0;
+                    double phi_b_Mn3_kNm = 0.90 * (Fy * Z33_mm3) / 1.0e6;
+                    double phi_b_Mn2_kNm = 0.90 * (Fy * Z22_mm3) / 1.0e6;
+                    double phi_v_Vn_kN = 0.90 * (0.60 * Fy * sec.Av2_cm2 * 100.0) / 1000.0;
+
+                    // AISC 360-22 Equation H1-1a / H1-1b
+                    double p_ratio = (phi_c_Pn_kN > 0) ? (Pu_kN / phi_c_Pn_kN) : 0.0;
+                    double m_ratio = (phi_b_Mn3_kNm > 0 ? (Mu3_kNm / phi_b_Mn3_kNm) : 0.0) +
+                                     (phi_b_Mn2_kNm > 0 ? (Mu2_kNm / phi_b_Mn2_kNm) : 0.0);
+
+                    double dc_pmm = (p_ratio >= 0.20) ? (p_ratio + (8.0 / 9.0) * m_ratio) : (p_ratio / 2.0 + m_ratio);
+                    double dc_v = (phi_v_Vn_kN > 0) ? (Vu2_kN / phi_v_Vn_kN) : 0.0;
+
+                    double governingDC = Math.max(dc_pmm, dc_v);
+                    if (governingDC > lastMaxGoverningDC) {
+                        lastMaxGoverningDC = governingDC;
+                    }
+
+                    boolean isOverstressed = (dc_pmm > 1.0 || dc_v > 1.0);
+                    if (isOverstressed) {
+                        lastOverstressedCount++;
+                    }
+
+                    String status = !isOverstressed ? "PASS / OK" : "OVERSTRESS";
+
+                    String[] row = {
+                            "Elem " + elem.id,
+                            sec.name,
+                            "0.000",
+                            "LRFD_COMB",
+                            String.format(Locale.US, "%.3f", dc_pmm),
+                            String.format(Locale.US, "%.3f", dc_v),
+                            status,
+                            "1.0/1.0",
+                            String.format(Locale.US, "%.2f", length),
+                            "1.14",
+                            "1.02/1.0",
+                            "Compact"
+                    };
+                    ctx.y = drawTableRow(ctx, row, designWidths);
+                }
+                ctx.y += 14f;
+            }
+
+            drawSubSectionTitle(ctx, "7.2 AISC 360-22 Design Equations & Stability Formulations");
+            ctx.y = drawWrappedText(ctx, "• Combined Axial Compression & Biaxial Flexure Interaction (AISC Chapter H):", MARGIN_LEFT, USABLE_WIDTH, 11.5f, boldBodyPaint);
+            ctx.y = drawWrappedText(ctx, "  For Pu / (φc·Pn) >= 0.20:  Pu / (φc·Pn) + (8/9) · [ (B1·Mu3)/(φb·Mn3) + (Mu2)/(φb·Mn2) ] <= 1.0  (Eq. H1-1a)", MARGIN_LEFT, USABLE_WIDTH, 11f, tablePaint);
+            ctx.y = drawWrappedText(ctx, "  For Pu / (φc·Pn) < 0.20:   Pu / (2·φc·Pn) + [ (B1·Mu3)/(φb·Mn3) + (Mu2)/(φb·Mn2) ] <= 1.0       (Eq. H1-1b)", MARGIN_LEFT, USABLE_WIDTH, 11f, tablePaint);
+            ctx.y = drawWrappedText(ctx, "• Second-Order Moment Magnification: B1 = Cm / [ 1 - α·(Pr / Pe1) ] >= 1.0 with Euler critical buckling load Pe1 = π²·E·I / (K1·L)².", MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
+            ctx.y = drawWrappedText(ctx, "• Lateral Torsional Buckling (LTB) Moment Gradient Factor Cb = 12.5·Mmax / [ 2.5·Mmax + 3·MA + 4·MB + 3·MC ] <= 3.0.", MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
+            ctx.y += 14f;
+        }
     }
 
     private void drawChapter8_SystemServiceability(PageContext ctx, StructuralModel model,

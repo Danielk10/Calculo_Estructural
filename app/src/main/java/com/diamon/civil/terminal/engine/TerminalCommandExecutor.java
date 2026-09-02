@@ -142,10 +142,15 @@ public class TerminalCommandExecutor {
         return result.isEmpty() ? "(empty)" : result;
     }
 
-    /** Returns true for system/internal directories that should not be visible to the user at root. */
+    /** Returns true for system/internal directories and files that should not be visible to the user at root. */
     private boolean shouldHideFromListing(File f) {
         String name = f.getName();
         if (name.startsWith(".")) return true;
+        if (name.equalsIgnoreCase("profileInstalled") ||
+            name.equalsIgnoreCase("profileinstaller_profileWrittenFor_lastUpdateTime.dat") ||
+            name.toLowerCase().startsWith("profileinstaller")) {
+            return true;
+        }
         if (!f.isDirectory()) return false;
         return name.equals("usr") || name.equals("fake_root") || name.equals("lib") ||
                name.equals("include") || name.equals("share") || name.equals("bin") ||
