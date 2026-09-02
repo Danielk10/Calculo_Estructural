@@ -166,15 +166,16 @@ public class GmshRunner {
         meshOpts.append("Mesh.MeshSizeFactor=").append(meshFactor).append(";");
         meshOpts.append(" Mesh.ElementOrder=").append(is2ndOrder ? 2 : 1).append(";");
         if (is2ndOrder) {
-            meshOpts.append(" Mesh.SecondOrderLinear=1; Mesh.Optimize=1;");
+            meshOpts.append(" Mesh.SecondOrderIncomplete=1; Mesh.SecondOrderLinear=1; Mesh.Optimize=1;");
         }
         if (isHex) {
-            meshOpts.append(" Mesh.Recombine3DAll=1; Mesh.Algorithm=6; Mesh.SubdivisionAlgorithm=2; Mesh.Algorithm3D=1;");
+            meshOpts.append(" Mesh.Recombine3DAll=1; Mesh.Algorithm=6; Mesh.SubdivisionAlgorithm=2; Mesh.Recombine3DLevel=2; Mesh.Algorithm3D=1;");
         } else if (isWedge) {
             meshOpts.append(" Mesh.SubdivisionAlgorithm=1; Mesh.Algorithm3D=1;");
         } else {
             meshOpts.append(" Mesh.Algorithm3D=1; Mesh.Recombine3DAll=0;");
         }
+        meshOpts.append(" Mesh.SaveGroupsOfNodes=1; Mesh.SaveGroupsOfElements=1;");
         
         command.add(meshOpts.toString());
         command.add("-3");                         // 3D mesh

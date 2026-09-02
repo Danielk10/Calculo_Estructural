@@ -13,6 +13,10 @@ public class SolidInpAssembler {
     }
 
     public static void assemble(File workDir, String inputName, String materialName, double E, double nu, double totalLoadValue, int loadDof, String fixedRegion, String loadRegion) throws IOException {
+        assemble(workDir, inputName, materialName, E, nu, totalLoadValue, loadDof, fixedRegion, loadRegion, null);
+    }
+
+    public static void assemble(File workDir, String inputName, String materialName, double E, double nu, double totalLoadValue, int loadDof, String fixedRegion, String loadRegion, String requestedElementType) throws IOException {
         File rawInp = new File(workDir, inputName + "_raw.inp");
         File cleanInp = new File(workDir, inputName + "_clean.inp");
         File nsetsInp = new File(workDir, "nsets.inp");
@@ -70,7 +74,21 @@ public class SolidInpAssembler {
             writeNodes(pw, loadedNodes);
         }
 
-        // 2. Clean up main mesh and retain ONLY valid 3D continuum solid elements (C3D4, C3D10, C3D8, C3D8R, C3D20, C3D20R, C3D6, C3D15)
+        // 3. Clean up main mesh and retain ONLY valid 3D continuum solid elements
+        // (C3D4, C3D8, C3D8R, C3D6, C3D10, C3D20, C3D20R, C3D15)
+        String targetElemType = null;
+        if (requestedElementType != null && !requestedElementType.trim().isEmpty()) {
+            String req = requestedElementType.toUpperCase(Locale.US);
+            if (req.contains("C3D8R")) targetElemType = "C3D8R";
+            else if (req.contains("C3D8")) targetElemType = "C3D8";
+            else if (req.contains("C3D20R")) targetElemType = "C3D20R";
+            else if (req.contains("C3D20")) targetElemType = "C3D20";
+            else if (req.contains("C3D10")) targetElemType = "C3D10";
+            else if (req.contains("C3D4")) targetElemType = "C3D4";
+            else if (req.contains("C3D15")) targetElemType = "C3D15";
+            else if (req.contains("C3D6")) targetElemType = "C3D6";
+        }
+
         int elementCount = 0;
         try (PrintWriter pw = new PrintWriter(new FileWriter(cleanInp))) {
             boolean inElementBlock = false;
@@ -89,55 +107,63 @@ public class SolidInpAssembler {
                 
                 if (u.startsWith("*ELEMENT")) {
                     if (u.contains("TYPE=TETRA4") || u.contains("TYPE=TET4") || u.contains("TYPE=C3D4")) {
-                        pw.println("*ELEMENT, TYPE=C3D4, ELSET=Eall");
+                        String outType = (targetElemType != null && targetElemType.startsWith("C3D4")) ? targetElemType : "C3D4";
+                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
                         inElementBlock = true;
                         skipCurrentBlock = false;
                         current3DType = "C3D4";
                         continue;
                     } else if (u.contains("TYPE=TETRA10") || u.contains("TYPE=C3D10") || u.contains("TYPE=TET10")) {
-                        pw.println("*ELEMENT, TYPE=C3D10, ELSET=Eall");
+                        String outType = (targetElemType != null && targetElemType.startsWith("C3D10")) ? targetElemType : "C3D10";
+                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
                         inElementBlock = true;
                         skipCurrentBlock = false;
                         current3DType = "C3D10";
                         continue;
                     } else if (u.contains("TYPE=HEXA8R") || u.contains("TYPE=C3D8R") || u.contains("TYPE=HEX8R")) {
-                        pw.println("*ELEMENT, TYPE=C3D8R, ELSET=Eall");
+                        String outType = (targetElemType != null && targetElemType.equals("C3D8")) ? "C3D8" : "C3D8R";
+                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
                         inElementBlock = true;
                         skipCurrentBlock = false;
                         current3DType = "C3D8R";
                         continue;
                     } else if (u.contains("TYPE=HEXA8") || u.contains("TYPE=C3D8") || u.contains("TYPE=HEX8")) {
-                        pw.println("*ELEMENT, TYPE=C3D8, ELSET=Eall");
+                        String outType = (targetElemType != null && targetElemType.equals("C3D8R")) ? "C3D8R" : "C3D8";
+                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
                         inElementBlock = true;
                         skipCurrentBlock = false;
                         current3DType = "C3D8";
                         continue;
                     } else if (u.contains("TYPE=HEXA20R") || u.contains("TYPE=C3D20R") || u.contains("TYPE=HEX20R")) {
-                        pw.println("*ELEMENT, TYPE=C3D20R, ELSET=Eall");
+                        String outType = (targetElemType != null && targetElemType.equals("C3D20")) ? "C3D20" : "C3D20R";
+                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
                         inElementBlock = true;
                         skipCurrentBlock = false;
                         current3DType = "C3D20R";
                         continue;
                     } else if (u.contains("TYPE=HEXA20") || u.contains("TYPE=C3D20") || u.contains("TYPE=HEX20") || u.contains("TYPE=C3D27") || u.contains("TYPE=HEX27") || u.contains("TYPE=HEXA27")) {
-                        pw.println("*ELEMENT, TYPE=C3D20, ELSET=Eall");
+                        String outType = (targetElemType != null && targetElemType.equals("C3D20R")) ? "C3D20R" : "C3D20";
+                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
                         inElementBlock = true;
                         skipCurrentBlock = false;
                         current3DType = "C3D20";
                         continue;
                     } else if (u.contains("TYPE=PRISM6") || u.contains("TYPE=C3D6") || u.contains("TYPE=WED6") || u.contains("TYPE=PRI6")) {
-                        pw.println("*ELEMENT, TYPE=C3D6, ELSET=Eall");
+                        String outType = (targetElemType != null && targetElemType.startsWith("C3D6")) ? targetElemType : "C3D6";
+                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
                         inElementBlock = true;
                         skipCurrentBlock = false;
                         current3DType = "C3D6";
                         continue;
                     } else if (u.contains("TYPE=PRISM15") || u.contains("TYPE=C3D15") || u.contains("TYPE=WED15") || u.contains("TYPE=PRI15") || u.contains("TYPE=PRI18") || u.contains("TYPE=WED18") || u.contains("TYPE=PRISM18")) {
-                        pw.println("*ELEMENT, TYPE=C3D15, ELSET=Eall");
+                        String outType = (targetElemType != null && targetElemType.startsWith("C3D15")) ? targetElemType : "C3D15";
+                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
                         inElementBlock = true;
                         skipCurrentBlock = false;
                         current3DType = "C3D15";
                         continue;
                     } else {
-                        // Any 1D/2D or non-solid element (M3D9, M3D8, M3D4, CPS3, CPS4, CPS8, S4, S8, B31, etc.) must be skipped
+                        // Any 1D/2D or non-solid element (M3D9, M3D8, M3D4, CPS3, CPS4, CPS6, CPS8, S4, S8, B31, etc.) must be skipped
                         skipCurrentBlock = true;
                         inElementBlock = false;
                         current3DType = null;
@@ -160,7 +186,7 @@ public class SolidInpAssembler {
                 if (inElementBlock && line.contains(",")) {
                     String[] parts = line.trim().split(",");
                     if ("C3D20".equals(current3DType) || "C3D20R".equals(current3DType)) {
-                        // Truncate C3D27 (27 nodes) to standard CalculiX C3D20 (20 nodes)
+                        // Truncate C3D27 (27 nodes) to standard serendipity CalculiX C3D20 (20 nodes)
                         if (parts.length > 21) {
                             StringBuilder sb = new StringBuilder();
                             for (int i = 0; i < 21; i++) {
@@ -169,7 +195,7 @@ public class SolidInpAssembler {
                             line = sb.toString();
                         }
                     } else if ("C3D15".equals(current3DType)) {
-                        // Truncate C3D18 (18 nodes) to standard CalculiX C3D15 (15 nodes)
+                        // Truncate C3D18 (18 nodes) to standard serendipity CalculiX C3D15 (15 nodes)
                         if (parts.length > 16) {
                             StringBuilder sb = new StringBuilder();
                             for (int i = 0; i < 16; i++) {
@@ -230,15 +256,19 @@ public class SolidInpAssembler {
     private static Set<Integer> resolveRegionNodes(List<String> lines, Map<Integer, double[]> nodeCoords, String regionName, boolean isFixed) {
         Set<Integer> nodes = new TreeSet<>();
         if (regionName == null || regionName.trim().isEmpty() || regionName.equalsIgnoreCase("AUTO") || regionName.contains("Auto")) {
-            // First check standard physical groups in Gmsh
+            // Check standard physical groups in Gmsh (both direct and indirect ELSETs)
             if (isFixed) {
-                nodes = extractNodesFromPhysical(lines, "Fixed");
-                if (nodes.isEmpty()) nodes = extractNodesFromPhysical(lines, "SURFACE1");
-                if (nodes.isEmpty()) nodes = extractNodesFromPhysical(lines, "NFix");
+                String[] fixedAliases = {"Fixed", "N_FIXED_SURF", "SURFACE1", "NFix", "FIXED_SURF", "FIXED_NODES"};
+                for (String alias : fixedAliases) {
+                    nodes = extractNodesFromPhysical(lines, alias);
+                    if (!nodes.isEmpty()) return nodes;
+                }
             } else {
-                nodes = extractNodesFromPhysical(lines, "Loaded");
-                if (nodes.isEmpty()) nodes = extractNodesFromPhysical(lines, "SURFACE2");
-                if (nodes.isEmpty()) nodes = extractNodesFromPhysical(lines, "NLoad");
+                String[] loadAliases = {"Loaded", "E_LOAD_FACETS", "SURFACE2", "NLoad", "LOAD_SURF", "LOAD_NODES"};
+                for (String alias : loadAliases) {
+                    nodes = extractNodesFromPhysical(lines, alias);
+                    if (!nodes.isEmpty()) return nodes;
+                }
             }
             if (!nodes.isEmpty()) return nodes;
             
@@ -354,30 +384,104 @@ public class SolidInpAssembler {
 
     private static Set<Integer> extractNodesFromPhysical(List<String> lines, String setName) {
         Set<Integer> nodes = new TreeSet<>();
-        if (setName == null) return nodes;
-        boolean capture = false;
+        if (setName == null || setName.trim().isEmpty()) return nodes;
+        String target = setName.trim().toUpperCase(Locale.US);
+
+        Map<Integer, List<Integer>> elementToNodes = new HashMap<>();
+        Map<String, Set<Integer>> elsets = new HashMap<>();
+
+        boolean inElementBlock = false;
+        String currentElset = null;
+        boolean inElsetBlock = false;
+        String currentNamedElset = null;
+
         for (String line : lines) {
-            String u = line.trim().toUpperCase(Locale.US);
-            if (u.startsWith("*ELEMENT") && u.contains("ELSET=" + setName.toUpperCase(Locale.US))) {
-                capture = true;
+            String trimmed = line.trim();
+            if (trimmed.isEmpty()) continue;
+            String u = trimmed.toUpperCase(Locale.US);
+
+            if (u.startsWith("*ELEMENT")) {
+                inElementBlock = true;
+                inElsetBlock = false;
+                currentNamedElset = null;
+                currentElset = null;
+                int idx = u.indexOf("ELSET=");
+                if (idx != -1) {
+                    currentElset = u.substring(idx + 6).trim().split("[,\\s]")[0];
+                }
                 continue;
             }
-            if (capture) {
-                if (u.startsWith("*")) {
-                    capture = false;
-                    continue;
+
+            if (u.startsWith("*ELSET")) {
+                inElsetBlock = true;
+                inElementBlock = false;
+                currentElset = null;
+                currentNamedElset = null;
+                int idx = u.indexOf("ELSET=");
+                if (idx != -1) {
+                    currentNamedElset = u.substring(idx + 6).trim().split("[,\\s]")[0];
                 }
-                String[] parts = line.trim().split(",");
-                for (int i = 1; i < parts.length; i++) {
-                    String p = parts[i].trim();
+                continue;
+            }
+
+            if (u.startsWith("*")) {
+                inElementBlock = false;
+                inElsetBlock = false;
+                currentElset = null;
+                currentNamedElset = null;
+                continue;
+            }
+
+            if (inElementBlock) {
+                String[] parts = trimmed.split(",");
+                if (parts.length >= 2) {
+                    try {
+                        int elemId = Integer.parseInt(parts[0].trim());
+                        List<Integer> elemNodes = new ArrayList<>();
+                        for (int i = 1; i < parts.length; i++) {
+                            String p = parts[i].trim();
+                            if (!p.isEmpty()) {
+                                elemNodes.add(Integer.parseInt(p));
+                            }
+                        }
+                        elementToNodes.put(elemId, elemNodes);
+
+                        if (currentElset != null) {
+                            elsets.computeIfAbsent(currentElset.toUpperCase(Locale.US), k -> new HashSet<>()).add(elemId);
+                            if (currentElset.equalsIgnoreCase(target)) {
+                                nodes.addAll(elemNodes);
+                            }
+                        }
+                    } catch (NumberFormatException ignore) {}
+                }
+            } else if (inElsetBlock && currentNamedElset != null) {
+                String[] parts = trimmed.split(",");
+                for (String part : parts) {
+                    String p = part.trim();
                     if (!p.isEmpty()) {
                         try {
-                            nodes.add(Integer.parseInt(p));
+                            int elemId = Integer.parseInt(p);
+                            elsets.computeIfAbsent(currentNamedElset.toUpperCase(Locale.US), k -> new HashSet<>()).add(elemId);
                         } catch (NumberFormatException ignore) {}
                     }
                 }
             }
         }
+
+        // If nodes were not directly in an *ELEMENT block with matching ELSET, check *ELSET blocks
+        if (nodes.isEmpty()) {
+            for (Map.Entry<String, Set<Integer>> entry : elsets.entrySet()) {
+                if (entry.getKey().equalsIgnoreCase(target)) {
+                    for (int elemId : entry.getValue()) {
+                        List<Integer> nList = elementToNodes.get(elemId);
+                        if (nList != null) {
+                            nodes.addAll(nList);
+                        }
+                    }
+                }
+            }
+        }
+
         return nodes;
     }
 

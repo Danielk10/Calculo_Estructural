@@ -50,12 +50,12 @@ cd "$TEST_DIR"
 
 cat > cantilever.geo << 'EOF2'
 SetFactory("OpenCASCADE");
-Box(1) = {0, 0, 0, 10, 1, 1};
-Mesh.CharacteristicLengthMax = 0.2;
+Box(1) = {0, 0, 0, 100, 10, 10};
+Mesh.CharacteristicLengthMax = 2.0;
 Mesh.ElementOrder = 1;
-s() = Surface In BoundingBox{-0.01,-0.01,-0.01, 0.01,1.01,1.01};
+s() = Surface In BoundingBox{-0.1, -0.1, -0.1, 0.1, 10.1, 10.1};
 Physical Surface("Fixed") = s();
-s2() = Surface In BoundingBox{9.99,-0.01,-0.01, 10.01,1.01,1.01};
+s2() = Surface In BoundingBox{99.9, -0.1, -0.1, 100.1, 10.1, 10.1};
 Physical Surface("Loaded") = s2();
 Physical Volume("Steel") = {1};
 EOF2

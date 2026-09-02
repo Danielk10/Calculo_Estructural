@@ -407,21 +407,22 @@ public class SolidInpAssemblerTest {
         
         StringBuilder meshOpts = new StringBuilder();
         meshOpts.append("Mesh.ElementOrder=").append(is2nd ? 2 : 1).append(";");
-        if (is2nd) meshOpts.append(" Mesh.SecondOrderLinear=1; Mesh.Optimize=1;");
+        if (is2nd) meshOpts.append(" Mesh.SecondOrderIncomplete=1; Mesh.SecondOrderLinear=1; Mesh.Optimize=1;");
         if (isHex) {
-            meshOpts.append(" Mesh.Recombine3DAll=1; Mesh.Algorithm=6; Mesh.SubdivisionAlgorithm=2; Mesh.Algorithm3D=1;");
+            meshOpts.append(" Mesh.Recombine3DAll=1; Mesh.Algorithm=6; Mesh.SubdivisionAlgorithm=2; Mesh.Recombine3DLevel=2; Mesh.Algorithm3D=1;");
         } else if (isWedge) {
             meshOpts.append(" Mesh.SubdivisionAlgorithm=1; Mesh.Algorithm3D=1;");
         } else {
             meshOpts.append(" Mesh.Algorithm3D=1; Mesh.Recombine3DAll=0;");
         }
+        meshOpts.append(" Mesh.SaveGroupsOfNodes=1; Mesh.SaveGroupsOfElements=1;");
         
         File rawInp = new File(workDir, "job_raw.inp");
         ProcessBuilder pbGmsh = new ProcessBuilder(
             "gmsh", geoFile.getAbsolutePath(),
             "-string", meshOpts.toString(),
             "-3",
-            "-clmax", "1.0",
+            "-clmax", "4.0",
             "-o", rawInp.getAbsolutePath(),
             "-format", "inp",
             "-v", "0"
@@ -434,14 +435,16 @@ public class SolidInpAssemblerTest {
         assertTrue("raw INP should exist for " + elemType, rawInp.exists());
         
         // 3. Assemble with SolidInpAssembler
-        SolidInpAssembler.assemble(workDir, "job", "Structural Steel A36", 200000.0, 0.3, -100.0, "Fixed", "Loaded");
+        SolidInpAssembler.assemble(workDir, "job", "Structural Steel A36", 200000.0, 0.3, -100.0, 2, "Fixed", "Loaded", elemType);
         File cleanInp = new File(workDir, "job_clean.inp");
         File finalInp = new File(workDir, "job.inp");
         assertTrue("Clean INP should exist for " + elemType, cleanInp.exists());
         assertTrue("Final INP should exist for " + elemType, finalInp.exists());
         
         // 4. Solve with CalculiX
-        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "job");
+        File ccxBin = new File("/home/danielpdiamon/.local/bin/ccx");
+        if (!ccxBin.exists()) ccxBin = new File("/usr/bin/ccx");
+        ProcessBuilder pbCcx = new ProcessBuilder(ccxBin.getAbsolutePath(), "job");
         pbCcx.directory(workDir);
         pbCcx.redirectErrorStream(true);
         Process pCcx = pbCcx.start();

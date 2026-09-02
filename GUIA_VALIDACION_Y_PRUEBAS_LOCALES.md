@@ -174,16 +174,21 @@ Para el análisis continuo de piezas mecánicas tridimensionales, se sigue el pi
 mkdir -p /tmp/pruebas_fea
 cd /tmp/pruebas_fea
 
-# Crear viga prismática 10x1x1 mm y exportar a STEP
-echo "pload ALL; box b 10 1 1; stepwrite a b /tmp/pruebas_fea/cantilever.step; exit" | xvfb-run -a DRAWEXE
+# Crear viga prismática 100x10x10 mm y exportar a STEP
+echo "pload ALL; box b 100 10 10; stepwrite a b /tmp/pruebas_fea/cantilever.step; exit" | xvfb-run -a DRAWEXE
 ```
 
 ### Paso 5.2: Mallado Volumétrico Cuadrático con Gmsh (`C3D10`)
 ```bash
 cat << 'EOF' > cantilever.geo
 SetFactory("OpenCASCADE");
-Box(1) = {0, 0, 0, 10, 1, 1};
-Mesh.MeshSizeMax = 0.8;
+Box(1) = {0, 0, 0, 100, 10, 10};
+s() = Surface In BoundingBox{-0.1, -0.1, -0.1, 0.1, 10.1, 10.1};
+Physical Surface("Fixed") = s();
+s2() = Surface In BoundingBox{99.9, -0.1, -0.1, 100.1, 10.1, 10.1};
+Physical Surface("Loaded") = s2();
+Physical Volume("Steel") = {1};
+Mesh.MeshSizeMax = 2.5;
 Mesh.ElementOrder = 2;
 Mesh.SecondOrderLinear = 1;
 Mesh.Optimize = 1;

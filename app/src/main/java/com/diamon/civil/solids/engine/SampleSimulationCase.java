@@ -13,9 +13,8 @@ public final class SampleSimulationCase {
     }
 
     /**
-     * Writes a 10 × 1 × 1 cantilever with explicit physical surfaces. Those sets
-     * are consumed by {@link SolidInpAssembler}, so the generated CalculiX job always
-     * has a real fixed end and a real loaded end.
+     * Writes a 100 × 10 × 10 mm cantilever with explicit physical surfaces.
+     * With P = 100 N, sigma_max ≈ 60 MPa and deflection ≈ 0.20 mm.
      */
     public static File createCantileverGeo(File workDir) throws IOException {
         if (workDir == null || (!workDir.exists() && !workDir.mkdirs())) {
@@ -23,12 +22,17 @@ public final class SampleSimulationCase {
         }
 
         File geoFile = new File(workDir, CANTILEVER_NAME + ".geo");
-        String script = "SetFactory(\"OpenCASCADE\");\n" +
-                "Box(1) = {0, 0, 0, 10, 1, 1};\n" +
-                "s() = Surface In BoundingBox{-0.1,-0.1,-0.1, 0.1,1.1,1.1};\n" +
-                "Physical Surface(\"Fixed\") = s();\n" +
-                "s2() = Surface In BoundingBox{9.9,-0.1,-0.1, 10.1,1.1,1.1};\n" +
-                "Physical Surface(\"Loaded\") = s2();\n" +
+        String script = "SetFactory(\"OpenCASCADE\");\n\n" +
+                "// Dimensiones en mm: Longitud = 100 mm, Base = 10 mm, Altura = 10 mm\n" +
+                "// Con P = 100 N produce sigma_max ≈ 60 MPa y flecha ≈ 0.2 mm (comportamiento elástico seguro)\n" +
+                "Box(1) = {0, 0, 0, 100, 10, 10};\n\n" +
+                "// Superficie de empotramiento en X = 0\n" +
+                "s() = Surface In BoundingBox{-0.1, -0.1, -0.1, 0.1, 10.1, 10.1};\n" +
+                "Physical Surface(\"Fixed\") = s();\n\n" +
+                "// Superficie de aplicación de carga en X = 100\n" +
+                "s2() = Surface In BoundingBox{99.9, -0.1, -0.1, 100.1, 10.1, 10.1};\n" +
+                "Physical Surface(\"Loaded\") = s2();\n\n" +
+                "// Volumen físico para CalculiX\n" +
                 "Physical Volume(\"Steel\") = {1};\n";
 
         try (FileOutputStream output = new FileOutputStream(geoFile, false)) {

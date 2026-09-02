@@ -668,7 +668,7 @@ public class SolidFragment extends Fragment {
                     float deformScale = 1.0f;
                     boolean isSphere = inpFile.getName().toLowerCase(java.util.Locale.US).contains("sphere");
                     if (calculixExecutor.convertFrdToGlb(frdFile.getAbsolutePath(), glbFile.getAbsolutePath(), deformScale, isSphere)) {
-                        logger.info("Step: 3D Visualization Model ready! Rendering in 3D Viewer...");
+                        logger.info("Step: 3D Visualization Model ready! Open the 3D Viewer tab to inspect results.");
                         modelPath = glbFile.getAbsolutePath();
 
                         if (activity != null) {
@@ -676,13 +676,6 @@ public class SolidFragment extends Fragment {
                                 if (binding != null && isAdded()) {
                                     binding.pbSolid.setVisibility(View.GONE);
                                     binding.btnRunSolidAnalysis.setEnabled(true);
-                                    if (binding.tabLayoutSolid.getTabCount() > 1) {
-                                        TabLayout.Tab viewerTab = binding.tabLayoutSolid.getTabAt(1);
-                                        if (viewerTab != null) {
-                                            viewerTab.select();
-                                        }
-                                    }
-                                    showModelInViewer();
                                     Toast.makeText(appContext, R.string.toast_simulation_complete, Toast.LENGTH_SHORT).show();
                                 }
                             });
@@ -1024,7 +1017,7 @@ public class SolidFragment extends Fragment {
                             calculixExecutor = new CalculixExecutor(appContext, workDir);
                         }
 
-                        com.diamon.civil.solids.engine.SolidInpAssembler.assemble(workDir, "job_solid", finalMaterialName, E, finalNu, finalLoadMagnitude, loadDof, fixedRegion, loadRegion);
+                        com.diamon.civil.solids.engine.SolidInpAssembler.assemble(workDir, "job_solid", finalMaterialName, E, finalNu, finalLoadMagnitude, loadDof, fixedRegion, loadRegion, elemType);
                         
                         logger.info("Step 3: Running CalculiX Solver ccx...");
                         String ccxResult = calculixExecutor.executeCalculix("job_solid");
