@@ -627,17 +627,27 @@ public class PDFReportGenerator {
             float[] nodeWidths = {65f, 95f, 95f, 95f, 169f}; // Sum = 519f
             ctx.y = drawTableHeader(ctx, nodeHeaders, nodeWidths);
 
+            boolean hasPlatePanels = false;
+            if (model.panels != null) {
+                for (StructuralModel.Panel p : model.panels) {
+                    if (p.elementType != null && (p.elementType.equalsIgnoreCase("S4R") || p.elementType.equalsIgnoreCase("S4") || p.elementType.equalsIgnoreCase("SLAB"))) {
+                        hasPlatePanels = true;
+                        break;
+                    }
+                }
+            }
+
             for (StructuralModel.Node node : model.nodes) {
                 ctx.ensureSpace(14f);
                 String supportStr;
                 if (node.supportType == null || node.supportType == StructuralModel.SupportType.FREE) {
                     supportStr = "Free Joint (6 DOFs Active)";
                 } else if (node.supportType == StructuralModel.SupportType.FIXED) {
-                    supportStr = "Fixed Base (Ux,Uy,Uz,Rx,Ry,Rz = 0)";
+                    supportStr = hasPlatePanels ? "Fixed Edge (w=Uz=0, θx=0, θy=0)" : "Fixed Base (Ux,Uy,Uz,Rx,Ry,Rz = 0)";
                 } else if (node.supportType == StructuralModel.SupportType.PINNED) {
-                    supportStr = "Pinned Support (Ux,Uy,Uz = 0)";
+                    supportStr = hasPlatePanels ? "Pinned Support (w=Uz=0)" : "Pinned Support (Ux,Uy,Uz = 0)";
                 } else if (node.supportType == StructuralModel.SupportType.ROLLER) {
-                    supportStr = "Roller Support (Uy = 0)";
+                    supportStr = hasPlatePanels ? "Simple / Roller Support (w=Uz=0)" : "Roller Support (Uy = 0)";
                 } else {
                     supportStr = node.supportType.toString();
                 }
@@ -1024,20 +1034,58 @@ public class PDFReportGenerator {
                 if (sf == null) continue;
 
                 double P_kN = sf.N / 1000.0;
-                double V2_kN = sf.V2 / 1000.0;
-                double V3_kN = sf.V3 / 1000.0;
-                double T_kNm = sf.M3 / 1000.0;
-                double M2_kNm = 0.0;
                 double M1_I_kNm = sf.M1 / 1000.0;
                 double M1_J_kNm = sf.M2 / 1000.0;
                 double M1_Mid_kNm = (sf.M1 + sf.M2) / 2000.0;
+
+                // Transverse distributed load w in kN/m
+                double w_kN_m = 0.0;
+                if (elem.distLoads != null) {
+                    for (StructuralModel.ElementDistLoad dl : elem.distLoads) {
+                        w_kN_m += (dl.w1 + dl.w2) / 2000.0;
+                    }
+                }
+                if (model.elementDistLoads != null) {
+                    for (StructuralModel.ElementDistLoad dl : model.elementDistLoads) {
+                        if (dl.elementId == elem.id) {
+                            w_kN_m += (dl.w1 + dl.w2) / 2000.0;
+                        }
+                    }
+                }
+
+                if (Math.abs(w_kN_m) > 1e-4) {
+                    M1_Mid_kNm += (w_kN_m * L * L) / 8.0;
+                }
+
+                // Strict differential beam equilibrium: V(x) = dM/dx
+                double V2_I_kN, V2_Mid_kN, V2_J_kN;
+                if (L > 1e-4) {
+                    double V_avg = (M1_J_kNm - M1_I_kNm) / L;
+                    if (Math.abs(w_kN_m) > 1e-4) {
+                        V2_I_kN = V_avg + w_kN_m * (L / 2.0);
+                        V2_Mid_kN = V_avg;
+                        V2_J_kN = V_avg - w_kN_m * (L / 2.0);
+                    } else {
+                        V2_I_kN = V_avg;
+                        V2_Mid_kN = V_avg;
+                        V2_J_kN = V_avg;
+                    }
+                } else {
+                    V2_I_kN = sf.V2 / 1000.0;
+                    V2_Mid_kN = sf.V2 / 1000.0;
+                    V2_J_kN = sf.V2 / 1000.0;
+                }
+
+                double V3_kN = sf.V3 / 1000.0;
+                double T_kNm = sf.M3 / 1000.0;
+                double M2_kNm = 0.0;
 
                 // Joint I (0.00L)
                 ctx.ensureSpace(14f);
                 ctx.y = drawTableRow(ctx, new String[]{
                         "Elem " + elem.id, "0.000", "Joint I", "COMB_LRFD",
                         String.format(Locale.US, "%+.2f", P_kN),
-                        String.format(Locale.US, "%+.2f", V2_kN),
+                        String.format(Locale.US, "%+.2f", V2_I_kN),
                         String.format(Locale.US, "%+.2f", V3_kN),
                         String.format(Locale.US, "%+.2f", T_kNm),
                         String.format(Locale.US, "%+.2f", M2_kNm),
@@ -1049,7 +1097,7 @@ public class PDFReportGenerator {
                 ctx.y = drawTableRow(ctx, new String[]{
                         "Elem " + elem.id, String.format(Locale.US, "%.3f", L * 0.5), "Midspan", "COMB_LRFD",
                         String.format(Locale.US, "%+.2f", P_kN),
-                        String.format(Locale.US, "%+.2f", V2_kN),
+                        String.format(Locale.US, "%+.2f", V2_Mid_kN),
                         String.format(Locale.US, "%+.2f", V3_kN),
                         String.format(Locale.US, "%+.2f", T_kNm),
                         String.format(Locale.US, "%+.2f", M2_kNm),
@@ -1061,7 +1109,7 @@ public class PDFReportGenerator {
                 ctx.y = drawTableRow(ctx, new String[]{
                         "Elem " + elem.id, String.format(Locale.US, "%.3f", L), "Joint J", "COMB_LRFD",
                         String.format(Locale.US, "%+.2f", P_kN),
-                        String.format(Locale.US, "%+.2f", V2_kN),
+                        String.format(Locale.US, "%+.2f", V2_J_kN),
                         String.format(Locale.US, "%+.2f", V3_kN),
                         String.format(Locale.US, "%+.2f", T_kNm),
                         String.format(Locale.US, "%+.2f", M2_kNm),
