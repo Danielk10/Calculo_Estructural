@@ -1,4 +1,48 @@
-# Notas de Versión - Structural Analysis FEA Advanced (Versión Alfa 0.1.0)
+# Notas de Versión - Structural Analysis FEA Advanced
+
+## 📦 Structural Analysis FEA Advanced v0.2.0 (Pre-Release)
+
+### 🚀 Novedades, Motores FEA, Visualización 2D/3D y Correcciones Físicas
+
+#### 1. Liberaciones Mecánicas en Extremos de Barras (Releases M11, M22, M33) y Semirrigidez Kθ
+- **Condensación Estática Exacta:**
+  - Implementación de liberaciones de grado de libertad por nodo (extremo inicial I y extremo final J) para flexión en el plano principal ($M_{33}$), flexión secundaria ($M_{22}$) y torsión ($M_{11}$).
+  - Soporte para **articulación pura** ($K_\theta = 0$) y **conexiones semirrígidas** ($K_\theta > 0\text{ kN}\cdot\text{m/rad}$), modificando la matriz de rigidez local mediante condensación estática de resortes rotacionales.
+- **Diálogo de Propiedades y Glifos Gráficos:**
+  - Checkboxes en el diálogo de asignación de barras para activar liberaciones de momento con campo condicional de rigidez rotacional.
+  - Símbolos normalizados de articulación circular en el editor 2D y rombos dorados 3D en el visor OpenGL.
+
+#### 2. Cargas Complejas en el Vano del Elemento (Puntuales, Momentos y Distribuidas Trapezoidales)
+- **Cargas Puntuales Excéntricas y Momentos Concentrados en el Vano ($x/L \in [0, 1]$):**
+  - Fuerzas transversales ($F_y$), fuerzas axiales ($F_x$) y momentos flectores concentrados ($M_z$) aplicados en cualquier posición relativa del miembro.
+- **Cargas Distribuidas Variables y Parciales:**
+  - Cargas trapezoidales con intensidad inicial $w_1$ (en $x_{start}$) e intensidad final $w_2$ (en $x_{end}$).
+  - Integración numérica exacta de fuerzas de empotramiento perfecto (Fixed-End Forces) mediante regla compuesta de Simpson, transformadas automáticamente al vector global de cargas.
+
+#### 3. Catálogo y Creación de Materiales Personalizados
+- **Diálogo Interactivo `dialog_custom_material.xml`:**
+  - Permite al usuario definir materiales propios especificando: Módulo de Young $E$ (MPa), Coeficiente de Poisson $\nu$, Densidad $\rho$ ($\text{kg/m}^3$), Límite de fluencia $F_y$ (MPa) y Resistencia a compresión $f'_c$ (MPa).
+  - Integración transparente en `MaterialDatabase` y resolución en el motor `FrameAnalysisEngine`.
+
+#### 4. Renderizado Vectorial Dinámico en el Editor 2D y Visor 3D OpenGL
+- **Editor 2D (`GridEditorView`):**
+  - Dibujo de cargas puntuales transversales y axiales en la posición geométrica exacta del vano.
+  - Arcos circulares con punta de flecha direccional para momentos concentrados $M_z$ (horario/antihorario) con insignias de valor.
+  - Polígonos sombreados (`#33FF1744`) con peines de flechas para cargas distribuidas uniformes y trapezoidales.
+- **Visor 3D OpenGL (`StructuralFragment`):**
+  - Generación de líneas y vectores tridimensionales en los VBOs de OpenGL para cargas en barras y lazos de momentos concentrados.
+
+#### 5. Acoplamiento Físico Riguroso Muro-Pórtico (Shear Wall CPS4)
+- **Formulación Q4 Isoparamétrica Exacta:**
+  - Matriz de rigidez de membrana $8\times 8$ integrada numéricamente con cuadratura $2\times 2$ de Gauss-Legendre.
+  - Resolución del acoplamiento monolítico marco-muro: el muro de corte absorbe el **$98.74\%$** del cortante lateral ($49.37\text{ kN}$ de $50\text{ kN}$), y las columnas confinantes absorben el **$1.26\%$** ($0.63\text{ kN}$), con momentos basales residuales mínimos ($< 0.71\text{ kN}\cdot\text{m}$).
+- **Corrección de Variables en Reportes PDF (`PDFReportGenerator`):**
+  - La Sección 6.2 del reporte PDF ahora diferencia paneles de tensión plana ($\text{CPS4}/\text{CPE4}$) mostrando tensiones en el plano ($\sigma_x, \sigma_y, \tau_{xy}, V_{wall}$) en lugar de momentos de losa ($M_x, M_y$).
+
+#### 6. Suite de Certificación FEM Multi-Solver (CalculiX & OpenSees)
+- Validación automatizada cruzada en local con CalculiX `ccx 2.23` y `OpenSeesPy` certificando 12/12 presets estructurales y 100/100 tests unitarios con 100% de éxito.
+
+---
 
 ## 📦 Structural Analysis FEA Advanced v0.1.0 (Pre-Release)
 
