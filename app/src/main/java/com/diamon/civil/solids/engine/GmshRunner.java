@@ -115,21 +115,22 @@ public class GmshRunner {
                 if (sewnBrep.exists()) {
                     sewnBrep.delete();
                 }
-                String tclScript = "pload ALL\n" +
+                File tclFile = new File(workDir, "sew_iges.tcl");
+                String tclScript = "pload MODELING\n" +
+                        "pload XSDRAW\n" +
                         "igesread \"" + inputFile.getAbsolutePath() + "\" ig *\n" +
-                        "sewing s 0.05 ig\n" +
+                        "sewing s 0.1 ig\n" +
                         "mkvolume v s\n" +
                         "writebrep v \"" + sewnBrep.getAbsolutePath() + "\"\n" +
                         "exit\n";
                 try {
-                    ProcessBuilder pbDraw = new ProcessBuilder(drawexeBin.getAbsolutePath());
+                    try (java.io.PrintWriter pwTcl = new java.io.PrintWriter(new java.io.FileWriter(tclFile))) {
+                        pwTcl.write(tclScript);
+                    }
+                    ProcessBuilder pbDraw = new ProcessBuilder(drawexeBin.getAbsolutePath(), "-b", "-f", tclFile.getAbsolutePath());
                     pbDraw.directory(workDir);
                     setupEnvironment(pbDraw.environment());
                     Process pDraw = pbDraw.start();
-                    try (java.io.OutputStream os = pDraw.getOutputStream()) {
-                        os.write(tclScript.getBytes(StandardCharsets.UTF_8));
-                        os.flush();
-                    }
                     pDraw.waitFor();
                     if (sewnBrep.exists() && sewnBrep.length() > 0) {
                         targetInput = sewnBrep;
@@ -142,7 +143,7 @@ public class GmshRunner {
             }
         }
 
-        // If input is a CAD file (STEP, IGES, BREP), generate a clean OpenCASCADE driver .geo file
+        // If input is a CAD file (STEP, IGES, BREP), generate a robust OpenCASCADE driver .geo file
         if (nameLower.endsWith(".step") || nameLower.endsWith(".stp") ||
             nameLower.endsWith(".iges") || nameLower.endsWith(".igs") ||
             nameLower.endsWith(".brep")) {
@@ -158,7 +159,20 @@ public class GmshRunner {
             try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(geoDriver))) {
                 pw.println("// OpenCASCADE CAD Driver for Gmsh");
                 pw.println("SetFactory(\"OpenCASCADE\");");
+                pw.println("Geometry.OCCFixDegenerated = 1;");
+                pw.println("Geometry.OCCFixSmallEdges = 1;");
+                pw.println("Geometry.OCCFixSmallFaces = 1;");
+                pw.println("Geometry.OCCSewFaces = 1;");
+                pw.println("Geometry.Tolerance = 0.1;");
                 pw.println("Merge \"" + targetInput.getAbsolutePath() + "\";");
+                pw.println("");
+                pw.println("v() = Volume{:};");
+                pw.println("If (#v() == 0)");
+                pw.println("  Surface Loop(1) = Surface{:};");
+                pw.println("  Volume(1) = {1};");
+                pw.println("EndIf");
+                pw.println("");
+                pw.println("Physical Volume(\"SOLID_VOLUME\", 1) = Volume{:};");
             } catch (Exception e) {
                 Log.e(TAG, "Failed to create geo driver: " + e.getMessage());
             }
