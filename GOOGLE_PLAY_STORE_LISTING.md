@@ -17,7 +17,7 @@ Structural Analysis FEA 3D
 ```text
 Análisis estructural 2D/3D y elementos finitos FEA en tu móvil.
 ```
-*(Longitud exacta: 75 caracteres)*
+*(Longitud exacta: 63 caracteres)*
 
 ---
 
@@ -73,47 +73,47 @@ Structural Analysis FEA 3D
 
 ### 📌 Short Description (Max 80 characters)
 ```text
-Professional 2D/3D structural analysis and FEA finite element suite on mobile.
+2D/3D structural analysis and FEA finite elements on your mobile.
 ```
-*(Exact length: 78 characters)*
+*(Exact length: 64 characters)*
 
 ---
 
 ### 📄 Full Description (Max 4000 characters)
 
 ```text
-Structural Analysis FEA 3D is a comprehensive engineering platform designed to model, calculate, and simulate skeletal structures and 3D mechanical components directly on your mobile device.
+Structural Analysis FEA 3D is a powerful civil, mechanical, and structural engineering tool designed to model, calculate, and simulate framed structures and three-dimensional components directly on your mobile device.
 
-Engineered for civil, structural, and mechanical engineers, architects, and students, this app allows you to analyze continuous beams, space frames, trusses, slabs, shear walls, and 3D solid parts with speed and precision.
+Designed for civil engineers, structural designers, mechanical engineers, architects, and students, it solves beams, 3D space frames, trusses, slabs, shear walls, and 3D mechanical parts with maximum precision and speed.
 
-🏛️ 1. 2D & 3D STRUCTURAL ANALYSIS MODULE
-• Intuitive Modeling: Draw nodes, members, and panels on a precision grid with magnetic snap, or choose from pre-engineered benchmarks and templates.
-• Structural Topologies: Continuous beams, planar frames, 3D space frames, articulated trusses, two-way slabs/plates, and shear walls.
-• Support Conditions: Fixed/clamped supports, pinned/hinged supports, and roller bearings.
-• Load Assignments: Concentrated nodal loads (Fx, Fy, Fz), distributed span loads (w), and point loads on beam spans.
-• Section & Material Library: Standard steel profile catalogs (IPE, HEB, HEA, W, RHS/CHS) and reinforced concrete sections (rectangular and circular), with fully customizable elastic properties (E, ν, fy, density).
+🏛️ 1. STRUCTURAL CALCULATION MODULE (2D AND 3D)
+• Intuitive Modeling: Draw nodes, members, and panels on a millimeter grid with magnetic snap, or select from multiple engineering templates and benchmark models.
+• Structural Typologies: Continuous beams, 2D planar and 3D space frames, pinned trusses, two-way slabs, and structural walls.
+• Support Conditions: Fixed supports, pinned/hinged supports, and roller supports.
+• Load Assignment: Point loads on nodes (Fx, Fy, Fz), uniform distributed loads on spans (w), and intermediate point forces.
+• Material and Section Catalog: Standard library of steel profiles (IPE, HEB, HEA, W, tubular) and reinforced concrete sections (rectangular and circular), with the ability to customize elastic properties (E, ν, fy, density).
 
-📊 2. REAL-TIME 3D VISUALIZATION & FORCE DIAGRAMS
-• Internal Force Diagrams: Continuous bending moment (M), shear force (V), and axial force (N) diagrams with distinct positive/negative color fills.
-• 3D Elastic Deformed Shape: Inspect structural behavior under load with dynamic real-time deformation scaling.
-• 3D Load Vectors: Clear engineering arrows and glyphs displaying spatial direction and load magnitudes.
-• Drift & Deflection Checks: Verify maximum serviceability deflections (L/360) and inter-story seismic drift limits against international building codes.
+📊 2. DIAGRAMS AND INTERACTIVE 3D VIEWER
+• Internal Force Diagrams: Bending moments (M), shear forces (V), and axial forces (N) with color coding and shaded areas.
+• 3D Elastic Deformed Shape: Inspect structural behavior under load with real-time interactive scale amplification.
+• 3D Force Vectors: Volumetric arrows and clear engineering symbols showing the exact direction and magnitude of each applied load.
+• Serviceability and Drift Verification: Check maximum allowable deflections (L/360) and seismic inter-story drifts under international earthquake-resistant standards.
 
-⚙️ 3. 3D SOLID CAD & CONTINUOUS FEA MODULE
-• Parametric CAD Modeling: Create boxes, cylinders, and spheres with edge fillets, chamfers, extrusions, and boolean operations (Union, Cut, Intersect).
-• CAD Import: Import and view standard engineering CAD files (STEP, IGES, BREP, STL).
-• Finite Element Analysis (FEA): 3D volumetric meshing and color contour heatmaps displaying Von Mises equivalent stress distributions.
-• 3D Model Export: Export your computed models in GLB format for 3D inspection and sharing.
+⚙️ 3. 3D SOLIDS AND STRESS ANALYSIS MODULE
+• Parametric CAD Modeling: Generation of boxes, cylinders, and spheres with fillet, chamfer, extrusion, and boolean operations (union, cut, and intersection).
+• CAD Import: View files in standard engineering formats (STEP, IGES, BREP, STL).
+• Finite Element Analysis (FEA): Volumetric discretization and calculation of chromatic heatmaps with Von Mises equivalent stresses.
+• 3D Export: Export your three-dimensional models in GLB format for visualization or sharing.
 
 📑 4. PROFESSIONAL PDF CALCULATION REPORTS
-• Instantly generate comprehensive engineering calculation reports ready for submission and printing.
-• Includes project cover sheet, design assumptions, node coordinates, member connectivity, support reactions, internal action envelopes, displacements, and formal structural verdicts.
+• Automatic generation of complete technical reports ready to print or share.
+• Includes formal cover page, summary of design assumptions, connectivity tables, applied loads, support reactions, maximum internal force envelopes, deflections, and structural verdict.
 
-🔒 5. 100% LOCAL & PRIVATE PROCESSING
-• All matrix solvers and physical simulations execute entirely on your device’s processor.
-• Operates completely offline without requiring cloud connectivity. Your engineering designs and calculation files remain strictly private.
+🔒 5. 100% LOCAL AND PRIVATE PROCESSING
+• All matrix calculations and physics simulations are processed directly on your device's processor.
+• Works completely offline without an internet connection. Your models and calculation reports never leave your phone or tablet.
 
-💻 6. INTEGRATED ENGINEERING CONSOLE
-• Built-in command terminal for advanced users to inspect files, execute automation scripts, and manage project data.
+💻 6. INTEGRATED TECHNICAL CONSOLE
+• Command terminal for advanced users and developers looking to inspect files, run simulation scripts, and manage projects.
 ```
-*(Approximate length: 3200 characters)*
+*(Approximate length: 3100 characters)*
