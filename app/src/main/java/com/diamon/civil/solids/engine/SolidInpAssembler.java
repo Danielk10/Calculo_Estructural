@@ -258,13 +258,13 @@ public class SolidInpAssembler {
         if (regionName == null || regionName.trim().isEmpty() || regionName.equalsIgnoreCase("AUTO") || regionName.contains("Auto")) {
             // Check standard physical groups in Gmsh (both direct and indirect ELSETs)
             if (isFixed) {
-                String[] fixedAliases = {"Fixed", "N_FIXED_SURF", "SURFACE1", "NFix", "FIXED_SURF", "FIXED_NODES"};
+                String[] fixedAliases = {"Fixed", "N_FIXED_SURF", "NFix", "FIXED_SURF", "FIXED_NODES", "SUPPORT", "EMPOTRAMIENTO"};
                 for (String alias : fixedAliases) {
                     nodes = extractNodesFromPhysical(lines, alias);
                     if (!nodes.isEmpty()) return nodes;
                 }
             } else {
-                String[] loadAliases = {"Loaded", "E_LOAD_FACETS", "SURFACE2", "NLoad", "LOAD_SURF", "LOAD_NODES"};
+                String[] loadAliases = {"Loaded", "E_LOAD_FACETS", "NLoad", "LOAD_SURF", "LOAD_NODES", "FORCE", "CARGA"};
                 for (String alias : loadAliases) {
                     nodes = extractNodesFromPhysical(lines, alias);
                     if (!nodes.isEmpty()) return nodes;
@@ -330,9 +330,10 @@ public class SolidInpAssembler {
         double dy = Math.max(maxY - minY, 1e-6);
         double dz = Math.max(maxZ - minZ, 1e-6);
 
-        double tolX = Math.max(dx * 0.05, 1e-4);
-        double tolY = Math.max(dy * 0.05, 1e-4);
-        double tolZ = Math.max(dz * 0.05, 1e-4);
+        // Precise planar tolerance (0.1% or max 0.005 mm) to strictly select boundary surface nodes and NEVER internal volume nodes
+        double tolX = Math.max(dx * 0.001, 1e-3);
+        double tolY = Math.max(dy * 0.001, 1e-3);
+        double tolZ = Math.max(dz * 0.001, 1e-3);
 
         if (faceType.equals("X_MIN")) {
             for (Map.Entry<Integer, double[]> e : nodeCoords.entrySet()) {
