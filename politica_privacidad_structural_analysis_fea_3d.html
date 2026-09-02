@@ -197,15 +197,27 @@
 
         <section>
             <h2>3. Permisos Solicitados y su Uso</h2>
-            <p><strong>Structural Analysis FEA 3D</strong> requiere los siguientes permisos estrictamente necesarios para su funcionamiento:</p>
+            <p><strong>Structural Analysis FEA 3D</strong> requiere los siguientes permisos estrictamente necesarios para su funcionamiento técnico y computacional (compatible desde Android 7.0 / API 24 hasta Android 17 / API 37):</p>
             <table>
                 <thead>
                     <tr>
                         <th>Permiso</th>
-                        <th>Propósito Técnico</th>
+                        <th>Propósito Técnico y Justificación</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <tr>
+                        <td><code>android.permission.WAKE_LOCK</code></td>
+                        <td>Mantiene activo el procesador (CPU) del dispositivo durante el cómputo de elementos finitos y mallados volumétricos densos, evitando que el sistema operativo suspenda el cálculo matemático o apague la pantalla mientras se ejecutan solvers pesados de CalculiX y Gmsh.</td>
+                    </tr>
+                    <tr>
+                        <td><code>android.permission.FOREGROUND_SERVICE<br>android.permission.FOREGROUND_SERVICE_DATA_SYNC<br>android.permission.FOREGROUND_SERVICE_SPECIAL_USE</code></td>
+                        <td>Permite la ejecución ininterrumpida de procesos de simulación estructural y ensamblaje matricial en primer plano, evitando el cierre forzado por parte del gestor de memoria de Android en versiones modernas (Android 14 / API 34 a Android 17 / API 37).</td>
+                    </tr>
+                    <tr>
+                        <td><code>android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS</code></td>
+                        <td>Permite al usuario eximir opcionalmente a la aplicación de las restricciones agresivas de ahorro de energía (modo Doze), garantizando que cálculos de ingeniería de larga duración terminen sin truncamiento.</td>
+                    </tr>
                     <tr>
                         <td><code>android.permission.INTERNET</code></td>
                         <td>Permite cargar la presente Política de Privacidad en línea, acceder a manuales teóricos de CalculiX/OpenCASCADE, gestionar anuncios de Google AdMob y compras dentro de la aplicación (Google Play In-App Billing).</td>
@@ -216,7 +228,7 @@
                     </tr>
                     <tr>
                         <td><code>Acceso al Almacenamiento / SAF (Storage Access Framework)</code></td>
-                        <td>Permite al usuario importar archivos de modelos (.inp, .step, .iges, .brep, .stl) y exportar reportes de cálculo en PDF y artefactos de simulación a la carpeta pública <em>Download/</em>.</td>
+                        <td>Permite al usuario importar archivos de modelos (.inp, .step, .iges, .brep, .stl) y exportar reportes de cálculo en PDF y artefactos de simulación a la carpeta pública <em>Download/</em> sin requerir permisos invasivos de almacenamiento global.</td>
                     </tr>
                 </tbody>
             </table>
