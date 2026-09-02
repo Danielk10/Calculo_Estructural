@@ -116,7 +116,7 @@ public class GmshRunner {
                         "igesread \"" + inputFile.getAbsolutePath() + "\" ig *\n" +
                         "sewing s 0.05 ig\n" +
                         "mkvolume v s\n" +
-                        "save v \"" + sewnBrep.getAbsolutePath() + "\"\n" +
+                        "writebrep v \"" + sewnBrep.getAbsolutePath() + "\"\n" +
                         "exit\n";
                 try {
                     ProcessBuilder pbDraw = new ProcessBuilder(drawexeBin.getAbsolutePath());
