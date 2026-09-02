@@ -713,7 +713,7 @@ public class SolidFragment extends Fragment {
                         if (binding != null && isAdded()) {
                             binding.pbSolid.setVisibility(View.GONE);
                             binding.btnRunSolidAnalysis.setEnabled(true);
-                            Toast.makeText(appContext, "INP Execution Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(appContext, getString(R.string.toast_inp_error, e.getMessage()), Toast.LENGTH_LONG).show();
                         }
                     });
                 }

@@ -5,10 +5,10 @@ import java.util.List;
 
 public class StructuralModel {
     public enum SupportType {
-        FREE,       // Libre
-        FIXED,      // Empotrado (Ux=0, Uy=0, Uz=0, Rx=0, Ry=0, Rz=0)
-        PINNED,     // Articulado (Ux=0, Uy=0, Uz=0)
-        ROLLER      // Apoyo Simple / Rodillo (Uy=0)
+        FREE,       // Free / Unconstrained
+        FIXED,      // Fixed / Encastre (Ux=0, Uy=0, Uz=0, Rx=0, Ry=0, Rz=0)
+        PINNED,     // Pinned / Hinged (Ux=0, Uy=0, Uz=0)
+        ROLLER      // Roller Support (Uy=0)
     }
 
     public static class Node {

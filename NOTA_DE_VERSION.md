@@ -1,26 +1,33 @@
 # Notas de Versión - Structural Analysis FEA 3D
 
-## 📦 Structural Analysis FEA 3D v0.5.0 (Pre-Release)
+## 📦 Structural Analysis FEA 3D v0.1.0 (Pre-Release)
 
-### 🚀 Mejoras en Visor 3D, Costura de Superficies IGES y Validación Físico-Matemática Completa
+### 🚀 Primera Versión Oficial - Plataforma Integral de Elementos Finitos 3D y Marcos Estructurales para Android
 
-#### 1. Estabilidad y Persistencia en Visor 3D
-- **Cámara Independiente al Cambiar de Pestaña:**
-  - Se desacopló la recarga del composable 3D en `SceneViewBridge`. Al alternar entre las pestañas de Parámetros, Visor 3D y Logs, la orientación y posición de la cámara del usuario se mantienen intactas sin recentrarse automáticamente.
-  - La función de centrado queda asignada exclusivamente al botón *Centrar Vista* del visor 3D.
-- **Retención y Reemplazo Seguro de Resultados 3D:**
-  - Se eliminó el borrado preventivo de `job_solid.glb` durante la limpieza previa al cálculo.
-  - El modelo 3D visualizado permanece en pantalla durante la ejecución y se reemplaza de forma atómica una vez que CalculiX y la conversión FRD→GLB finalizan con éxito, eliminando parpadeos, pantallas vacías o posibles cierres involuntarios de la app.
+---
 
-#### 2. Soporte y Costura Robusta de Archivos CAD IGES / IGS
-- **Corrección en DRAWEXE (OpenCASCADE):**
-  - Se actualizó el comando de serialización de sólidos cosidos en `GmshRunner` de `save` a `writebrep`.
-  - Garantiza que modelos en formato `.igs` y `.iges` cosan de manera determinista sus caras NURBS en sólidos cerrados `.brep`, permitiendo que Gmsh genere la malla volumétrica tetraédrica sin errores de contorno abierto.
+### 1. ⚙️ Núcleo Científico y Motores Nativos de Simulación FEA
+- **Solucionador CalculiX (CCX 2.23):** Integración nativa del motor de cálculo de elementos finitos con soporte multihilo de álgebra lineal **SPOOLES 2.2** y extracción modal / frecuencias naturales mediante **ARPACK-NG**.
+- **Generador de Mallas Gmsh (v5.0.0):** Generación automática y refinamiento de mallas tetraédricas de 1.er y 2.º orden (C3D4, C3D10) y soporte para transiciones hexaédricas.
+- **Modelador CAD OpenCASCADE (OCCT 8.0.0.p1):** Creación directa de geometrías primitivas (Cubo, Cilindro, Esfera), operaciones avanzadas (Redondeos, Chaflanes, Extrusión) y operaciones booleanas completas (Unión, Corte e Intersección).
+- **Ingesta de Formatos CAD Estándar:** Compatibilidad total para importar y analizar modelos en formatos STEP (`.step`, `.stp`), IGES (`.iges`, `.igs`), BREP (`.brep`) y GEO (`.geo`).
 
-#### 3. Validación Físico-Matemática con CalculiX Real y Gmsh
-- **29/29 Pruebas Superadas al 100%:**
-  - Validación completa del pipeline CAD → Malla C3D4 → Deck CalculiX → Solver ccx → Resultados FRD en todos los formatos CAD soportados (`.step`, `.stp`, `.brep`, `.igs`, `.iges`, `.geo`) y geometrías de prueba (`cantilever_plate`, `perforated_block`, `structural_ibeam`, `flanged_connector`).
-- **Verificación Analítica (Euler-Bernoulli):**
-  - Validación en viga en voladizo ($100 \times 10 \times 10\text{ mm}$, $P = -100\text{ N}$, $E = 200\,000\text{ MPa}$): flecha analítica $\delta = 0.2000\text{ mm}$ vs FEA $\delta = 0.1762\text{ mm}$ (diferencia esperada de $11.88\% \le 15\%$ por rigidez de elementos C3D4).
-- **Consistencia Cross-Formato:**
-  - Desviaciones volumétricas inferiores al $0.7\%$ entre los diferentes formatos CAD para una misma geometría.
+---
+
+### 2. 🏗️ Módulo de Análisis Estructural y Pórticos 2D/3D
+- **Editor Topológico en Cuadrícula 2D:** Dibujo interactivo con snapping magnético (0.5 m), asignación de apoyos en nodos (Empotrado, Articulado, Rodillo), cargas puntuales con momentos ($F_x, F_y, M_z$), liberaciones de momentos en extremos y cargas distribuidas trapezoidales/parciales en vano ($w_1, w_2$).
+- **Diagramas de Esfuerzos Internos:** Cálculo en tiempo real y visualización gráfica interactiva de Momento Flector ($M_{33}$), Fuerza Cortante ($V_{22}$), Fuerza Axial ($N$) y Deformada ($U$).
+- **Plantillas y Benchmarks Predefinidos:** Pórticos industriales, vigas continuas, armaduras Pratt y Warren, losas de hormigón (S4R) y muros de cortante confinados (CPS4).
+
+---
+
+### 3. 🎨 Visor 3D Interactivo y Memorias Técnicas en PDF
+- **Visor SceneView / Filament:** Renderizado de esfuerzos de Von Mises con mapa térmico continuo de colores, deformación escalable y control fluido de cámara 3D.
+- **Memorias de Cálculo en PDF Automatizadas:** Generación de informes técnicos de ingeniería con evaluación normativa (ACI 318-19, AISC 360-16, ASCE 7-22), tablas de rigidez, reacciones en apoyos y veredicto estructural automático.
+- **Diálogos Interactivos de Acerca de y Licencias:** Enlaces directos y clickeables a la documentación de todos los componentes de código abierto integrados y al repositorio del proyecto.
+
+---
+
+### 📦 Artefactos Disponibles para esta Versión:
+- **APK Release (Producción firmado):** `/tmp/calculoestructural_build/outputs/apk/release/app-release.apk`
+- **APK Debug:** `/tmp/calculoestructural_build/outputs/apk/debug/app-debug.apk`

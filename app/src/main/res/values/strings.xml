@@ -9,7 +9,6 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="apply">Apply</string>
-    <string name="undo">Undo</string>
     <string name="clear">Clear</string>
 
     <!-- Navigation Drawer & Menus -->
@@ -25,14 +24,13 @@
     <string name="menu_about_licenses">About / Licenses</string>
     <string name="menu_privacy_policy">Privacy Policy</string>
     <string name="privacy_policy_title">Privacy Policy</string>
-    <string name="privacy_policy_loading">Loading Privacy Policy...</string>
     <string name="privacy_policy_error">Unable to load Privacy Policy. Please check your internet connection.</string>
     <string name="retry">Retry</string>
 
     <string name="about_dialog_title">About Structural Analysis FEA 3D</string>
-    <string name="about_dialog_message">Structural Analysis FEA 3D v0.3.0\n\nHigh-performance 3D Solid &amp; Frame Finite Element Analysis (FEA) platform for Android.\nPowered by CalculiX (CCX 2.23), Gmsh 3D mesh generator (v5.0.0), and OpenCASCADE Technology (OCCT 8.0.0.p1).\n\nLead Developer: Daniel Diamon\nLocation: Tinaquillo, Cojedes, Venezuela\nLicense: GNU General Public License v3.0 (GPLv3)\nRepository: https://github.com/Danielk10/Calculo_Estructural</string>
+    <string name="about_dialog_message"><![CDATA[<b>Structural Analysis FEA 3D v0.1.0</b><br/><br/>High-performance 3D Solid &amp; Frame Finite Element Analysis (FEA) platform for Android.<br/>Powered by CalculiX (CCX 2.23), Gmsh 3D mesh generator (v5.0.0), and OpenCASCADE Technology (OCCT 8.0.0.p1).<br/><br/><b>Lead Developer:</b> Daniel Diamon<br/><b>License:</b> GNU General Public License v3.0 (GPLv3)<br/><b>Repository:</b> <a href="https://github.com/Danielk10/Calculo_Estructural">GitHub Repository</a>]]></string>
     <string name="licenses_dialog_title">About &amp; Licenses</string>
-    <string name="licenses_dialog_message">Structural Analysis FEA 3D v0.3.0\n\nHigh-performance 3D Solid &amp; Frame Finite Element Analysis (FEA) platform for Android.\nPowered by CalculiX (CCX 2.23), Gmsh 3D mesh generator (v5.0.0), and OpenCASCADE Technology (OCCT 8.0.0.p1).\n\nLead Developer: Daniel Diamon\nLocation: Tinaquillo, Cojedes, Venezuela\nLicense: GNU General Public License v3.0 (GPLv3)\n\nBundled Open-Source Scientific Components &amp; Repositories:\n• CalculiX (CCX 2.23): GNU GPL (Guido Dhondt)\n  https://www.calculix.de\n• Gmsh (v5.0.0): GNU GPL v2.0+ (C. Geuzaine, J.-F. Remacle)\n  https://gmsh.info\n• OpenCASCADE Technology (OCCT 8.0.0.p1): GNU LGPL v2.1\n  https://dev.opencascade.org\n  https://github.com/Open-CASCADE-Technology/OCCT\n• SPOOLES (v2.2 MT): Public Domain (C. Ashcraft, J. Liu)\n  https://www.netlib.org/linalg/spooles/spooles.2.2.html\n• ARPACK-NG: BSD 3-Clause\n  https://github.com/opencollab/arpack-ng\n• OpenBLAS / LAPACK: BSD 3-Clause\n  https://github.com/OpenMathLib/OpenBLAS\n  https://www.netlib.org/lapack/\n• SceneView / Filament: Apache License 2.0\n  https://github.com/SceneView/sceneview-android\n  https://github.com/google/filament\n• iText 7 Core (v7.2.5): AGPL v3.0\n  https://github.com/itext/itext7\n• GCC Fortran Runtime: GNU GPL v3.0+\n  https://gcc.gnu.org</string>
+    <string name="licenses_dialog_message"><![CDATA[<b>Structural Analysis FEA 3D v0.1.0</b><br/><br/>High-performance 3D Solid &amp; Frame Finite Element Analysis (FEA) platform for Android.<br/>Powered by CalculiX (CCX 2.23), Gmsh 3D mesh generator (v5.0.0), and OpenCASCADE Technology (OCCT 8.0.0.p1).<br/><br/><b>Lead Developer:</b> Daniel Diamon<br/><b>License:</b> GNU General Public License v3.0 (GPLv3)<br/><b>Repository:</b> <a href="https://github.com/Danielk10/Calculo_Estructural">GitHub Repository</a><br/><br/><b>Bundled Open-Source Scientific Components:</b><br/>• <b>CalculiX (CCX 2.23):</b> GNU GPL (Guido Dhondt)<br/>  <a href="http://www.calculix.de">CalculiX Home</a><br/>• <b>Gmsh (v5.0.0):</b> GNU GPL v2.0+ (C. Geuzaine, J.-F. Remacle)<br/>  <a href="https://gmsh.info">Gmsh Official</a><br/>• <b>OpenCASCADE Technology (OCCT 8.0.0.p1):</b> GNU LGPL v2.1<br/>  <a href="https://dev.opencascade.org">OpenCASCADE Portal</a> | <a href="https://github.com/Open-CASCADE-Technology/OCCT">OCCT GitHub</a><br/>• <b>SPOOLES (v2.2 MT):</b> Public Domain (C. Ashcraft, J. Liu)<br/>  <a href="https://www.netlib.org/linalg/spooles/spooles.2.2.html">Netlib SPOOLES</a><br/>• <b>ARPACK-NG:</b> BSD 3-Clause<br/>  <a href="https://github.com/opencollab/arpack-ng">arpack-ng GitHub</a><br/>• <b>OpenBLAS / LAPACK:</b> BSD 3-Clause<br/>  <a href="https://github.com/OpenMathLib/OpenBLAS">OpenBLAS GitHub</a> | <a href="https://www.netlib.org/lapack/">LAPACK Netlib</a><br/>• <b>SceneView / Filament:</b> Apache License 2.0<br/>  <a href="https://github.com/SceneView/sceneview-android">SceneView Android</a> | <a href="https://github.com/google/filament">Filament GitHub</a><br/>• <b>iText 7 Core (v7.2.5):</b> AGPL v3.0<br/>  <a href="https://github.com/itext/itext7">iText7 GitHub</a><br/>• <b>GCC Fortran Runtime:</b> GNU GPL v3.0+<br/>  <a href="https://gcc.gnu.org">GCC Home</a>]]></string>
 
     <!-- Navigation & Tabs -->
     <string name="tab_parameters">PARAMETERS</string>
@@ -40,21 +38,23 @@
     <string name="tab_solver_log">SOLVER LOG</string>
 
     <!-- Structural Analysis Module -->
-    <string name="structural_analysis_config">ANALYSIS CONFIGURATION</string>
     <string name="label_structure_type">Structural System Type</string>
     <string name="label_element_type">Finite Element Formulation</string>
     <string name="label_material">Material Specification</string>
     <string name="label_cross_section">Cross-Section Profile</string>
-    <string name="hint_load_magnitude">Applied Load Magnitude (N)</string>
-    <string name="grid_editor_title">2D FRAME &amp; TOPOLOGY EDITOR</string>
     <string name="grid_stats_format">%1$d Nodes | %2$d Elements</string>
-    <string name="btn_draw_beam">Draw Member</string>
-    <string name="btn_select_move">Select / Move</string>
-    <string name="btn_boundary_support">Support (SPC)</string>
-    <string name="btn_delete_entity">Delete</string>
+    <string name="btn_mode_draw">✏ Draw</string>
+    <string name="btn_mode_pan">✋ Pan View</string>
+    <string name="btn_mode_move_nodes">✥ Move Nodes</string>
+    <string name="btn_mode_inspect">🔍 Select / Info</string>
+    <string name="btn_mode_support">⏏ Support</string>
+    <string name="btn_mode_load">⬇ Load</string>
+    <string name="btn_mode_delete">🗑 Delete</string>
+    <string name="btn_mode_undo">↶ Undo</string>
+    <string name="btn_mode_clear">✕ Clear</string>
+    <string name="btn_mode_custom_material">+ Material</string>
+    <string name="tv_component_info_hint">Select any node, member, or panel to inspect technical properties</string>
     <string name="label_preset_template">Engineering Preset / Benchmark:</string>
-    <string name="btn_undo">UNDO</string>
-    <string name="btn_clear">CLEAR</string>
     <string name="btn_run_fea_solver">EXECUTE FEA SOLVER</string>
     <string name="btn_solving_fea">SOLVING WITH CALCULIX (CCX)...</string>
     <string name="label_deformation_scale">Deformation Scale: 1.0x</string>
@@ -67,23 +67,21 @@
     <string name="btn_reset_viewport">Center Viewport</string>
 
     <!-- 3D Solid Module -->
-    <string name="cad_geometry_modeling">CAD Geometry</string>
     <string name="label_active_cad_geometry">Active CAD Model:</string>
     <string name="btn_delete_model">Delete Active Model</string>
     <string name="dialog_delete_model_title">Delete CAD Model</string>
     <string name="dialog_delete_model_msg">Are you sure you want to delete \'%1$s\' from the workspace?</string>
-    <string name="btn_primitive_box">Primitive Box</string>
-    <string name="btn_primitive_cylinder">Primitive Cylinder</string>
-    <string name="btn_primitive_sphere">Primitive Sphere</string>
-    <string name="btn_apply_fillet">Apply Fillet</string>
-    <string name="btn_apply_chamfer">Apply Chamfer</string>
-    <string name="btn_extrude_face">Extrude Face</string>
-    <string name="btn_boolean_union">Boolean Union</string>
-    <string name="btn_boolean_cut">Boolean Cut</string>
-    <string name="btn_boolean_intersect">Boolean Intersect</string>
-    <string name="btn_import_cad">Import CAD Geometry (STEP / IGES / BREP)</string>
-    <string name="btn_load_benchmark">Load Benchmark Model</string>
-    <string name="solid_fea_config">FINITE ELEMENT CONFIGURATION</string>
+    <string name="btn_primitive_box">+ Box</string>
+    <string name="btn_primitive_cylinder">+ Cylinder</string>
+    <string name="btn_primitive_sphere">+ Sphere</string>
+    <string name="btn_apply_fillet">Fillet</string>
+    <string name="btn_apply_chamfer">Chamfer</string>
+    <string name="btn_extrude_face">Extrude</string>
+    <string name="btn_boolean_union">Union ∪</string>
+    <string name="btn_boolean_cut">Cut ∖</string>
+    <string name="btn_boolean_intersect">Intersect ∩</string>
+    <string name="btn_import_cad">📁 Import</string>
+    <string name="btn_load_benchmark">⚡ Benchmark</string>
     <string name="label_mesh_density">Mesh Refinement Density: Level 3 / 5 (Medium - ~20mm)</string>
     <string name="mesh_density_format">Mesh Refinement Density: Level %1$d / 5 (%2$s)</string>
     <string name="density_coarse">Coarse - ~50mm</string>
@@ -91,10 +89,7 @@
     <string name="density_medium">Medium - ~20mm</string>
     <string name="density_fine">Fine - ~10mm</string>
     <string name="density_ultra_fine">Ultra-Fine - ~5mm</string>
-    <string name="cb_quadratic_elements">Quadratic Elements (2nd-Order High-Precision)</string>
-    <string name="cb_hexahedral_meshing">Hexahedral Meshing (Recombine Transfinite)</string>
-    <string name="hint_young_modulus">Young\'s Modulus E (MPa)</string>
-    <string name="solid_boundary_config">BOUNDARY CONDITIONS &amp; APPLIED LOADS (SPC &amp; CLOAD)</string>
+    <string name="label_young_modulus_short">E (MPa)</string>
     <string name="label_fixed_support_region">Fixed Support Region (SPC 1-3):</string>
     <string name="label_load_application_region">Load Application Region (Loaded Face):</string>
     <string name="label_load_direction">Load Force Vector Direction:</string>
@@ -110,11 +105,44 @@
     <!-- Boundary Dialog -->
     <string name="dialog_boundary_title">Apply Boundary Condition</string>
     <string name="dialog_boundary_selected_default">Selected: Face / Node</string>
-    <string name="dialog_boundary_selected_format">Selected: %1$s</string>
     <string name="btn_fixed_support">FIXED SUPPORT (SPC 1-6)</string>
     <string name="btn_apply_pressure_load">APPLY PRESSURE / LOAD (DLOAD)</string>
-    <string name="btn_confirm_load_value">CONFIRM LOAD VALUE</string>
     <string name="hint_load_value">Load Magnitude (N or MPa)</string>
+
+    <!-- Dialogs for Structural System -->
+    <string name="dialog_node_load_title">Joint Boundary &amp; Loads</string>
+    <string name="label_boundary_support_spc">Boundary Support Restraint (SPC)</string>
+    <string name="label_applied_point_loads">Applied Concentrated Point Loads</string>
+    <string name="hint_force_fx">Horizontal Force Fx (kN)</string>
+    <string name="hint_force_fy">Vertical Force Fy (kN) [negative = gravity]</string>
+    <string name="hint_moment_mz">Applied Moment Mz (kN·m) [+ = CCW]</string>
+    <string name="dialog_custom_material_title">Custom Material Definition</string>
+    <string name="badge_custom">Custom</string>
+    <string name="hint_mat_name">Material Name</string>
+    <string name="hint_mat_young">Young\'s Modulus E (MPa)</string>
+    <string name="hint_mat_poisson">Poisson\'s Ratio ν</string>
+    <string name="hint_mat_density">Density ρ (kg/m³)</string>
+    <string name="hint_mat_yield">Yield Strength Fy (MPa)</string>
+    <string name="hint_mat_fc">Compressive Strength f\'c (MPa)</string>
+    <string name="dialog_member_props_title">Member Properties</string>
+    <string name="label_end_releases">End Releases</string>
+    <string name="hint_end_releases_desc">Default: Continuous (Rigid). Enable to release DOF or set partial stiffness.</string>
+    <string name="label_start_node_i">Start Node (I-End)</string>
+    <string name="label_end_node_j">End Node (J-End)</string>
+    <string name="label_stiffness_start_hint">I-End Rotational Stiffness Kθ (kN·m/rad) [0 = pinned, empty = free]</string>
+    <string name="label_stiffness_end_hint">J-End Rotational Stiffness Kθ (kN·m/rad) [0 = pinned, empty = free]</string>
+    <string name="hint_stiffness_default">0 = Pinned | 5000 = Semi-rigid</string>
+    <string name="label_element_loads">Element Loads</string>
+    <string name="label_dist_load_section">Distributed Load (Variable / Partial Length)</string>
+    <string name="hint_dist_start_pos">Start pos (0-1)</string>
+    <string name="hint_dist_end_pos">End pos (0-1)</string>
+    <string name="hint_dist_w1">w₁ (kN/m)</string>
+    <string name="hint_dist_w2">w₂ (kN/m)</string>
+    <string name="label_point_load_span">Concentrated Point Load on Span</string>
+    <string name="hint_point_pos">Position (0-1)</string>
+    <string name="hint_point_fy">Fy (kN)</string>
+    <string name="hint_point_fx">Fx (kN)</string>
+    <string name="hint_point_mz">Mz (kN·m)</string>
 
     <!-- Terminal Module -->
     <string name="terminal_prompt">fea@system:~$</string>
@@ -122,7 +150,6 @@
     <string name="terminal_cd_history_prev">Previous command</string>
     <string name="terminal_cd_history_next">Next command</string>
     <string name="terminal_cd_abort">Abort running process</string>
-    <string name="terminal_cd_clear">Clear terminal transcript</string>
     <string name="terminal_cd_copy">Copy terminal transcript</string>
     <string name="terminal_cd_send">Execute command</string>
     <string name="terminal_copied_toast">Transcript copied to clipboard</string>
@@ -130,9 +157,6 @@
 
     <!-- Toast & Feedback Messages -->
     <string name="toast_cad_imported">CAD geometry imported successfully: %1$s</string>
-    <string name="toast_cad_imported_simple">CAD geometry imported successfully</string>
-    <string name="toast_solid_mesh_imported">Solid Mesh INP imported</string>
-    <string name="toast_structural_imported">Structural Frame imported: %1$d nodes, %2$d elements</string>
     <string name="toast_only_inp_supported">Only INP mesh files (*.inp) are supported for import</string>
     <string name="toast_inp_imported_terminal">INP file imported to Terminal workspace: %1$s</string>
     <string name="toast_inp_imported_solid">Solid INP mesh imported to 3D Solid workspace: %1$s</string>
@@ -156,20 +180,20 @@
     <string name="toast_no_report_to_export">No simulation report available to export</string>
     <string name="toast_pdf_export_failed">Failed to export PDF calculation report</string>
     <string name="toast_browser_open_error">Could not open web browser</string>
-    <string name="toast_unsupported_format">Unsupported file format: %1$s</string>
     <string name="toast_unsupported_cad_format">Unsupported CAD format: %1$s. Supported formats: STEP (*.step, *.stp), IGES (*.iges, *.igs), BREP (*.brep), GEO (*.geo).</string>
     <string name="toast_import_failed">Model import failed: %1$s</string>
     <string name="toast_no_active_module">No active FEA module available for export</string>
     <string name="toast_export_all_success">Exported %1$d items to Downloads/Structural_Analysis_FEA_3D/%2$s</string>
     <string name="toast_simulation_complete">FEA Simulation Complete</string>
-    <string name="toast_fixed_boundary_applied">Fixed Support (SPC 1-6) applied to selection</string>
-    <string name="toast_load_boundary_applied">Load applied to selection: %1$.2f N</string>
-    <string name="toast_invalid_load_value">Invalid load magnitude</string>
     <string name="toast_model_deleted">Model deleted: %1$s</string>
     <string name="toast_no_model_to_delete">No model selected to delete</string>
     <string name="toast_define_nodes_first">Please define structural nodes and elements on the grid</string>
     <string name="toast_select_structure_type">Please select a valid structure type</string>
     <string name="toast_run_analysis_first">Please execute FEA solver first</string>
+    <string name="toast_material_name_required">Material name and Young\'s modulus (E) are required</string>
+    <string name="toast_load_cleared">Applied load cleared</string>
+    <string name="toast_reactions_copied">Reactions report copied to clipboard &amp; logged</string>
+    <string name="toast_inp_error">INP Execution Error: %1$s</string>
 
     <!-- Geometry Spinner Names -->
     <string name="geo_item_benchmark">Benchmark: Cantilever Beam</string>
@@ -183,28 +207,12 @@
     <string name="geo_item_cut">Boolean Cut (Perforated Solid)</string>
     <string name="geo_item_intersect">Boolean Intersect (Common Volume)</string>
 
-    <!-- Grid Editor HUD Modes -->
-    <string name="grid_mode_draw">DRAW (Snap Active)</string>
-    <string name="grid_mode_select_move">SELECT / EDIT</string>
-    <string name="grid_mode_support">BOUNDARY SUPPORTS</string>
-    <string name="grid_mode_load">ASSIGN LOADS</string>
-    <string name="grid_mode_delete">DELETE ENTITY</string>
-    <string name="btn_assign_load">Loads</string>
-    <string name="dialog_joint_load_title">Joint Restraints &amp; Point Loads</string>
-    <string name="dialog_element_title">Element Section &amp; Material Assignment</string>
-    <string name="toast_load_assigned">Point load assigned to Joint #%1$d: Fx=%2$.1f N, Fy=%3$.1f N</string>
-
     <!-- String Arrays -->
-    <string-array name="analysis_modes">
-        <item>Linear Static Analysis (Static General)</item>
-        <item>Natural Frequencies &amp; Modal Extraction (Frequency)</item>
-    </string-array>
-
     <string-array name="support_options">
-        <item>Fixed Support (Encaster SPC 1-6)</item>
-        <item>Pinned Support (Hinged SPC 1-3)</item>
-        <item>Roller Support (Sliding SPC 2)</item>
-        <item>Free End (Unconstrained)</item>
+        <item>FREE (Unconstrained)</item>
+        <item>FIXED (Encaster SPC 1-6)</item>
+        <item>PINNED (Hinged SPC 1-3)</item>
+        <item>ROLLER (Sliding Base SPC 2)</item>
     </string-array>
 
     <string-array name="element_types_solid">

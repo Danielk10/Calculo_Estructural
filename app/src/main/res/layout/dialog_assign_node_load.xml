@@ -28,7 +28,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Joint Boundary &amp; Loads"
+                android:text="@string/dialog_node_load_title"
                 android:textColor="@android:color/white"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -42,7 +42,6 @@
                 android:paddingEnd="10dp"
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
-                android:text="Node #1"
                 android:textColor="#38BDF8"
                 android:textSize="12sp"
                 android:textStyle="bold"
@@ -54,7 +53,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Coordinates: X = 0.00 m, Y = 0.00 m"
             android:textColor="#94A3B8"
             android:textSize="12.5sp" />
     </LinearLayout>
@@ -74,7 +72,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Boundary Support Restraint (SPC)"
+                android:text="@string/label_boundary_support_spc"
                 android:textColor="#1E293B"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -98,7 +96,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Applied Concentrated Point Loads"
+                android:text="@string/label_applied_point_loads"
                 android:textColor="#1E293B"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -108,7 +106,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Horizontal Force Fx (kN)"
+                android:hint="@string/hint_force_fx"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
@@ -129,7 +127,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Vertical Force Fy (kN) [negative = gravity]"
+                android:hint="@string/hint_force_fy"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
@@ -150,7 +148,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Applied Moment Mz (kN·m) [+ = CCW]"
+                android:hint="@string/hint_moment_mz"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"

@@ -116,14 +116,14 @@ public class AssetHelper {
             out.flush();
             return true;
         } catch (IOException e) {
-            Log.e(TAG, "Error copiando " + assetPath + ": " + e.getMessage());
+            Log.e(TAG, "Error copying asset " + assetPath + ": " + e.getMessage());
             return false;
         }
     }
 
     /**
-     * Crea enlaces simbolicos desde la carpeta jniLibs (donde Android guarda los .so)
-     * hacia la estructura de carpetas 'usr/bin' y 'usr/lib' esperada por las herramientas.
+     * Creates symbolic links from the jniLibs directory (where Android stores .so binaries)
+     * to the 'usr/bin' and 'usr/lib' directory structure expected by native FEA toolchains.
      */
     private boolean ensureNativeToolLinks() {
         File filesDir = context.getFilesDir();
@@ -142,7 +142,7 @@ public class AssetHelper {
             ok &= linkToSystem(new File(usrLib, "libz.so.1"), systemLibz);
         }
 
-        // --- ENLACES GENERADOS SEGUN MAPEO DE BINARIOS ---
+        // --- Native symbolic links mapped to packaged .so files ---
         ok &= linkTool(new File(usrBin, "DRAWEXE"), "libDRAWEXE.so");
         ok &= linkTool(new File(usrBin, "DRAWEXE-8.0.0"), "libDRAWEXE_8.0.0.so");
         ok &= linkTool(new File(usrBin, "ccx"), "libccx.so");

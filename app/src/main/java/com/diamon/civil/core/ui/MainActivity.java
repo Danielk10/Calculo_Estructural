@@ -15,6 +15,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.text.HtmlCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -134,9 +135,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void showAboutDialog() {
+        CharSequence message = HtmlCompat.fromHtml(getString(R.string.about_dialog_message), HtmlCompat.FROM_HTML_MODE_LEGACY);
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.about_dialog_title)
-                .setMessage(R.string.about_dialog_message)
+                .setMessage(message)
                 .setPositiveButton(R.string.close, null)
                 .create();
         dialog.show();
@@ -147,9 +149,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void showLicensesDialog() {
+        CharSequence message = HtmlCompat.fromHtml(getString(R.string.licenses_dialog_message), HtmlCompat.FROM_HTML_MODE_LEGACY);
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.licenses_dialog_title)
-                .setMessage(R.string.licenses_dialog_message)
+                .setMessage(message)
                 .setPositiveButton(R.string.close, null)
                 .create();
         dialog.show();

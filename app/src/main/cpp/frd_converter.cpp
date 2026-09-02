@@ -28,15 +28,15 @@
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #include "include/tiny_gltf.h"
 
-// ─── Tipos de datos ──────────────────────────────────────────────────────────
+// ─── Data Types ──────────────────────────────────────────────────────────
 
 struct Node  { float x, y, z; float dx=0.0f, dy=0.0f, dz=0.0f; };
 struct Element { std::vector<int> nodes; };
 
-// Resultado por nodo: estrés Von Mises calculado desde las 6 componentes del tensor
+// Nodal result: Von Mises stress computed from the 6 stress tensor components
 struct Result { float vonMises; };
 
-// ─── Mapa arco-iris para colormap de estrés ──────────────────────────────────
+// ─── Rainbow colormap for stress visualization ──────────────────────────────
 static void get_color(float value, float min_v, float max_v, float rgb[3]) {
     float ratio = (max_v > min_v) ? (value - min_v) / (max_v - min_v) : 0.5f;
     ratio = std::max(0.0f, std::min(1.0f, ratio));  // clamp [0,1]
@@ -45,7 +45,7 @@ static void get_color(float value, float min_v, float max_v, float rgb[3]) {
     rgb[2] = std::max(0.0f, 1.0f - 2.0f * ratio);
 }
 
-// ─── Utilidades para calcular bounding-box y centrar el modelo ────────────────
+// ─── Bounding box utilities and model centering ─────────────────────────────
 struct BBox {
     float xMin, xMax, yMin, yMax, zMin, zMax;
     BBox()
@@ -436,11 +436,11 @@ bool convertFrdToGlbStandalone(const char* inputPath, const char* outputPath, fl
     LOGI("FRD parsed: %zu nodes, %zu elements, %zu results, stress=[%.4f, %.4f]",
          nodes.size(), elements.size(), results.size(), min_stress, max_stress);
 
-    // ── Bounding-box para centrar el modelo ───────────────────────────────────
+    // ── Bounding box for model centering ───────────────────────────────────
     BBox bbox;
     for (auto const& [id, n] : nodes) bbox.expand(n.x, n.y, n.z);
     float extent = bbox.maxExtent();
-    float scale  = (extent > 0.0f) ? 1.0f / extent : 1.0f; // normalizar a ~1 m
+    float scale  = (extent > 0.0f) ? 1.0f / extent : 1.0f; // normalize to ~1 m
 
     // ── Helper: get deformed, centered, scaled position of a node ─────────────
     auto get_pos = [&](const Node& node) -> std::array<float,3> {

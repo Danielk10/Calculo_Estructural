@@ -450,12 +450,7 @@ public class StructuralFragment extends Fragment {
         tvBadge.setText(String.format(java.util.Locale.US, "Node #%d", node.id));
         tvCoords.setText(String.format(java.util.Locale.US, "Coordinates: X = %.2f m, Y = %.2f m", node.x, node.y));
 
-        String[] supportOptions = new String[]{
-                "FREE (Unconstrained)",
-                "FIXED (Encaster SPC 1-6)",
-                "PINNED (Hinged SPC 1-3)",
-                "ROLLER (Sliding Base SPC 2)"
-        };
+        String[] supportOptions = getResources().getStringArray(R.array.support_options);
         ArrayAdapter<String> supportAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_spinner_compact, supportOptions);
         supportAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown_compact);
         spSupport.setAdapter(supportAdapter);
@@ -511,9 +506,9 @@ public class StructuralFragment extends Fragment {
                     binding.gridEditorView.assignPointLoadWithMoment(node.id, fx * 1000.0, fy * 1000.0, 0.0, mz * 1000.0);
                     Toast.makeText(requireContext(), String.format(java.util.Locale.US, "Node #%d: Updated (Fx=%.1f kN, Fy=%.1f kN, Mz=%.2f kN·m)", node.id, fx, fy, mz), Toast.LENGTH_SHORT).show();
                 })
-                .setNeutralButton("Clear Load", (dialog, which) -> {
+                .setNeutralButton(R.string.clear, (dialog, which) -> {
                     binding.gridEditorView.assignPointLoad(node.id, 0.0, 0.0, 0.0);
-                    Toast.makeText(requireContext(), "Applied load cleared", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.toast_load_cleared, Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
@@ -822,7 +817,7 @@ public class StructuralFragment extends Fragment {
 
         new MaterialAlertDialogBuilder(requireContext())
                 .setView(dialogView)
-                .setPositiveButton("Add Material", (dialog, which) -> {
+                .setPositiveButton(R.string.apply, (dialog, which) -> {
                     String name = "";
                     double E = 0, nu = 0, rho = 0, fy = 0, fc = 0;
                     try { if (etName != null && etName.getText() != null) name = etName.getText().toString().trim(); } catch (Exception ignored) {}
@@ -833,7 +828,7 @@ public class StructuralFragment extends Fragment {
                     try { if (etFc != null && etFc.getText() != null && etFc.getText().length() > 0) fc = Double.parseDouble(etFc.getText().toString()); } catch (Exception ignored) {}
 
                     if (name.isEmpty() || E <= 0) {
-                        Toast.makeText(requireContext(), "Material name and E are required", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), R.string.toast_material_name_required, Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -938,7 +933,7 @@ public class StructuralFragment extends Fragment {
     public void exportReactionsReport() {
         if (currentModel == null || currentResult == null) {
             if (getContext() != null)
-                Toast.makeText(getContext(), "Run analysis first to view reactions", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.toast_run_analysis_first, Toast.LENGTH_SHORT).show();
             return;
         }
         com.diamon.civil.structural.engine.FrameAnalysisEngine.AnalysisOutput engineOutput =
@@ -947,7 +942,7 @@ public class StructuralFragment extends Fragment {
         logger.log(reportStr);
         copyToClipboard(reportStr);
         if (getContext() != null) {
-            Toast.makeText(getContext(), "Reactions report copied to clipboard & logged", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), R.string.toast_reactions_copied, Toast.LENGTH_LONG).show();
         }
     }
 

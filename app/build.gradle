@@ -12,7 +12,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    // Redirigir la carpeta build a /tmp
+    // Redirect build directory to /tmp
     project.layout.buildDirectory.set(file("/tmp/calculoestructural_build"))
 
     namespace 'com.diamon.civil'
@@ -24,8 +24,8 @@ android {
         applicationId "com.diamon.civil"
         minSdk 24
         targetSdk 37
-        versionCode 5
-        versionName "0.5.0"
+        versionCode 1
+        versionName "0.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndkVersion "30.0.14904198"
