@@ -26,6 +26,9 @@
     <string name="privacy_policy_title">Privacy Policy</string>
     <string name="privacy_policy_error">Unable to load Privacy Policy. Please check your internet connection.</string>
     <string name="retry">Retry</string>
+    <string name="menu_disclaimer">Disclaimer / Educational Use</string>
+    <string name="disclaimer_dialog_title">Educational Use &amp; Disclaimer</string>
+    <string name="disclaimer_dialog_message"><![CDATA[<b>EDUCATIONAL &amp; PRELIMINARY USE ONLY</b><br/><br/>This application is intended strictly for <b>educational purposes, academic learning, and rapid preliminary engineering estimations</b>.<br/><br/><b>CRITICAL LEGAL DISCLAIMER:</b><br/>Under no circumstances may any calculation, FEA simulation result, stress/force diagram, or exported calculation report be used for the engineering design, final validation, formal sign-off, or construction of real-world projects or infrastructure.<br/><br/>The developer assumes no civil, technical, or legal liability for decisions made or structures built using results from this application. Real-world engineering projects must always be designed and certified by licensed professional engineers using certified tools and official building codes.]]></string>
 
     <string name="about_dialog_title">About Structural Analysis FEA 3D</string>
     <string name="about_dialog_message"><![CDATA[<b>Structural Analysis FEA 3D v0.1.0</b><br/><br/>High-performance 3D Solid &amp; Frame Finite Element Analysis (FEA) platform for Android.<br/>Powered by CalculiX (CCX 2.23), Gmsh 3D mesh generator (v5.0.0), and OpenCASCADE Technology (OCCT 8.0.0.p1).<br/><br/><b>Lead Developer:</b> Daniel Diamon<br/><b>License:</b> GNU General Public License v3.0 (GPLv3)<br/><b>Repository:</b> <a href="https://github.com/Danielk10/Calculo_Estructural">GitHub Repository</a>]]></string>
@@ -43,16 +46,16 @@
     <string name="label_material">Material Specification</string>
     <string name="label_cross_section">Cross-Section Profile</string>
     <string name="grid_stats_format">%1$d Nodes | %2$d Elements</string>
-    <string name="btn_mode_draw">✏ Draw</string>
-    <string name="btn_mode_pan">✋ Pan View</string>
-    <string name="btn_mode_move_nodes">✥ Move Nodes</string>
-    <string name="btn_mode_inspect">🔍 Select / Info</string>
-    <string name="btn_mode_support">⏏ Support</string>
-    <string name="btn_mode_load">⬇ Load</string>
-    <string name="btn_mode_delete">🗑 Delete</string>
-    <string name="btn_mode_undo">↶ Undo</string>
-    <string name="btn_mode_clear">✕ Clear</string>
-    <string name="btn_mode_custom_material">+ Material</string>
+    <string name="btn_mode_inspect">Select</string>
+    <string name="btn_mode_draw">Draw</string>
+    <string name="btn_mode_move_nodes">Move</string>
+    <string name="btn_mode_pan">Pan</string>
+    <string name="btn_mode_support">Support</string>
+    <string name="btn_mode_load">Load</string>
+    <string name="btn_mode_custom_material">Material</string>
+    <string name="btn_mode_delete">Delete</string>
+    <string name="btn_mode_undo">Undo</string>
+    <string name="btn_mode_clear">Clear</string>
     <string name="tv_component_info_hint">Select any node, member, or panel to inspect technical properties</string>
     <string name="label_preset_template">Engineering Preset / Benchmark:</string>
     <string name="btn_run_fea_solver">EXECUTE FEA SOLVER</string>
@@ -80,8 +83,7 @@
     <string name="btn_boolean_union">Union ∪</string>
     <string name="btn_boolean_cut">Cut ∖</string>
     <string name="btn_boolean_intersect">Intersect ∩</string>
-    <string name="btn_import_cad">📁 Import</string>
-    <string name="btn_load_benchmark">⚡ Benchmark</string>
+    <string name="btn_import_cad">📁 Import CAD (STEP, IGES, BREP)</string>
     <string name="label_mesh_density">Mesh Refinement Density: Level 3 / 5 (Medium - ~20mm)</string>
     <string name="mesh_density_format">Mesh Refinement Density: Level %1$d / 5 (%2$s)</string>
     <string name="density_coarse">Coarse - ~50mm</string>

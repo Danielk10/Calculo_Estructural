@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="176dp"
-    android:background="#1E1E24"
+    android:background="@drawable/nav_header_bg"
     android:gravity="bottom"
     android:orientation="vertical"
     android:padding="16dp"
@@ -11,17 +11,24 @@
     <ImageView
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:src="@drawable/ic_app_logo" />
+        android:contentDescription="@string/app_name"
+        android:src="@mipmap/ic_launcher" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp"
+        android:paddingTop="10dp"
         android:text="@string/app_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="#FFFFFF"
+        android:textSize="15sp"
         android:textStyle="bold" />
 
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Finite Element Analysis 3D"
+        android:textColor="#94A3B8"
+        android:textSize="11.5sp" />
 
 </LinearLayout>

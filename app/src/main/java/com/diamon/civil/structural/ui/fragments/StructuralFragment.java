@@ -49,6 +49,7 @@ public class StructuralFragment extends Fragment {
 
     private StructuralBeamDatParser.ParseResult currentResult;
     private float currentDispScale = 1000f;
+    private final List<StructuralModel.CustomMaterial> customMaterialsList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -154,6 +155,34 @@ public class StructuralFragment extends Fragment {
                 }
                 @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
             });
+
+            binding.spinnerStructureType.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                    if (binding == null) return;
+                    if (position == 3) { // Truss Framework
+                        if (binding.spinnerElementTypeStructural.getSelectedItemPosition() != 4) {
+                            binding.spinnerElementTypeStructural.setSelection(4);
+                        }
+                    } else if (binding.spinnerElementTypeStructural.getSelectedItemPosition() == 4) {
+                        binding.spinnerElementTypeStructural.setSelection(0);
+                    }
+                }
+                @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+            });
+
+            binding.spinnerElementTypeStructural.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                    if (binding == null) return;
+                    if (position == 4) { // Truss Member
+                        if (binding.spinnerStructureType.getSelectedItemPosition() != 3) {
+                            binding.spinnerStructureType.setSelection(3);
+                        }
+                    }
+                }
+                @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+            });
         } catch (Exception e) {
             logger.error("Failed to load databases: " + e.getMessage());
         }
@@ -165,14 +194,22 @@ public class StructuralFragment extends Fragment {
     public void loadModel(StructuralModel model) {
         if (model == null) return;
         currentModel = model;
+        if (model.customMaterials != null && !model.customMaterials.isEmpty()) {
+            customMaterialsList.clear();
+            customMaterialsList.addAll(model.customMaterials);
+            if (materialDatabase != null) {
+                materialDatabase.loadCustomMaterials(model.customMaterials);
+            }
+        }
         if (binding != null) {
             if (binding.gridEditorView != null) {
-                binding.gridEditorView.setModel(model.nodes, model.elements);
+                binding.gridEditorView.setModel(model);
             }
             if (binding.frameGLView != null) {
                 binding.frameGLView.setModel(model);
             }
-            logger.info("Loaded structural model: " + model.nodes.size() + " nodes, " + model.elements.size() + " elements");
+            int pCount = model.panels != null ? model.panels.size() : 0;
+            logger.info("Loaded structural model: " + model.nodes.size() + " nodes, " + model.elements.size() + " elements, " + pCount + " panels");
         }
     }
 
@@ -198,10 +235,7 @@ public class StructuralFragment extends Fragment {
                     if (currentModel != null) {
                         binding.frameGLView.setModel(currentModel);
                     } else if (binding.gridEditorView != null) {
-                        StructuralModel tempModel = new StructuralModel();
-                        tempModel.nodes.addAll(binding.gridEditorView.getNodes());
-                        tempModel.elements.addAll(binding.gridEditorView.getElements());
-                        binding.frameGLView.setModel(tempModel);
+                        binding.frameGLView.setModel(binding.gridEditorView.getStructuralModel());
                     }
                     binding.frameGLView.requestRender();
                 }
@@ -308,39 +342,63 @@ public class StructuralFragment extends Fragment {
                 switch (position) {
                     case 0:
                         binding.gridEditorView.loadPresetPortalFrame(4.0, 3.0);
+                        binding.spinnerStructureType.setSelection(0);
+                        binding.spinnerElementTypeStructural.setSelection(0);
                         break;
                     case 1:
                         binding.gridEditorView.loadPresetTwoBayFrame(4.0, 3.0);
+                        binding.spinnerStructureType.setSelection(0);
+                        binding.spinnerElementTypeStructural.setSelection(0);
                         break;
                     case 2:
                         binding.gridEditorView.loadPresetContinuousBeam(3.0);
+                        binding.spinnerStructureType.setSelection(2);
+                        binding.spinnerElementTypeStructural.setSelection(0);
                         break;
                     case 3:
                         binding.gridEditorView.loadPresetPitchedTruss(6.0, 3.0, 4.5);
+                        binding.spinnerStructureType.setSelection(3);
+                        binding.spinnerElementTypeStructural.setSelection(4);
                         break;
                     case 4:
                         binding.gridEditorView.loadPresetOverhangingBeam(4.0, 2.0);
+                        binding.spinnerStructureType.setSelection(1);
+                        binding.spinnerElementTypeStructural.setSelection(0);
                         break;
                     case 5:
                         binding.gridEditorView.loadPresetThreeStoryBuilding(3.0, 3.0);
+                        binding.spinnerStructureType.setSelection(0);
+                        binding.spinnerElementTypeStructural.setSelection(0);
                         break;
                     case 6:
                         binding.gridEditorView.loadPresetWarrenTrussBridge(12.0, 3.0);
+                        binding.spinnerStructureType.setSelection(3);
+                        binding.spinnerElementTypeStructural.setSelection(4);
                         break;
                     case 7:
                         binding.gridEditorView.loadPresetConcreteContinuousBeam(4.0, 3.0, 2.0);
+                        binding.spinnerStructureType.setSelection(2);
+                        binding.spinnerElementTypeStructural.setSelection(0);
                         break;
                     case 8:
                         binding.gridEditorView.loadPresetPrattTruss(10.0, 2.5);
+                        binding.spinnerStructureType.setSelection(3);
+                        binding.spinnerElementTypeStructural.setSelection(4);
                         break;
                     case 9:
                         binding.gridEditorView.loadPresetCantileverBracket(4.0, 3.0);
+                        binding.spinnerStructureType.setSelection(1);
+                        binding.spinnerElementTypeStructural.setSelection(0);
                         break;
                     case 10:
                         binding.gridEditorView.loadPresetConcreteSlabPlate(4.0, 4.0, 0.15);
+                        binding.spinnerStructureType.setSelection(0);
+                        binding.spinnerElementTypeStructural.setSelection(2);
                         break;
                     case 11:
                         binding.gridEditorView.loadPresetShearWall(3.0, 3.0, 0.20);
+                        binding.spinnerStructureType.setSelection(0);
+                        binding.spinnerElementTypeStructural.setSelection(3);
                         break;
                 }
             }
@@ -870,13 +928,18 @@ public class StructuralFragment extends Fragment {
                     }
 
                     // Add to MaterialDatabase
+                    final String customName = name;
                     if (materialDatabase != null) {
-                        materialDatabase.addCustomMaterial(name, E, nu, rho, fy, fc);
+                        materialDatabase.addCustomMaterial(customName, E, nu, rho, fy, fc);
                     }
 
-                    // Also store in the StructuralModel for persistence
+                    // Also store in customMaterialsList and StructuralModel for persistence
+                    StructuralModel.CustomMaterial customMat = new StructuralModel.CustomMaterial(customName, E, nu, rho, fy, fc);
+                    customMaterialsList.removeIf(cm -> cm.name.equalsIgnoreCase(customName));
+                    customMaterialsList.add(customMat);
                     if (currentModel != null) {
-                        currentModel.customMaterials.add(new StructuralModel.CustomMaterial(name, E, nu, rho, fy, fc));
+                        currentModel.customMaterials.removeIf(cm -> cm.name.equalsIgnoreCase(customName));
+                        currentModel.customMaterials.add(customMat);
                     }
 
                     // Update material spinners
@@ -1063,13 +1126,42 @@ public class StructuralFragment extends Fragment {
 
         
         final String structureType = binding.spinnerStructureType.getSelectedItem().toString();
+        final String elemTypeStr = binding.spinnerElementTypeStructural.getSelectedItem() != null ?
+                binding.spinnerElementTypeStructural.getSelectedItem().toString() : "Euler-Bernoulli / Timoshenko Beam";
         
         String matName = binding.spinnerMaterialStructural.getSelectedItem() != null ? binding.spinnerMaterialStructural.getSelectedItem().toString() : "Steel";
         String secName = binding.spinnerSectionStructural.getSelectedItem() != null ? binding.spinnerSectionStructural.getSelectedItem().toString() : "HEB200";
 
-
         StructuralModel uiModel = binding.gridEditorView != null ?
                 binding.gridEditorView.getStructuralModel() : new StructuralModel();
+
+        uiModel.customMaterials.clear();
+        uiModel.customMaterials.addAll(customMaterialsList);
+
+        final boolean isTrussSystem = structureType.toLowerCase(java.util.Locale.US).contains("truss") ||
+                elemTypeStr.toLowerCase(java.util.Locale.US).contains("truss");
+
+        for (StructuralModel.Element e : uiModel.elements) {
+            if (e.sectionName == null || e.sectionName.trim().isEmpty()) {
+                e.sectionName = secName;
+            }
+            if (e.materialName == null || e.materialName.trim().isEmpty()) {
+                e.materialName = matName;
+            }
+            if (isTrussSystem) {
+                if (e.releaseStart == null) e.releaseStart = new StructuralModel.EndRelease();
+                e.releaseStart.m33Released = true;
+                e.releaseStart.m33Stiffness = 0.0;
+                if (e.releaseEnd == null) e.releaseEnd = new StructuralModel.EndRelease();
+                e.releaseEnd.m33Released = true;
+                e.releaseEnd.m33Stiffness = 0.0;
+            }
+        }
+        for (StructuralModel.Panel p : uiModel.panels) {
+            if (p.materialName == null || p.materialName.trim().isEmpty()) {
+                p.materialName = matName;
+            }
+        }
 
         if (uiModel.nodes.isEmpty() || (uiModel.elements.isEmpty() && uiModel.panels.isEmpty())) {
             Toast.makeText(getContext(), R.string.toast_define_nodes_first, Toast.LENGTH_SHORT).show();

@@ -18,13 +18,17 @@
     <item android:title="@string/menu_support_tools">
         <menu>
             <item
-                android:id="@+id/nav_privacy_policy"
-                android:icon="@android:drawable/ic_menu_agenda"
-                android:title="@string/menu_privacy_policy" />
-            <item
                 android:id="@+id/nav_docs"
                 android:icon="@android:drawable/ic_menu_help"
                 android:title="@string/menu_documentation" />
+            <item
+                android:id="@+id/nav_disclaimer"
+                android:icon="@drawable/ic_disclaimer"
+                android:title="@string/menu_disclaimer" />
+            <item
+                android:id="@+id/nav_privacy_policy"
+                android:icon="@drawable/ic_privacy_policy"
+                android:title="@string/menu_privacy_policy" />
             <item
                 android:id="@+id/nav_about"
                 android:icon="@android:drawable/ic_menu_info_details"

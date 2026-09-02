@@ -1,0 +1,286 @@
+<resources>
+    <!-- Application & General -->
+    <string name="app_name">Structural Analysis FEA 3D</string>
+    <string name="loading_engine">Inicializando motor del solver FEA...</string>
+    <string name="deploying_engine">Implementando recursos de tiempo de ejecución FEM...</string>
+    <string name="initializing_native_modules">Inicializando módulos nativos...</string>
+    <string name="engine_failure_assets">Error de motor: No se pudieron desplegar los recursos de ejecución.</string>
+    <string name="close">Cerrar</string>
+    <string name="ok">Aceptar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="apply">Aplicar</string>
+    <string name="clear">Limpiar</string>
+
+    <!-- Navigation Drawer & Menus -->
+    <string name="menu_structural_analysis">Cálculo Estructural</string>
+    <string name="menu_solid_analysis">Análisis de Sólidos 3D</string>
+    <string name="menu_advanced_terminal">Terminal Avanzada</string>
+    <string name="menu_support_tools">Herramientas y Soporte</string>
+    <string name="menu_documentation">Manual Teórico y Documentación</string>
+    <string name="menu_about">Acerca de</string>
+    <string name="menu_import_inp">Importar INP</string>
+    <string name="menu_export_pdf">Exportar Memoria de Cálculo en PDF</string>
+    <string name="menu_export_all">Exportar Todos los Artefactos</string>
+    <string name="menu_about_licenses">Acerca de / Licencias</string>
+    <string name="menu_privacy_policy">Políticas de Privacidad</string>
+    <string name="privacy_policy_title">Políticas de Privacidad</string>
+    <string name="privacy_policy_error">No se pudo cargar la política de privacidad. Verifique su conexión a internet.</string>
+    <string name="retry">Reintentar</string>
+    <string name="menu_disclaimer">Aviso Legal / Fines Educativos</string>
+    <string name="disclaimer_dialog_title">Uso Educativo y Descargo de Responsabilidad</string>
+    <string name="disclaimer_dialog_message"><![CDATA[<b>EXCLUSIVAMENTE PARA FINES EDUCATIVOS Y CÁLCULOS RÁPIDOS</b><br/><br/>Esta aplicación ha sido diseñada exclusivamente para <b>fines educativos, académicos y cálculos rápidos de predimensionamiento o verificación preliminar</b>.<br/><br/><b>AVISO LEGAL IMPORTANTE:</b><br/>Bajo ninguna circunstancia ningún cálculo, resultado de simulación por elementos finitos (FEA), diagrama de esfuerzos ni reporte generado por esta aplicación se puede tomar, utilizar ni certificar para el diseño, cálculo ejecutivo, firma ni construcción de proyectos u obras reales de ingeniería civil, estructural o mecánica.<br/><br/>El desarrollador no asume ninguna responsabilidad civil, técnica ni legal por el uso de estos resultados en obras de ingeniería del mundo real. Para proyectos reales, consulte siempre a ingenieros colegiados y utilice normativas oficiales y software profesional certificado.]]></string>
+
+    <string name="about_dialog_title">Acerca de Structural Analysis FEA 3D</string>
+    <string name="about_dialog_message"><![CDATA[<b>Structural Analysis FEA 3D v0.1.0</b><br/><br/>Plataforma de alto rendimiento para Análisis por Elementos Finitos (FEA) de Sólidos y Estructuras 3D en Android.<br/>Impulsado por CalculiX (CCX 2.23), generador de mallas 3D Gmsh (v5.0.0) y OpenCASCADE Technology (OCCT 8.0.0.p1).<br/><br/><b>Desarrollador Principal:</b> Daniel Diamon<br/><b>Licencia:</b> GNU General Public License v3.0 (GPLv3)<br/><b>Repositorio:</b> <a href="https://github.com/Danielk10/Calculo_Estructural">Repositorio en GitHub</a>]]></string>
+    <string name="licenses_dialog_title">Acerca de y Licencias</string>
+    <string name="licenses_dialog_message"><![CDATA[<b>Structural Analysis FEA 3D v0.1.0</b><br/><br/>Plataforma de alto rendimiento para Análisis por Elementos Finitos (FEA) de Sólidos y Estructuras 3D en Android.<br/>Impulsado por CalculiX (CCX 2.23), generador de mallas 3D Gmsh (v5.0.0) y OpenCASCADE Technology (OCCT 8.0.0.p1).<br/><br/><b>Desarrollador Principal:</b> Daniel Diamon<br/><b>Licencia:</b> GNU General Public License v3.0 (GPLv3)<br/><b>Repositorio:</b> <a href="https://github.com/Danielk10/Calculo_Estructural">Repositorio en GitHub</a><br/><br/><b>Componentes Científicos de Código Abierto Integrados:</b><br/>• <b>CalculiX (CCX 2.23):</b> GNU GPL (Guido Dhondt)<br/>  <a href="http://www.calculix.de">CalculiX Oficial</a><br/>• <b>Gmsh (v5.0.0):</b> GNU GPL v2.0+ (C. Geuzaine, J.-F. Remacle)<br/>  <a href="https://gmsh.info">Gmsh Oficial</a><br/>• <b>OpenCASCADE Technology (OCCT 8.0.0.p1):</b> GNU LGPL v2.1<br/>  <a href="https://dev.opencascade.org">Portal OpenCASCADE</a> | <a href="https://github.com/Open-CASCADE-Technology/OCCT">OCCT GitHub</a><br/>• <b>SPOOLES (v2.2 MT):</b> Dominio Público (C. Ashcraft, J. Liu)<br/>  <a href="https://www.netlib.org/linalg/spooles/spooles.2.2.html">Netlib SPOOLES</a><br/>• <b>ARPACK-NG:</b> BSD 3-Clause<br/>  <a href="https://github.com/opencollab/arpack-ng">arpack-ng GitHub</a><br/>• <b>OpenBLAS / LAPACK:</b> BSD 3-Clause<br/>  <a href="https://github.com/OpenMathLib/OpenBLAS">OpenBLAS GitHub</a> | <a href="https://www.netlib.org/lapack/">LAPACK Netlib</a><br/>• <b>SceneView / Filament:</b> Licencia Apache 2.0<br/>  <a href="https://github.com/SceneView/sceneview-android">SceneView Android</a> | <a href="https://github.com/google/filament">Filament GitHub</a><br/>• <b>iText 7 Core (v7.2.5):</b> AGPL v3.0<br/>  <a href="https://github.com/itext/itext7">iText7 GitHub</a><br/>• <b>GCC Fortran Runtime:</b> GNU GPL v3.0+<br/>  <a href="https://gcc.gnu.org">GCC Oficial</a>]]></string>
+
+    <!-- Navigation & Tabs -->
+    <string name="tab_parameters">PARÁMETROS</string>
+    <string name="tab_viewer_3d">VISOR 3D</string>
+    <string name="tab_solver_log">REGISTRO DEL SOLVER</string>
+
+    <!-- Structural Analysis Module -->
+    <string name="label_structure_type">Tipo de Sistema Estructural</string>
+    <string name="label_element_type">Formulación de Elementos Finitos</string>
+    <string name="label_material">Especificación de Material</string>
+    <string name="label_cross_section">Perfil de Sección Transversal</string>
+    <string name="grid_stats_format">%1$d Nodos | %2$d Elementos</string>
+    <string name="btn_mode_inspect">Seleccionar</string>
+    <string name="btn_mode_draw">Dibujar</string>
+    <string name="btn_mode_move_nodes">Mover</string>
+    <string name="btn_mode_pan">Desplazar</string>
+    <string name="btn_mode_support">Apoyo</string>
+    <string name="btn_mode_load">Carga</string>
+    <string name="btn_mode_custom_material">Material</string>
+    <string name="btn_mode_delete">Eliminar</string>
+    <string name="btn_mode_undo">Deshacer</string>
+    <string name="btn_mode_clear">Limpiar</string>
+    <string name="tv_component_info_hint">Seleccione un nodo, barra o panel para inspeccionar sus propiedades técnicas</string>
+    <string name="label_preset_template">Ejemplo Predefinido / Benchmark:</string>
+    <string name="btn_run_fea_solver">EJECUTAR SOLVER FEA</string>
+    <string name="btn_solving_fea">RESOLVIENDO CON CALCULIX (CCX)...</string>
+    <string name="label_deformation_scale">Escala de Deformación: 1.0x</string>
+    <string name="deformation_scale_format">Escala de Deformación: %.1fx</string>
+    <string name="btn_view_wireframe">Geometría</string>
+    <string name="btn_view_deformed">Deformada (U)</string>
+    <string name="btn_view_moment">Momento Flector (M33)</string>
+    <string name="btn_view_shear">Fuerza Cortante (V22)</string>
+    <string name="btn_view_axial">Fuerza Axial (N)</string>
+    <string name="btn_reset_viewport">Centrar Vista</string>
+
+    <!-- 3D Solid Module -->
+    <string name="label_active_cad_geometry">Modelo CAD Activo:</string>
+    <string name="btn_delete_model">Eliminar Modelo Activo</string>
+    <string name="dialog_delete_model_title">Eliminar Modelo CAD</string>
+    <string name="dialog_delete_model_msg">¿Está seguro de que desea eliminar \'%1$s\' del espacio de trabajo?</string>
+    <string name="btn_primitive_box">+ Caja</string>
+    <string name="btn_primitive_cylinder">+ Cilindro</string>
+    <string name="btn_primitive_sphere">+ Esfera</string>
+    <string name="btn_apply_fillet">Filete</string>
+    <string name="btn_apply_chamfer">Chaflán</string>
+    <string name="btn_extrude_face">Extruir</string>
+    <string name="btn_boolean_union">Unión ∪</string>
+    <string name="btn_boolean_cut">Corte ∖</string>
+    <string name="btn_boolean_intersect">Intersección ∩</string>
+    <string name="btn_import_cad">📁 Importar CAD (STEP, IGES, BREP)</string>
+    <string name="label_mesh_density">Densidad de Malla: Nivel 3 / 5 (Media - ~20mm)</string>
+    <string name="mesh_density_format">Densidad de Malla: Nivel %1$d / 5 (%2$s)</string>
+    <string name="density_coarse">Gruesa - ~50mm</string>
+    <string name="density_medium_coarse">Media-Gruesa - ~30mm</string>
+    <string name="density_medium">Media - ~20mm</string>
+    <string name="density_fine">Fina - ~10mm</string>
+    <string name="density_ultra_fine">Ultra-Fina - ~5mm</string>
+    <string name="label_young_modulus_short">E (MPa)</string>
+    <string name="label_fixed_support_region">Región de Apoyo Fijo (SPC 1-3):</string>
+    <string name="label_load_application_region">Región de Aplicación de Carga (Cara Cargada):</string>
+    <string name="label_load_direction">Dirección del Vector de Fuerza:</string>
+    <string name="label_load_magnitude">Magnitud de Fuerza Total (N):</string>
+    <string name="btn_reset_view">Centrar Vista</string>
+    <string name="btn_reload_mesh">Recargar Malla</string>
+
+    <!-- Boolean Dialog -->
+    <string name="dialog_boolean_title">Operación Booleana: %1$s</string>
+    <string name="dialog_boolean_solid_a">Seleccionar Sólido A (Objetivo):</string>
+    <string name="dialog_boolean_solid_b">Seleccionar Sólido B (Herramienta):</string>
+
+    <!-- Boundary Dialog -->
+    <string name="dialog_boundary_title">Aplicar Condición de Borde</string>
+    <string name="dialog_boundary_selected_default">Seleccionado: Cara / Nodo</string>
+    <string name="btn_fixed_support">APOYO FIJO (SPC 1-6)</string>
+    <string name="btn_apply_pressure_load">APLICAR PRESIÓN / CARGA (DLOAD)</string>
+    <string name="hint_load_value">Magnitud de Carga (N o MPa)</string>
+
+    <!-- Dialogs for Structural System -->
+    <string name="dialog_node_load_title">Condiciones de Apoyo y Cargas en Nudo</string>
+    <string name="label_boundary_support_spc">Restricción de Apoyo (SPC)</string>
+    <string name="label_applied_point_loads">Cargas Puntuales Concentradas</string>
+    <string name="hint_force_fx">Fuerza Horizontal Fx (kN)</string>
+    <string name="hint_force_fy">Fuerza Vertical Fy (kN) [negativo = gravedad]</string>
+    <string name="hint_moment_mz">Momento Aplicado Mz (kN·m) [+ = antihorario]</string>
+    <string name="dialog_custom_material_title">Definición de Material Personalizado</string>
+    <string name="badge_custom">Personalizado</string>
+    <string name="hint_mat_name">Nombre del Material</string>
+    <string name="hint_mat_young">Módulo de Young E (MPa)</string>
+    <string name="hint_mat_poisson">Coeficiente de Poisson ν</string>
+    <string name="hint_mat_density">Densidad ρ (kg/m³)</string>
+    <string name="hint_mat_yield">Límite Elástico Fy (MPa)</string>
+    <string name="hint_mat_fc">Resistencia a Compresión f\'c (MPa)</string>
+    <string name="dialog_member_props_title">Propiedades de la Barra</string>
+    <string name="label_end_releases">Liberaciones en Extremos (Rótulas)</string>
+    <string name="hint_end_releases_desc">Por defecto: Continuo (Rígido). Active para liberar GL o definir rigidez parcial.</string>
+    <string name="label_start_node_i">Nodo Inicial (Extremo I)</string>
+    <string name="label_end_node_j">Nodo Final (Extremo J)</string>
+    <string name="label_stiffness_start_hint">Rigidez Rotacional Extremo I Kθ (kN·m/rad) [0 = articulado, vacío = libre]</string>
+    <string name="label_stiffness_end_hint">Rigidez Rotacional Extremo J Kθ (kN·m/rad) [0 = articulado, vacío = libre]</string>
+    <string name="hint_stiffness_default">0 = Articulado | 5000 = Semi-rígido</string>
+    <string name="label_element_loads">Cargas en Elemento</string>
+    <string name="label_dist_load_section">Carga Distribuida (Variable / Longitud Parcial)</string>
+    <string name="hint_dist_start_pos">Pos. inicial (0-1)</string>
+    <string name="hint_dist_end_pos">Pos. final (0-1)</string>
+    <string name="hint_dist_w1">w₁ (kN/m)</string>
+    <string name="hint_dist_w2">w₂ (kN/m)</string>
+    <string name="label_point_load_span">Carga Puntual Concentrada en Tramo</string>
+    <string name="hint_point_pos">Posición (0-1)</string>
+    <string name="hint_point_fy">Fy (kN)</string>
+    <string name="hint_point_fx">Fx (kN)</string>
+    <string name="hint_point_mz">Mz (kN·m)</string>
+
+    <!-- Terminal Module -->
+    <string name="terminal_prompt">fea@sistema:~$</string>
+    <string name="terminal_hint">Ingrese comando FEA, script o prueba...</string>
+    <string name="terminal_cd_history_prev">Comando anterior</string>
+    <string name="terminal_cd_history_next">Comando siguiente</string>
+    <string name="terminal_cd_abort">Abortar proceso en ejecución</string>
+    <string name="terminal_cd_copy">Copiar registro de terminal</string>
+    <string name="terminal_cd_send">Ejecutar comando</string>
+    <string name="terminal_copied_toast">Registro copiado al portapapeles</string>
+    <string name="terminal_process_aborted">\n[PROCESO ABORTADO POR EL USUARIO]\n</string>
+
+    <!-- Toast & Feedback Messages -->
+    <string name="toast_cad_imported">Geometría CAD importada correctamente: %1$s</string>
+    <string name="toast_only_inp_supported">Solo se admiten archivos de malla INP (*.inp) para importar</string>
+    <string name="toast_inp_imported_terminal">Archivo INP importado al espacio de trabajo de la Terminal: %1$s</string>
+    <string name="toast_inp_imported_solid">Malla INP sólida importada al espacio de trabajo 3D: %1$s</string>
+    <string name="toast_inp_imported_structural">INP de estructura importado: %1$d nodos, %2$d elementos</string>
+    <string name="toast_primitive_created">%1$s creado con éxito</string>
+    <string name="toast_primitive_failed">Error al crear %1$s</string>
+    <string name="toast_no_active_geometry">No hay geometría activa cargada</string>
+    <string name="toast_sphere_no_edges">No aplicable: La esfera es una superficie continua sin aristas vivas para %1$s.</string>
+    <string name="toast_operation_applied">%1$s aplicado con éxito</string>
+    <string name="toast_operation_failed_detail">No aplicable: %1$s requiere aristas vivas que intersecten con espesor suficiente.</string>
+    <string name="toast_boolean_min_files">No aplicable: Cree o importe al menos 2 archivos CAD (.brep / .step) primero para operaciones booleanas.</string>
+    <string name="toast_boolean_distinct">El Sólido A y el Sólido B deben ser entidades diferentes</string>
+    <string name="toast_boolean_non_manifold">Operación booleana %1$s no aplicable: Las formas no intersectan en el espacio 3D o tienen bordes no múltiples.</string>
+    <string name="toast_engine_not_ready">El motor de análisis no está listo</string>
+    <string name="toast_select_element_type">Por favor seleccione un tipo de elemento</string>
+    <string name="toast_test_case_loaded">Caso de prueba benchmark cargado</string>
+    <string name="toast_view_centered">Vista centrada</string>
+    <string name="toast_model_reloaded">Modelo recargado en el visor</string>
+    <string name="toast_copied_to_clipboard">Copiado al portapapeles</string>
+    <string name="toast_pdf_exported">Memoria de cálculo en PDF exportada a Descargas</string>
+    <string name="toast_no_report_to_export">No hay reporte de simulación disponible para exportar</string>
+    <string name="toast_pdf_export_failed">Error al exportar la memoria de cálculo en PDF</string>
+    <string name="toast_browser_open_error">No se pudo abrir el navegador web</string>
+    <string name="toast_unsupported_cad_format">Formato CAD no compatible: %1$s. Formatos admitidos: STEP (*.step, *.stp), IGES (*.iges, *.igs), BREP (*.brep), GEO (*.geo).</string>
+    <string name="toast_import_failed">Error al importar el modelo: %1$s</string>
+    <string name="toast_no_active_module">No hay módulo FEA activo disponible para exportar</string>
+    <string name="toast_export_all_success">Exportados %1$d elementos a Descargas/Structural_Analysis_FEA_3D/%2$s</string>
+    <string name="toast_simulation_complete">Simulación FEA Completada</string>
+    <string name="toast_model_deleted">Modelo eliminado: %1$s</string>
+    <string name="toast_no_model_to_delete">Ningún modelo seleccionado para eliminar</string>
+    <string name="toast_define_nodes_first">Por favor defina nodos y elementos estructurales en la cuadrícula</string>
+    <string name="toast_select_structure_type">Por favor seleccione un tipo de estructura válido</string>
+    <string name="toast_run_analysis_first">Por favor ejecute el solver FEA primero</string>
+    <string name="toast_material_name_required">El nombre del material y el módulo de Young (E) son obligatorios</string>
+    <string name="toast_load_cleared">Carga aplicada eliminada</string>
+    <string name="toast_reactions_copied">Reporte de reacciones copiado al portapapeles y registrado</string>
+    <string name="toast_inp_error">Error de ejecución INP: %1$s</string>
+
+    <!-- Geometry Spinner Names -->
+    <string name="geo_item_benchmark">Benchmark: Viga en Voladizo</string>
+    <string name="geo_item_box">Primitiva: Caja (10x10x10 mm)</string>
+    <string name="geo_item_cylinder">Primitiva: Cilindro (r=5, h=10 mm)</string>
+    <string name="geo_item_sphere">Primitiva: Esfera (r=5 mm)</string>
+    <string name="geo_item_fillet">Sólido con Filete (Filete r=1mm)</string>
+    <string name="geo_item_chamfer">Sólido con Chaflán (Chaflán 1mm)</string>
+    <string name="geo_item_extrude">Sólido Extruido (Extrusión 10mm)</string>
+    <string name="geo_item_union">Unión Booleana (Sólido Fusionado)</string>
+    <string name="geo_item_cut">Corte Booleano (Sólido Perforado)</string>
+    <string name="geo_item_intersect">Intersección Booleana (Volumen Común)</string>
+
+    <!-- String Arrays -->
+    <string-array name="support_options">
+        <item>LIBRE (Sin restricción)</item>
+        <item>EMPOTRADO (Restricción SPC 1-6)</item>
+        <item>ARTICULADO (Articulación SPC 1-3)</item>
+        <item>RODILLO (Apoyo Móvil SPC 2)</item>
+    </string-array>
+
+    <string-array name="element_types_solid">
+        <item>1er-Orden: C3D4 (Tetraedro Lineal de 4 Nodos)</item>
+        <item>1er-Orden: C3D8 (Hexaedro / Ladrillo Lineal de 8 Nodos)</item>
+        <item>1er-Orden: C3D8R (Hexaedro de Integración Reducida de 8 Nodos)</item>
+        <item>1er-Orden: C3D6 (Cuña / Prisma Lineal de 6 Nodos)</item>
+        <item>2do-Orden: C3D10 (Tetraedro Cuadrático de 10 Nodos)</item>
+        <item>2do-Orden: C3D20 (Hexaedro / Ladrillo Cuadrático de 20 Nodos)</item>
+        <item>2do-Orden: C3D20R (Hexaedro de Integración Reducida de 20 Nodos)</item>
+        <item>2do-Orden: C3D15 (Cuña / Prisma Cuadrático de 15 Nodos)</item>
+    </string-array>
+
+    <string-array name="solid_fixed_regions">
+        <item>Auto / Superficie Física (Fija / Eje Mayor)</item>
+        <item>Cara Extremo Izquierdo (X- Mín)</item>
+        <item>Cara Extremo Derecho (X+ Máx)</item>
+        <item>Cara Base Inferior (Y- Mín)</item>
+        <item>Cara Superior Techo (Y+ Máx)</item>
+        <item>Cara Posterior Fondo (Z- Mín)</item>
+        <item>Cara Frontal (Z+ Máx)</item>
+    </string-array>
+
+    <string-array name="solid_load_regions">
+        <item>Auto / Superficie Física (Cargada / Eje Mayor)</item>
+        <item>Cara Extremo Derecho (X+ Máx)</item>
+        <item>Cara Extremo Izquierdo (X- Mín)</item>
+        <item>Cara Superior Techo (Y+ Máx)</item>
+        <item>Cara Base Inferior (Y- Mín)</item>
+        <item>Cara Frontal (Z+ Máx)</item>
+        <item>Cara Posterior Fondo (Z- Mín)</item>
+    </string-array>
+
+    <string-array name="solid_load_directions">
+        <item>Vertical Y (Transversal / Gravedad GL 2)</item>
+        <item>Horizontal X (Axial GL 1)</item>
+        <item>Profundidad Lateral Z (Lateral GL 3)</item>
+    </string-array>
+
+    <string-array name="structure_types_structural">
+        <item>Pórtico Espacial / Plano 3D (Viga Cuadrática B32)</item>
+        <item>Viga en Voladizo 3D (Viga Lineal B31)</item>
+        <item>Sistema de Puente en Viga Continua (B32)</item>
+        <item>Estructura de Armadura / Cercha (Barra Axial T3D2)</item>
+    </string-array>
+
+    <string-array name="element_types_structural">
+        <item>Viga Euler-Bernoulli / Timoshenko</item>
+        <item>Elemento de Columna Axial</item>
+        <item>Losa / Diafragma de Piso</item>
+        <item>Elemento de Muro de Cortante</item>
+        <item>Elemento de Armadura en Tracción / Compresión</item>
+    </string-array>
+
+    <string-array name="structural_presets">
+        <item>Pórtico Plano 2D (4.0m x 3.0m)</item>
+        <item>Pórtico Industrial de Dos Vano (2 Tramos)</item>
+        <item>Viga Continua (3 Apoyos)</item>
+        <item>Armadura de Techo a Dos Aguas</item>
+        <item>Viga con Voladizo (4.0m + 2.0m)</item>
+        <item>Edificio de 3 Niveles (Patrón Sísmico)</item>
+        <item>Puente en Celosía Warren de 12m (Carga en Tablero)</item>
+        <item>Viga Continua de Hormigón (4m + 3m + 2m)</item>
+        <item>Armadura Plana Pratt (10.0m de Luz)</item>
+        <item>Ménsula en Voladizo (4.0m x 3.0m)</item>
+        <item>Losa / Placa de Hormigón 2D (Lámina S4R)</item>
+        <item>Muro de Cortante Armado 2D (Tensión Plana CPS4)</item>
+    </string-array>
+</resources>

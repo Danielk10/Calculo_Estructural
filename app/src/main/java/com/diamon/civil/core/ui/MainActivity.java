@@ -118,6 +118,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             switchFragment(new SolidFragment(), getString(R.string.menu_solid_analysis));
         } else if (id == R.id.nav_terminal) {
             switchFragment(new TerminalFragment(), getString(R.string.menu_advanced_terminal));
+        } else if (id == R.id.nav_disclaimer) {
+            showDisclaimerDialog();
         } else if (id == R.id.nav_privacy_policy) {
             startActivity(new Intent(this, PrivacyPolicyActivity.class));
         } else if (id == R.id.nav_docs) {
@@ -132,6 +134,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         binding.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showDisclaimerDialog() {
+        CharSequence message = HtmlCompat.fromHtml(getString(R.string.disclaimer_dialog_message), HtmlCompat.FROM_HTML_MODE_LEGACY);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.disclaimer_dialog_title)
+                .setMessage(message)
+                .setPositiveButton(R.string.ok, null)
+                .create();
+        dialog.show();
     }
 
     private void showAboutDialog() {
@@ -206,6 +218,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         } else if (id == R.id.action_licenses) {
             showLicensesDialog();
+            return true;
+        } else if (id == R.id.action_disclaimer) {
+            showDisclaimerDialog();
             return true;
         } else if (id == R.id.action_privacy_policy) {
             startActivity(new Intent(this, PrivacyPolicyActivity.class));

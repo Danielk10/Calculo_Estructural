@@ -192,7 +192,22 @@
                             android:orientation="horizontal"
                             android:gravity="center_vertical">
 
-                            <!-- Tool Mode Buttons -->
+                            <!-- 1. Selection & Inspection -->
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnModeInspect"
+                                android:layout_width="wrap_content"
+                                android:layout_height="34dp"
+                                android:text="@string/btn_mode_inspect"
+                                android:textSize="11sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:layout_marginEnd="4dp"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <!-- 2. Creation & Geometry -->
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnModeDraw"
                                 android:layout_width="wrap_content"
@@ -206,20 +221,6 @@
                                 android:layout_marginEnd="4dp"
                                 app:cornerRadius="6dp"
                                 style="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnModePan"
-                                android:layout_width="wrap_content"
-                                android:layout_height="34dp"
-                                android:text="@string/btn_mode_pan"
-                                android:textSize="11sp"
-                                android:insetTop="0dp"
-                                android:insetBottom="0dp"
-                                android:paddingStart="10dp"
-                                android:paddingEnd="10dp"
-                                android:layout_marginEnd="4dp"
-                                app:cornerRadius="6dp"
-                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnModeMoveNodes"
@@ -236,19 +237,20 @@
                                 style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
                             <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnModeInspect"
+                                android:id="@+id/btnModePan"
                                 android:layout_width="wrap_content"
                                 android:layout_height="34dp"
-                                android:text="@string/btn_mode_inspect"
+                                android:text="@string/btn_mode_pan"
                                 android:textSize="11sp"
                                 android:insetTop="0dp"
                                 android:insetBottom="0dp"
                                 android:paddingStart="10dp"
                                 android:paddingEnd="10dp"
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginEnd="6dp"
                                 app:cornerRadius="6dp"
                                 style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
+                            <!-- 3. Physical Boundary Conditions, Loads & Material -->
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnModeSupport"
                                 android:layout_width="wrap_content"
@@ -278,6 +280,23 @@
                                 style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
                             <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnCustomMaterial"
+                                android:layout_width="wrap_content"
+                                android:layout_height="34dp"
+                                android:text="@string/btn_mode_custom_material"
+                                android:textSize="11sp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="10dp"
+                                android:paddingEnd="10dp"
+                                android:layout_marginEnd="6dp"
+                                android:textColor="#1976D2"
+                                app:strokeColor="#1976D2"
+                                app:cornerRadius="6dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <!-- 4. Modifications & History -->
+                            <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnModeDelete"
                                 android:layout_width="wrap_content"
                                 android:layout_height="34dp"
@@ -287,7 +306,7 @@
                                 android:insetBottom="0dp"
                                 android:paddingStart="12dp"
                                 android:paddingEnd="12dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="4dp"
                                 app:cornerRadius="6dp"
                                 style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
@@ -318,21 +337,6 @@
                                 android:layout_marginEnd="4dp"
                                 android:textColor="#D32F2F"
                                 app:strokeColor="#D32F2F"
-                                app:cornerRadius="6dp"
-                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnCustomMaterial"
-                                android:layout_width="wrap_content"
-                                android:layout_height="34dp"
-                                android:text="@string/btn_mode_custom_material"
-                                android:textSize="11sp"
-                                android:insetTop="0dp"
-                                android:insetBottom="0dp"
-                                android:paddingStart="10dp"
-                                android:paddingEnd="10dp"
-                                android:textColor="#1976D2"
-                                app:strokeColor="#1976D2"
                                 app:cornerRadius="6dp"
                                 style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
                         </LinearLayout>

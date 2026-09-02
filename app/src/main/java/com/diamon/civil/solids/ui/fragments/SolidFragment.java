@@ -488,17 +488,6 @@ public class SolidFragment extends Fragment {
         binding.btnUnion.setOnClickListener(v -> showBooleanDialog("union"));
         binding.btnCut.setOnClickListener(v -> showBooleanDialog("cut"));
         binding.btnIntersect.setOnClickListener(v -> showBooleanDialog("intersect"));
-        binding.btnLoadTestCase.setOnClickListener(v -> {
-            if (getContext() != null && workDir != null) {
-                try {
-                    activeSimulationGeometry = SampleSimulationCase.createCantileverGeo(workDir);
-                    loadDefaultTestCase();
-                    android.widget.Toast.makeText(getContext(), R.string.toast_test_case_loaded, android.widget.Toast.LENGTH_SHORT).show();
-                } catch (java.io.IOException e) {
-                    logger.error("Failed to load test case: " + e.getMessage());
-                }
-            }
-        });
         
         binding.btnRunSolidAnalysis.setOnClickListener(v -> runFullPipeline());
         
