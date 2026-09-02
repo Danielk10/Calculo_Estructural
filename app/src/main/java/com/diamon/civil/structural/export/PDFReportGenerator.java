@@ -1076,9 +1076,19 @@ public class PDFReportGenerator {
                     V2_J_kN = sf.V2 / 1000.0;
                 }
 
-                double V3_kN = sf.V3 / 1000.0;
-                double T_kNm = sf.M3 / 1000.0;
-                double M2_kNm = 0.0;
+                boolean is2DModel = true;
+                if (model.nodes != null) {
+                    for (StructuralModel.Node n : model.nodes) {
+                        if (Math.abs(n.z) > 1e-4) {
+                            is2DModel = false;
+                            break;
+                        }
+                    }
+                }
+
+                double V3_kN = is2DModel ? 0.0 : (sf.V3 / 1000.0);
+                double T_kNm = is2DModel ? 0.0 : (sf.M3 / 1000.0);
+                double M2_kNm = is2DModel ? 0.0 : (sf.M2 / 1000.0);
 
                 // Joint I (0.00L)
                 ctx.ensureSpace(14f);
