@@ -561,19 +561,6 @@
                         android:textColor="@color/white"
                         app:strokeColor="#38BDF8"
                         android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:layout_marginEnd="6dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnViewReactions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="38dp"
-                        android:text="⚖ Reactions"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:textSize="11sp"
-                        android:textColor="#4ADE80"
-                        app:strokeColor="#4ADE80"
-                        android:insetTop="0dp"
                         android:insetBottom="0dp" />
                 </LinearLayout>
             </HorizontalScrollView>

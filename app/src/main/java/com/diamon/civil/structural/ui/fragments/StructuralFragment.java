@@ -275,10 +275,6 @@ public class StructuralFragment extends Fragment {
         if (binding.btnCustomMaterial != null) {
             binding.btnCustomMaterial.setOnClickListener(v -> showCustomMaterialDialog());
         }
-
-        if (binding.btnViewReactions != null) {
-            binding.btnViewReactions.setOnClickListener(v -> exportReactionsReport());
-        }
         
         binding.tvStructuralLog.setOnClickListener(v -> copyToClipboard(logger.getFullLog()));
 
@@ -874,19 +870,10 @@ public class StructuralFragment extends Fragment {
     }
 
     /**
-     * Exports a text report of all support reactions and external constraints
-     * to the solver log and clipboard. Available after analysis is complete.
+     * Builds a text report of all support reactions, external constraints and equilibrium.
      */
-    public void exportReactionsReport() {
-        if (currentModel == null || currentResult == null) {
-            if (getContext() != null)
-                Toast.makeText(getContext(), "Run analysis first to view reactions", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Get reactions from the last FrameAnalysisEngine run
-        com.diamon.civil.structural.engine.FrameAnalysisEngine.AnalysisOutput engineOutput =
-                com.diamon.civil.structural.engine.FrameAnalysisEngine.analyze(currentModel);
+    public String buildReactionsReportString(StructuralModel model, com.diamon.civil.structural.engine.FrameAnalysisEngine.AnalysisOutput engineOutput) {
+        if (model == null || engineOutput == null) return "";
 
         StringBuilder report = new StringBuilder();
         report.append("═══════════════════════════════════════════════════════\n");
@@ -898,7 +885,7 @@ public class StructuralFragment extends Fragment {
         report.append(String.format(java.util.Locale.US, "%-8s %-12s %-10s %-10s %-10s\n",
                 "Node", "Support", "X (m)", "Y (m)", "Z (m)"));
         report.append("─────────────────────────────────────────────────\n");
-        for (StructuralModel.Node n : currentModel.nodes) {
+        for (StructuralModel.Node n : model.nodes) {
             if (n.supportType != StructuralModel.SupportType.FREE) {
                 report.append(String.format(java.util.Locale.US, "%-8d %-12s %-10.3f %-10.3f %-10.3f\n",
                         n.id, n.supportType.name(), n.x, n.y, n.z));
@@ -933,7 +920,7 @@ public class StructuralFragment extends Fragment {
         report.append("\n── Member End Releases ──\n");
         report.append(String.format(java.util.Locale.US, "%-8s %-20s %-20s\n", "Member", "I-End Releases", "J-End Releases"));
         report.append("─────────────────────────────────────────────────\n");
-        for (StructuralModel.Element elem : currentModel.elements) {
+        for (StructuralModel.Element elem : model.elements) {
             String iRel = elem.releaseStart != null && elem.releaseStart.hasAnyRelease() ?
                     buildReleaseString(elem.releaseStart) : "Continuous";
             String jRel = elem.releaseEnd != null && elem.releaseEnd.hasAnyRelease() ?
@@ -942,8 +929,18 @@ public class StructuralFragment extends Fragment {
         }
 
         report.append("\n═══════════════════════════════════════════════════════\n");
+        return report.toString();
+    }
 
-        String reportStr = report.toString();
+    public void exportReactionsReport() {
+        if (currentModel == null || currentResult == null) {
+            if (getContext() != null)
+                Toast.makeText(getContext(), "Run analysis first to view reactions", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        com.diamon.civil.structural.engine.FrameAnalysisEngine.AnalysisOutput engineOutput =
+                com.diamon.civil.structural.engine.FrameAnalysisEngine.analyze(currentModel);
+        String reportStr = buildReactionsReportString(currentModel, engineOutput);
         logger.log(reportStr);
         copyToClipboard(reportStr);
         if (getContext() != null) {
@@ -1099,6 +1096,10 @@ public class StructuralFragment extends Fragment {
                 // Analyze with FrameAnalysisEngine for direct stiffness verification / fallback
                 com.diamon.civil.structural.engine.FrameAnalysisEngine.AnalysisOutput engineOutput =
                         com.diamon.civil.structural.engine.FrameAnalysisEngine.analyze(model);
+
+                if (engineOutput != null) {
+                    logger.log(buildReactionsReportString(model, engineOutput));
+                }
 
                 if (parseResult == null || parseResult.displacements == null || parseResult.displacements.isEmpty()) {
                     parseResult = engineOutput.parseResult;
