@@ -15,29 +15,30 @@ public class ModuleLogger {
 
     public static final String HELP_TEXT =
         "Special Test & Pipeline Commands:\n" +
-        "  test-gmsh              - Run 3D CAD Boolean subtraction & mesh test (Gmsh + OCCT)\n" +
-        "  test-draw              - Run OpenCASCADE DRAWEXE headless primitive box test (OCCT)\n" +
-        "  test-calculix          - Run CalculiX validation test (Sequential / 1 Thread: test_calculix.inp)\n" +
-        "  test-calculix-parallel - Run CalculiX test with multi-threading (Multi-core: test_calculix.inp)\n" +
-        "  test-frame             - Run 2D Frame structural analysis test (test_portico.inp)\n" +
-        "  test-frd-parser        - Run C++ JNI parser test on test_calculix.frd\n" +
-        "  test-dat-parser        - Run Java DAT parser test on test_calculix.dat\n" +
-        "  test-coordinate-fallback - Run automatic boundary condition assignment test\n" +
-        "  test-step-solve        - Run Meshing & Solving pipeline with linkrods.step\n" +
-        "  test-bracket-solve     - Run Meshing & Solving pipeline with bracket_simple.step\n" +
-        "  test-cad-solve         - Run Headless CAD meshing & solving pipeline (OCCT + Gmsh + CalculiX)\n" +
-        "  run-sim-test           - Run automated end-to-end FEA calculation test (Cantilever Beam)\n\n" +
+        "  test-gmsh              - 3D CAD Boolean difference & mesh test (Cylinder - Sphere, V=48.69 mm³)\n" +
+        "  test-draw              - OpenCASCADE DRAWEXE headless box primitive test (10×10×10 mm BREP)\n" +
+        "  test-calculix          - Linear elasticity validation: Hooke & Poisson on unit cube (1 Thread)\n" +
+        "  test-calculix-parallel - Multi-threaded CalculiX execution on unit cube (Multi-core)\n" +
+        "  test-frame             - 2D Portal Frame structural analysis (B31 beam forces & lateral drift)\n" +
+        "  test-frd-parser        - C++ JNI FRD binary result parser & GLB converter test\n" +
+        "  test-dat-parser        - Java DAT parser test for beam internal forces and displacements\n" +
+        "  test-coordinate-fallback - Automatic spatial boundary condition detection on 3D geometry\n" +
+        "  test-step-solve        - End-to-end CAD meshing & solving pipeline with linkrods.step\n" +
+        "  test-bracket-solve     - End-to-end CAD meshing & solving pipeline with bracket_simple.step\n" +
+        "  test-cad-solve         - Headless CAD generation, meshing & FEA solving (DRAWEXE+Gmsh+CCX)\n" +
+        "  run-sim-test           - Automated Cantilever Beam simulation vs Euler-Bernoulli theory\n\n" +
         "Standard Shell Commands:\n" +
-        "  ls [path]              - List files and directories\n" +
+        "  ls [path]              - List files and directories in workspace\n" +
         "  cd <path>              - Change working directory\n" +
         "  pwd                    - Show current directory path\n" +
+        "  cat <file>             - Print file content to terminal\n" +
         "  mkdir <name>           - Create new directory\n" +
         "  rm [-rf] <target>      - Delete file or directory\n" +
         "  clear                  - Clear terminal screen\n" +
         "  help                   - Show this help message\n\n" +
         "Solvers & Direct Binaries:\n" +
-        "  ccx <args>             - Run CalculiX CCX solver directly (or <jobname> to run ccx -i <jobname>)\n" +
-        "  gmsh <args>            - Run Gmsh mesh generator directly\n" +
+        "  ccx <jobname>          - Run CalculiX CCX solver directly on <jobname>.inp\n" +
+        "  gmsh <args>            - Run Gmsh 3D mesh generator directly\n" +
         "  DRAWEXE <args>         - Run OpenCASCADE Test Harness DRAWEXE directly\n";
 
     static {
