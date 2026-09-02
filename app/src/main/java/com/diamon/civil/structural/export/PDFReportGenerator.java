@@ -1460,11 +1460,30 @@ public class PDFReportGenerator {
         float[] perfWidths = {169f, 110f, 130f, 110f}; // Sum = 519f
         ctx.y = drawTableHeader(ctx, perfHeaders, perfWidths);
 
+        boolean hasConcrete = false;
+        boolean hasSteel = false;
+        if (model.elements != null) {
+            for (StructuralModel.Element elem : model.elements) {
+                String matName = elem.materialName != null ? elem.materialName.toLowerCase(Locale.US) : "";
+                String secName = elem.sectionName != null ? elem.sectionName.toLowerCase(Locale.US) : "";
+                if (matName.contains("concrete") || matName.contains("hormig") || secName.startsWith("rect") || secName.startsWith("circ")) {
+                    hasConcrete = true;
+                } else {
+                    hasSteel = true;
+                }
+            }
+        }
+        boolean isConcreteStructure = hasConcrete && !hasSteel;
+
+        String axialRef = isConcreteStructure ? "ACI 318-19 Axial Compression (φPn)" : "AISC Compression / Tension";
+        String shearRef = isConcreteStructure ? "ACI 318-19 Shear Strength (φVc + φVs)" : "AISC Shear Yielding (φv·Vn)";
+        String flexRef = isConcreteStructure ? "ACI 318-19 Flexural Strength (φMn)" : "AISC Plastic Flexure (φb·Mn)";
+
         String deflAssessment = (maxDisp < 25.0) ? "PASS / OK" : "VERIFY";
         ctx.y = drawTableRow(ctx, new String[]{"Peak Vector Deflection |U|", String.format(Locale.US, "%.4f mm", maxDisp), "L / 360 Floor Serviceability (25 mm)", deflAssessment}, perfWidths);
-        ctx.y = drawTableRow(ctx, new String[]{"Peak Frame Axial Force |P|", String.format(Locale.US, "%.2f kN", maxForceN), "AISC Compression / Tension", "PASS / OK"}, perfWidths);
-        ctx.y = drawTableRow(ctx, new String[]{"Peak Major Shear Force |V2|", String.format(Locale.US, "%.2f kN", maxForceV), "AISC Shear Yielding (φv·Vn)", "PASS / OK"}, perfWidths);
-        ctx.y = drawTableRow(ctx, new String[]{"Peak Major Bending Moment |M3|", String.format(Locale.US, "%.2f kN·m", maxMomM), "AISC Plastic Flexure (φb·Mn)", "PASS / OK"}, perfWidths);
+        ctx.y = drawTableRow(ctx, new String[]{"Peak Frame Axial Force |P|", String.format(Locale.US, "%.2f kN", maxForceN), axialRef, "PASS / OK"}, perfWidths);
+        ctx.y = drawTableRow(ctx, new String[]{"Peak Major Shear Force |V2|", String.format(Locale.US, "%.2f kN", maxForceV), shearRef, "PASS / OK"}, perfWidths);
+        ctx.y = drawTableRow(ctx, new String[]{"Peak Major Bending Moment |M3|", String.format(Locale.US, "%.2f kN·m", maxMomM), flexRef, "PASS / OK"}, perfWidths);
         ctx.y += 14f;
     }
 
@@ -1476,10 +1495,26 @@ public class PDFReportGenerator {
         drawSubSectionTitle(ctx, "9.1 Executive Compliance & Safety Evaluation");
         ctx.y = drawWrappedText(ctx, "1. GLOBAL EQUILIBRIUM: Strict global equilibrium (Newton's 3rd law) is confirmed with 0.000 kN solver residual error.", MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
 
+        boolean hasConcrete = false;
+        boolean hasSteel = false;
+        if (model.elements != null) {
+            for (StructuralModel.Element elem : model.elements) {
+                String matName = elem.materialName != null ? elem.materialName.toLowerCase(Locale.US) : "";
+                String secName = elem.sectionName != null ? elem.sectionName.toLowerCase(Locale.US) : "";
+                if (matName.contains("concrete") || matName.contains("hormig") || secName.startsWith("rect") || secName.startsWith("circ")) {
+                    hasConcrete = true;
+                } else {
+                    hasSteel = true;
+                }
+            }
+        }
+        boolean isConcreteStructure = hasConcrete && !hasSteel;
+        String codeDesc = isConcreteStructure ? "ACI 318-19" : ((hasConcrete && hasSteel) ? "AISC 360-22 and ACI 318-19" : "AISC 360-22 Chapter H");
+
         if (lastOverstressedCount == 0) {
-            ctx.y = drawWrappedText(ctx, String.format(Locale.US, "2. MEMBER STRENGTH & CAPACITY: All structural members satisfy AISC 360-22 Chapter H and ACI 318-19 ultimate limit states with Demand-to-Capacity ratios D/C <= 1.0 (Peak Governing D/C = %.3f).", lastMaxGoverningDC), MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
+            ctx.y = drawWrappedText(ctx, String.format(Locale.US, "2. MEMBER STRENGTH & CAPACITY: All structural members satisfy %s ultimate limit states with Demand-to-Capacity ratios D/C <= 1.0 (Peak Governing D/C = %.3f).", codeDesc, lastMaxGoverningDC), MARGIN_LEFT, USABLE_WIDTH, 11.5f, bodyPaint);
         } else {
-            ctx.y = drawWrappedText(ctx, String.format(Locale.US, "2. MEMBER STRENGTH & CAPACITY: WARNING — %d structural member(s) exceed AISC 360-22 limit states (Peak Governing D/C = %.3f > 1.0). Section strengthening or cross-section upsizing is required.", lastOverstressedCount, lastMaxGoverningDC), MARGIN_LEFT, USABLE_WIDTH, 11.5f, boldBodyPaint);
+            ctx.y = drawWrappedText(ctx, String.format(Locale.US, "2. MEMBER STRENGTH & CAPACITY: WARNING — %d structural member(s) exceed %s limit states (Peak Governing D/C = %.3f > 1.0). Section strengthening or cross-section upsizing is required.", lastOverstressedCount, codeDesc, lastMaxGoverningDC), MARGIN_LEFT, USABLE_WIDTH, 11.5f, boldBodyPaint);
         }
 
         if (!lastDeflectionVerify && !lastDriftExceeds) {
