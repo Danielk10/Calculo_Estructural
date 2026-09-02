@@ -10,7 +10,7 @@
 ¡Primera versión oficial de Structural Analysis FEA 3D!
 • Motor FEA nativo CalculiX 2.23 (SPOOLES) y validador OpenSees.
 • Análisis de pórticos 2D/3D, losas S4R y muros CPS4.
-• Modelado CAD 3D (OpenCASCADE) con mallas automáticas Gmsh 5.0 (C3D10).
+• Modelado CAD 3D (OpenCASCADE 8.0.0.p1) con mallas automáticas Gmsh 5.0 (C3D10).
 • Diagramas interactivos de momentos M, cortantes V, axiales N y deformadas.
 • Memorias técnicas de cálculo en PDF bajo normas AISC 360-22, ACI 318-19 y ASCE 7-22.
 • 100% verificado y validado físicamente en local.
@@ -21,7 +21,7 @@
 Official First Release of Structural Analysis FEA 3D!
 • Native CalculiX 2.23 (SPOOLES direct solver) & OpenSees validation.
 • 2D/3D frame, slab shell (S4R) & shear wall (CPS4) analysis.
-• 3D solid CAD modeling (OpenCASCADE) with Gmsh 5.0 auto-meshing (C3D10).
+• 3D solid CAD modeling (OpenCASCADE 8.0.0.p1) with Gmsh 5.0 auto-meshing (C3D10).
 • Interactive internal action diagrams (Bending M, Shear V, Axial N, Deformed shape).
 • Automated PDF engineering calculation reports (AISC 360-22, ACI 318-19, ASCE 7-22).
 • 100% physically verified and validated locally.
@@ -50,7 +50,7 @@ Official First Release of Structural Analysis FEA 3D!
 * **12 Presets Estructurales Integrados:** Vigas continuas, vigas con voladizo, pórticos simples e industriales de múltiples crujías, cerchas Pratt y Warren, losas bidireccionales de hormigón (S4R) y muros de corte confinados (CPS4).
 
 #### 2. 🧊 Módulo de Sólidos 3D y Modelado CAD (CAD + Gmsh + CalculiX)
-* **Modelado CAD Headless con OpenCASCADE (OCCT 8.0.0):** Generación de primitivas volumétricas (Cubo, Cilindro, Esfera), chaflanes, redondeos y operaciones booleanas (Unión, Corte e Intersección).
+* **Modelado CAD Headless con OpenCASCADE (OCCT 8.0.0.p1):** Generación de primitivas volumétricas (Cubo, Cilindro, Esfera), chaflanes, redondeos y operaciones booleanas (Unión, Corte e Intersección).
 * **Importación Universal CAD:** Soporte completo para formatos STEP (`.step`, `.stp`), IGES (`.iges`, `.igs`), BREP (`.brep`) y GEO (`.geo`).
 * **Mallador Automático Gmsh (v5.0.0):** Generación de mallas tetraédricas cuadráticas de segundo orden (`C3D10`) y lineales (`C3D4`) libres de distorsión jacobiana.
 * **Visualizador 3D SceneView:** Renderizado tridimensional de mapas térmicos de tensiones de Von Mises y deformación elástica.
@@ -85,7 +85,7 @@ Official First Release of Structural Analysis FEA 3D!
 * **12 Built-in Structural Presets:** Cantilever beams, continuous beams, single/multi-bay frames, Pratt & Warren trusses, 2-way concrete slabs (S4R), and confined shear walls (CPS4).
 
 #### 2. 🧊 3D Continuum Solids & CAD Modeling (CAD + Gmsh + CalculiX)
-* **Headless CAD Engine (OpenCASCADE OCCT 8.0.0):** 3D solid primitives (Box, Cylinder, Sphere), fillets, chamfers, and full Boolean operations (Cut, Fuse, Common).
+* **Headless CAD Engine (OpenCASCADE OCCT 8.0.0.p1):** 3D solid primitives (Box, Cylinder, Sphere), fillets, chamfers, and full Boolean operations (Cut, Fuse, Common).
 * **Universal CAD Ingestion:** Full import and healing for STEP (`.step`, `.stp`), IGES (`.iges`, `.igs`), BREP (`.brep`), and GEO (`.geo`) files.
 * **Gmsh 5.0 3D Mesh Engine:** Automatic generation of quadratic second-order 10-node tetrahedral elements (`C3D10`) with zero negative Jacobian distortion.
 * **3D SceneView Interactive Viewer:** 3D inspection of Von Mises stress thermal color maps and scaled deformed meshes.

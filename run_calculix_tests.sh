@@ -2,6 +2,7 @@
 # run_calculix_tests.sh
 
 cd ~
+export PATH="$HOME/.local/bin:$PATH"
 
 echo "================================================="
 echo "  Ejecutando Prueba SECUENCIAL (1 Núcleo)"
