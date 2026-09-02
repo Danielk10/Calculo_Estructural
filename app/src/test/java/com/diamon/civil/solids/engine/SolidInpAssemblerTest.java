@@ -396,23 +396,48 @@ public class SolidInpAssemblerTest {
     private void runElementBenchmarkTest(String elemType) throws Exception {
         File workDir = tempFolder.newFolder("work_" + elemType.toLowerCase(java.util.Locale.US));
         
-        // 1. Generate standard cantilever benchmark
-        File geoFile = SampleSimulationCase.createCantileverGeo(workDir);
-        assertTrue("cantilever.geo should exist", geoFile.exists());
+        // 1. Generate standard cantilever benchmark (or extruded prism for C3D6/C3D15)
+        boolean isWedge = elemType.contains("6") || elemType.contains("15");
+        File geoFile;
+        if (isWedge) {
+            geoFile = new File(workDir, "cantilever_wedge.geo");
+            String wedgeGeo = "Point(1) = {0, 0, 0, 5.0};\n" +
+                    "Point(2) = {0, 10, 0, 5.0};\n" +
+                    "Point(3) = {0, 10, 10, 5.0};\n" +
+                    "Point(4) = {0, 0, 10, 5.0};\n" +
+                    "Line(1) = {1, 2};\n" +
+                    "Line(2) = {2, 3};\n" +
+                    "Line(3) = {3, 1};\n" +
+                    "Line(4) = {1, 3};\n" +
+                    "Line(5) = {3, 4};\n" +
+                    "Line(6) = {4, 1};\n" +
+                    "Line Loop(1) = {1, 2, 3};\n" +
+                    "Plane Surface(1) = {1};\n" +
+                    "Line Loop(2) = {-3, 5, 6};\n" +
+                    "Plane Surface(2) = {2};\n" +
+                    "ext1[] = Extrude {100, 0, 0} { Surface{1}; Layers{10}; Recombine; };\n" +
+                    "ext2[] = Extrude {100, 0, 0} { Surface{2}; Layers{10}; Recombine; };\n" +
+                    "Physical Surface(\"Fixed\") = {1, 2};\n" +
+                    "Physical Surface(\"Loaded\") = {ext1[0], ext2[0]};\n" +
+                    "Physical Volume(\"Steel\") = {ext1[1], ext2[1]};\n";
+            try (PrintWriter pw = new PrintWriter(new FileWriter(geoFile))) {
+                pw.write(wedgeGeo);
+            }
+        } else {
+            geoFile = SampleSimulationCase.createCantileverGeo(workDir);
+        }
+        assertTrue("geo file should exist", geoFile.exists());
         
         // 2. Determine Gmsh options based on formulation
         boolean is2nd = elemType.contains("10") || elemType.contains("20") || elemType.contains("15");
         boolean isHex = elemType.contains("8") || elemType.contains("20");
-        boolean isWedge = elemType.contains("6") || elemType.contains("15");
         
         StringBuilder meshOpts = new StringBuilder();
         meshOpts.append("Mesh.ElementOrder=").append(is2nd ? 2 : 1).append(";");
         if (is2nd) meshOpts.append(" Mesh.SecondOrderIncomplete=1; Mesh.SecondOrderLinear=1; Mesh.Optimize=1;");
         if (isHex) {
             meshOpts.append(" Mesh.Recombine3DAll=1; Mesh.Algorithm=6; Mesh.SubdivisionAlgorithm=2; Mesh.Recombine3DLevel=2; Mesh.Algorithm3D=1;");
-        } else if (isWedge) {
-            meshOpts.append(" Mesh.SubdivisionAlgorithm=1; Mesh.Algorithm3D=1;");
-        } else {
+        } else if (!isWedge) {
             meshOpts.append(" Mesh.Algorithm3D=1; Mesh.Recombine3DAll=0;");
         }
         meshOpts.append(" Mesh.SaveGroupsOfNodes=1; Mesh.SaveGroupsOfElements=1;");
