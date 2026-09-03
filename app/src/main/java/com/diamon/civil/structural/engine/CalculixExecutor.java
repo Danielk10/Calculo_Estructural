@@ -23,11 +23,18 @@ public class CalculixExecutor {
 
     public CalculixExecutor(Context context, File workDir) {
         this.workDir = workDir;
-        this.nativeLibDir = new File(context.getApplicationInfo().nativeLibraryDir);
-        this.filesDir = context.getFilesDir();
+        this.nativeLibDir = context != null && context.getApplicationInfo() != null ? new File(context.getApplicationInfo().nativeLibraryDir) : null;
+        this.filesDir = context != null ? context.getFilesDir() : null;
         
         // The solver is a child process. Do not load the JNI/OCCT stack here: the
         // terminal must remain usable even when the optional 3D viewer is absent.
+    }
+
+    /** Standalone / local testing constructor without requiring Android Context. */
+    public CalculixExecutor(File filesDir, File nativeLibDir, File workDir) {
+        this.filesDir = filesDir;
+        this.nativeLibDir = nativeLibDir;
+        this.workDir = workDir;
     }
 
     public void setWorkDir(File workDir) {
@@ -107,15 +114,31 @@ public class CalculixExecutor {
     }
 
     public String executeBinaryWithStreaming(String binaryName, OutputListener listener, String input, int numThreads, String... args) {
-        File binary;
-        File packagedBinary = new File(nativeLibDir, "lib" + binaryName + ".so");
-        if (packagedBinary.exists()) {
+        File binary = null;
+        File packagedBinary = nativeLibDir != null ? new File(nativeLibDir, "lib" + binaryName + ".so") : null;
+        if (packagedBinary != null && packagedBinary.exists()) {
             binary = packagedBinary;
-        } else {
-            binary = new File(new File(filesDir, "usr/bin"), binaryName);
+        } else if (filesDir != null) {
+            File binInFiles = new File(new File(filesDir, "usr/bin"), binaryName);
+            if (binInFiles.exists()) {
+                binary = binInFiles;
+            }
         }
 
-        if (!binary.exists()) {
+        if (binary == null || !binary.exists()) {
+            File systemBinary = new File("/usr/bin", binaryName);
+            if (systemBinary.exists()) {
+                binary = systemBinary;
+            } else {
+                String home = System.getProperty("user.home", "");
+                File localBinary = new File(home + "/.local/bin", binaryName);
+                if (localBinary.exists()) {
+                    binary = localBinary;
+                }
+            }
+        }
+
+        if (binary == null || !binary.exists()) {
              return "Invalid command: " + binaryName;
         }
 
@@ -140,41 +163,51 @@ public class CalculixExecutor {
             env.put("OMP_STACKSIZE", "64M");
             env.put("CCX_NPROC_EQUATION_SOLVER", threadsStr);
 
-            File usrLib = new File(filesDir, "usr/lib");
-            File usrBin = new File(filesDir, "usr/bin");
+            File usrLib = filesDir != null ? new File(filesDir, "usr/lib") : null;
+            File usrBin = filesDir != null ? new File(filesDir, "usr/bin") : null;
 
             // Critical TCL/TK environment for DRAWEXE headless execution
-            env.put("TCL_LIBRARY", new File(usrLib, "tcl8.6").getAbsolutePath());
-            env.put("TK_LIBRARY", new File(usrLib, "tk8.6").getAbsolutePath());
-            env.put("TCLLIBPATH", String.format("%s %s %s",
-                    usrLib.getAbsolutePath(),
-                    new File(usrLib, "tcl8.6").getAbsolutePath(),
-                    new File(usrLib, "tk8.6").getAbsolutePath()));
+            if (usrLib != null && new File(usrLib, "tcl8.6").exists()) {
+                env.put("TCL_LIBRARY", new File(usrLib, "tcl8.6").getAbsolutePath());
+                env.put("TK_LIBRARY", new File(usrLib, "tk8.6").getAbsolutePath());
+                env.put("TCLLIBPATH", String.format("%s %s %s",
+                        usrLib.getAbsolutePath(),
+                        new File(usrLib, "tcl8.6").getAbsolutePath(),
+                        new File(usrLib, "tk8.6").getAbsolutePath()));
+            }
 
-            File occtResources = new File(filesDir, "usr/share/opencascade/resources");
-            env.put("CASROOT", new File(filesDir, "usr/share/opencascade").getAbsolutePath());
-            env.put("CSF_OCCTResourcePath", occtResources.getAbsolutePath());
-            env.put("CSF_DrawPluginDefaults", new File(occtResources, "DrawResources").getAbsolutePath());
+            if (filesDir != null) {
+                File occtResources = new File(filesDir, "usr/share/opencascade/resources");
+                if (occtResources.exists()) {
+                    env.put("CASROOT", new File(filesDir, "usr/share/opencascade").getAbsolutePath());
+                    env.put("CSF_OCCTResourcePath", occtResources.getAbsolutePath());
+                    env.put("CSF_DrawPluginDefaults", new File(occtResources, "DrawResources").getAbsolutePath());
+                }
+            }
 
             // Force headless mode by ensuring DISPLAY is absent
             env.remove("DISPLAY");
 
             // Disable fdsan via LD_PRELOAD to prevent aborts in DRAWEXE on Android 11+
-            String preload = new File(nativeLibDir, "libfdsan_bypass.so").getAbsolutePath();
-            env.put("LD_PRELOAD", preload);
+            if (nativeLibDir != null) {
+                File preloadFile = new File(nativeLibDir, "libfdsan_bypass.so");
+                if (preloadFile.exists()) {
+                    env.put("LD_PRELOAD", preloadFile.getAbsolutePath());
+                }
+            }
 
             String currentLdPath = System.getenv("LD_LIBRARY_PATH");
             if (currentLdPath == null) currentLdPath = "";
 
-            env.put("LD_LIBRARY_PATH", usrLib.getAbsolutePath() + ":" +
-                    nativeLibDir.getAbsolutePath() + ":" +
-                    currentLdPath);
+            String extraLd = (usrLib != null && usrLib.exists()) ? usrLib.getAbsolutePath() + ":" : "";
+            String nativeLd = (nativeLibDir != null && nativeLibDir.exists()) ? nativeLibDir.getAbsolutePath() + ":" : "";
+            env.put("LD_LIBRARY_PATH", extraLd + nativeLd + currentLdPath);
 
             String currentPath = System.getenv("PATH");
             if (currentPath == null) currentPath = "";
-            env.put("PATH", usrBin.getAbsolutePath() + ":" +
-                    nativeLibDir.getAbsolutePath() + ":" +
-                    currentPath);
+            String extraPath = (usrBin != null && usrBin.exists()) ? usrBin.getAbsolutePath() + ":" : "";
+            String nativePath = (nativeLibDir != null && nativeLibDir.exists()) ? nativeLibDir.getAbsolutePath() + ":" : "";
+            env.put("PATH", extraPath + nativePath + currentPath);
 
             Process process = pb.start();
             synchronized (this) {

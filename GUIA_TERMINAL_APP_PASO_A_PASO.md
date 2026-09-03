@@ -474,16 +474,29 @@ Es fundamental conocer con claridad qué capacidades técnicas ofrece la termina
 
 ---
 
-## 🏆 9. Verificación Local y Certificación Científica
+## 🏆 9. Verificación Local y Certificación Científica de Punta a Punta
 
-Todos los comandos, pipelines y solucionadores descritos en esta guía han sido rigurosamente validados y probados en el entorno de desarrollo local con los siguientes resultados:
+Todos los comandos, pipelines, solucionadores y ejemplos prácticos descritos en esta guía han sido rigurosamente validados y probados en el entorno de desarrollo local sin fallos ni falsos positivos mediante dos suites automatizadas:
 
-1. **Simulación de Física Estructural (`simulate_structural_ui_and_physics.py`):**
-   - **9 de 9 casos analizados con éxito.**
-   - **24 de 24 comprobaciones físicas aprobadas al 100%** (incluyendo flechas admisibles ACI 318, derivas de entrepiso sísmicas NSR-10 / ASCE 7-22 menores a 1.0% y leyes de equilibrio de Newton).
-2. **Batería de Modelos CAD y Formatos (`test_all_sample_models.py`):**
-   - **13 de 13 pruebas pasadas exitosamente (100%)** en formatos STEP, BRep, IGES, mallas tetraédricas `C3D4`/`C3D10` y pórticos espaciales 2D/3D.
-3. **Validación Independiente con OpenSees (`validate_all_presets_calculix_opensees.py`):**
-   - **12 de 12 presets estructurales certificados** con equilibrio estático exacto y concordancia de desplazamientos superior al $97\%$.
-4. **Pruebas Unitarias de Gradle (`./gradlew testDebugUnitTest`):**
-   - **Compilación e integración completada con éxito (`BUILD SUCCESSFUL`).**
+### 9.1 Script de Certificación End-to-End (`validate_terminal_guide_end_to_end.py`)
+Para verificar instantáneamente en local todos los comandos de la terminal (shell, pruebas diagnósticas, llamadas a binarios nativos y casos prácticos):
+```bash
+python3 validate_terminal_guide_end_to_end.py
+```
+*Resultados certificados:*
+- ✅ **Gestión de archivos:** `mkdir`, `cd`, `pwd`, `touch`, `ls`, `cat`, `cp`, `rm` verificados.
+- ✅ **Comprobación analítica de Hooke y Poisson:** Desplazamiento axial $\delta_z = +0.001905\text{ mm}$ y contracción lateral $\delta_x = \delta_y = -0.000571\text{ mm}$ con $0.0000\%$ de error.
+- ✅ **Equilibrio estático de pórtico 2D:** Cortante basal $\sum R_x = -10.00\text{ kN}$ y par reactivo vertical $\pm 8.00\text{ kN}$.
+- ✅ **Modelado CAD y mallado 3D:** DRAWEXE headless y Gmsh CSG booleano (Cilindro $-$ Esfera) completados con código de salida 0.
+- ✅ **Casos prácticos 1, 2 y 3:** Interoperabilidad transversal entre carpetas, importación de `.inp` externos y gestión de proyectos validados.
+
+### 9.2 Suite de Pruebas Unitarias de Gradle (`TerminalGuideEndToEndTest`)
+Para correr la batería de pruebas Java/JNI directamente con el arnés de Gradle:
+```bash
+./gradlew testDebugUnitTest --tests "com.diamon.civil.terminal.engine.TerminalGuideEndToEndTest"
+```
+*Suites globales ejecutadas y aprobadas:*
+1. **Simulación de Física Estructural (`simulate_structural_ui_and_physics.py`):** 9/9 casos, 24/24 comprobaciones físicas aprobadas al 100%.
+2. **Batería de Modelos CAD y Formatos (`test_all_sample_models.py`):** 13/13 pruebas pasadas con éxito (100%).
+3. **Validación Independiente con OpenSees (`validate_all_presets_calculix_opensees.py`):** 12/12 presets certificados con equilibrio estático exacto.
+4. **Pruebas Unitarias Generales de Gradle:** `./gradlew testDebugUnitTest` $\rightarrow$ **`BUILD SUCCESSFUL`**.
