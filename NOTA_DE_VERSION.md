@@ -29,7 +29,7 @@
 
 #### 2. 🌐 Multi-idioma (Español / Inglés) y Aviso Legal
 * **Soporte de Idioma Español (ES):** Traducción integral de todos los textos de la interfaz gráfica de usuario (UI), etiquetas, botones, diálogos y selectores.
-* **Aviso Legal y Deslinde de Responsabilidad:** Inclusión de advertencia explícita en menú lateral, menú principal y política de privacidad, indicando que la aplicación es para fines académicos, educativos y de pre-dimensionamiento rápido, prohibiendo su uso directo para obras civiles reales de ingeniería sin firma profesional independiente.
+* **Aviso Legal y Nota de Confiabilidad:** Inclusión de nota informativa en menú lateral, menú principal y política de privacidad, indicando que la aplicación es para fines académicos, educativos y de predimensionamiento rápido, aclarando que los datos y resultados numéricos son estimativos y no deben considerarse 100% confiables o concluyentes sin la correspondiente verificación técnica independiente.
 
 #### 3. 🧊 Módulo de Sólidos 3D y Modelado CAD (CAD + Gmsh + CalculiX)
 * **Modelado CAD Headless con OpenCASCADE (OCCT 8.0.0.p1):** Generación de primitivas volumétricas (Cubo, Cilindro, Esfera), chaflanes, redondeos y operaciones booleanas (Unión, Corte e Intersección).
