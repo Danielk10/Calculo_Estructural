@@ -96,7 +96,9 @@ Este módulo está dedicado al modelado tridimensional continuo de piezas y comp
 
 ## 💻 3. Terminal Avanzada de Ingeniería
 
-La aplicación incluye un intérprete de comandos Unix integrado en su sandbox local para usuarios avanzados, investigadores e ingenieros. Permite ejecutar simulaciones directas, automatizaciones y comprobaciones de integridad físico-matemática:
+La aplicación incluye un intérprete de comandos Unix integrado en su sandbox local para usuarios avanzados, investigadores e ingenieros. Permite ejecutar simulaciones directas, automatizaciones y comprobaciones de integridad físico-matemática.
+
+> 📖 **Guía Completa Paso a Paso:** Para aprender en profundidad todas las capacidades, ejemplos prácticos, flujos avanzados y limitaciones de la consola, consulta **[GUIA_TERMINAL_APP_PASO_A_PASO.md](GUIA_TERMINAL_APP_PASO_A_PASO.md)**.
 
 ### 3.1 Comandos de Validación y Pipelines Especiales
 - **`test-calculix`:** Validación de elasticidad lineal 3D (Cubo unitario C3D8 sometido a $P = 400\text{ N}$). Muestra la tensión axial exacta $\sigma_z = 400\text{ MPa}$, la deformación de Hooke $\delta_z = +0.001905\text{ mm}$ y la contracción de Poisson $\delta_x = \delta_y = -0.000571\text{ mm}$ con $0.0000\%$ de error analítico.

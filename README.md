@@ -278,6 +278,7 @@ chmod +x setup-sdk.sh
 
 ## 📚 Documentación Técnica Adicional
 
+- **[GUIA_TERMINAL_APP_PASO_A_PASO.md](GUIA_TERMINAL_APP_PASO_A_PASO.md)**: Guía completa paso a paso y profunda de uso de la terminal de la app (comandos, scripts, arquitectura, posibilidades y limitaciones).
 - **[ANALISIS_VALIDACION_ESTRUCTURAL_OPENSEES_CALCULIX.md](ANALISIS_VALIDACION_ESTRUCTURAL_OPENSEES_CALCULIX.md)**: Informe científico detallado con fundamentos físico-matemáticos (Euler-Bernoulli vs Timoshenko), por qué los resultados son correctos y comparativa de los 12 presets.
 - **[GUIA_VALIDACION_Y_PRUEBAS_LOCALES.md](GUIA_VALIDACION_Y_PRUEBAS_LOCALES.md)**: Guía de pruebas locales con CalculiX real y verificación independiente con OpenSees (Módulos de Cálculo Estructural, Sólidos 3D y Terminal).
 - **[MANUAL_USUARIO.md](MANUAL_USUARIO.md)**: Manual de uso completo y guía funcional paso a paso.
