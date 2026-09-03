@@ -180,6 +180,15 @@ public class StructuralFragment extends Fragment {
                             binding.spinnerStructureType.setSelection(3);
                         }
                     }
+                    if (binding.gridEditorView != null) {
+                        if (position == 2) { // Slab / Floor Diaphragm (S4R)
+                            binding.gridEditorView.setActiveElementType("S4R", 0.15);
+                        } else if (position == 3) { // Shear Wall Member (CPS4)
+                            binding.gridEditorView.setActiveElementType("CPS4", 0.20);
+                        } else {
+                            binding.gridEditorView.setActiveElementType("BEAM", 0.0);
+                        }
+                    }
                 }
                 @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
             });
@@ -440,6 +449,7 @@ public class StructuralFragment extends Fragment {
 
         binding.gridEditorView.setOnNodeSelectedListener(this::showNodePropertiesDialog);
         binding.gridEditorView.setOnElementSelectedListener(this::showElementPropertiesDialog);
+        binding.gridEditorView.setOnPanelSelectedListener(this::showPanelPropertiesDialog);
 
         binding.gridEditorView.setOnComponentInspectedListener(infoText -> {
             if (binding != null && binding.tvComponentInfo != null && isAdded()) {
@@ -450,7 +460,12 @@ public class StructuralFragment extends Fragment {
 
         binding.gridEditorView.setOnModelChangeListener((nodeCount, elementCount) -> {
             if (binding != null && binding.tvGridStats != null && isAdded()) {
-                binding.tvGridStats.setText(getString(R.string.grid_stats_format, nodeCount, elementCount));
+                int panelCount = binding.gridEditorView.getPanels() != null ? binding.gridEditorView.getPanels().size() : 0;
+                if (panelCount > 0) {
+                    binding.tvGridStats.setText(getString(R.string.grid_stats_panels_format, nodeCount, elementCount, panelCount));
+                } else {
+                    binding.tvGridStats.setText(getString(R.string.grid_stats_format, nodeCount, elementCount));
+                }
             }
         });
 
@@ -890,6 +905,122 @@ public class StructuralFragment extends Fragment {
                             "Member #%d: Properties updated%s", element.id, releaseInfo.toString()),
                             Toast.LENGTH_SHORT).show();
                     binding.gridEditorView.invalidate();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void showPanelPropertiesDialog(StructuralModel.Panel panel) {
+        if (getContext() == null || !isAdded() || panel == null) return;
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(requireContext());
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int pad = (int) (16 * getResources().getDisplayMetrics().density);
+        layout.setPadding(pad, pad, pad, pad);
+
+        TextView tvInfo = new TextView(requireContext());
+        tvInfo.setText(String.format(java.util.Locale.US, "Panel #%d (Nodes: %s)", panel.id, panel.nodeIds != null ? panel.nodeIds.toString() : "[]"));
+        tvInfo.setTextSize(16f);
+        tvInfo.setTypeface(null, android.graphics.Typeface.BOLD);
+        tvInfo.setTextColor(getResources().getColor(R.color.primaryColor, null));
+        layout.addView(tvInfo);
+
+        TextView tvType = new TextView(requireContext());
+        tvType.setText(R.string.label_element_type);
+        tvType.setPadding(0, pad / 2, 0, 4);
+        layout.addView(tvType);
+
+        Spinner spType = new Spinner(requireContext());
+        List<String> typeOptions = Arrays.asList("S4R - Losa / Placa Flexible (Shell / Bending)", "CPS4 - Muro de Cortante (Plane Stress / Wall)");
+        ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_spinner_compact, typeOptions);
+        typeAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown_compact);
+        spType.setAdapter(typeAdapter);
+        if ("CPS4".equalsIgnoreCase(panel.elementType)) {
+            spType.setSelection(1);
+        } else {
+            spType.setSelection(0);
+        }
+        layout.addView(spType);
+
+        com.google.android.material.textfield.TextInputLayout tilThickness = new com.google.android.material.textfield.TextInputLayout(requireContext());
+        tilThickness.setHint(getString(R.string.panel_thickness_label));
+        TextInputEditText etThickness = new TextInputEditText(requireContext());
+        etThickness.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        etThickness.setText(String.format(java.util.Locale.US, "%.3f", panel.thickness));
+        tilThickness.addView(etThickness);
+        layout.addView(tilThickness);
+
+        TextView tvMat = new TextView(requireContext());
+        tvMat.setText(R.string.label_material);
+        tvMat.setPadding(0, pad / 2, 0, 4);
+        layout.addView(tvMat);
+
+        Spinner spMat = new Spinner(requireContext());
+        List<String> matNames = new ArrayList<>();
+        if (materialDatabase != null && !materialDatabase.getMaterials().isEmpty()) {
+            for (MaterialDatabase.Material m : materialDatabase.getMaterials()) matNames.add(m.name);
+        } else {
+            matNames.addAll(Arrays.asList("Normal Weight Concrete 25MPa", "Normal Weight Concrete 30MPa", "Structural Steel A36", "Aluminum 6061-T6"));
+        }
+        ArrayAdapter<String> matAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_spinner_compact, matNames);
+        matAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown_compact);
+        spMat.setAdapter(matAdapter);
+        if (panel.materialName != null) {
+            int idx = matNames.indexOf(panel.materialName);
+            if (idx >= 0) spMat.setSelection(idx);
+        }
+        layout.addView(spMat);
+
+        com.google.android.material.textfield.TextInputLayout tilLoad = new com.google.android.material.textfield.TextInputLayout(requireContext());
+        tilLoad.setHint(getString(R.string.panel_surface_load_label));
+        TextInputEditText etLoad = new TextInputEditText(requireContext());
+        etLoad.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
+        etLoad.setHint(getString(R.string.panel_surface_load_hint));
+        tilLoad.addView(etLoad);
+        layout.addView(tilLoad);
+
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.panel_properties_title)
+                .setView(layout)
+                .setPositiveButton(android.R.string.ok, (d, which) -> {
+                    try {
+                        String tStr = etThickness.getText() != null ? etThickness.getText().toString().trim() : "";
+                        if (!tStr.isEmpty()) {
+                            panel.thickness = Math.max(0.01, Double.parseDouble(tStr));
+                        }
+                        panel.elementType = (spType.getSelectedItemPosition() == 1) ? "CPS4" : "S4R";
+                        if (spMat.getSelectedItem() != null) {
+                            panel.materialName = spMat.getSelectedItem().toString();
+                        }
+
+                        String loadStr = etLoad.getText() != null ? etLoad.getText().toString().trim() : "";
+                        if (!loadStr.isEmpty()) {
+                            double loadVal = Double.parseDouble(loadStr) * 1000.0;
+                            if (panel.nodeIds != null && !panel.nodeIds.isEmpty()) {
+                                double perNode = loadVal / panel.nodeIds.size();
+                                List<StructuralModel.Load> loads = binding.gridEditorView.getLoads();
+                                for (int nid : panel.nodeIds) {
+                                    StructuralModel.Load existing = null;
+                                    for (StructuralModel.Load l : loads) {
+                                        if (l.nodeId == nid) { existing = l; break; }
+                                    }
+                                    if ("CPS4".equalsIgnoreCase(panel.elementType)) {
+                                        if (existing != null) existing.fx += perNode;
+                                        else loads.add(new StructuralModel.Load(nid, perNode, 0.0, 0.0));
+                                    } else {
+                                        if (existing != null) existing.fz += perNode;
+                                        else loads.add(new StructuralModel.Load(nid, 0.0, 0.0, perNode));
+                                    }
+                                }
+                                binding.gridEditorView.setLoads(loads);
+                            }
+                        }
+
+                        binding.gridEditorView.invalidate();
+                        Toast.makeText(requireContext(), R.string.panel_updated_toast, Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        logger.error("Error updating panel: " + e.getMessage());
+                    }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();

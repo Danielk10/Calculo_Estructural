@@ -46,6 +46,7 @@
     <string name="label_material">Material Specification</string>
     <string name="label_cross_section">Cross-Section Profile</string>
     <string name="grid_stats_format">%1$d Nodes | %2$d Elements</string>
+    <string name="grid_stats_panels_format">%1$d Nodes | %2$d Elements | %3$d Panels</string>
     <string name="btn_mode_inspect">Select</string>
     <string name="btn_mode_draw">Draw</string>
     <string name="btn_mode_move_nodes">Move</string>
@@ -57,6 +58,11 @@
     <string name="btn_mode_undo">Undo</string>
     <string name="btn_mode_clear">Clear</string>
     <string name="tv_component_info_hint">Select any node, member, or panel to inspect technical properties</string>
+    <string name="panel_properties_title">Panel Properties (Slab / Wall)</string>
+    <string name="panel_thickness_label">Thickness t (m)</string>
+    <string name="panel_surface_load_label">Surface Load / Pressure (kN/m²)</string>
+    <string name="panel_surface_load_hint">e.g. -10.0 (Gravity) or 25.0 (Shear)</string>
+    <string name="panel_updated_toast">Panel properties updated</string>
     <string name="label_preset_template">Engineering Preset / Benchmark:</string>
     <string name="btn_run_fea_solver">EXECUTE FEA SOLVER</string>
     <string name="btn_solving_fea">SOLVING WITH CALCULIX (CCX)...</string>

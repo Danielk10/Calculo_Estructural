@@ -57,6 +57,9 @@ public class GridEditorView extends View {
     private int nextElementId = 1;
     private int nextPanelId = 1;
 
+    private String activeElementType = "BEAM";
+    private double defaultPanelThickness = 0.15;
+
     private String defaultSection = "HEB200";
     private String defaultMaterial = "Structural Steel A36";
 
@@ -124,6 +127,10 @@ public class GridEditorView extends View {
         void onElementSelected(StructuralModel.Element element);
     }
 
+    public interface OnPanelSelectedListener {
+        void onPanelSelected(StructuralModel.Panel panel);
+    }
+
     public interface OnComponentInspectedListener {
         void onComponentInspected(String infoText);
     }
@@ -131,6 +138,7 @@ public class GridEditorView extends View {
     private OnModelChangeListener modelChangeListener;
     private OnNodeSelectedListener nodeSelectedListener;
     private OnElementSelectedListener elementSelectedListener;
+    private OnPanelSelectedListener panelSelectedListener;
     private OnComponentInspectedListener componentInspectedListener;
 
     public GridEditorView(Context context) {
@@ -337,6 +345,24 @@ public class GridEditorView extends View {
         return defaultMaterial;
     }
 
+    public void setActiveElementType(String type, double thickness) {
+        this.activeElementType = (type != null && !type.trim().isEmpty()) ? type.trim() : "BEAM";
+        if (thickness > 0) this.defaultPanelThickness = thickness;
+        invalidate();
+    }
+
+    public String getActiveElementType() {
+        return activeElementType;
+    }
+
+    public void setDefaultPanelThickness(double thickness) {
+        if (thickness > 0) this.defaultPanelThickness = thickness;
+    }
+
+    public double getDefaultPanelThickness() {
+        return defaultPanelThickness;
+    }
+
     public void setOnModelChangeListener(OnModelChangeListener listener) {
         this.modelChangeListener = listener;
     }
@@ -347,6 +373,10 @@ public class GridEditorView extends View {
 
     public void setOnElementSelectedListener(OnElementSelectedListener listener) {
         this.elementSelectedListener = listener;
+    }
+
+    public void setOnPanelSelectedListener(OnPanelSelectedListener listener) {
+        this.panelSelectedListener = listener;
     }
 
     public void setOnComponentInspectedListener(OnComponentInspectedListener listener) {
@@ -1140,35 +1170,60 @@ public class GridEditorView extends View {
         // 4. Elements (Beams / Columns) with dimension badges
         drawElements(canvas, height);
 
-        // 5. Active candidate drag line & guidelines
+        // 5. Active candidate drag line & guidelines / panel preview
         if (isDragging && activeNode != null) {
             float x1 = worldToScreenX(activeNode.x);
             float y1 = worldToScreenY(activeNode.y, height);
             float x2 = hasSnappedTarget ? worldToScreenX(snappedGridX) : currentDragX;
             float y2 = hasSnappedTarget ? worldToScreenY(snappedGridY, height) : currentDragY;
 
-            // Orthogonal guide line across screen
-            if (Math.abs(x1 - x2) < 2f) {
-                canvas.drawLine(x1, 0, x1, height, guideLinePaint);
-            } else if (Math.abs(y1 - y2) < 2f) {
-                canvas.drawLine(0, y1, width, y1, guideLinePaint);
+            boolean isPanel = "S4R".equalsIgnoreCase(activeElementType) || "CPS4".equalsIgnoreCase(activeElementType);
+
+            if (isPanel) {
+                float left = Math.min(x1, x2);
+                float right = Math.max(x1, x2);
+                float top = Math.min(y1, y2);
+                float bottom = Math.max(y1, y2);
+                RectF panelRect = new RectF(left, top, right, bottom);
+                canvas.drawRect(panelRect, panelPaint);
+                canvas.drawRect(panelRect, panelBorderPaint);
+
+                double wWorld = Math.abs(screenToWorldX(x2) - activeNode.x);
+                double hWorld = Math.abs(screenToWorldY(y2, height) - activeNode.y);
+                float mx = (left + right) / 2f;
+                float my = (top + bottom) / 2f;
+
+                String typeName = "S4R".equalsIgnoreCase(activeElementType) ? "Slab (S4R)" : "Shear Wall (CPS4)";
+                String dragHudText = String.format(Locale.US, "%s: %.1fm × %.1fm (t=%.2fm)", typeName, wWorld, hWorld, defaultPanelThickness);
+                float hudW = hudTextPaint.measureText(dragHudText);
+                RectF dragBadgeRect = new RectF(mx - hudW / 2f - 8f, my - 22f, mx + hudW / 2f + 8f, my + 6f);
+                canvas.drawRoundRect(dragBadgeRect, 8f, 8f, hudBgPaint);
+                canvas.drawRoundRect(dragBadgeRect, 8f, 8f, badgeBorderPaint);
+                canvas.drawText(dragHudText, mx - hudW / 2f, my - 2f, hudTextPaint);
+            } else {
+                // Orthogonal guide line across screen
+                if (Math.abs(x1 - x2) < 2f) {
+                    canvas.drawLine(x1, 0, x1, height, guideLinePaint);
+                } else if (Math.abs(y1 - y2) < 2f) {
+                    canvas.drawLine(0, y1, width, y1, guideLinePaint);
+                }
+
+                canvas.drawLine(x1, y1, x2, y2, activeElementPaint);
+
+                // Dynamic Length & Delta HUD badge on active drag
+                double dx = screenToWorldX(x2) - activeNode.x;
+                double dy = screenToWorldY(y2, height) - activeNode.y;
+                double len = Math.sqrt(dx * dx + dy * dy);
+                float mx = (x1 + x2) / 2f;
+                float my = (y1 + y2) / 2f - 20f;
+
+                String dragHudText = String.format(Locale.US, "L=%.2fm (dX=%.1f, dY=%.1f)", len, dx, dy);
+                float hudW = hudTextPaint.measureText(dragHudText);
+                RectF dragBadgeRect = new RectF(mx - hudW / 2f - 8f, my - 22f, mx + hudW / 2f + 8f, my + 6f);
+                canvas.drawRoundRect(dragBadgeRect, 8f, 8f, hudBgPaint);
+                canvas.drawRoundRect(dragBadgeRect, 8f, 8f, badgeBorderPaint);
+                canvas.drawText(dragHudText, mx - hudW / 2f, my - 2f, hudTextPaint);
             }
-
-            canvas.drawLine(x1, y1, x2, y2, activeElementPaint);
-
-            // Dynamic Length & Delta HUD badge on active drag
-            double dx = screenToWorldX(x2) - activeNode.x;
-            double dy = screenToWorldY(y2, height) - activeNode.y;
-            double len = Math.sqrt(dx * dx + dy * dy);
-            float mx = (x1 + x2) / 2f;
-            float my = (y1 + y2) / 2f - 20f;
-
-            String dragHudText = String.format(Locale.US, "L=%.2fm (dX=%.1f, dY=%.1f)", len, dx, dy);
-            float hudW = hudTextPaint.measureText(dragHudText);
-            RectF dragBadgeRect = new RectF(mx - hudW / 2f - 8f, my - 22f, mx + hudW / 2f + 8f, my + 6f);
-            canvas.drawRoundRect(dragBadgeRect, 8f, 8f, hudBgPaint);
-            canvas.drawRoundRect(dragBadgeRect, 8f, 8f, badgeBorderPaint);
-            canvas.drawText(dragHudText, mx - hudW / 2f, my - 2f, hudTextPaint);
         }
 
         // 6. Applied Point Loads
@@ -1973,6 +2028,13 @@ public class GridEditorView extends View {
                         notifyComponentInspected();
                         invalidate();
                         return true;
+                    } else if (selectedPanel != null) {
+                        if (panelSelectedListener != null) {
+                            panelSelectedListener.onPanelSelected(selectedPanel);
+                        }
+                        notifyComponentInspected();
+                        invalidate();
+                        return true;
                     }
                 } else if (currentMode == Mode.MOVE_NODES || currentMode == Mode.SELECT_MOVE) {
                     selectedNode = getNodeNearScreen(x, y, 45f);
@@ -1989,6 +2051,9 @@ public class GridEditorView extends View {
                     selectedNode = getNodeNearScreen(x, y, 45f);
                     selectedElement = (selectedNode == null) ? getElementNearScreen(x, y, 30f) : null;
                     selectedPanel = (selectedNode == null && selectedElement == null) ? getPanelNearScreen(x, y) : null;
+                    if (selectedPanel != null && panelSelectedListener != null) {
+                        panelSelectedListener.onPanelSelected(selectedPanel);
+                    }
                     notifyComponentInspected();
                     invalidate();
                     return true;
@@ -2078,44 +2143,70 @@ public class GridEditorView extends View {
                     if (dragged) {
                         saveSnapshot();
 
-                        if (activeNodeIsPending) {
-                            // Check if a node already exists at activeNode position
-                            StructuralModel.Node existingStart = null;
-                            for (StructuralModel.Node n : nodes) {
-                                if (Math.hypot(n.x - activeNode.x, n.y - activeNode.y) < 0.15) {
-                                    existingStart = n;
-                                    break;
+                        boolean isPanel = "S4R".equalsIgnoreCase(activeElementType) || "CPS4".equalsIgnoreCase(activeElementType);
+                        double wDist = Math.abs(snappedGridX - activeNode.x);
+                        double hDist = Math.abs(snappedGridY - activeNode.y);
+
+                        if (isPanel && wDist >= 0.4 && hDist >= 0.4) {
+                            double minX = Math.min(activeNode.x, snappedGridX);
+                            double maxX = Math.max(activeNode.x, snappedGridX);
+                            double minY = Math.min(activeNode.y, snappedGridY);
+                            double maxY = Math.max(activeNode.y, snappedGridY);
+
+                            StructuralModel.Node n1 = getOrCreateNodeAt(minX, minY);
+                            StructuralModel.Node n2 = getOrCreateNodeAt(maxX, minY);
+                            StructuralModel.Node n3 = getOrCreateNodeAt(maxX, maxY);
+                            StructuralModel.Node n4 = getOrCreateNodeAt(minX, maxY);
+
+                            ensureElementBetween(n1.id, n2.id);
+                            ensureElementBetween(n2.id, n3.id);
+                            ensureElementBetween(n3.id, n4.id);
+                            ensureElementBetween(n4.id, n1.id);
+
+                            panels.add(new StructuralModel.Panel(nextPanelId++, java.util.Arrays.asList(n1.id, n2.id, n3.id, n4.id),
+                                    defaultPanelThickness, defaultMaterial, activeElementType));
+
+                            notifyModelChange();
+                        } else {
+                            if (activeNodeIsPending) {
+                                // Check if a node already exists at activeNode position
+                                StructuralModel.Node existingStart = null;
+                                for (StructuralModel.Node n : nodes) {
+                                    if (Math.hypot(n.x - activeNode.x, n.y - activeNode.y) < 0.15) {
+                                        existingStart = n;
+                                        break;
+                                    }
+                                }
+                                if (existingStart != null) {
+                                    activeNode = existingStart;
+                                } else {
+                                    nodes.add(activeNode);
+                                }
+                                activeNodeIsPending = false;
+                            }
+
+                            StructuralModel.Node targetNode = hoveredNode;
+                            if (targetNode == null) {
+                                for (StructuralModel.Node n : nodes) {
+                                    if (Math.hypot(n.x - snappedGridX, n.y - snappedGridY) < 0.15) {
+                                        targetNode = n;
+                                        break;
+                                    }
                                 }
                             }
-                            if (existingStart != null) {
-                                activeNode = existingStart;
-                            } else {
-                                nodes.add(activeNode);
+
+                            if (targetNode == null) {
+                                targetNode = new StructuralModel.Node(nextNodeId++, snappedGridX, snappedGridY, 0.0,
+                                        snappedGridY == 0 ? StructuralModel.SupportType.FIXED : StructuralModel.SupportType.FREE);
+                                nodes.add(targetNode);
                             }
-                            activeNodeIsPending = false;
-                        }
 
-                        StructuralModel.Node targetNode = hoveredNode;
-                        if (targetNode == null) {
-                            for (StructuralModel.Node n : nodes) {
-                                if (Math.hypot(n.x - snappedGridX, n.y - snappedGridY) < 0.15) {
-                                    targetNode = n;
-                                    break;
-                                }
+                            if (targetNode.id != activeNode.id && !hasElementBetween(activeNode.id, targetNode.id)) {
+                                elements.add(new StructuralModel.Element(nextElementId++, activeNode.id, targetNode.id, defaultSection, defaultMaterial));
                             }
+                            
+                            notifyModelChange();
                         }
-
-                        if (targetNode == null) {
-                            targetNode = new StructuralModel.Node(nextNodeId++, snappedGridX, snappedGridY, 0.0,
-                                    snappedGridY == 0 ? StructuralModel.SupportType.FIXED : StructuralModel.SupportType.FREE);
-                            nodes.add(targetNode);
-                        }
-
-                        if (targetNode.id != activeNode.id && !hasElementBetween(activeNode.id, targetNode.id)) {
-                            elements.add(new StructuralModel.Element(nextElementId++, activeNode.id, targetNode.id, defaultSection, defaultMaterial));
-                        }
-                        
-                        notifyModelChange();
                     }
 
                     activeNode = null;
@@ -2156,6 +2247,26 @@ public class GridEditorView extends View {
             }
         }
         return false;
+    }
+
+    private void ensureElementBetween(int n1Id, int n2Id) {
+        if (n1Id != n2Id && !hasElementBetween(n1Id, n2Id)) {
+            elements.add(new StructuralModel.Element(nextElementId++, n1Id, n2Id, defaultSection, defaultMaterial));
+        }
+    }
+
+    private StructuralModel.Node getOrCreateNodeAt(double x, double y) {
+        for (StructuralModel.Node n : nodes) {
+            if (Math.hypot(n.x - x, n.y - y) < 0.15) {
+                return n;
+            }
+        }
+        StructuralModel.SupportType sup = (y == 0) ?
+                ("CPS4".equalsIgnoreCase(activeElementType) ? StructuralModel.SupportType.FIXED : StructuralModel.SupportType.PINNED) :
+                StructuralModel.SupportType.FREE;
+        StructuralModel.Node n = new StructuralModel.Node(nextNodeId++, x, y, 0.0, sup);
+        nodes.add(n);
+        return n;
     }
 
     private void deleteNode(StructuralModel.Node node) {

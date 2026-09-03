@@ -479,5 +479,101 @@ public class FrameAnalysisEngineTest {
         assertEquals(150000.0, loadedMat.E, 1e-3);
         assertEquals(0.25, loadedMat.nu, 1e-3);
     }
+
+    @Test
+    public void testCustomDrawnSlab_S4R_BendingAndEquilibrium() {
+        StructuralModel model = new StructuralModel();
+
+        // User drawn custom 5.0m x 4.0m slab, thickness = 0.18m
+        double w = 5.0;
+        double h = 4.0;
+        double t = 0.18;
+
+        // 4 corner nodes
+        model.nodes.add(new StructuralModel.Node(1, 0.0, 0.0, 0.0, StructuralModel.SupportType.PINNED));
+        model.nodes.add(new StructuralModel.Node(2, w, 0.0, 0.0, StructuralModel.SupportType.PINNED));
+        model.nodes.add(new StructuralModel.Node(3, w, h, 0.0, StructuralModel.SupportType.PINNED));
+        model.nodes.add(new StructuralModel.Node(4, 0.0, h, 0.0, StructuralModel.SupportType.PINNED));
+
+        // Perimeter boundary beams
+        model.elements.add(new StructuralModel.Element(1, 1, 2, "Rect 200x300", "Normal Weight Concrete 25MPa"));
+        model.elements.add(new StructuralModel.Element(2, 2, 3, "Rect 200x300", "Normal Weight Concrete 25MPa"));
+        model.elements.add(new StructuralModel.Element(3, 3, 4, "Rect 200x300", "Normal Weight Concrete 25MPa"));
+        model.elements.add(new StructuralModel.Element(4, 4, 1, "Rect 200x300", "Normal Weight Concrete 25MPa"));
+
+        // User drawn S4R slab panel
+        model.panels.add(new StructuralModel.Panel(1, java.util.Arrays.asList(1, 2, 3, 4), t, "Normal Weight Concrete 25MPa", "S4R"));
+
+        // User applied -20 kN out-of-plane gravity load distributed over the 4 nodes (-5 kN each)
+        model.loads.add(new StructuralModel.Load(1, 0.0, 0.0, -5000.0));
+        model.loads.add(new StructuralModel.Load(2, 0.0, 0.0, -5000.0));
+        model.loads.add(new StructuralModel.Load(3, 0.0, 0.0, -5000.0));
+        model.loads.add(new StructuralModel.Load(4, 0.0, 0.0, -5000.0));
+
+        FrameAnalysisEngine.AnalysisOutput out = FrameAnalysisEngine.analyze(model);
+
+        assertNotNull(out);
+        assertNotNull(out.parseResult);
+        assertFalse("Panel forces should be generated for custom slab", out.parseResult.panelForces.isEmpty());
+
+        StructuralBeamDatParser.PanelForces pf = out.parseResult.panelForces.get(0);
+        assertEquals(1, pf.panelId);
+        assertTrue(pf.Mx > 0.0);
+
+        // Verify vertical equilibrium: sum of reactions Rz must balance -20 kN applied load
+        assertEquals(-20000.0, out.sumAppliedFz, 1e-3);
+        assertEquals(20000.0, Math.abs(out.sumReactRz), 1e-1);
+    }
+
+    @Test
+    public void testCustomDrawnShearWall_CPS4_LateralStiffnessAndShear() {
+        StructuralModel model = new StructuralModel();
+
+        // User drawn custom 3.5m x 3.0m shear wall, thickness = 0.25m
+        double w = 3.5;
+        double h = 3.0;
+        double t = 0.25;
+
+        // Base nodes fixed at y = 0
+        model.nodes.add(new StructuralModel.Node(1, 0.0, 0.0, 0.0, StructuralModel.SupportType.FIXED));
+        model.nodes.add(new StructuralModel.Node(2, w, 0.0, 0.0, StructuralModel.SupportType.FIXED));
+        // Top nodes free at y = h
+        model.nodes.add(new StructuralModel.Node(3, w, h, 0.0, StructuralModel.SupportType.FREE));
+        model.nodes.add(new StructuralModel.Node(4, 0.0, h, 0.0, StructuralModel.SupportType.FREE));
+
+        // Perimeter frame
+        model.elements.add(new StructuralModel.Element(1, 1, 4, "Rect 300x400", "Normal Weight Concrete 25MPa"));
+        model.elements.add(new StructuralModel.Element(2, 2, 3, "Rect 300x400", "Normal Weight Concrete 25MPa"));
+        model.elements.add(new StructuralModel.Element(3, 4, 3, "Rect 300x400", "Normal Weight Concrete 25MPa"));
+
+        // User drawn CPS4 shear wall panel
+        model.panels.add(new StructuralModel.Panel(1, java.util.Arrays.asList(1, 2, 3, 4), t, "Normal Weight Concrete 25MPa", "CPS4"));
+
+        // 60 kN lateral earthquake/wind force applied at top nodes (+30 kN each)
+        model.loads.add(new StructuralModel.Load(3, 30000.0, 0.0, 0.0));
+        model.loads.add(new StructuralModel.Load(4, 30000.0, 0.0, 0.0));
+
+        FrameAnalysisEngine.AnalysisOutput out = FrameAnalysisEngine.analyze(model);
+
+        assertNotNull(out);
+        assertNotNull(out.parseResult);
+        assertFalse("Panel forces should be generated for custom shear wall", out.parseResult.panelForces.isEmpty());
+
+        StructuralBeamDatParser.PanelForces pf = out.parseResult.panelForces.get(0);
+        assertEquals(1, pf.panelId);
+        assertTrue("Wall panel must carry substantial lateral shear", pf.Vshear_total > 50.0);
+
+        // Check horizontal equilibrium: base reaction sum Rx must balance 60 kN applied
+        assertEquals(60000.0, out.sumAppliedFx, 1e-3);
+        assertEquals(60000.0, Math.abs(out.sumReactRx), 1e-1);
+
+        // Top drift must be positive in the direction of load
+        Map<Integer, StructuralBeamDatParser.NodeDisplacement> dispMap = new HashMap<>();
+        for (StructuralBeamDatParser.NodeDisplacement d : out.parseResult.displacements) {
+            dispMap.put(d.nodeId, d);
+        }
+        assertTrue("Top node 4 drift must be positive in load direction", dispMap.get(4).ux > 0);
+        assertTrue("Top node 3 drift must be positive in load direction", dispMap.get(3).ux > 0);
+    }
 }
 
