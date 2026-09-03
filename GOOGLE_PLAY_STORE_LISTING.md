@@ -62,6 +62,21 @@ Diseñada para ingenieros civiles, calculistas, mecánicos, arquitectos y estudi
 
 ---
 
+### 🚀 Novedades de esta Versión ("What's New") — [Máximo 500 caracteres]
+
+```text
+¡Novedades en Structural Analysis FEA 3D v0.1.0!
+• Dibujo interactivo y cálculo FEA de losas S4R y muros CPS4 en el editor 2D.
+• Diálogo de propiedades de paneles: espesor, material y cargas superficiales.
+• Localización completa al idioma español (ES) en componentes de interfaz.
+• Sincronización entre editor 2D, visor 3D y solver CalculiX CCX.
+• Aviso legal y deslinde de responsabilidad para fines educativos y preliminares.
+• Memorias de cálculo en PDF bajo normas AISC 360-22, ACI 318-19 y ASCE 7-22.
+```
+*(Longitud exacta: 497 caracteres)*
+
+---
+
 ## 🇺🇸 ENGLISH VERSION
 
 ### 🏷️ App Title (Max 30 characters)
@@ -117,3 +132,18 @@ Designed for civil engineers, structural designers, mechanical engineers, archit
 • Command terminal for advanced users and developers looking to inspect files, run simulation scripts, and manage projects.
 ```
 *(Approximate length: 3100 characters)*
+
+---
+
+### 🚀 What's New in this Version — [Max 500 characters]
+
+```text
+What's New in Structural Analysis FEA 3D v0.1.0!
+• Interactive drawing and FEA solving for custom S4R slabs & CPS4 shear walls in 2D editor.
+• Panel properties dialog: edit thickness, material, and surface/lateral loads.
+• Full Spanish (ES) language localization across UI components.
+• Seamless synchronization between 2D editor, 3D viewport, and CalculiX CCX solver.
+• Legal disclaimer and educational usage policy notice.
+• Automated engineering PDF calculation reports (AISC 360-22, ACI 318-19, ASCE 7-22).
+```
+*(Exact length: 489 characters)*

@@ -1,40 +1,12 @@
-# 📦 Notas de Versión / Release Notes
-## Structural Analysis FEA 3D (`com.diamon.civil`) — Versión 0.1.0
+# 📦 Notas de Versión
+## Structural Analysis FEA 3D (`com.diamon.civil`) — Versión Alfa 0.1.0
 
 ---
-
-## 📱 Google Play Store — "What's New" / "Novedades de esta Versión"
-
-### 🇪🇸 Español (es-419 / es-ES) — [Máx. 500 caracteres]
-```text
-¡Novedades en Structural Analysis FEA 3D v0.1.0!
-• Dibujo interactivo y cálculo FEA de losas S4R y muros CPS4 en el editor 2D.
-• Diálogo de propiedades de paneles: espesor, material y cargas superficiales.
-• Localización completa al idioma español (ES) en componentes de interfaz.
-• Sincronización entre editor 2D, visor 3D y solver CalculiX CCX.
-• Aviso legal y deslinde de responsabilidad para fines educativos y preliminares.
-• Memorias de cálculo en PDF bajo normas AISC 360-22, ACI 318-19 y ASCE 7-22.
-```
-
-### 🇺🇸 English (en-US) — [Max. 500 characters]
-```text
-What's New in Structural Analysis FEA 3D v0.1.0!
-• Interactive drawing and FEA solving for custom S4R slabs & CPS4 shear walls in 2D editor.
-• Panel properties dialog: edit thickness, material, and surface/lateral loads.
-• Full Spanish (ES) language localization across UI components.
-• Seamless synchronization between 2D editor, 3D viewport, and CalculiX CCX solver.
-• Legal disclaimer and educational usage policy notice.
-• Automated engineering PDF calculation reports (AISC 360-22, ACI 318-19, ASCE 7-22).
-```
-
----
-
-## 🇪🇸 NOTAS COMPLETAS DE VERSIÓN (ESPAÑOL)
 
 ### 🚀 Novedades y Capacidades Principales
 
 #### 1. 🏗️ Módulo de Análisis Estructural y Pórticos (FEA 2D / 3D)
-* **Dibujo Interactivo de Lozas y Muros en Editor 2D:**
+* **Dibujo Interactivo de Losas y Muros en Editor 2D:**
   * Soporte para dibujar paneles bidimensionales de **Losa / Placa Flexible (`S4R`)** y **Muro de Cortante (`CPS4`)** mediante arrastre directo sobre la rejilla.
   * Vista previa rectangular con borde punteado y HUD con cotas métricas y espesor en tiempo real.
   * Generación topológica automática de los 4 nudos de esquina, apoyos en base y elementos perimetrales de contorno.
@@ -79,53 +51,11 @@ What's New in Structural Analysis FEA 3D v0.1.0!
 #### 5. ⚙️ Núcleo Científico y Validación
 * **CalculiX CCX 2.23:** Solucionador nativo en C/Fortran con álgebra lineal directa multihilo **SPOOLES 2.2**.
 * **Validación Cruzada Independiente con OpenSees:** Correlación física certificada superior al 99.85% en modelos de flexión, momentos y cargas trapezoidales.
-* **100% de Pruebas Superadas:** Suite unitaria `./gradlew test` completada con 0 fallos, incluyendo validación analítica de lozas S4R y muros CPS4 personalizados.
+* **100% de Pruebas Superadas:** Suite unitaria `./gradlew test` completada con 0 fallos, incluyendo validación analítica de losas S4R y muros CPS4 personalizados.
 
 ---
 
-## 🇺🇸 FULL RELEASE NOTES (ENGLISH)
-
-### 🚀 Key Features and Highlights
-
-#### 1. 🏗️ Structural Analysis & Frame FEA Module (2D / 3D)
-* **Interactive Drawing of Slabs & Shear Walls in 2D Editor:**
-  * Drag-to-create interactive drawing tool for **Slab / Floor Diaphragm (`S4R`)** and **Shear Wall (`CPS4`)** panels.
-  * Real-time rectangular preview with dynamic HUD showing metric dimensions and thickness.
-  * Automatic boundary node generation, support assignment, and perimeter bounding frames.
-* **2D Panel Property Inspection & Editing:**
-  * Panel properties dialog to adjust thickness ($t$), material, element formulation (`S4R` vs `CPS4`), and apply surface loads ($q$ in $\text{kN/m}^2$) with automatic tributary distribution to nodes.
-* **Interactive Topological Canvas:** 2D grid editor with magnetic snapping (0.5 m), rapid placement of nodes, frame elements, boundary supports (Fixed, Pinned, Roller), and live component counters (Nodes, Members, Panels).
-* **Advanced Load Application:** Support for nodal forces ($F_x, F_y$), concentrated moments ($M_z$), and member span distributed loads (uniform, trapezoidal, partial-span $w_1, w_2$).
-* **Member End Releases & Semi-Rigid Connections:** M33 bending moment releases and rotational stiffness spring definition ($K_\theta$).
-* **Internal Action Diagrams:** Real-time color-filled rendering of Bending Moment ($M_{33}$), Shear Force ($V_{22}$), Axial Force ($N$), and continuous elastic deflected shapes.
-* **12 Built-in Structural Presets:** Cantilever beams, continuous beams, single/multi-bay frames, Pratt & Warren trusses, 2-way concrete slabs (S4R), and confined shear walls (CPS4).
-
-#### 2. 🌐 Multi-Language (Spanish / English) & Legal Notice
-* **Spanish (ES) UI Localization:** Complete translation of all graphical user interface text, buttons, labels, and dialogs.
-* **Engineering Disclaimer & Educational Policy:** Clear in-app notice and privacy policy section detailing that calculations are for educational and preliminary exploration only, prohibiting direct unverified use in real-world construction.
-
-#### 3. 🧊 3D Continuum Solids & CAD Modeling (CAD + Gmsh + CalculiX)
-* **Headless CAD Engine (OpenCASCADE OCCT 8.0.0.p1):** 3D solid primitives (Box, Cylinder, Sphere), fillets, chamfers, and full Boolean operations (Cut, Fuse, Common).
-* **Universal CAD Ingestion:** Full import and healing for STEP (`.step`, `.stp`), IGES (`.iges`, `.igs`), BREP (`.brep`), and GEO (`.geo`) files.
-* **Gmsh 5.0 3D Mesh Engine:** Automatic generation of quadratic second-order 10-node tetrahedral elements (`C3D10`) with zero negative Jacobian distortion.
-* **3D SceneView Interactive Viewer:** 3D inspection of Von Mises stress thermal color maps and scaled deformed meshes.
-
-#### 4. 📄 Automated Engineering PDF Calculation Reports
-* **One-Click Professional Reporting:** Generates comprehensive calculation memo ready for engineering review and structural submittal.
-* **Rigid Table 6.1 Multi-Station Internal Forces:** Fixed 10-column layout ensuring perfect vertical alignment for $P, V_2, V_3, T, M_2, M_3$ across all member stations ($0.00L, 0.50L, 1.00L$).
-* **Automated Code Design Checks:**
-  * **AISC 360-22:** Steel member combined axial and flexural P-M-M interaction ratios (Eqs. H1-1a / H1-1b).
-  * **ACI 318-19 / Eurocode 2:** Reinforced concrete flexure, shear capacity ($V_c + V_s$), and two-way slab deflection.
-  * **ASCE 7-22 / NSR-10:** Inter-story seismic drift limits ($\Delta \le 1.0\%$) and live load deflection limits ($L/360, L/250$).
-
-#### 5. ⚙️ Scientific Computation & Validation
-* **CalculiX CCX 2.23:** Native C/Fortran finite element solver with **SPOOLES 2.2** multithreaded direct matrix solver.
-* **Independent OpenSees Cross-Validation:** Certified 92% - 100% agreement against analytical and research standards.
-* **100% Test Pass Rate:** Unit test suite executed and passed with zero regressions, verifying custom S4R slabs and CPS4 walls.
-
----
-
-### 📦 Build Outputs / Artefactos Generados:
-* **Production Signed Bundle (AAB for Google Play):** `/tmp/calculoestructural_build/outputs/bundle/release/app-release.aab`
+### 📦 Artefactos Generados:
+* **Production Signed Bundle (AAB para Google Play):** `/tmp/calculoestructural_build/outputs/bundle/release/app-release.aab`
 * **Release Signed APK:** `/tmp/calculoestructural_build/outputs/apk/release/app-release.apk`
 * **Debug Testing APK:** `/tmp/calculoestructural_build/outputs/apk/debug/app-debug.apk`
