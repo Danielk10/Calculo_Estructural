@@ -27,9 +27,9 @@
 * **Visualización de Resultados:** Diagramas de esfuerzos internos con relleno cromático continuo (Momento Flector $M_{33}$, Fuerza Cortante $V_{22}$, Fuerza Axial $N$) y deformada elástica interpolada.
 * **12 Presets Estructurales Integrados:** Vigas continuas, vigas con voladizo, pórticos simples e industriales de múltiples crujías, cerchas Pratt y Warren, losas bidireccionales de hormigón (S4R) y muros de corte confinados (CPS4).
 
-#### 2. 🌐 Multi-idioma (Español / Inglés) y Aviso Legal
+#### 2. 🌐 Multi-idioma (Español / Inglés) y Aviso de Confiabilidad
 * **Soporte de Idioma Español (ES):** Traducción integral de todos los textos de la interfaz gráfica de usuario (UI), etiquetas, botones, diálogos y selectores.
-* **Aviso Legal y Nota de Confiabilidad:** Inclusión de nota informativa en menú lateral, menú principal y política de privacidad, indicando que la aplicación es para fines académicos, educativos y de predimensionamiento rápido, aclarando que los datos y resultados numéricos son estimativos y no deben considerarse 100% confiables o concluyentes sin la correspondiente verificación técnica independiente.
+* **Nota de Confiabilidad y Fines Educativos:** Inclusión de nota informativa en menú lateral, menú superior y política de privacidad, indicando que la aplicación está diseñada para fines educativos y estimaciones preliminares, aclarando que los datos y resultados numéricos no son 100% confiables ni definitivos sin la debida validación técnica independiente.
 
 #### 3. 🧊 Módulo de Sólidos 3D y Modelado CAD (CAD + Gmsh + CalculiX)
 * **Modelado CAD Headless con OpenCASCADE (OCCT 8.0.0.p1):** Generación de primitivas volumétricas (Cubo, Cilindro, Esfera), chaflanes, redondeos y operaciones booleanas (Unión, Corte e Intersección).
