@@ -362,15 +362,7 @@ public class SolidFragment extends Fragment {
                 if (position >= 0 && position < availableGeometries.size()) {
                     File chosen = availableGeometries.get(position);
                     activeSimulationGeometry = chosen;
-                    if (chosen.getName().toLowerCase(java.util.Locale.US).endsWith(".inp")) {
-                        if (isFullyAssembledInp(chosen)) {
-                            logger.info("Active Deck: " + chosen.getName() + " (Fully assembled CalculiX deck ready for direct calculation).");
-                        } else {
-                            logger.info("Active Mesh: " + chosen.getName() + " (Raw INP mesh loaded. Configure materials/loads or click Execute FEA).");
-                        }
-                    } else {
-                        logger.info("Active CAD Model switched to: " + chosen.getName());
-                    }
+                    logger.info("Active CAD Model switched to: " + chosen.getName());
                 }
             }
             @Override
@@ -389,10 +381,7 @@ public class SolidFragment extends Fragment {
     }
 
     public static boolean isSupportedFormat(String fileName) {
-        if (fileName == null || fileName.trim().isEmpty()) return false;
-        String name = fileName.toLowerCase(java.util.Locale.US).trim();
-        if (name.equals("gmsh_cad_driver.geo") || name.startsWith("job_solid_clean") || name.startsWith("nsets") || name.equals("job_solid_raw.inp") || name.startsWith(".")) return false;
-        return isSupportedCadFormat(name) || name.endsWith(".inp");
+        return isSupportedCadFormat(fileName);
     }
 
     private void refreshGeometrySpinner(File selectFile) {
@@ -429,25 +418,14 @@ public class SolidFragment extends Fragment {
                             else if (name.equals("cut_result.brep")) displayNames.add(getString(R.string.geo_item_cut));
                             else if (name.equals("intersect_result.brep")) displayNames.add(getString(R.string.geo_item_intersect));
                             else displayNames.add("📥 " + f.getName());
-                        } else if (name.endsWith(".inp") && !name.startsWith("job_solid_clean") && !name.startsWith("nsets") && !name.equals("job_solid_raw.inp")) {
-                            availableGeometries.add(f);
-                            if (isFullyAssembledInp(f)) {
-                                displayNames.add("🧮 " + f.getName());
-                            } else {
-                                displayNames.add("📄 " + f.getName());
-                            }
                         }
                     }
                 }
             }
 
-            if (selectFile != null && isSupportedFormat(selectFile.getName()) && !availableGeometries.contains(selectFile)) {
+            if (selectFile != null && isSupportedCadFormat(selectFile.getName()) && !availableGeometries.contains(selectFile)) {
                 availableGeometries.add(selectFile);
-                if (selectFile.getName().toLowerCase(java.util.Locale.US).endsWith(".inp")) {
-                    displayNames.add(isFullyAssembledInp(selectFile) ? ("🧮 " + selectFile.getName()) : ("📄 " + selectFile.getName()));
-                } else {
-                    displayNames.add("📥 " + selectFile.getName());
-                }
+                displayNames.add("📥 " + selectFile.getName());
             }
 
             isProgrammaticGeometrySelection = true;
@@ -456,7 +434,7 @@ public class SolidFragment extends Fragment {
             binding.spinnerActiveGeometry.setAdapter(adapter);
 
             int selectedIndex = 0;
-            if (selectFile != null && isSupportedFormat(selectFile.getName())) {
+            if (selectFile != null && isSupportedCadFormat(selectFile.getName())) {
                 for (int i = 0; i < availableGeometries.size(); i++) {
                     if (availableGeometries.get(i).getAbsolutePath().equals(selectFile.getAbsolutePath())) {
                         selectedIndex = i;
@@ -584,7 +562,7 @@ public class SolidFragment extends Fragment {
             boolean exported = false;
             try {
                 com.diamon.civil.solids.export.SolidPDFReportGenerator generator = new com.diamon.civil.solids.export.SolidPDFReportGenerator();
-                boolean generated = generator.generateReport(ctx, reportFile, "3D Solid Analysis", workDir, logger.getFullLog());
+                boolean generated = generator.generateReport(ctx, reportFile, "3D Solid Analysis", workDir);
                 
                 if (generated && reportFile.exists()) {
                     com.diamon.civil.core.export.ExportManager manager = new com.diamon.civil.core.export.ExportManager(ctx);
@@ -657,8 +635,6 @@ public class SolidFragment extends Fragment {
                 if (binding != null) {
                     binding.pbSolid.setVisibility(View.VISIBLE);
                     binding.btnRunSolidAnalysis.setEnabled(false);
-                    activeSimulationGeometry = inpFile;
-                    refreshGeometrySpinner(inpFile);
                 }
             });
         }

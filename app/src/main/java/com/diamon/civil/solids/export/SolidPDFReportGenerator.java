@@ -117,50 +117,25 @@ public class SolidPDFReportGenerator {
         }
     }
 
+    /**
+     * @deprecated Use {@link #generateReport(Context, File, String, File)} instead.
+     * Raw console logs are excluded from the PDF report; only engineering calculation data is exported.
+     */
+    @Deprecated
     public boolean generateReport(Context context, File outputFile, String projectName, String logText) {
-        PdfDocument document = new PdfDocument();
-        pageNumber = 0;
-        PageContext ctx = new PageContext(document);
-
-        try {
-            drawCoverPage(document, projectName);
-            if (logText != null && !logText.isEmpty()) {
-                ctx.newPage(this);
-                drawLogPages(ctx, logText);
-            }
-
-            ctx.finish(this);
-            FileOutputStream fos = new FileOutputStream(outputFile);
-            document.writeTo(fos);
-            fos.close();
-            document.close();
-            return true;
-        } catch (Exception e) {
-            Log.e(TAG, "Error generating Solid PDF: " + e.getMessage(), e);
-            document.close();
-            return false;
-        }
+        return generateReport(context, outputFile, projectName, (File) null);
     }
 
     public boolean generateReport(Context context, File outputFile, String projectName, File workDir) {
-        return generateReport(context, outputFile, projectName, workDir, null);
-    }
-
-    public boolean generateReport(Context context, File outputFile, String projectName, File workDir, String logText) {
         PdfDocument document = new PdfDocument();
         pageNumber = 0;
         PageContext ctx = new PageContext(document);
 
         try {
             drawCoverPage(document, projectName);
-            File datFile = new File(workDir, "job_solid.dat");
+            File datFile = (workDir != null) ? new File(workDir, "job_solid.dat") : null;
             ctx.newPage(this);
             drawSummaryPage(ctx, datFile, workDir);
-
-            if (logText != null && !logText.trim().isEmpty()) {
-                ctx.newPage(this);
-                drawLogPages(ctx, logText);
-            }
 
             ctx.finish(this);
             FileOutputStream fos = new FileOutputStream(outputFile);
@@ -176,6 +151,14 @@ public class SolidPDFReportGenerator {
             document.close();
             return false;
         }
+    }
+
+    /**
+     * Backward-compatible overload. The logText parameter is ignored to keep the PDF report
+     * focused strictly on engineering calculation data without raw console logs.
+     */
+    public boolean generateReport(Context context, File outputFile, String projectName, File workDir, String logText) {
+        return generateReport(context, outputFile, projectName, workDir);
     }
 
     private void finishPage(PdfDocument document, Canvas canvas) {
@@ -494,19 +477,6 @@ public class SolidPDFReportGenerator {
         ctx.y = drawWrappedText(ctx, "• High stress concentrations near sharp geometric features should be evaluated for notch fatigue or local yielding.", MARGIN_LEFT, USABLE_WIDTH, 12f, bodyPaint);
     }
 
-    private void drawLogPages(PageContext ctx, String logText) {
-        ctx.ensureSpace(this, 30f);
-        ctx.canvas.drawText("ANALYSIS LOG", MARGIN_LEFT, ctx.y, headerPaint);
-        ctx.y += 6f;
-        ctx.canvas.drawLine(MARGIN_LEFT, ctx.y, PAGE_WIDTH - MARGIN_RIGHT, ctx.y, linePaint);
-        ctx.y += 18f;
-
-        String[] lines = logText.split("\n");
-        for (String line : lines) {
-            String cleaned = line.replace("\t", "    ");
-            ctx.y = drawWrappedText(ctx, cleaned, MARGIN_LEFT, USABLE_WIDTH, 12f, bodyPaint);
-        }
-    }
 
     private float drawTableHeader(PageContext ctx, String[] headers, float[] colWidths) {
         float rowHeight = 15f;
