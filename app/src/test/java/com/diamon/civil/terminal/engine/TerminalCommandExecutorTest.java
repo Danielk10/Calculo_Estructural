@@ -136,4 +136,51 @@ public class TerminalCommandExecutorTest {
         globalExecutor.execute("cd ../../..");
         assertEquals("/", globalExecutor.execute("pwd"));
     }
+
+    @Test
+    public void testEchoAndRedirection() throws Exception {
+        // Simple echo
+        String echoRes = executor.execute("echo \"Hello Terminal\"");
+        assertEquals("Hello Terminal", echoRes);
+
+        // Echo with write redirection (>)
+        String writeRes = executor.execute("echo \"pload ALL\\nbox b 10 10 10\" > test_script.tcl");
+        assertTrue(writeRes.contains("Written to test_script.tcl"));
+        String catRes = executor.execute("cat test_script.tcl");
+        assertTrue(catRes.contains("pload ALL"));
+        assertTrue(catRes.contains("box b 10 10 10"));
+
+        // Echo with append redirection (>>)
+        String appendRes = executor.execute("echo \"writebrep b test.brep\" >> test_script.tcl");
+        assertTrue(appendRes.contains("Appended to test_script.tcl"));
+        String catAppended = executor.execute("cat test_script.tcl");
+        assertTrue(catAppended.contains("writebrep b test.brep"));
+
+        // Sandbox check on echo redirection
+        String escapeRes = executor.execute("echo \"malicious\" > ../../outside.txt");
+        assertTrue(escapeRes.contains("escapes workspace sandbox"));
+    }
+
+    @Test
+    public void testSplitCommandLinePreservesQuotes() {
+        String cmd = "draw -c \"pload ALL; box b 10 20 30; exit\"";
+        String[] tokens = TerminalCommandExecutor.splitCommandLine(cmd);
+        assertEquals(3, tokens.length);
+        assertEquals("draw", tokens[0]);
+        assertEquals("-c", tokens[1]);
+        assertEquals("pload ALL; box b 10 20 30; exit", tokens[2]);
+
+        String cmd2 = "gmsh solid.step -3 -clmax 2.5 -string \"Mesh.MeshSizeMax = 1.0;\" -format inp";
+        String[] tokens2 = TerminalCommandExecutor.splitCommandLine(cmd2);
+        assertEquals(9, tokens2.length);
+        assertEquals("gmsh", tokens2[0]);
+        assertEquals("solid.step", tokens2[1]);
+        assertEquals("-3", tokens2[2]);
+        assertEquals("-clmax", tokens2[3]);
+        assertEquals("2.5", tokens2[4]);
+        assertEquals("-string", tokens2[5]);
+        assertEquals("Mesh.MeshSizeMax = 1.0;", tokens2[6]);
+        assertEquals("-format", tokens2[7]);
+        assertEquals("inp", tokens2[8]);
+    }
 }

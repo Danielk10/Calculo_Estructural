@@ -488,23 +488,72 @@ public class TerminalFragment extends Fragment {
 
             if (result == null) {
                 // Delegate to binary execution if command not built-in
-                String[] parts = input.split("\\s+");
-                String binary = parts[0];
-                String[] args = new String[parts.length - 1];
-                System.arraycopy(parts, 1, args, 0, args.length);
+                String[] parts = TerminalCommandExecutor.splitCommandLine(input);
+                if (parts.length > 0) {
+                    String binary = parts[0];
+                    String[] args = new String[parts.length - 1];
+                    System.arraycopy(parts, 1, args, 0, args.length);
 
-                if (binary.equalsIgnoreCase("gmsh")) {
-                    result = calculixExecutor.executeBinary("gmsh", args);
-                } else if (binary.equalsIgnoreCase("ccx")) {
-                    if (args.length == 1 && !args[0].startsWith("-")) {
-                        result = calculixExecutor.executeCalculix(args[0]);
+                    if (binary.equalsIgnoreCase("gmsh")) {
+                        if (args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("--help")) {
+                            result = calculixExecutor.executeBinary("gmsh", "-help");
+                        } else {
+                            result = calculixExecutor.executeBinary("gmsh", args);
+                        }
+                    } else if (binary.equalsIgnoreCase("ccx")) {
+                        if (args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("--help")) {
+                            result = "CalculiX CCX Usage:\n" +
+                                     "  ccx <jobname>       - Run analysis on <jobname>.inp\n" +
+                                     "  ccx -i <jobname>    - Standard CalculiX input flag\n" +
+                                     "  ccx -v              - Print CalculiX version and build date\n";
+                        } else if (args.length == 1 && (args[0].equalsIgnoreCase("-v") || args[0].equalsIgnoreCase("--version"))) {
+                            result = calculixExecutor.executeBinary("ccx", "-v");
+                        } else if (args.length == 1 && !args[0].startsWith("-")) {
+                            result = calculixExecutor.executeCalculix(args[0]);
+                        } else if (args.length == 2 && args[0].equalsIgnoreCase("-i")) {
+                            result = calculixExecutor.executeCalculix(args[1]);
+                        } else {
+                            result = calculixExecutor.executeBinary("ccx", args);
+                        }
+                    } else if (binary.equalsIgnoreCase("drawexe") || binary.equalsIgnoreCase("draw")) {
+                        if (args.length == 0) {
+                            result = "OpenCASCADE DRAWEXE (TCL CAD Engine) Usage:\n" +
+                                     "  draw <script.tcl>           - Run TCL script in headless batch mode\n" +
+                                     "  draw -b -f <script.tcl>     - Standard batch execution from file\n" +
+                                     "  draw -c \"<tcl_commands>\"    - Run inline TCL/CAD commands\n\n" +
+                                     "Key TCL/CAD Commands:\n" +
+                                     "  pload ALL                   - Load modeling, exchange & test commands\n" +
+                                     "  box <b> <dx> <dy> <dz>      - Create 3D rectangular prism\n" +
+                                     "  cylinder <c> <R> <H>        - Create 3D cylinder\n" +
+                                     "  sphere <s> <R>              - Create 3D sphere\n" +
+                                     "  bcut <res> <s1> <s2>        - Boolean difference / cut\n" +
+                                     "  bfuse <res> <s1> <s2>       - Boolean union / fuse\n" +
+                                     "  bcommon <res> <s1> <s2>     - Boolean intersection\n" +
+                                     "  vprops <shape>              - Volume, centroid, inertia tensor\n" +
+                                     "  checkshape <shape>          - Validate solid topology\n" +
+                                     "  testwritestep <file> <shp>  - Export solid to STEP (.step)\n" +
+                                     "  writebrep <shp> <file>      - Export solid to OpenCASCADE BRep\n" +
+                                     "  exit                        - Terminate script\n";
+                        } else if (args.length == 1 && args[0].endsWith(".tcl")) {
+                            // Automatically execute TCL script in headless batch mode (-b -f)
+                            result = calculixExecutor.executeBinary("DRAWEXE", "-b", "-f", args[0]);
+                        } else if (args.length >= 2 && args[0].equalsIgnoreCase("-c")) {
+                            // Run inline command in headless batch mode (-b -c)
+                            result = calculixExecutor.executeBinary("DRAWEXE", "-b", "-c", args[1]);
+                        } else if (args.length >= 1 && !args[0].equals("-b") && !args[0].equals("-v") && !args[0].equals("-i")) {
+                            // Prepend -b for headless mobile execution
+                            String[] drawArgs = new String[args.length + 1];
+                            drawArgs[0] = "-b";
+                            System.arraycopy(args, 0, drawArgs, 1, args.length);
+                            result = calculixExecutor.executeBinary("DRAWEXE", drawArgs);
+                        } else {
+                            result = calculixExecutor.executeBinary("DRAWEXE", args);
+                        }
+                    } else if (binary.equalsIgnoreCase("tclsh") || binary.equalsIgnoreCase("tcl")) {
+                        result = calculixExecutor.executeBinary("tclsh", args);
                     } else {
-                        result = calculixExecutor.executeBinary("ccx", args);
+                        result = calculixExecutor.executeBinary(binary, args);
                     }
-                } else if (binary.equalsIgnoreCase("drawexe")) {
-                    result = calculixExecutor.executeBinary("DRAWEXE", args);
-                } else {
-                    result = calculixExecutor.executeBinary(binary, args);
                 }
             }
 

@@ -32,14 +32,18 @@ public class ModuleLogger {
         "  cd <path>              - Change working directory\n" +
         "  pwd                    - Show current directory path\n" +
         "  cat <file>             - Print file content to terminal\n" +
+        "  echo <text> [> file]   - Print text or write/append (>>) to file\n" +
+        "  touch <file>           - Create empty file or update timestamp\n" +
+        "  cp <src> <dst>         - Copy file between folders\n" +
         "  mkdir <name>           - Create new directory\n" +
         "  rm [-rf] <target>      - Delete file or directory\n" +
         "  clear                  - Clear terminal screen\n" +
         "  help                   - Show this help message\n\n" +
-        "Solvers & Direct Binaries:\n" +
-        "  ccx <jobname>          - Run CalculiX CCX solver directly on <jobname>.inp\n" +
-        "  gmsh <args>            - Run Gmsh 3D mesh generator directly\n" +
-        "  DRAWEXE <args>         - Run OpenCASCADE Test Harness DRAWEXE directly\n";
+        "Solvers, CAD & Scripting Binaries:\n" +
+        "  ccx <jobname>          - Run CalculiX CCX solver directly on <jobname>.inp (-i, -v)\n" +
+        "  gmsh <args>            - Run Gmsh 3D mesh generator directly (-3, -order, -clmax, -format)\n" +
+        "  draw [script.tcl|-c]   - Run OpenCASCADE DRAWEXE TCL CAD engine in headless mode\n" +
+        "  tclsh <script.tcl>     - Execute Tcl 8.6 script interpreter\n";
 
     static {
         GLOBAL_LOGGER.log(WELCOME_BANNER);

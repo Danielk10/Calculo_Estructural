@@ -3,7 +3,10 @@ package com.diamon.civil.terminal.engine;
 import com.diamon.civil.structural.test.simulation.SimulationTestManager;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class TerminalCommandExecutor {
 
@@ -42,7 +45,8 @@ public class TerminalCommandExecutor {
     public String execute(String commandLine) {
         if (commandLine == null || commandLine.trim().isEmpty()) return "";
 
-        String[] parts = commandLine.trim().split("\\s+");
+        String[] parts = splitCommandLine(commandLine.trim());
+        if (parts.length == 0) return "";
         String cmd = parts[0].toLowerCase();
 
         switch (cmd) {
@@ -62,6 +66,8 @@ public class TerminalCommandExecutor {
                 return touchFile(parts);
             case "cp":
                 return copyFile(parts);
+            case "echo":
+                return executeEcho(commandLine.trim());
             case "test-gmsh":
             case "test_gmsh":
             case "test-draw":
@@ -94,7 +100,10 @@ public class TerminalCommandExecutor {
                 return SimulationTestManager.runTest(homeDir, new File(System.getProperty("java.library.path")));
             case "gmsh":
             case "ccx":
+            case "draw":
             case "drawexe":
+            case "tcl":
+            case "tclsh":
                 return null; // Delegate to binary executor in TerminalFragment
             case "help":
             case "?":
@@ -102,6 +111,129 @@ public class TerminalCommandExecutor {
             default:
                 return null; // Delegate
         }
+    }
+
+    public static String[] splitCommandLine(String commandLine) {
+        if (commandLine == null || commandLine.trim().isEmpty()) {
+            return new String[0];
+        }
+        List<String> tokens = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+        boolean inDoubleQuotes = false;
+        boolean inSingleQuotes = false;
+        boolean escapeNext = false;
+
+        for (int i = 0; i < commandLine.length(); i++) {
+            char c = commandLine.charAt(i);
+
+            if (escapeNext) {
+                currentToken.append(c);
+                escapeNext = false;
+                continue;
+            }
+
+            if (c == '\\' && !inSingleQuotes) {
+                escapeNext = true;
+                continue;
+            }
+
+            if (c == '"' && !inSingleQuotes) {
+                inDoubleQuotes = !inDoubleQuotes;
+                continue;
+            }
+
+            if (c == '\'' && !inDoubleQuotes) {
+                inSingleQuotes = !inSingleQuotes;
+                continue;
+            }
+
+            if (Character.isWhitespace(c) && !inDoubleQuotes && !inSingleQuotes) {
+                if (currentToken.length() > 0) {
+                    tokens.add(currentToken.toString());
+                    currentToken.setLength(0);
+                }
+            } else {
+                currentToken.append(c);
+            }
+        }
+
+        if (currentToken.length() > 0) {
+            tokens.add(currentToken.toString());
+        }
+
+        return tokens.toArray(new String[0]);
+    }
+
+    private String executeEcho(String commandLine) {
+        String trimmed = commandLine.trim();
+        String afterEcho = trimmed.length() > 4 ? trimmed.substring(4).trim() : "";
+        if (afterEcho.isEmpty()) return "";
+
+        boolean append = false;
+        String content;
+        String targetName = null;
+
+        if (afterEcho.contains(" >> ")) {
+            int idx = afterEcho.lastIndexOf(" >> ");
+            content = afterEcho.substring(0, idx).trim();
+            targetName = afterEcho.substring(idx + 4).trim();
+            append = true;
+        } else if (afterEcho.contains(" > ")) {
+            int idx = afterEcho.lastIndexOf(" > ");
+            content = afterEcho.substring(0, idx).trim();
+            targetName = afterEcho.substring(idx + 3).trim();
+            append = false;
+        } else {
+            content = afterEcho;
+        }
+
+        if ((content.startsWith("\"") && content.endsWith("\"")) ||
+            (content.startsWith("'") && content.endsWith("'"))) {
+            if (content.length() >= 2) {
+                content = content.substring(1, content.length() - 1);
+            }
+        }
+        content = content.replace("\\n", "\n");
+
+        if (targetName != null && !targetName.isEmpty()) {
+            File target;
+            if (targetName.startsWith("/")) {
+                target = new File(globalRootDir, targetName.substring(1));
+            } else {
+                target = new File(currentDir, targetName);
+            }
+
+            try {
+                String rootPath = globalRootDir.getCanonicalPath();
+                String targetPath = target.getCanonicalPath();
+                if (!targetPath.startsWith(rootPath)) {
+                    return "Error: Path escapes workspace sandbox";
+                }
+            } catch (IOException e) {
+                return "Error resolving target: " + e.getMessage();
+            }
+
+            File parent = target.getParentFile();
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs();
+            }
+
+            try {
+                if (append) {
+                    java.nio.file.Files.write(target.toPath(), (content + "\n").getBytes(StandardCharsets.UTF_8),
+                            java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
+                    return "Appended to " + target.getName();
+                } else {
+                    java.nio.file.Files.write(target.toPath(), (content + "\n").getBytes(StandardCharsets.UTF_8),
+                            java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.TRUNCATE_EXISTING);
+                    return "Written to " + target.getName();
+                }
+            } catch (IOException e) {
+                return "Error writing file: " + e.getMessage();
+            }
+        }
+
+        return content;
     }
 
     private String listFiles(String[] parts) {

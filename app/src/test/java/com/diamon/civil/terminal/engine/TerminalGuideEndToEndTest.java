@@ -465,4 +465,36 @@ public class TerminalGuideEndToEndTest {
         terminalExecutor.execute("cd /");
         assertEquals("/", terminalExecutor.execute("pwd"));
     }
+
+    @Test
+    public void testLevel3_TclScriptingAndGmshPipeline() throws Exception {
+        // 1. Write TCL script using echo redirection
+        String echoRes = terminalExecutor.execute("echo \"pload ALL\\nbox b 10 20 30\\ntestwritestep b.step b\\nexit\" > generate_cad.tcl");
+        assertTrue(echoRes.contains("Written to generate_cad.tcl"));
+        File tclFile = new File(sandboxRoot, "generate_cad.tcl");
+        assertTrue(tclFile.exists());
+
+        // 2. Execute TCL script via DRAWEXE
+        calculixExecutor.setWorkDir(sandboxRoot);
+        String drawOut = calculixExecutor.executeBinary("DRAWEXE", "-b", "-f", "generate_cad.tcl");
+        assertTrue(drawOut.contains("Exit Code: 0"));
+        File stepFile = new File(sandboxRoot, "b.step");
+        assertTrue(stepFile.exists());
+        assertTrue(stepFile.length() > 200);
+
+        // 3. Mesh STEP file with Gmsh directly with flags
+        String gmshOut = calculixExecutor.executeBinary("gmsh", "b.step", "-3", "-clmax", "3.0", "-format", "inp", "-o", "b_mesh.inp");
+        assertTrue(gmshOut.contains("Exit Code: 0"));
+        File inpFile = new File(sandboxRoot, "b_mesh.inp");
+        assertTrue(inpFile.exists());
+        assertTrue(inpFile.length() > 500);
+
+        // 4. Check CalculiX version flag -v
+        String ccxVersion = calculixExecutor.executeBinary("ccx", "-v");
+        assertTrue(ccxVersion.contains("Version 2.") || ccxVersion.contains("Exit Code: 201"));
+
+        // 5. Check Gmsh help flag -help
+        String gmshHelp = calculixExecutor.executeBinary("gmsh", "-help");
+        assertTrue(gmshHelp.contains("Usage: gmsh") || gmshHelp.contains("Gmsh"));
+    }
 }
