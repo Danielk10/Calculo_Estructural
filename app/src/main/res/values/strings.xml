@@ -155,13 +155,26 @@
     <!-- Terminal Module -->
     <string name="terminal_prompt">fea@system:~$</string>
     <string name="terminal_hint">Enter FEA command</string>
-    <string name="terminal_cd_history_prev">Previous command</string>
-    <string name="terminal_cd_history_next">Next command</string>
+    <string name="terminal_cd_history_prev">Previous command / Line Up</string>
+    <string name="terminal_cd_history_next">Next command / Line Down</string>
     <string name="terminal_cd_abort">Abort running process</string>
-    <string name="terminal_cd_copy">Copy terminal transcript</string>
+    <string name="terminal_cd_copy">Copy terminal transcript or code</string>
     <string name="terminal_cd_send">Execute command</string>
+    <string name="terminal_cd_featext">Abrir editor de texto featext</string>
+    <string name="terminal_cd_save">Guardar archivo o exportar</string>
+    <string name="terminal_cd_paste">Pegar texto del portapapeles</string>
+    <string name="terminal_cd_delete">Borrar carácter</string>
+    <string name="terminal_cd_tab">Insertar tabulación (4 espacios)</string>
+    <string name="terminal_cd_arrow_left">Mover cursor a la izquierda</string>
+    <string name="terminal_cd_arrow_right">Mover cursor a la derecha</string>
+    <string name="terminal_cd_close_editor">Cerrar editor featext</string>
     <string name="terminal_copied_toast">Transcript copied to clipboard</string>
     <string name="terminal_process_aborted">\n[PROCESS ABORTED BY USER]\n</string>
+    <string name="featext_saved_toast">Archivo guardado: %1$s</string>
+    <string name="featext_saved_status">[Guardado]</string>
+    <string name="featext_modified_status">[Modificado]</string>
+    <string name="featext_closed_toast">Editor featext cerrado</string>
+    <string name="featext_title">featext 1.0</string>
 
     <!-- Toast & Feedback Messages -->
     <string name="toast_cad_imported">CAD geometry imported successfully: %1$s</string>

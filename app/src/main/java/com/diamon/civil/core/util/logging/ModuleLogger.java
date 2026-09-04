@@ -28,6 +28,7 @@ public class ModuleLogger {
         "  test-cad-solve         - Headless CAD generation, meshing & FEA solving (DRAWEXE+Gmsh+CCX)\n" +
         "  run-sim-test           - Automated Cantilever Beam simulation vs Euler-Bernoulli theory\n\n" +
         "Standard Shell Commands:\n" +
+        "  featext [file]         - Nano-style console text editor with syntax highlighting (.inp, .tcl, CAD)\n" +
         "  ls [path]              - List files and directories in workspace\n" +
         "  cd <path>              - Change working directory\n" +
         "  pwd                    - Show current directory path\n" +

@@ -94,6 +94,12 @@ public class CalculixExecutor {
                 ? jobName.substring(0, jobName.length() - ".inp".length())
                 : jobName;
         File inputBase = new File(workDir, baseName);
+        if (workDir != null) {
+            File spoolesOut = new File(workDir, "spooles.out");
+            if (spoolesOut.exists()) spoolesOut.delete();
+            File spoolesLog = new File(workDir, "spooles.log");
+            if (spoolesLog.exists()) spoolesLog.delete();
+        }
         return executeBinaryWithStreaming("ccx", listener, null, numThreads, "-i", inputBase.getAbsolutePath());
     }
 

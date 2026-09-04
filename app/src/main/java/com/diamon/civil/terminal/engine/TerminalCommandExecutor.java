@@ -50,6 +50,8 @@ public class TerminalCommandExecutor {
         String cmd = parts[0].toLowerCase();
 
         switch (cmd) {
+            case "featext":
+                return null; // Intercepted and launched in TerminalFragment
             case "ls":
                 return listFiles(parts);
             case "mkdir":

@@ -77,6 +77,41 @@ public class SolidInpAssembler {
         }
         loadedNodes.removeAll(fixedNodes);
 
+        if (loadedNodes.isEmpty() && !nodeCoords.isEmpty()) {
+            if (fixedNodes.size() >= nodeCoords.size() && fixedNodes.size() > 1) {
+                // Fixed nodes swallowed the entire mesh. Release the furthest node for load.
+                int lastNode = -1;
+                for (int n : fixedNodes) lastNode = n;
+                if (lastNode != -1) {
+                    fixedNodes.remove(lastNode);
+                    loadedNodes.add(lastNode);
+                }
+            } else {
+                // If overlap removed all loaded nodes, find nodes with maximum distance from fixed nodes
+                double maxDist = -1;
+                int bestNode = -1;
+                for (Map.Entry<Integer, double[]> entry : nodeCoords.entrySet()) {
+                    if (fixedNodes.contains(entry.getKey())) continue;
+                    double[] c = entry.getValue();
+                    double d = 0;
+                    for (int fn : fixedNodes) {
+                        double[] fc = nodeCoords.get(fn);
+                        if (fc != null) {
+                            double dx_n = c[0] - fc[0], dy_n = c[1] - fc[1], dz_n = c[2] - fc[2];
+                            d += dx_n * dx_n + dy_n * dy_n + dz_n * dz_n;
+                        }
+                    }
+                    if (d > maxDist) {
+                        maxDist = d;
+                        bestNode = entry.getKey();
+                    }
+                }
+                if (bestNode != -1) {
+                    loadedNodes.add(bestNode);
+                }
+            }
+        }
+
         if (fixedNodes.isEmpty() || loadedNodes.isEmpty()) {
             throw new IOException("Boundary condition assignment failed: fixed or loaded nodes could not be determined.");
         }
@@ -362,9 +397,8 @@ public class SolidInpAssembler {
 
         // Adaptive tolerance: start tight (0.1%) and progressively widen
         // to capture at least 3 non-collinear nodes for kinematic stability.
-        // For 3D continuum elements (C3D4/C3D10) with only translational DOFs,
-        // at least 3 non-collinear nodes are required to fully restrain
-        // all 6 rigid body modes (3 translations + 3 rotations).
+        // For planar faces, the distributed non-collinearity check breaks at factor 0.001.
+        // For curved faces (sphere, cylinder), it expands to capture the support ring.
         double[] toleranceFactors = {0.001, 0.005, 0.01, 0.02, 0.05, 0.10};
 
         for (double factor : toleranceFactors) {
@@ -426,6 +460,29 @@ public class SolidInpAssembler {
             }
         }
 
+        // Robust safety fallback for curved geometry extremes (e.g. sphere apex, cone tip) or 1D lines
+        if (result.size() < 3 && !nodeCoords.isEmpty()) {
+            int selAxis = 0;
+            if (faceType.contains("Y")) selAxis = 1;
+            else if (faceType.contains("Z")) selAxis = 2;
+            else if (faceType.contains("AUTO")) {
+                if (dy > dx && dy >= dz) selAxis = 1;
+                else if (dz > dx && dz > dy) selAxis = 2;
+            }
+            final int chosenAxis = selAxis;
+            final boolean wantMin = faceType.contains("MIN") || faceType.contains("LEFT") || faceType.contains("BOTTOM") || faceType.contains("BASE") || faceType.contains("BACK");
+            List<Map.Entry<Integer, double[]>> sorted = new ArrayList<>(nodeCoords.entrySet());
+            sorted.sort((e1, e2) -> {
+                double v1 = e1.getValue()[chosenAxis];
+                double v2 = e2.getValue()[chosenAxis];
+                return wantMin ? Double.compare(v1, v2) : Double.compare(v2, v1);
+            });
+            int count = Math.min(4, Math.max(1, sorted.size() / 2));
+            for (int i = 0; i < count; i++) {
+                result.add(sorted.get(i).getKey());
+            }
+        }
+
         return result;
     }
 
@@ -439,54 +496,70 @@ public class SolidInpAssembler {
      * - The 3 nodes must NOT be collinear (otherwise rotation around the
      *   line they define remains unconstrained)
      *
-     * The collinearity check uses the cross product of two edge vectors:
-     * if ||AB × AC|| / (||AB|| · ||AC||) > epsilon, the nodes span a 2D
-     * area and all rotations are restrained.
+     * Sampling is distributed across the entire set to ensure edge-numbered
+     * nodes in fine meshes do not falsely appear 100% collinear.
      */
     private static boolean areNodesKinematicallySufficient(Set<Integer> nodeIds, Map<Integer, double[]> nodeCoords) {
-        if (nodeIds.size() < 3) return false;
+        if (nodeIds == null || nodeIds.size() < 3 || nodeCoords == null) return false;
 
-        // Collect coordinates of selected nodes
-        List<double[]> pts = new ArrayList<>();
+        // Collect all coordinates of the candidate nodes
+        List<double[]> allPts = new ArrayList<>(nodeIds.size());
         for (int id : nodeIds) {
             double[] c = nodeCoords.get(id);
-            if (c != null) pts.add(c);
-            if (pts.size() >= 20) break; // Sample is sufficient
+            if (c != null) allPts.add(c);
         }
-        if (pts.size() < 3) return false;
+        if (allPts.size() < 3) return false;
 
-        // Check non-collinearity: find max cross-product magnitude
-        // among combinations of the first node with subsequent pairs
+        // Distribute sample across the set rather than taking only the first 20 sequential IDs,
+        // which on fine meshes may all lie on a single edge curve.
+        List<double[]> pts = new ArrayList<>();
+        int sampleSize = Math.min(40, allPts.size());
+        int stride = Math.max(1, allPts.size() / sampleSize);
+        for (int i = 0; i < allPts.size() && pts.size() < sampleSize; i += stride) {
+            pts.add(allPts.get(i));
+        }
+        double[] lastPt = allPts.get(allPts.size() - 1);
+        if (!pts.contains(lastPt)) {
+            pts.add(lastPt);
+        }
+
+        // Find pair (a, b) with maximum separation distance
         double[] a = pts.get(0);
-        double maxCrossNorm = 0.0;
-        for (int i = 1; i < pts.size() - 1; i++) {
-            double[] b = pts.get(i);
-            double abx = b[0] - a[0], aby = b[1] - a[1], abz = b[2] - a[2];
-            double abLen = Math.sqrt(abx * abx + aby * aby + abz * abz);
-            if (abLen < 1e-10) continue;
+        double[] b = null;
+        double maxDistSq = 0.0;
+        for (double[] p : pts) {
+            double dx = p[0] - a[0], dy = p[1] - a[1], dz = p[2] - a[2];
+            double dSq = dx * dx + dy * dy + dz * dz;
+            if (dSq > maxDistSq) {
+                maxDistSq = dSq;
+                b = p;
+            }
+        }
+        if (b == null || maxDistSq < 1e-12) return false;
 
-            for (int j = i + 1; j < pts.size(); j++) {
-                double[] c = pts.get(j);
-                double acx = c[0] - a[0], acy = c[1] - a[1], acz = c[2] - a[2];
-                double acLen = Math.sqrt(acx * acx + acy * acy + acz * acz);
-                if (acLen < 1e-10) continue;
+        // Vector AB
+        double abx = b[0] - a[0], aby = b[1] - a[1], abz = b[2] - a[2];
+        double abLen = Math.sqrt(maxDistSq);
 
-                // Cross product AB × AC
-                double cx = aby * acz - abz * acy;
-                double cy = abz * acx - abx * acz;
-                double cz = abx * acy - aby * acx;
-                double crossNorm = Math.sqrt(cx * cx + cy * cy + cz * cz);
+        // Find any third point c not collinear with AB (sin(angle) > 0.01)
+        for (double[] c : pts) {
+            double acx = c[0] - a[0], acy = c[1] - a[1], acz = c[2] - a[2];
+            double acLen = Math.sqrt(acx * acx + acy * acy + acz * acz);
+            if (acLen < 1e-6) continue;
 
-                // Normalize by edge lengths to get sin(angle)
-                double sinAngle = crossNorm / (abLen * acLen);
-                maxCrossNorm = Math.max(maxCrossNorm, sinAngle);
+            // Cross product AB × AC
+            double cx = aby * acz - abz * acy;
+            double cy = abz * acx - abx * acz;
+            double cz = abx * acy - aby * acx;
+            double crossNorm = Math.sqrt(cx * cx + cy * cy + cz * cz);
 
-                // If sin(angle) > 0.01 (~0.57°), nodes are clearly non-collinear
-                if (sinAngle > 0.01) return true;
+            double sinAngle = crossNorm / (abLen * acLen);
+            if (sinAngle > 0.01) {
+                return true; // Kinematically sufficient non-collinear support face
             }
         }
 
-        return maxCrossNorm > 0.01;
+        return false;
     }
 
     private static Set<Integer> extractNodesFromPhysical(List<String> lines, String setName) {

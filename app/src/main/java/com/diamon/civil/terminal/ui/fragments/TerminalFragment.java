@@ -33,8 +33,13 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import com.diamon.civil.terminal.editor.FeaTextDocument;
+import com.diamon.civil.terminal.editor.FeaTextSyntaxHighlighter;
+import com.diamon.civil.terminal.editor.FeaTextTokenizer;
 
 public class TerminalFragment extends Fragment {
 
@@ -46,6 +51,10 @@ public class TerminalFragment extends Fragment {
     private final List<String> commandHistory = new ArrayList<>();
     private int historyIndex = -1;
     private volatile boolean isExecutingCommand = false;
+
+    private final FeaTextDocument featextDoc = new FeaTextDocument();
+    private final FeaTextSyntaxHighlighter syntaxHighlighter = new FeaTextSyntaxHighlighter();
+    private boolean isEditorMode = false;
 
     @Nullable
     @Override
@@ -93,8 +102,30 @@ public class TerminalFragment extends Fragment {
             return false;
         });
 
-        binding.btnHistoryPrev.setOnClickListener(v -> navigateHistory(-1));
-        binding.btnHistoryNext.setOnClickListener(v -> navigateHistory(1));
+        binding.btnEditor.setOnClickListener(v -> toggleEditor());
+        binding.btnSave.setOnClickListener(v -> {
+            if (isEditorMode) saveFeaTextFile();
+            else exportResults();
+        });
+        binding.btnCopyLog.setOnClickListener(v -> {
+            if (isEditorMode) copyEditorText();
+            else copyLogToClipboard();
+        });
+        binding.btnPaste.setOnClickListener(v -> pasteFromClipboard());
+        binding.btnDelete.setOnClickListener(v -> performDelete());
+        binding.btnTab.setOnClickListener(v -> performTab());
+        binding.btnArrowLeft.setOnClickListener(v -> moveCursor(-1));
+        binding.btnArrowRight.setOnClickListener(v -> moveCursor(1));
+        binding.btnHistoryPrev.setOnClickListener(v -> {
+            if (isEditorMode) moveCursorLine(-1);
+            else navigateHistory(-1);
+        });
+        binding.btnHistoryNext.setOnClickListener(v -> {
+            if (isEditorMode) moveCursorLine(1);
+            else navigateHistory(1);
+        });
+        binding.btnCloseEditor.setOnClickListener(v -> closeFeaTextEditor());
+
         binding.btnAbort.setOnClickListener(v -> {
             if (calculixExecutor != null) {
                 calculixExecutor.abort();
@@ -106,7 +137,13 @@ public class TerminalFragment extends Fragment {
             }
             keepInputFocus();
         });
-        binding.btnCopyLog.setOnClickListener(v -> copyLogToClipboard());
+
+        syntaxHighlighter.setOnContentChangedListener(() -> {
+            if (binding != null && isEditorMode) {
+                featextDoc.setContent(binding.etEditorCode.getText().toString());
+                updateEditorMetrics();
+            }
+        });
 
         keepInputFocus();
 
@@ -282,6 +319,13 @@ public class TerminalFragment extends Fragment {
         if (input.equalsIgnoreCase("clear")) {
             ModuleLogger.getGlobal().clear();
             keepInputFocus();
+            return;
+        }
+
+        if (input.toLowerCase(Locale.US).startsWith("featext")) {
+            String[] parts = TerminalCommandExecutor.splitCommandLine(input);
+            String filename = parts.length > 1 ? parts[1] : "untitled.inp";
+            openFeaTextEditor(filename);
             return;
         }
 
@@ -653,6 +697,180 @@ public class TerminalFragment extends Fragment {
                 }
             });
         }
+    }
+
+    private void toggleEditor() {
+        if (isEditorMode) {
+            closeFeaTextEditor();
+        } else {
+            openFeaTextEditor("untitled.inp");
+        }
+    }
+
+    public void openFeaTextEditor(String filename) {
+        if (binding == null) return;
+        isEditorMode = true;
+        File workDir = getCurrentWorkDir() != null ? getCurrentWorkDir() : requireContext().getFilesDir();
+        File targetFile = new File(workDir, filename != null && !filename.trim().isEmpty() ? filename.trim() : "untitled.inp");
+        try {
+            featextDoc.loadFromFile(targetFile);
+        } catch (Exception e) {
+            featextDoc.setCurrentFile(targetFile);
+            featextDoc.setContent("");
+        }
+
+        binding.layoutTerminalConsole.setVisibility(View.GONE);
+        binding.layoutCommandInput.setVisibility(View.GONE);
+        binding.layoutFeaTextEditor.setVisibility(View.VISIBLE);
+        binding.btnCloseEditor.setVisibility(View.VISIBLE);
+
+        binding.tvFeaTextFilename.setText("File: " + featextDoc.getFilename());
+        binding.tvFeaTextStatus.setText(featextDoc.isModified() ? R.string.featext_modified_status : R.string.featext_saved_status);
+
+        syntaxHighlighter.setSyntaxMode(featextDoc.getSyntaxMode());
+        binding.etEditorCode.removeTextChangedListener(syntaxHighlighter);
+        binding.etEditorCode.setText(featextDoc.getContent());
+        binding.etEditorCode.addTextChangedListener(syntaxHighlighter);
+        syntaxHighlighter.highlight(binding.etEditorCode.getText(), featextDoc.getSyntaxMode());
+
+        updateEditorMetrics();
+        binding.etEditorCode.requestFocus();
+    }
+
+    private void saveFeaTextFile() {
+        if (binding == null) return;
+        File workDir = getCurrentWorkDir() != null ? getCurrentWorkDir() : requireContext().getFilesDir();
+        File targetFile = featextDoc.getCurrentFile() != null ? featextDoc.getCurrentFile() : new File(workDir, featextDoc.getFilename());
+        featextDoc.setContent(binding.etEditorCode.getText().toString());
+        try {
+            featextDoc.saveToFile(targetFile);
+            binding.tvFeaTextStatus.setText(R.string.featext_saved_status);
+            Toast.makeText(getContext(), getString(R.string.featext_saved_toast, targetFile.getName()), Toast.LENGTH_SHORT).show();
+            ModuleLogger.getGlobal().log("[featext] Saved '" + targetFile.getName() + "' (" + targetFile.length() + " bytes).");
+        } catch (IOException e) {
+            Toast.makeText(getContext(), "Error saving: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void closeFeaTextEditor() {
+        if (binding == null) return;
+        isEditorMode = false;
+        binding.layoutFeaTextEditor.setVisibility(View.GONE);
+        binding.btnCloseEditor.setVisibility(View.GONE);
+        binding.layoutTerminalConsole.setVisibility(View.VISIBLE);
+        binding.layoutCommandInput.setVisibility(View.VISIBLE);
+        ModuleLogger.getGlobal().log("[featext] Closed '" + featextDoc.getFilename() + "'.");
+        keepInputFocus();
+    }
+
+    private void copyEditorText() {
+        if (getContext() == null || binding == null) return;
+        int start = binding.etEditorCode.getSelectionStart();
+        int end = binding.etEditorCode.getSelectionEnd();
+        String textToCopy;
+        if (start != end && start >= 0 && end >= 0) {
+            textToCopy = binding.etEditorCode.getText().subSequence(Math.min(start, end), Math.max(start, end)).toString();
+        } else {
+            textToCopy = binding.etEditorCode.getText().toString();
+        }
+        ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("featext code", textToCopy);
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(getContext(), R.string.terminal_copied_toast, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void pasteFromClipboard() {
+        if (getContext() == null || binding == null) return;
+        ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard != null && clipboard.hasPrimaryClip() && clipboard.getPrimaryClip().getItemCount() > 0) {
+            CharSequence textToPaste = clipboard.getPrimaryClip().getItemAt(0).getText();
+            if (textToPaste != null) {
+                if (isEditorMode) {
+                    int sel = Math.max(0, binding.etEditorCode.getSelectionStart());
+                    binding.etEditorCode.getText().insert(sel, textToPaste);
+                } else {
+                    int sel = Math.max(0, binding.etCommand.getSelectionStart());
+                    binding.etCommand.getText().insert(sel, textToPaste);
+                }
+            }
+        }
+    }
+
+    private void performDelete() {
+        if (binding == null) return;
+        if (isEditorMode) {
+            int sel = binding.etEditorCode.getSelectionStart();
+            if (sel > 0) {
+                binding.etEditorCode.getText().delete(sel - 1, sel);
+            }
+        } else {
+            int sel = binding.etCommand.getSelectionStart();
+            if (sel > 0) {
+                binding.etCommand.getText().delete(sel - 1, sel);
+            }
+        }
+    }
+
+    private void performTab() {
+        if (binding == null) return;
+        if (isEditorMode) {
+            int sel = Math.max(0, binding.etEditorCode.getSelectionStart());
+            binding.etEditorCode.getText().insert(sel, "    ");
+        } else {
+            int sel = Math.max(0, binding.etCommand.getSelectionStart());
+            binding.etCommand.getText().insert(sel, "    ");
+        }
+    }
+
+    private void moveCursor(int delta) {
+        if (binding == null) return;
+        if (isEditorMode) {
+            int sel = binding.etEditorCode.getSelectionStart();
+            int newSel = Math.max(0, Math.min(sel + delta, binding.etEditorCode.length()));
+            binding.etEditorCode.setSelection(newSel);
+            updateEditorMetrics();
+        } else {
+            int sel = binding.etCommand.getSelectionStart();
+            int newSel = Math.max(0, Math.min(sel + delta, binding.etCommand.length()));
+            binding.etCommand.setSelection(newSel);
+        }
+    }
+
+    private void moveCursorLine(int deltaLine) {
+        if (binding == null) return;
+        int sel = binding.etEditorCode.getSelectionStart();
+        String text = binding.etEditorCode.getText().toString();
+        int currentLineStart = text.lastIndexOf('\n', Math.max(0, sel - 1)) + 1;
+        int col = sel - currentLineStart;
+        if (deltaLine < 0) {
+            if (currentLineStart > 1) {
+                int prevLineStart = text.lastIndexOf('\n', currentLineStart - 2) + 1;
+                int prevLineEnd = currentLineStart - 1;
+                int target = Math.min(prevLineStart + col, prevLineEnd);
+                binding.etEditorCode.setSelection(target);
+            }
+        } else {
+            int nextLineStart = text.indexOf('\n', sel);
+            if (nextLineStart != -1) {
+                nextLineStart++;
+                int nextLineEnd = text.indexOf('\n', nextLineStart);
+                if (nextLineEnd == -1) nextLineEnd = text.length();
+                int target = Math.min(nextLineStart + col, nextLineEnd);
+                binding.etEditorCode.setSelection(target);
+            }
+        }
+        updateEditorMetrics();
+    }
+
+    private void updateEditorMetrics() {
+        if (binding == null || !isEditorMode) return;
+        binding.tvEditorLineNumbers.setText(featextDoc.getLineNumbersText());
+        int sel = binding.etEditorCode.getSelectionStart();
+        int[] lc = featextDoc.getLineAndCol(sel);
+        binding.tvFeaTextPosition.setText(String.format(Locale.US, "Ln %d, Col %d", lc[0], lc[1]));
+        binding.tvFeaTextStatus.setText(featextDoc.isModified() ? R.string.featext_modified_status : R.string.featext_saved_status);
     }
 
     @Override

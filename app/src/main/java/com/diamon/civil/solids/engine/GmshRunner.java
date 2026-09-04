@@ -59,10 +59,12 @@ public class GmshRunner {
             try {
                 File outputInp = new File(workDir, jobName + "_raw.inp");
                 String result = runGmsh(inputFile, outputInp, meshDensity, elementType);
-                if (outputInp.exists() && outputInp.length() > 0) {
+                boolean success = (result != null && result.contains("Exit Code: 0") && outputInp.exists() && outputInp.length() > 0);
+                if (success) {
                     callback.onSuccess(outputInp);
                 } else {
-                    callback.onError("Gmsh did not produce output.\n" + result);
+                    if (outputInp.exists()) outputInp.delete();
+                    callback.onError("Gmsh did not produce a valid mesh.\n" + result);
                 }
             } catch (Throwable e) {
                 callback.onError("GmshRunner exception: " + e.getMessage());

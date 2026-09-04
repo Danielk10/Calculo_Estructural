@@ -13,7 +13,11 @@ if [[ ! -x "${SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" ]]; then
   tmp_dir="$(mktemp -d)"
   trap 'rm -rf "${tmp_dir}"' EXIT
 
-  curl -fsSL "${CMDLINE_TOOLS_URL}" -o "${tmp_dir}/${CMDLINE_TOOLS_ZIP}"
+  if command -v wget >/dev/null 2>&1; then
+    wget -q --show-progress -O "${tmp_dir}/${CMDLINE_TOOLS_ZIP}" "${CMDLINE_TOOLS_URL}"
+  else
+    curl -fsSL "${CMDLINE_TOOLS_URL}" -o "${tmp_dir}/${CMDLINE_TOOLS_ZIP}"
+  fi
   unzip -q -o "${tmp_dir}/${CMDLINE_TOOLS_ZIP}" -d "${SDK_ROOT}/cmdline-tools"
   rm -rf "${SDK_ROOT}/cmdline-tools/latest"
   mv "${SDK_ROOT}/cmdline-tools/cmdline-tools" "${SDK_ROOT}/cmdline-tools/latest"

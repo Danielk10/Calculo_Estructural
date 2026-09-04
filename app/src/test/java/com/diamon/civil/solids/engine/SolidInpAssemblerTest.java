@@ -7,6 +7,8 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.Map;
+import java.util.Locale;
 import com.diamon.civil.solids.engine.SolidDisplacementFrdParser;
 
 public class SolidInpAssemblerTest {
@@ -668,4 +670,146 @@ public class SolidInpAssemblerTest {
         assertTrue("NFix should exist", nsetsContent.contains("*NSET, NSET=NFix"));
         assertTrue("NLoad should exist", nsetsContent.contains("*NSET, NSET=NLoad"));
     }
+
+    @Test
+    public void testMultipleConsecutiveRunsFineMesh() throws Exception {
+        File workDir = tempFolder.newFolder("work_multi_runs");
+        File geoFile = SampleSimulationCase.createCantileverGeo(workDir);
+
+        String currentGlb = null;
+        for (int run = 1; run <= 5; run++) {
+            // Test whitelist cleanup matching SolidFragment
+            File[] files = workDir.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    if (f.isDirectory()) continue;
+                    String name = f.getName().toLowerCase(Locale.US);
+                    if (name.endsWith(".step") || name.endsWith(".stp") || (name.endsWith(".geo") && !name.endsWith(".geo_unrolled")) ||
+                        name.endsWith(".iges") || name.endsWith(".igs") || (name.endsWith(".brep") && !name.endsWith("_sewn.brep")) ||
+                        (name.endsWith(".inp") && !name.startsWith("job_solid") && !name.startsWith("nsets")) ||
+                        name.endsWith(".pdf") || (currentGlb != null && f.getAbsolutePath().equals(currentGlb))) {
+                        continue;
+                    }
+                    f.delete();
+                }
+            }
+
+            File rawInp = new File(workDir, "job_solid_raw.inp");
+            ProcessBuilder pbGmsh = new ProcessBuilder(
+                    "gmsh", geoFile.getAbsolutePath(),
+                    "-3",
+                    "-clmax", "5.0", // Fine mesh density 5
+                    "-o", rawInp.getAbsolutePath(),
+                    "-format", "inp",
+                    "-string", "Mesh.ElementOrder=2; Mesh.SecondOrderIncomplete=1; Mesh.Optimize=1;"
+            );
+            pbGmsh.directory(workDir);
+            pbGmsh.redirectErrorStream(true);
+            Process pGmsh = pbGmsh.start();
+            int codeGmsh = pGmsh.waitFor();
+            assertEquals("Gmsh meshing should succeed on run " + run, 0, codeGmsh);
+
+            // Test coordinate fallback selection on fine mesh (Left End Face / Right End Face)
+            SolidInpAssembler.assemble(workDir, "job_solid", "Structural Steel A36", 200000.0, 0.3, -100.0, 2, "Left End Face (X- Min)", "Right End Face (X+ Max)", "2nd-Order: C3D10 (10-Node Quadratic Tetrahedron)");
+
+            File ccxBin = new File("/home/danielpdiamon/.local/bin/ccx");
+            if (!ccxBin.exists()) ccxBin = new File("/usr/bin/ccx");
+            ProcessBuilder pbCcx = new ProcessBuilder(ccxBin.getAbsolutePath(), "job_solid");
+            pbCcx.directory(workDir);
+            pbCcx.redirectErrorStream(true);
+            Map<String, String> env = pbCcx.environment();
+            int cores = Runtime.getRuntime().availableProcessors();
+            env.put("OMP_NUM_THREADS", String.valueOf(cores));
+            env.put("OMP_STACKSIZE", "64M");
+            env.put("CCX_NPROC_EQUATION_SOLVER", String.valueOf(cores));
+
+            Process pCcx = pbCcx.start();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
+                while (reader.readLine() != null) {}
+            }
+            int codeCcx = pCcx.waitFor();
+            assertEquals("CalculiX solving should succeed on run " + run, 0, codeCcx);
+
+            File datFile = new File(workDir, "job_solid.dat");
+            assertTrue("job_solid.dat should exist on run " + run, datFile.exists());
+
+            double maxUy = 0.0;
+            try (BufferedReader reader = new BufferedReader(new FileReader(datFile))) {
+                String line;
+                boolean inDisp = false;
+                while ((line = reader.readLine()) != null) {
+                    String trimmed = line.trim();
+                    if (trimmed.toLowerCase(Locale.US).contains("displacements (vx,vy,vz)")) {
+                        inDisp = true; continue;
+                    }
+                    if (trimmed.toLowerCase(Locale.US).contains("stresses (elem, integ.pnt.")) {
+                        inDisp = false; continue;
+                    }
+                    if (inDisp) {
+                        String[] parts = trimmed.split("\\s+");
+                        if (parts.length >= 4 && Character.isDigit(parts[0].charAt(0))) {
+                            try {
+                                double uy = Double.parseDouble(parts[2].replace('D', 'E'));
+                                if (Math.abs(uy) > Math.abs(maxUy)) maxUy = uy;
+                            } catch (NumberFormatException ignore) {}
+                        }
+                    }
+                }
+            }
+            System.out.println("RUN " + run + " Max Uy = " + maxUy);
+            assertEquals("Tip deflection should match expected ~0.20 mm across every run", 0.20, Math.abs(maxUy), 0.03);
+        }
+    }
+
+    @Test
+    public void testSpherePrimitiveMeshingAndSolving() throws Exception {
+        File workDir = tempFolder.newFolder("work_sphere");
+        File geoFile = new File(workDir, "sphere.geo");
+        String sphereGeo = "SetFactory(\"OpenCASCADE\");\n" +
+                "Sphere(1) = {0, 0, 0, 5};\n" +
+                "Physical Volume(\"SOLID_VOLUME\", 1) = {1};\n";
+        try (PrintWriter pw = new PrintWriter(new FileWriter(geoFile))) {
+            pw.write(sphereGeo);
+        }
+
+        File rawInp = new File(workDir, "job_solid_raw.inp");
+        ProcessBuilder pbGmsh = new ProcessBuilder(
+                "gmsh", geoFile.getAbsolutePath(),
+                "-3",
+                "-clmax", "30.0", // Density 2 default for sphere
+                "-o", rawInp.getAbsolutePath(),
+                "-format", "inp",
+                "-string", "Mesh.MeshSizeFactor=1.5; Mesh.ElementOrder=1; Mesh.Algorithm3D=1; Mesh.Recombine3DAll=0; Mesh.SaveGroupsOfNodes=1; Mesh.SaveGroupsOfElements=1;"
+        );
+        pbGmsh.directory(workDir);
+        pbGmsh.redirectErrorStream(true);
+        Process pGmsh = pbGmsh.start();
+        int codeGmsh = pGmsh.waitFor();
+        assertEquals("Gmsh meshing on sphere should succeed", 0, codeGmsh);
+
+        // Assemble with exact UI parameters from user: C3D4, Auto Fixed, Auto Loaded
+        SolidInpAssembler.assemble(workDir, "job_solid", "Structural Steel A36", 200000.0, 0.3, -100.0, 2, "Auto / Superficie Física (Fija / Eje Mayor)", "Auto / Superficie Física (Cargada / Eje Mayor)", "1er-Orden: C3D4 (Tetraedro Lineal de 4 Nodos)");
+
+        File finalInp = new File(workDir, "job_solid.inp");
+        assertTrue("job_solid.inp should exist", finalInp.exists());
+        File nsetsInp = new File(workDir, "nsets.inp");
+        assertTrue("nsets.inp should exist", nsetsInp.exists());
+
+        // Solve with CalculiX
+        File ccxBin = new File("/home/danielpdiamon/.local/bin/ccx");
+        if (!ccxBin.exists()) ccxBin = new File("/usr/bin/ccx");
+        ProcessBuilder pbCcx = new ProcessBuilder(ccxBin.getAbsolutePath(), "job_solid");
+        pbCcx.directory(workDir);
+        pbCcx.redirectErrorStream(true);
+        Process pCcx = pbCcx.start();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
+            while (reader.readLine() != null) {}
+        }
+        int codeCcx = pCcx.waitFor();
+        assertEquals("CalculiX solving for sphere should succeed with code 0", 0, codeCcx);
+
+        File frdFile = new File(workDir, "job_solid.frd");
+        assertTrue("Results .frd file should exist for sphere", frdFile.exists() && frdFile.length() > 0);
+    }
 }
+

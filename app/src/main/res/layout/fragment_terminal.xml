@@ -6,104 +6,391 @@
     android:orientation="vertical"
     android:background="@color/terminal_black">
 
-    <!-- Terminal Action Toolbar (Clean technical distribution) -->
-    <LinearLayout
+    <!-- Terminal & featext Action Toolbar (HorizontalScrollView identical to 2D structural editor) -->
+    <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:orientation="horizontal"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:gravity="center_vertical"
+        android:layout_height="46dp"
+        android:scrollbars="none"
+        android:overScrollMode="never"
         android:background="#0D111A">
 
-        <!-- Copy Log Control (Left) -->
-        <ImageButton
-            android:id="@+id/btnCopyLog"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:scaleType="centerInside"
-            android:padding="8dp"
-            android:focusable="false"
-            android:src="@drawable/ic_copy"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/terminal_cd_copy"
-            app:tint="@color/terminal_green" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp">
 
-        <!-- Distributing Space -->
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
+            <!-- 1. Open / Toggle featext Console Editor -->
+            <ImageButton
+                android:id="@+id/btnEditor"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_edit"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_featext"
+                app:tint="@color/terminal_green"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp" />
 
-        <!-- Execution & History Navigation Controls (Right Group) -->
-        <ImageButton
-            android:id="@+id/btnAbort"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:scaleType="centerInside"
-            android:padding="8dp"
-            android:focusable="false"
-            android:src="@drawable/ic_stop"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/terminal_cd_abort"
-            android:visibility="gone"
-            app:tint="#FF5252"
-            android:layout_marginEnd="8dp" />
+            <!-- 2. Save File (in featext) / Export Report (in Terminal) -->
+            <ImageButton
+                android:id="@+id/btnSave"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_save"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_save"
+                app:tint="@color/terminal_green"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp" />
 
-        <ImageButton
-            android:id="@+id/btnHistoryPrev"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:scaleType="centerInside"
-            android:padding="8dp"
-            android:focusable="false"
-            android:src="@drawable/ic_arrow_up"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/terminal_cd_history_prev"
-            app:tint="@color/terminal_green"
-            android:layout_marginEnd="8dp" />
+            <!-- 3. Copy Transcript / Selection -->
+            <ImageButton
+                android:id="@+id/btnCopyLog"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_copy"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_copy"
+                app:tint="@color/terminal_green"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp" />
 
-        <ImageButton
-            android:id="@+id/btnHistoryNext"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:scaleType="centerInside"
-            android:padding="8dp"
-            android:focusable="false"
-            android:src="@drawable/ic_arrow_down"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/terminal_cd_history_next"
-            app:tint="@color/terminal_green" />
-    </LinearLayout>
+            <!-- 4. Paste Clipboard into Editor / Terminal Input -->
+            <ImageButton
+                android:id="@+id/btnPaste"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_paste"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_paste"
+                app:tint="@color/terminal_green"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp" />
 
-    <com.diamon.civil.terminal.ui.views.LogScrollView
-        android:id="@+id/scrollLog"
+            <!-- 5. Delete / Backspace Character -->
+            <ImageButton
+                android:id="@+id/btnDelete"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_delete"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_delete"
+                app:tint="@color/terminal_green"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp" />
+
+            <!-- 6. Tab / Indent (4 Spaces) -->
+            <ImageButton
+                android:id="@+id/btnTab"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_tab"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_tab"
+                app:tint="@color/terminal_green"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp" />
+
+            <!-- 7. Arrow Left (Move Cursor Left) -->
+            <ImageButton
+                android:id="@+id/btnArrowLeft"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_arrow_left"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_arrow_left"
+                app:tint="@color/terminal_green"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp" />
+
+            <!-- 8. Arrow Right (Move Cursor Right) -->
+            <ImageButton
+                android:id="@+id/btnArrowRight"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_arrow_right"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_arrow_right"
+                app:tint="@color/terminal_green"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp" />
+
+            <!-- 9. Arrow Up (History Prev / Line Up) -->
+            <ImageButton
+                android:id="@+id/btnHistoryPrev"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_arrow_up"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_history_prev"
+                app:tint="@color/terminal_green"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp" />
+
+            <!-- 10. Arrow Down (History Next / Line Down) -->
+            <ImageButton
+                android:id="@+id/btnHistoryNext"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_arrow_down"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_history_next"
+                app:tint="@color/terminal_green"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp" />
+
+            <!-- 11. Abort Execution (visible when command running) -->
+            <ImageButton
+                android:id="@+id/btnAbort"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_stop"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_abort"
+                android:visibility="gone"
+                app:tint="#FF5252"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp" />
+
+            <!-- 12. Close / Exit featext Editor -->
+            <ImageButton
+                android:id="@+id/btnCloseEditor"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:padding="7dp"
+                android:focusable="false"
+                android:src="@drawable/ic_close"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/terminal_cd_close_editor"
+                android:visibility="gone"
+                app:tint="#FF5252"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Workspace Viewport: Terminal Console OR featext Nano Editor -->
+    <FrameLayout
+        android:id="@+id/terminal_viewport_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="12dp"
-        android:background="#0A0E17"
-        android:focusable="false"
-        android:focusableInTouchMode="false">
+        android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/tvLog"
+        <!-- Mode A: Terminal Transcript Console -->
+        <LinearLayout
+            android:id="@+id/layoutTerminalConsole"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:textIsSelectable="true"
-            android:longClickable="true"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:textColorHighlight="#5580CBC4"
-            android:lineSpacingExtra="2dp"
-            android:textColor="@color/terminal_green"
-            android:textSize="12sp" />
-    </com.diamon.civil.terminal.ui.views.LogScrollView>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="visible">
 
+            <com.diamon.civil.terminal.ui.views.LogScrollView
+                android:id="@+id/scrollLog"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp"
+                android:background="#0A0E17"
+                android:focusable="false"
+                android:focusableInTouchMode="false">
+
+                <TextView
+                    android:id="@+id/tvLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:textIsSelectable="true"
+                    android:longClickable="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:textColorHighlight="#5580CBC4"
+                    android:lineSpacingExtra="2dp"
+                    android:textColor="@color/terminal_green"
+                    android:textSize="12sp" />
+            </com.diamon.civil.terminal.ui.views.LogScrollView>
+        </LinearLayout>
+
+        <!-- Mode B: featext Nano-style Console Text Editor -->
+        <LinearLayout
+            android:id="@+id/layoutFeaTextEditor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="#0A0E17"
+            android:visibility="gone">
+
+            <!-- Nano Header Bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                android:background="#161B26"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvFeaTextTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/featext_title"
+                    android:textColor="@color/terminal_green"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace" />
+
+                <TextView
+                    android:id="@+id/tvFeaTextFilename"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="File: untitled.inp"
+                    android:textColor="#E0E0E0"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace"
+                    android:ellipsize="middle"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:id="@+id/tvFeaTextStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/featext_saved_status"
+                    android:textColor="#80CBC4"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace" />
+            </LinearLayout>
+
+            <!-- Editor Body with Word-Wrapping and Line Numbers -->
+            <ScrollView
+                android:id="@+id/scrollEditor"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true"
+                android:scrollbars="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp">
+
+                    <!-- Line Numbers Gutter -->
+                    <TextView
+                        android:id="@+id/tvEditorLineNumbers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:minWidth="32dp"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:gravity="end"
+                        android:text="1"
+                        android:textColor="#546E7A"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="2dp" />
+
+                    <!-- Vertical Separator Line -->
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#263238"
+                        android:layout_marginEnd="6dp" />
+
+                    <!-- Multi-line Word-Wrapped Syntax-Highlighted Code Editor -->
+                    <EditText
+                        android:id="@+id/etEditorCode"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:gravity="top|start"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="2dp"
+                        android:textColor="@color/terminal_green"
+                        android:textColorHighlight="#5580CBC4"
+                        android:inputType="textMultiLine|textNoSuggestions"
+                        android:scrollHorizontally="false"
+                        android:paddingEnd="8dp" />
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- Nano Footer / Status & Shortcut Bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:background="#161B26"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvFeaTextPosition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ln 1, Col 1"
+                    android:textColor="#90A4AE"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace" />
+
+                <TextView
+                    android:id="@+id/tvFeaTextHelpShortcuts"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="[💾] Guardar | [✕] Salir | [⇥] Tab | [⌫] Borrar"
+                    android:textColor="#80CBC4"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Terminal Prompt & Command Input Bar -->
     <LinearLayout
+        android:id="@+id/layoutCommandInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -135,8 +422,10 @@
 
         <ImageButton
             android:id="@+id/btnSend"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:padding="7dp"
+            android:scaleType="centerInside"
             android:focusable="false"
             android:focusableInTouchMode="false"
             android:src="@drawable/ic_send"
