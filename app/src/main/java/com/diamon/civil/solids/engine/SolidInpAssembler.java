@@ -63,6 +63,20 @@ public class SolidInpAssembler {
         Set<Integer> fixedNodes = resolveRegionNodes(lines, nodeCoords, fixedRegion, true);
         Set<Integer> loadedNodes = resolveRegionNodes(lines, nodeCoords, loadRegion, false);
 
+        // Ensure physical realism: loaded nodes cannot be fixed supports.
+        // If the user selected the identical region for both, or there is partial overlap:
+        if (fixedNodes.containsAll(loadedNodes)) {
+            boolean fixedIsMin = true;
+            if (fixedRegion != null) {
+                String fr = fixedRegion.toUpperCase(Locale.US);
+                if (fr.contains("MAX") || fr.contains("RIGHT") || fr.contains("TOP") || fr.contains("FRONT") || fr.contains("+")) {
+                    fixedIsMin = false;
+                }
+            }
+            loadedNodes = extractSpatialFaceNodes(nodeCoords, fixedIsMin ? "AUTO_MAX" : "AUTO_MIN");
+        }
+        loadedNodes.removeAll(fixedNodes);
+
         if (fixedNodes.isEmpty() || loadedNodes.isEmpty()) {
             throw new IOException("Boundary condition assignment failed: fixed or loaded nodes could not be determined.");
         }
@@ -89,131 +103,147 @@ public class SolidInpAssembler {
             else if (req.contains("C3D6")) targetElemType = "C3D6";
         }
 
+        List<String> nodeLines = new ArrayList<>();
+        List<String> elementLines = new ArrayList<>();
         int elementCount = 0;
-        try (PrintWriter pw = new PrintWriter(new FileWriter(cleanInp))) {
-            boolean inElementBlock = false;
-            boolean skipCurrentBlock = false;
-            String current3DType = null;
-            for (String line : lines) {
-                String u = line.trim().toUpperCase(Locale.US);
-                
-                if (u.startsWith("*NODE")) {
-                    pw.println("*NODE, NSET=NALL");
-                    inElementBlock = false;
+
+        inNodeBlock = false;
+        boolean inElementBlock = false;
+        boolean skipCurrentBlock = false;
+        String current3DType = null;
+
+        for (String line : lines) {
+            String u = line.trim().toUpperCase(Locale.US);
+
+            if (u.startsWith("*NODE")) {
+                inNodeBlock = true;
+                inElementBlock = false;
+                skipCurrentBlock = false;
+                current3DType = null;
+                continue;
+            }
+
+            if (u.startsWith("*ELEMENT")) {
+                inNodeBlock = false;
+                if (u.contains("TYPE=TETRA4") || u.contains("TYPE=TET4") || u.contains("TYPE=C3D4")) {
+                    String outType = (targetElemType != null && targetElemType.startsWith("C3D4")) ? targetElemType : "C3D4";
+                    elementLines.add("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
+                    inElementBlock = true;
                     skipCurrentBlock = false;
-                    current3DType = null;
+                    current3DType = "C3D4";
                     continue;
-                }
-                
-                if (u.startsWith("*ELEMENT")) {
-                    if (u.contains("TYPE=TETRA4") || u.contains("TYPE=TET4") || u.contains("TYPE=C3D4")) {
-                        String outType = (targetElemType != null && targetElemType.startsWith("C3D4")) ? targetElemType : "C3D4";
-                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
-                        inElementBlock = true;
-                        skipCurrentBlock = false;
-                        current3DType = "C3D4";
-                        continue;
-                    } else if (u.contains("TYPE=TETRA10") || u.contains("TYPE=C3D10") || u.contains("TYPE=TET10")) {
-                        String outType = (targetElemType != null && targetElemType.startsWith("C3D10")) ? targetElemType : "C3D10";
-                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
-                        inElementBlock = true;
-                        skipCurrentBlock = false;
-                        current3DType = "C3D10";
-                        continue;
-                    } else if (u.contains("TYPE=HEXA8R") || u.contains("TYPE=C3D8R") || u.contains("TYPE=HEX8R")) {
-                        String outType = (targetElemType != null && targetElemType.equals("C3D8")) ? "C3D8" : "C3D8R";
-                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
-                        inElementBlock = true;
-                        skipCurrentBlock = false;
-                        current3DType = "C3D8R";
-                        continue;
-                    } else if (u.contains("TYPE=HEXA8") || u.contains("TYPE=C3D8") || u.contains("TYPE=HEX8")) {
-                        String outType = (targetElemType != null && targetElemType.equals("C3D8R")) ? "C3D8R" : "C3D8";
-                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
-                        inElementBlock = true;
-                        skipCurrentBlock = false;
-                        current3DType = "C3D8";
-                        continue;
-                    } else if (u.contains("TYPE=HEXA20R") || u.contains("TYPE=C3D20R") || u.contains("TYPE=HEX20R")) {
-                        String outType = (targetElemType != null && targetElemType.equals("C3D20")) ? "C3D20" : "C3D20R";
-                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
-                        inElementBlock = true;
-                        skipCurrentBlock = false;
-                        current3DType = "C3D20R";
-                        continue;
-                    } else if (u.contains("TYPE=HEXA20") || u.contains("TYPE=C3D20") || u.contains("TYPE=HEX20") || u.contains("TYPE=C3D27") || u.contains("TYPE=HEX27") || u.contains("TYPE=HEXA27")) {
-                        String outType = (targetElemType != null && targetElemType.equals("C3D20R")) ? "C3D20R" : "C3D20";
-                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
-                        inElementBlock = true;
-                        skipCurrentBlock = false;
-                        current3DType = "C3D20";
-                        continue;
-                    } else if (u.contains("TYPE=PRISM6") || u.contains("TYPE=C3D6") || u.contains("TYPE=WED6") || u.contains("TYPE=PRI6")) {
-                        String outType = (targetElemType != null && targetElemType.startsWith("C3D6")) ? targetElemType : "C3D6";
-                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
-                        inElementBlock = true;
-                        skipCurrentBlock = false;
-                        current3DType = "C3D6";
-                        continue;
-                    } else if (u.contains("TYPE=PRISM15") || u.contains("TYPE=C3D15") || u.contains("TYPE=WED15") || u.contains("TYPE=PRI15") || u.contains("TYPE=PRI18") || u.contains("TYPE=WED18") || u.contains("TYPE=PRISM18")) {
-                        String outType = (targetElemType != null && targetElemType.startsWith("C3D15")) ? targetElemType : "C3D15";
-                        pw.println("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
-                        inElementBlock = true;
-                        skipCurrentBlock = false;
-                        current3DType = "C3D15";
-                        continue;
-                    } else {
-                        // Any 1D/2D or non-solid element (M3D9, M3D8, M3D4, CPS3, CPS4, CPS6, CPS8, S4, S8, B31, etc.) must be skipped
-                        skipCurrentBlock = true;
-                        inElementBlock = false;
-                        current3DType = null;
-                        continue;
-                    }
-                }
-                
-                if (u.startsWith("*") && !u.startsWith("*ELEMENT")) {
-                    if (u.startsWith("*BOUNDARY") || u.startsWith("*STEP") || u.startsWith("*CLOAD") || u.startsWith("*END")) {
-                        break; 
-                    }
+                } else if (u.contains("TYPE=TETRA10") || u.contains("TYPE=C3D10") || u.contains("TYPE=TET10")) {
+                    String outType = (targetElemType != null && targetElemType.startsWith("C3D10")) ? targetElemType : "C3D10";
+                    elementLines.add("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
+                    inElementBlock = true;
+                    skipCurrentBlock = false;
+                    current3DType = "C3D10";
+                    continue;
+                } else if (u.contains("TYPE=HEXA8R") || u.contains("TYPE=C3D8R") || u.contains("TYPE=HEX8R")) {
+                    String outType = (targetElemType != null && targetElemType.equals("C3D8")) ? "C3D8" : "C3D8R";
+                    elementLines.add("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
+                    inElementBlock = true;
+                    skipCurrentBlock = false;
+                    current3DType = "C3D8R";
+                    continue;
+                } else if (u.contains("TYPE=HEXA8") || u.contains("TYPE=C3D8") || u.contains("TYPE=HEX8")) {
+                    String outType = (targetElemType != null && targetElemType.equals("C3D8R")) ? "C3D8R" : "C3D8";
+                    elementLines.add("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
+                    inElementBlock = true;
+                    skipCurrentBlock = false;
+                    current3DType = "C3D8";
+                    continue;
+                } else if (u.contains("TYPE=HEXA20R") || u.contains("TYPE=C3D20R") || u.contains("TYPE=HEX20R")) {
+                    String outType = (targetElemType != null && targetElemType.equals("C3D20")) ? "C3D20" : "C3D20R";
+                    elementLines.add("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
+                    inElementBlock = true;
+                    skipCurrentBlock = false;
+                    current3DType = "C3D20R";
+                    continue;
+                } else if (u.contains("TYPE=HEXA20") || u.contains("TYPE=C3D20") || u.contains("TYPE=HEX20") || u.contains("TYPE=C3D27") || u.contains("TYPE=HEX27") || u.contains("TYPE=HEXA27")) {
+                    String outType = (targetElemType != null && targetElemType.equals("C3D20R")) ? "C3D20R" : "C3D20";
+                    elementLines.add("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
+                    inElementBlock = true;
+                    skipCurrentBlock = false;
+                    current3DType = "C3D20";
+                    continue;
+                } else if (u.contains("TYPE=PRISM6") || u.contains("TYPE=C3D6") || u.contains("TYPE=WED6") || u.contains("TYPE=PRI6")) {
+                    String outType = (targetElemType != null && targetElemType.startsWith("C3D6")) ? targetElemType : "C3D6";
+                    elementLines.add("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
+                    inElementBlock = true;
+                    skipCurrentBlock = false;
+                    current3DType = "C3D6";
+                    continue;
+                } else if (u.contains("TYPE=PRISM15") || u.contains("TYPE=C3D15") || u.contains("TYPE=WED15") || u.contains("TYPE=PRI15") || u.contains("TYPE=PRI18") || u.contains("TYPE=WED18") || u.contains("TYPE=PRISM18")) {
+                    String outType = (targetElemType != null && targetElemType.startsWith("C3D15")) ? targetElemType : "C3D15";
+                    elementLines.add("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
+                    inElementBlock = true;
+                    skipCurrentBlock = false;
+                    current3DType = "C3D15";
+                    continue;
+                } else {
+                    // Any 1D/2D or non-solid element (M3D9, M3D8, M3D4, CPS3, CPS4, CPS6, CPS8, S4, S8, B31, etc.) must be skipped
                     skipCurrentBlock = true;
                     inElementBlock = false;
                     current3DType = null;
                     continue;
                 }
+            }
 
-                if (skipCurrentBlock) continue;
-                
-                if (inElementBlock && line.contains(",")) {
-                    String[] parts = line.trim().split(",");
-                    if ("C3D20".equals(current3DType) || "C3D20R".equals(current3DType)) {
-                        // Truncate C3D27 (27 nodes) to standard serendipity CalculiX C3D20 (20 nodes)
-                        if (parts.length > 21) {
-                            StringBuilder sb = new StringBuilder();
-                            for (int i = 0; i < 21; i++) {
-                                sb.append(parts[i].trim()).append(i < 20 ? ", " : "");
-                            }
-                            line = sb.toString();
-                        }
-                    } else if ("C3D15".equals(current3DType)) {
-                        // Truncate C3D18 (18 nodes) to standard serendipity CalculiX C3D15 (15 nodes)
-                        if (parts.length > 16) {
-                            StringBuilder sb = new StringBuilder();
-                            for (int i = 0; i < 16; i++) {
-                                sb.append(parts[i].trim()).append(i < 15 ? ", " : "");
-                            }
-                            line = sb.toString();
-                        }
-                    }
-                    pw.println(line);
-                    elementCount++;
-                } else if (!inElementBlock) {
-                    pw.println(line);
+            if (u.startsWith("*") && !u.startsWith("*ELEMENT") && !u.startsWith("*NODE")) {
+                inNodeBlock = false;
+                if (u.startsWith("*BOUNDARY") || u.startsWith("*STEP") || u.startsWith("*CLOAD") || u.startsWith("*END")) {
+                    break;
                 }
+                skipCurrentBlock = true;
+                inElementBlock = false;
+                current3DType = null;
+                continue;
+            }
+
+            if (skipCurrentBlock) continue;
+
+            if (inNodeBlock && line.contains(",")) {
+                nodeLines.add(line);
+            } else if (inElementBlock && line.contains(",")) {
+                String formattedLine = line;
+                String[] parts = line.trim().split(",");
+                if ("C3D20".equals(current3DType) || "C3D20R".equals(current3DType)) {
+                    // Truncate C3D27 (27 nodes) to standard serendipity CalculiX C3D20 (20 nodes)
+                    if (parts.length > 21) {
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < 21; i++) {
+                            sb.append(parts[i].trim()).append(i < 20 ? ", " : "");
+                        }
+                        formattedLine = sb.toString();
+                    }
+                } else if ("C3D15".equals(current3DType)) {
+                    // Truncate C3D18 (18 nodes) to standard serendipity CalculiX C3D15 (15 nodes)
+                    if (parts.length > 16) {
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < 16; i++) {
+                            sb.append(parts[i].trim()).append(i < 15 ? ", " : "");
+                        }
+                        formattedLine = sb.toString();
+                    }
+                }
+                elementLines.add(formattedLine);
+                elementCount++;
             }
         }
 
         if (elementCount == 0) {
             throw new IOException("Mesh generation produced 0 3D solid continuum elements (C3D4/C3D10/C3D8/C3D8R/C3D20/C3D20R/C3D6/C3D15). The CAD model could not be discretized as a 3D solid volume.");
+        }
+
+        try (PrintWriter pw = new PrintWriter(new FileWriter(cleanInp))) {
+            pw.println("*NODE, NSET=NALL");
+            for (String nl : nodeLines) {
+                pw.println(nl);
+            }
+            for (String el : elementLines) {
+                pw.println(el);
+            }
         }
 
         // 3. Assemble final INP with professional engineering logic

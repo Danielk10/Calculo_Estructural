@@ -143,6 +143,10 @@ public class SolidPDFReportGenerator {
     }
 
     public boolean generateReport(Context context, File outputFile, String projectName, File workDir) {
+        return generateReport(context, outputFile, projectName, workDir, null);
+    }
+
+    public boolean generateReport(Context context, File outputFile, String projectName, File workDir, String logText) {
         PdfDocument document = new PdfDocument();
         pageNumber = 0;
         PageContext ctx = new PageContext(document);
@@ -152,6 +156,11 @@ public class SolidPDFReportGenerator {
             File datFile = new File(workDir, "job_solid.dat");
             ctx.newPage(this);
             drawSummaryPage(ctx, datFile, workDir);
+
+            if (logText != null && !logText.trim().isEmpty()) {
+                ctx.newPage(this);
+                drawLogPages(ctx, logText);
+            }
 
             ctx.finish(this);
             FileOutputStream fos = new FileOutputStream(outputFile);
@@ -350,6 +359,53 @@ public class SolidPDFReportGenerator {
             } catch (Exception e) {
                 Log.e(TAG, "Error parsing dat: " + e.getMessage());
             }
+        }
+
+        if (dispList.isEmpty() && workDir != null) {
+            File frdFile = new File(workDir, "job_solid.frd");
+            if (frdFile.exists()) {
+                try (java.io.BufferedReader frdReader = new java.io.BufferedReader(new java.io.FileReader(frdFile))) {
+                    String frdLine;
+                    boolean captureDisp = false;
+                    while ((frdLine = frdReader.readLine()) != null) {
+                        if (frdLine.contains("-4  DISP")) {
+                            captureDisp = true;
+                            continue;
+                        }
+                        if (captureDisp && frdLine.startsWith(" -3")) break;
+                        if (captureDisp && frdLine.startsWith(" -1") && frdLine.length() >= 13) {
+                            try {
+                                int nodeId = Integer.parseInt(frdLine.substring(3, 13).trim());
+                                List<Double> vals = new ArrayList<>();
+                                for (int i = 13; i < frdLine.length(); i += 12) {
+                                    int end = Math.min(i + 12, frdLine.length());
+                                    String chunk = frdLine.substring(i, end).trim();
+                                    if (!chunk.isEmpty()) vals.add(Double.parseDouble(chunk));
+                                }
+                                if (vals.size() >= 3) {
+                                    double ux = vals.get(0), uy = vals.get(1), uz = vals.get(2);
+                                    double disp = Math.sqrt(ux * ux + uy * uy + uz * uz);
+                                    DispEntry de = new DispEntry();
+                                    de.nodeId = nodeId; de.ux = ux; de.uy = uy; de.uz = uz; de.mag = disp;
+                                    dispList.add(de);
+                                    if (disp > maxDisp) {
+                                        maxDisp = disp;
+                                        maxDispNode = nodeId;
+                                    }
+                                }
+                            } catch (Exception ignore) {}
+                        }
+                    }
+                } catch (Exception ignore) {}
+            }
+        }
+
+        if (dispList.isEmpty() && stressList.isEmpty()) {
+            ctx.ensureSpace(this, 60f);
+            ctx.canvas.drawText("No completed simulation output available.", MARGIN_LEFT, ctx.y, subHeaderPaint);
+            ctx.y += 16f;
+            ctx.y = drawWrappedText(ctx, "Execute the FEA solver using the 'EXECUTE FEA SOLVER' button to compute nodal displacements and Cauchy stresses before generating the engineering summary.", MARGIN_LEFT, USABLE_WIDTH, 12f, bodyPaint);
+            return;
         }
 
         ctx.ensureSpace(this, 120f);

@@ -388,6 +388,13 @@ public class SolidFragment extends Fragment {
                 || name.endsWith(".geo");
     }
 
+    public static boolean isSupportedFormat(String fileName) {
+        if (fileName == null || fileName.trim().isEmpty()) return false;
+        String name = fileName.toLowerCase(java.util.Locale.US).trim();
+        if (name.equals("gmsh_cad_driver.geo") || name.startsWith("job_solid_clean") || name.startsWith("nsets") || name.equals("job_solid_raw.inp") || name.startsWith(".")) return false;
+        return isSupportedCadFormat(name) || name.endsWith(".inp");
+    }
+
     private void refreshGeometrySpinner(File selectFile) {
         if (binding == null || getActivity() == null) return;
         getActivity().runOnUiThread(() -> {
@@ -422,14 +429,25 @@ public class SolidFragment extends Fragment {
                             else if (name.equals("cut_result.brep")) displayNames.add(getString(R.string.geo_item_cut));
                             else if (name.equals("intersect_result.brep")) displayNames.add(getString(R.string.geo_item_intersect));
                             else displayNames.add("📥 " + f.getName());
+                        } else if (name.endsWith(".inp") && !name.startsWith("job_solid_clean") && !name.startsWith("nsets") && !name.equals("job_solid_raw.inp")) {
+                            availableGeometries.add(f);
+                            if (isFullyAssembledInp(f)) {
+                                displayNames.add("🧮 " + f.getName());
+                            } else {
+                                displayNames.add("📄 " + f.getName());
+                            }
                         }
                     }
                 }
             }
 
-            if (selectFile != null && isSupportedCadFormat(selectFile.getName()) && !availableGeometries.contains(selectFile)) {
+            if (selectFile != null && isSupportedFormat(selectFile.getName()) && !availableGeometries.contains(selectFile)) {
                 availableGeometries.add(selectFile);
-                displayNames.add("📥 " + selectFile.getName());
+                if (selectFile.getName().toLowerCase(java.util.Locale.US).endsWith(".inp")) {
+                    displayNames.add(isFullyAssembledInp(selectFile) ? ("🧮 " + selectFile.getName()) : ("📄 " + selectFile.getName()));
+                } else {
+                    displayNames.add("📥 " + selectFile.getName());
+                }
             }
 
             isProgrammaticGeometrySelection = true;
@@ -438,7 +456,7 @@ public class SolidFragment extends Fragment {
             binding.spinnerActiveGeometry.setAdapter(adapter);
 
             int selectedIndex = 0;
-            if (selectFile != null && isSupportedCadFormat(selectFile.getName())) {
+            if (selectFile != null && isSupportedFormat(selectFile.getName())) {
                 for (int i = 0; i < availableGeometries.size(); i++) {
                     if (availableGeometries.get(i).getAbsolutePath().equals(selectFile.getAbsolutePath())) {
                         selectedIndex = i;
@@ -566,7 +584,7 @@ public class SolidFragment extends Fragment {
             boolean exported = false;
             try {
                 com.diamon.civil.solids.export.SolidPDFReportGenerator generator = new com.diamon.civil.solids.export.SolidPDFReportGenerator();
-                boolean generated = generator.generateReport(ctx, reportFile, "3D Solid Analysis", workDir);
+                boolean generated = generator.generateReport(ctx, reportFile, "3D Solid Analysis", workDir, logger.getFullLog());
                 
                 if (generated && reportFile.exists()) {
                     com.diamon.civil.core.export.ExportManager manager = new com.diamon.civil.core.export.ExportManager(ctx);
@@ -597,7 +615,41 @@ public class SolidFragment extends Fragment {
         if (ctx == null) return;
         final android.content.Context appContext = ctx.getApplicationContext();
 
-        logger.info("Imported INP Deck from Menu: " + inpFile.getName());
+        logger.info("Imported INP Deck: " + inpFile.getName());
+
+        final int matPos = (binding != null) ? binding.spinnerMaterialSolid.getSelectedItemPosition() : 0;
+        final String fixedRegion = (binding != null && binding.spinnerFixedRegion.getSelectedItem() != null)
+                ? binding.spinnerFixedRegion.getSelectedItem().toString() : "AUTO";
+        final String loadRegion = (binding != null && binding.spinnerLoadRegion.getSelectedItem() != null)
+                ? binding.spinnerLoadRegion.getSelectedItem().toString() : "AUTO";
+        final String elemType = (binding != null && binding.spinnerElementType.getSelectedItem() != null)
+                ? binding.spinnerElementType.getSelectedItem().toString() : "C3D10";
+        final int loadDirPos = (binding != null) ? binding.spinnerLoadDirection.getSelectedItemPosition() : 0;
+        final int loadDof = (loadDirPos == 1) ? 1 : (loadDirPos == 2) ? 3 : 2;
+
+        final String loadMagStr = (binding != null) ? binding.etLoadMagnitude.getText().toString().trim() : "";
+        double parsedLoad = -100.0;
+        try {
+            if (!loadMagStr.isEmpty()) parsedLoad = Double.parseDouble(loadMagStr);
+        } catch (NumberFormatException ignored) {}
+        final double finalLoadMagnitude = parsedLoad;
+
+        final String modulusStr = (binding != null) ? binding.etSolidModulus.getText().toString().trim() : "";
+        String materialName = "Structural Steel A36";
+        double nu = 0.3;
+        double youngModulusTemp = 200000.0;
+        if (materialDatabase != null && matPos >= 0 && matPos < materialDatabase.getMaterials().size()) {
+            MaterialDatabase.Material mat = materialDatabase.getMaterials().get(matPos);
+            materialName = mat.name;
+            nu = mat.nu;
+            youngModulusTemp = mat.E;
+        }
+        try {
+            if (!modulusStr.isEmpty()) youngModulusTemp = Double.parseDouble(modulusStr);
+        } catch (NumberFormatException ignored) {}
+        final double finalE = youngModulusTemp;
+        final String finalMaterialName = materialName;
+        final double finalNu = nu;
 
         android.app.Activity activity = getActivity();
         if (activity != null) {
@@ -605,6 +657,8 @@ public class SolidFragment extends Fragment {
                 if (binding != null) {
                     binding.pbSolid.setVisibility(View.VISIBLE);
                     binding.btnRunSolidAnalysis.setEnabled(false);
+                    activeSimulationGeometry = inpFile;
+                    refreshGeometrySpinner(inpFile);
                 }
             });
         }
@@ -626,26 +680,7 @@ public class SolidFragment extends Fragment {
                     File rawInp = new File(workDir, "job_solid_raw.inp");
                     com.diamon.civil.core.io.FileHelper.copyFile(inpFile, rawInp);
 
-                    int matPos = (binding != null) ? binding.spinnerMaterialSolid.getSelectedItemPosition() : 0;
-                    String materialName = "Structural Steel A36";
-                    double nu = 0.3;
-                    double E = 200000.0;
-                    if (materialDatabase != null && matPos >= 0 && matPos < materialDatabase.getMaterials().size()) {
-                        MaterialDatabase.Material mat = materialDatabase.getMaterials().get(matPos);
-                        materialName = mat.name;
-                        nu = mat.nu;
-                        E = mat.E;
-                    }
-                    String fixedRegion = (binding != null && binding.spinnerFixedRegion.getSelectedItem() != null)
-                            ? binding.spinnerFixedRegion.getSelectedItem().toString() : "AUTO";
-                    String loadRegion = (binding != null && binding.spinnerLoadRegion.getSelectedItem() != null)
-                            ? binding.spinnerLoadRegion.getSelectedItem().toString() : "AUTO";
-                    String elemType = (binding != null && binding.spinnerElementType.getSelectedItem() != null)
-                            ? binding.spinnerElementType.getSelectedItem().toString() : "C3D10";
-                    int loadDirPos = (binding != null) ? binding.spinnerLoadDirection.getSelectedItemPosition() : 0;
-                    int loadDof = (loadDirPos == 1) ? 1 : (loadDirPos == 2) ? 3 : 2;
-
-                    com.diamon.civil.solids.engine.SolidInpAssembler.assemble(workDir, "job_solid", materialName, E, nu, currentDynamicLoadValue, loadDof, fixedRegion, loadRegion, elemType);
+                    com.diamon.civil.solids.engine.SolidInpAssembler.assemble(workDir, "job_solid", finalMaterialName, finalE, finalNu, finalLoadMagnitude, loadDof, fixedRegion, loadRegion, elemType);
                 }
 
                 logger.info("Step: Running CalculiX Solver ccx...");
@@ -1004,8 +1039,14 @@ public class SolidFragment extends Fragment {
         }
 
         String nameLower = cadFile.getName().toLowerCase();
+        if (nameLower.endsWith(".inp")) {
+            logger.info("Directly executing active INP mesh/deck: " + cadFile.getName());
+            onInpImported(cadFile);
+            return;
+        }
+
         if (!nameLower.endsWith(".geo") && !nameLower.endsWith(".step") && !nameLower.endsWith(".stp") && !nameLower.endsWith(".brep") && !nameLower.endsWith(".iges") && !nameLower.endsWith(".igs")) {
-            logger.error("Unsupported geometry format. Please load a compatible model (.geo, .step, .brep, .iges) before running the solver.");
+            logger.error("Unsupported geometry format. Please load a compatible model (.geo, .step, .brep, .iges, .inp) before running the solver.");
             binding.pbSolid.setVisibility(View.GONE);
             binding.btnRunSolidAnalysis.setEnabled(true);
             return;
@@ -1127,11 +1168,10 @@ public class SolidFragment extends Fragment {
         if (files == null) return;
         for (File f : files) {
             String name = f.getName();
-            // Preserve user-created CAD models and primitives
+            // Preserve user-created CAD models, primitives, and imported INP meshes
             if (name.endsWith(".step") || name.endsWith(".stp") || name.endsWith(".geo") ||
-                name.endsWith(".iges") || name.endsWith(".igs") ||
-                name.equals("box.brep") || name.equals("cylinder.brep") || name.equals("sphere.brep") ||
-                name.startsWith("operated_")) {
+                name.endsWith(".iges") || name.endsWith(".igs") || name.endsWith(".brep") ||
+                (name.endsWith(".inp") && !name.startsWith("job_solid") && !name.startsWith("nsets"))) {
                 continue;
             }
             // Keep the active GLB currently displayed in the 3D viewer

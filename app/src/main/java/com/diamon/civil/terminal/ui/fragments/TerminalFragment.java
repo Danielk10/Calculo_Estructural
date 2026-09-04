@@ -21,7 +21,7 @@ import com.diamon.civil.core.util.logging.ModuleLogger;
 import com.diamon.civil.databinding.FragmentTerminalBinding;
 import com.diamon.civil.solids.engine.SolidDisplacementFrdParser;
 import com.diamon.civil.solids.engine.SolidInpAssembler;
-import com.diamon.civil.solids.export.SolidPDFReportGenerator;
+import com.diamon.civil.terminal.export.TerminalPDFReportGenerator;
 import com.diamon.civil.structural.engine.CalculixExecutor;
 import com.diamon.civil.structural.engine.StructuralBeamDatParser;
 import com.diamon.civil.terminal.engine.TerminalCommandExecutor;
@@ -242,8 +242,8 @@ public class TerminalFragment extends Fragment {
         executor.execute(() -> {
             boolean exported = false;
             try {
-                SolidPDFReportGenerator generator = new SolidPDFReportGenerator();
-                boolean success = generator.generateReport(ctx, reportFile, "Terminal Analysis Log", logText);
+                TerminalPDFReportGenerator generator = new TerminalPDFReportGenerator();
+                boolean success = generator.generateReport(ctx, reportFile, "Terminal Execution Log", workDir, logText);
 
                 if (success && reportFile.exists()) {
                     ExportManager manager = new ExportManager(ctx);

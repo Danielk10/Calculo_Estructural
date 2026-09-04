@@ -244,27 +244,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         com.diamon.civil.core.io.FileHelper fh = new com.diamon.civil.core.io.FileHelper(getContentResolver());
                         final String finalName = fileName;
 
-                        if (!nameLower.endsWith(".inp")) {
-                            runOnUiThread(() -> Toast.makeText(this, R.string.toast_only_inp_supported, Toast.LENGTH_LONG).show());
-                            return;
-                        }
-
                         Fragment current = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                         if (current instanceof SolidFragment) {
+                            boolean isCad = SolidFragment.isSupportedCadFormat(fileName);
+                            boolean isInp = nameLower.endsWith(".inp");
+                            if (!isCad && !isInp) {
+                                runOnUiThread(() -> Toast.makeText(this, getString(R.string.toast_unsupported_cad_format, finalName), Toast.LENGTH_LONG).show());
+                                return;
+                            }
                             File solidDir = new File(getFilesDir(), "3d_solid_analysis");
                             if (!solidDir.exists()) solidDir.mkdirs();
                             File targetFile = new File(solidDir, fileName);
                             if (fh.importFile(uri, targetFile)) {
-                                com.diamon.civil.core.io.FileHelper.copyFile(targetFile, new File(solidDir, "job_solid_raw.inp"));
                                 runOnUiThread(() -> {
                                     Fragment activeFrag = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                                     if (activeFrag instanceof SolidFragment && ((SolidFragment) activeFrag).isAdded()) {
-                                        ((SolidFragment) activeFrag).onInpImported(targetFile);
+                                        if (isCad) {
+                                            ((SolidFragment) activeFrag).loadGeometryFile(targetFile);
+                                        } else {
+                                            com.diamon.civil.core.io.FileHelper.copyFile(targetFile, new File(solidDir, "job_solid_raw.inp"));
+                                            ((SolidFragment) activeFrag).onInpImported(targetFile);
+                                            Toast.makeText(this, getString(R.string.toast_inp_imported_solid, finalName), Toast.LENGTH_SHORT).show();
+                                        }
                                     }
-                                    Toast.makeText(this, getString(R.string.toast_inp_imported_solid, finalName), Toast.LENGTH_SHORT).show();
                                 });
                             }
                         } else if (current instanceof TerminalFragment) {
+                            if (!nameLower.endsWith(".inp")) {
+                                runOnUiThread(() -> Toast.makeText(this, R.string.toast_only_inp_supported, Toast.LENGTH_LONG).show());
+                                return;
+                            }
                             File terminalDir = ((TerminalFragment) current).getCurrentWorkDir();
                             if (terminalDir == null) terminalDir = getFilesDir();
                             if (!terminalDir.exists()) terminalDir.mkdirs();

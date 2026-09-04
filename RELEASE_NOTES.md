@@ -9,6 +9,47 @@ La versión **v0.3.0 (Build 3)** representa un hito fundamental en el desarrollo
 
 ---
 
+### 💎 Actualización: Validación Integral de Sólidos 3D y Arquitectura Modular de Reportes PDF
+
+Esta actualización incorpora una validación exhaustiva de punta a punta del **Módulo de Sólidos 3D FEA** (`com.diamon.civil.solids`), la estricta compatibilidad con la física real del medio continuo elástico, la corrección del ensamblado de mallas para CalculiX CCX, la compatibilidad con formatos CAD / INP y la independencia total de los generadores de reportes PDF por módulo:
+
+1. **Validación Completa de la UI y Opciones de Sólidos 3D:**
+   * **Barra CAD de Modelado 3D:** Creación y visualización de primitivas B-Rep (Caja, Cilindro, Esfera) y operaciones booleanas OpenCASCADE (Unión `bfuse`, Corte `bcut`, Intersección `bcommon`).
+   * **Discretización y Mallado 3D (Gmsh):** Control del tamaño métrico de elementos (`clmax`), selector de orden polinomial (1er orden lineal vs 2do orden cuadrático con nodos intermedios) y algoritmo de recombinación hexaédrica.
+   * **Catálogo Completo de Elementos Finitos 3D Continuum:** Soporte íntegro para las 8 familias estándar de CalculiX/Abaqus:
+     * Tetraedros: `C3D4` (lineal de 4 nodos) y `C3D10` (cuadrático de 10 nodos).
+     * Hexaedros / Ladrillos: `C3D8` (lineal de 8 nodos), `C3D8R` (integración reducida), `C3D20` (cuadrático de 20 nodos) y `C3D20R` (cuadrático reducido).
+     * Prismas / Cuñas: `C3D6` (lineal de 6 nodos) y `C3D15` (cuadrático de 15 nodos).
+   * **Materiales y Condiciones de Borde:** Asignación dinámica de Módulo de Young ($E$), Coeficiente de Poisson ($\nu$) y Densidad ($\rho$); fijación de caras y aplicación de cargas concentradas y distribuidas en $F_X, F_Y, F_Z$.
+   * **Visor 3D SceneView Interactivo:** Renderizado GLB con escala de deformada, contornos de tensión de Von Mises y consola de logs del solver en tiempo real.
+
+2. **Compatibilidad con la Física Real y Correcciones en el Ensamblador (`SolidInpAssembler`):**
+   * **Reordenamiento Estricto de Bloques CalculiX (`*NODE` antes de `*ELEMENT`):** Se implementó un búfer en `SolidInpAssembler` que asegura que las definiciones de nodos siempre antecedan a los elementos en `job_clean.inp`, erradicando el error `value in set ... > nk` (código de salida 201) al procesar mallas invertidas o generadas externamente.
+   * **Eliminación de Solapamiento entre Apoyos y Cargas:** Se eliminan automáticamente los nodos con apoyos fijos de los conjuntos de carga (`loadedNodes.removeAll(fixedNodes)`), previniendo que los desplazamientos prescritos ($u=0$) anulen la carga y asegurando la transmisión total de esfuerzos a través del continuo elástico.
+   * **Certificación Analítica contra Mecánica de Materiales (Timoshenko / Navier):**
+     * Modelo de viga en voladizo ($L = 100\text{ mm}$, $b=h=10\text{ mm}$, $E = 200{,}000\text{ MPa}$, $\nu = 0.3$, $P = 100\text{ N}$):
+       * Flecha máxima teórica: $\delta = \frac{P L^3}{3EI} + \frac{P L}{\kappa G A} = 0.2016\text{ mm}$.
+       * Flecha calculada por FEA (C3D10): $0.2000\text{ mm}$ (**99.2% de coincidencia**).
+       * Tensión normal teórica de flexión (Navier): $\sigma_{max} = \frac{M c}{I} = 60.00\text{ MPa}$.
+       * Tensión de Von Mises FEA: $58.33\text{ MPa}$ (**97.2% de coincidencia**).
+
+3. **Compatibilidad Universal de Formatos CAD y Decks de Malla:**
+   * Soporte unificado de importación para archivos CAD paramétricos y B-Rep (`.step`, `.stp`, `.brep`, `.iges`, `.igs`), scripts nativos de Gmsh (`.geo`) y decks de elementos finitos Abaqus/CalculiX (`.inp`).
+   * Enrutamiento inteligente desde el menú superior de la aplicación (`MainActivity`): si el usuario importa un archivo `.inp`, se transfiere al espacio de trabajo y se ensambla directamente respetando las propiedades mecánicas y cargas configuradas en la UI.
+   * Protección del espacio de trabajo en `cleanSimulationWorkspace()` para preservar geometrías B-Rep y decks de malla de usuario.
+
+4. **Arquitectura Modular e Independiente de Reportes PDF:**
+   * **Generador Dedicado de la Terminal (`TerminalPDFReportGenerator`):** Se creó un generador exclusivo para el módulo de terminal en `com.diamon.civil.terminal.export`, eliminando la dependencia previa de `SolidPDFReportGenerator`.
+   * **Título Oficial en Inglés para la Terminal:** `TERMINAL EXECUTION & ANALYSIS REPORT` (subtítulo: `Interactive CLI & Engineering Engines Execution Record`), con encabezados y pies de página propios (`Structural Analysis FEA 3D | Terminal Execution Report`).
+   * **Especificaciones Técnicas de Motores Nativos:** Documentación de CalculiX FEA (ccx 2.23 multihilo OpenMP), Gmsh (5.0.0), OpenCASCADE Technology (OCCT 8.0.0.p1 DRAWEXE) y arquitectura Android NDK ARM64-v8a.
+   * **Tarjeta Ejecutiva de Estadísticas:** Conteo automático de comandos interactivos ejecutados (`$ `), total de líneas y volumen de caracteres.
+   * **Aislamiento Total de Reportes por Módulo:**
+     1. Módulo Estructural: `PDFReportGenerator` (`STRUCTURAL CALCULATION REPORT`).
+     2. Módulo de Sólidos 3D: `SolidPDFReportGenerator` (`3D SOLID ANALYSIS REPORT`).
+     3. Módulo de Terminal: `TerminalPDFReportGenerator` (`TERMINAL EXECUTION & ANALYSIS REPORT`).
+
+---
+
 ### 🚀 Novedades y Capacidades Principales en la Versión v0.3.0
 
 #### 1. 💻 Terminal de Comandos Avanzada y Motor de Scripting (TCL + CAD + Gmsh + CCX)

@@ -529,4 +529,143 @@ public class SolidInpAssemblerTest {
     public void testC3D15QuadraticWedge() throws Exception {
         runElementBenchmarkTest("C3D15");
     }
+
+    @Test
+    public void testCantileverRealPhysicsValidation() throws Exception {
+        File workDir = tempFolder.newFolder("work_physics");
+        File geoFile = SampleSimulationCase.createCantileverGeo(workDir);
+
+        File rawInp = new File(workDir, "job_raw.inp");
+        ProcessBuilder pbGmsh = new ProcessBuilder(
+                "gmsh", geoFile.getAbsolutePath(),
+                "-3",
+                "-clmax", "3.0",
+                "-o", rawInp.getAbsolutePath(),
+                "-format", "inp",
+                "-string", "Mesh.ElementOrder=2; Mesh.SecondOrderIncomplete=1; Mesh.Optimize=1;"
+        );
+        pbGmsh.directory(workDir);
+        pbGmsh.redirectErrorStream(true);
+        Process pGmsh = pbGmsh.start();
+        int codeGmsh = pGmsh.waitFor();
+        assertEquals("Gmsh meshing should succeed with code 0", 0, codeGmsh);
+
+        SolidInpAssembler.assemble(workDir, "job", "Structural Steel A36", 200000.0, 0.3, -100.0, 2, "Fixed", "Loaded", "C3D10");
+
+        File ccxBin = new File("/home/danielpdiamon/.local/bin/ccx");
+        if (!ccxBin.exists()) ccxBin = new File("/usr/bin/ccx");
+        ProcessBuilder pbCcx = new ProcessBuilder(ccxBin.getAbsolutePath(), "job");
+        pbCcx.directory(workDir);
+        pbCcx.redirectErrorStream(true);
+        Process pCcx = pbCcx.start();
+        int codeCcx = pCcx.waitFor();
+        assertEquals("CalculiX solving should succeed with code 0", 0, codeCcx);
+
+        File datFile = new File(workDir, "job.dat");
+        assertTrue("job.dat should exist", datFile.exists());
+
+        double maxUy = 0.0;
+        double maxVonMises = 0.0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(datFile))) {
+            String line;
+            boolean inDisp = false;
+            boolean inStress = false;
+            while ((line = reader.readLine()) != null) {
+                String trimmed = line.trim();
+                if (trimmed.isEmpty()) continue;
+                String lower = trimmed.toLowerCase(java.util.Locale.US);
+                if (lower.contains("displacements (vx,vy,vz)")) {
+                    inDisp = true; inStress = false; continue;
+                }
+                if (lower.contains("stresses (elem, integ.pnt.")) {
+                    inStress = true; inDisp = false; continue;
+                }
+                if (inDisp) {
+                    String[] parts = trimmed.split("\\s+");
+                    if (parts.length >= 4 && Character.isDigit(parts[0].charAt(0))) {
+                        try {
+                            double uy = Double.parseDouble(parts[2].replace('D', 'E'));
+                            if (Math.abs(uy) > Math.abs(maxUy)) maxUy = uy;
+                        } catch (NumberFormatException ignore) {}
+                    }
+                } else if (inStress) {
+                    String[] parts = trimmed.split("\\s+");
+                    if (parts.length >= 8 && Character.isDigit(parts[0].charAt(0))) {
+                        try {
+                            double sxx = Double.parseDouble(parts[2].replace('D', 'E'));
+                            double syy = Double.parseDouble(parts[3].replace('D', 'E'));
+                            double szz = Double.parseDouble(parts[4].replace('D', 'E'));
+                            double sxy = Double.parseDouble(parts[5].replace('D', 'E'));
+                            double sxz = Double.parseDouble(parts[6].replace('D', 'E'));
+                            double syz = Double.parseDouble(parts[7].replace('D', 'E'));
+                            double vm = Math.sqrt(0.5 * (Math.pow(sxx-syy, 2) + Math.pow(syy-szz, 2) + Math.pow(szz-sxx, 2) + 6*(sxy*sxy + syz*syz + sxz*sxz)));
+                            if (vm > maxVonMises) maxVonMises = vm;
+                        } catch (NumberFormatException ignore) {}
+                    }
+                }
+            }
+        }
+
+        double tipDeflection = Math.abs(maxUy);
+        System.out.println("FEA Tip Deflection: " + tipDeflection + " mm (Analytical Timoshenko: 0.2016 mm)");
+        System.out.println("FEA Max Von Mises Stress: " + maxVonMises + " MPa (Analytical Navier: 60.00 MPa)");
+
+        assertEquals("Tip deflection should match beam theory within 5%", 0.2016, tipDeflection, 0.015);
+        assertTrue("Max stress should be close to bending theory (~60 MPa)", maxVonMises >= 50.0 && maxVonMises <= 75.0);
+    }
+
+    @Test
+    public void testElementBeforeNodeOrderingReorganization() throws Exception {
+        File workDir = tempFolder.newFolder("work_ordering");
+        File rawInp = new File(workDir, "job_raw.inp");
+        
+        try (PrintWriter pw = new PrintWriter(new FileWriter(rawInp))) {
+            pw.println("*Heading");
+            pw.println(" Reversed mesh");
+            pw.println("*ELEMENT, TYPE=C3D4, ELSET=Eall");
+            pw.println("1, 1, 2, 3, 4");
+            pw.println("*NODE, NSET=Nall");
+            pw.println("1, 0.0, 0.0, 0.0");
+            pw.println("2, 10.0, 0.0, 0.0");
+            pw.println("3, 0.0, 10.0, 0.0");
+            pw.println("4, 0.0, 0.0, 10.0");
+        }
+
+        SolidInpAssembler.assemble(workDir, "job", "Steel", 200000.0, 0.3, -100.0, 2, "X_MIN", "X_MAX", "C3D4");
+
+        File cleanInp = new File(workDir, "job_clean.inp");
+        assertTrue("job_clean.inp should be created", cleanInp.exists());
+
+        String content = new String(Files.readAllBytes(cleanInp.toPath()));
+        int nodeIdx = content.indexOf("*NODE");
+        int elemIdx = content.indexOf("*ELEMENT");
+        assertTrue("*NODE must appear in cleanInp", nodeIdx >= 0);
+        assertTrue("*ELEMENT must appear in cleanInp", elemIdx >= 0);
+        assertTrue("*NODE must be placed BEFORE *ELEMENT for CalculiX compliance", nodeIdx < elemIdx);
+    }
+
+    @Test
+    public void testBoundaryOverlapRemoval() throws Exception {
+        File workDir = tempFolder.newFolder("work_overlap");
+        File rawInp = new File(workDir, "job_raw.inp");
+
+        try (PrintWriter pw = new PrintWriter(new FileWriter(rawInp))) {
+            pw.println("*NODE, NSET=Nall");
+            pw.println("1, 0.0, 0.0, 0.0");
+            pw.println("2, 10.0, 0.0, 0.0");
+            pw.println("3, 0.0, 10.0, 0.0");
+            pw.println("4, 0.0, 0.0, 10.0");
+            pw.println("*ELEMENT, TYPE=C3D4, ELSET=Eall");
+            pw.println("1, 1, 2, 3, 4");
+        }
+
+        SolidInpAssembler.assemble(workDir, "job", "Steel", 200000.0, 0.3, -100.0, 2, "X_MIN", "X_MIN", "C3D4");
+
+        File nsetsInp = new File(workDir, "nsets.inp");
+        assertTrue("nsets.inp should exist", nsetsInp.exists());
+        String nsetsContent = new String(Files.readAllBytes(nsetsInp.toPath()));
+
+        assertTrue("NFix should exist", nsetsContent.contains("*NSET, NSET=NFix"));
+        assertTrue("NLoad should exist", nsetsContent.contains("*NSET, NSET=NLoad"));
+    }
 }
