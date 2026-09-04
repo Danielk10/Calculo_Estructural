@@ -123,6 +123,7 @@ Estos comandos permiten organizar carpetas, revisar resultados numéricos y admi
 | `mkdir` | `mkdir <nombre>` | Crea un nuevo directorio de trabajo. | `$ mkdir calculos_acero` |
 | `touch` | `touch <archivo>` | Crea un archivo vacío o actualiza su fecha y hora. | `$ touch notas.txt` |
 | `cat` | `cat <archivo>` | Muestra el contenido de un archivo de texto en pantalla (máximo 500 KB para proteger la memoria UI). | `$ cat job_structural.dat` |
+| `echo` | `echo <texto>`<br>`echo "<texto>" > <archivo>`<br>`echo "<texto>" >> <archivo>` | Imprime texto o crea/escribe (`>`) o añade (`>>`) contenido a un archivo directamente en la terminal. Admite saltos de línea `\n`. | `$ echo "pload ALL\nbox b 10 10 10\nexit" > script.tcl` |
 | `cp` | `cp <origen> <destino>` | Copia un archivo entre carpetas. Permite traer modelos desde otros módulos. | `$ cp /structural_analysis/job_structural.inp .` |
 | `rm` | `rm <archivo>`<br>`rm -rf <carpeta>` | Elimina un archivo individual o una carpeta completa de manera recursiva. | `$ rm modelo_antiguo.inp`<br>`$ rm -rf carpeta_temporal` |
 | `clear` | `clear` | Limpia completamente el área de registro de la terminal. | `$ clear` |
@@ -272,65 +273,138 @@ $ run-sim-test
 
 ---
 
-## ⚡ 5. Nivel 3: Ejecución Directa de Binarios Nativos (`ccx`, `gmsh`, `DRAWEXE`)
+## ⚡ 5. Nivel 3: Ejecución Directa de Binarios Nativos (`ccx`, `gmsh`, `draw` / `DRAWEXE`, `tclsh`)
 
-Si ingresas un comando que no coincide con los comandos internos de shell ni con los comandos especiales de test, la terminal lo delega directamente a los binarios nativos del sistema.
+Si ingresas un comando que no coincide con los comandos internos de shell ni con los comandos de diagnóstico `test-*`, la terminal lo delega directamente a los motores nativos instalados. La terminal incluye un analizador inteligente de línea de comandos que preserva comillas simples y dobles (`"..."`, `'...'`), permitiendo pasar scripts en línea y argumentos complejos.
+
+---
 
 ### 5.1 Ejecutar CalculiX Directamente (`ccx`)
 
-CalculiX CCX es el núcleo físico de la aplicación. Para resolver un modelo, sólo necesitas tener su archivo de entrada `.inp` en la carpeta actual.
+CalculiX CCX es el solucionador FEA principal de la aplicación. Puede invocarse tanto en modo estándar como con sus banderas de control:
 
-#### Sintaxis:
+#### Formas de Invocación Válidas:
 ```bash
-ccx <nombre_del_job_sin_extension>
-```
-*Ejemplo:*
-```bash
-$ ls
-      mi_viga.inp
-$ ccx mi_viga
+# 1. Por nombre base del archivo (CalculiX añade automáticamente la extensión .inp)
+ccx mi_viga
+
+# 2. Con la bandera estándar de entrada de CalculiX (-i)
+ccx -i mi_viga
+
+# 3. Incluyendo la extensión .inp (la terminal la limpia automáticamente para CalculiX)
+ccx mi_viga.inp
+
+# 4. Consultar la versión y compilación del motor nativo
+ccx -v
+
+# 5. Consultar sintaxis de uso
+ccx -h
 ```
 
-#### Archivos Generados por CalculiX tras la Ejecución:
-- `mi_viga.dat`: Archivo de texto plano con los resultados solicitados mediante las tarjetas `*NODE PRINT` (desplazamientos, reacciones) y `*EL PRINT` (esfuerzos seccionales, tensiones).
-- `mi_viga.frd`: Base de datos de resultados nodales y por elementos (desplazamientos $U_x, U_y, U_z$ y tensiones de Von Mises).
-- `mi_viga.sta`: Archivo de estado del cálculo (*Status file*). Indica si los pasos de carga convergieron limpiamente.
-- `mi_viga.cvg`: Registro de residuos de equilibrio en análisis no lineales.
-
-#### Pasar Argumentos Adicionales a CalculiX:
-Puedes consultar la versión de CalculiX o usar parámetros avanzados de flags:
-```bash
-$ ccx -v
-```
+#### Archivos Generados por CalculiX tras el Cálculo:
+* `job.dat`: Archivo de texto plano con los resultados nodales solicitados en `*NODE PRINT` (desplazamientos, reacciones en apoyos) y seccionales en `*EL PRINT` / `*SECTION PRINT` (fuerzas axiales $N$, cortantes $V$, momentos flectores $M$).
+* `job.frd`: Base de datos de resultados en formato binario/ASCII estándar para post-proceso 3D (desplazamientos vectoriales y tensiones de Von Mises).
+* `job.sta`: Registro de convergencia (*Status file*).
+* `job.cvg`: Registro de residuos de fuerza y desplazamiento para análisis no lineales.
 
 ---
 
 ### 5.2 Ejecutar el Generador de Mallas Gmsh (`gmsh`)
 
-Puedes invocar Gmsh directamente para transformar geometrías CAD en archivos de malla `.inp` compatibles con CalculiX.
+Gmsh es un generador de mallas tridimensionales que convierte archivos geométricos CAD (`.geo`, `.step`, `.stp`, `.brep`, `.iges`) en mallas de elementos finitos compatibles con CalculiX (`.inp`).
 
-#### Ejemplos de Comandos:
-1. **Mallar un script `.geo` en elementos tetraédricos 3D:**
+#### Opciones y Banderas Clave de Gmsh:
+| Bandera | Descripción y Parámetros | Ejemplo de Uso |
+| :--- | :--- | :--- |
+| `-1`, `-2`, `-3` | Dimensión del mallado (1D barras, 2D placas/láminas, 3D sólidos). | `gmsh pieza.step -3 -format inp -o pieza.inp` |
+| `-format <fmt>` | Formato de salida: `inp` (CalculiX/Abaqus), `msh` (Gmsh nativo), `stl`, `vtk`, `med`. | `-format inp` |
+| `-clmax <valor>` | Tamaño máximo característico de elemento finito (en mm). | `-clmax 2.0` |
+| `-clmin <valor>` | Tamaño mínimo característico de elemento finito. | `-clmin 0.5` |
+| `-clscale <factor>` | Factor multiplicador global de refinamiento de malla. | `-clscale 0.8` |
+| `-order 1` | Genera elementos de primer orden / lineales (`C3D4` tetraedros de 4 nodos). | `-order 1` |
+| `-order 2` | Genera elementos de segundo orden / cuadráticos (`C3D10` tetraedros de 10 nodos). | `-order 2` |
+| `-optimize` | Optimiza la calidad geométrica de los tetraedros generados. | `-optimize` |
+| `-optimize_netgen` | Ejecuta el optimizador 3D Netgen para eliminar elementos distorsionados. | `-optimize_netgen` |
+| `-string "..."` | Inyecta parámetros y directivas de scripting en línea directamente a Gmsh. | `-string "Mesh.MeshSizeMax = 1.5;"` |
+| `-help` | Imprime en consola la lista exhaustiva de todos los comandos y opciones de Gmsh. | `gmsh -help` |
+| `-version` | Imprime la versión del motor Gmsh. | `gmsh -version` |
+
+#### Ejemplos Prácticos con Gmsh:
+```bash
+# 1. Mallar una geometría STEP en tetraedros lineales C3D4 para CalculiX:
+gmsh soporte.step -3 -clmax 2.0 -format inp -o soporte_malla.inp
+
+# 2. Generar malla cuadrática de alta precisión C3D10:
+gmsh puente.step -3 -order 2 -optimize -format inp -o puente_c3d10.inp
+
+# 3. Mallar un script paramétrico .geo a formato Abaqus/CalculiX:
+gmsh cilindro.geo -3 -format inp -o cilindro.inp
+```
+
+---
+
+### 5.3 Scripts TCL y Modelado CAD con OpenCASCADE (`draw` / `DRAWEXE`)
+
+La aplicación incluye el entorno interactivo y motor de scripting **OpenCASCADE DRAW Test Harness (`DRAWEXE`)**, el cual funciona como un intérprete completo de **Tcl 8.6** integrado con el kernel geométrico de modelado de sólidos 3D B-Rep más potente del mundo open source.
+
+En la terminal de la aplicación, el comando `draw` es un alias directo de `DRAWEXE` que fuerza automáticamente la ejecución en **modo batch sin interfaz gráfica (`-b`)**, garantizando máxima velocidad y estabilidad en Android sin requerir servidor X11.
+
+#### Modos de Invocación de `draw`:
+1. **Ejecutar un script TCL desde un archivo (`.tcl`):**
    ```bash
-   gmsh modelo.geo -3 -format inp -o modelo.inp
+   draw mi_script.tcl
    ```
-2. **Mallar un archivo CAD STEP controlando el tamaño máximo de elemento:**
+   *(La terminal detecta la extensión `.tcl` e inyecta automáticamente las banderas batch: `DRAWEXE -b -f mi_script.tcl`)*.
+
+2. **Ejecutar comandos CAD/TCL en una sola línea (`-c`):**
    ```bash
-   gmsh pieza.step -3 -clmax 2.5 -format inp -o pieza_malla.inp
+   draw -c "pload ALL; box b 10 20 30; puts [vprops b]; exit"
    ```
-3. **Generar malla cuadrática de alto orden (`C3D10` tetraedros de 10 nodos):**
+
+3. **Consultar la ayuda rápida de modelado CAD:**
    ```bash
-   gmsh pieza.step -3 -order 2 -format inp -o pieza_cuadratica.inp
+   draw
+   ```
+   *(Al invocar `draw` sin argumentos, la terminal muestra el manual resumido de comandos CAD de OpenCASCADE)*.
+
+4. **Ejecutar scripts estándar de Tcl con `tclsh`:**
+   ```bash
+   tclsh script_calculo.tcl
    ```
 
 ---
 
-### 5.3 Ejecutar OpenCASCADE DRAW (`DRAWEXE`)
+#### 📐 Referencia Completa de Comandos CAD y TCL en DRAWEXE:
 
-Puedes ejecutar scripts paramétricos de OpenCASCADE en modo headless pasando la bandera `-b` (batch mode):
-```bash
-DRAWEXE -b mi_script.tcl
+Al inicio de cualquier script TCL para modelado CAD, siempre debes cargar los módulos de OpenCASCADE con:
+```tcl
+pload ALL
 ```
+
+| Categoría | Comando en TCL | Descripción y Parámetros |
+| :--- | :--- | :--- |
+| **Primitivas 3D** | `box <b> <dx> <dy> <dz>` | Crea un prisma rectangular / caja 3D en el origen con dimensiones `dx`, `dy`, `dz`. |
+| | `box <b> <x> <y> <z> <dx> <dy> <dz>` | Crea una caja ubicada en las coordenadas `(x, y, z)`. |
+| | `cylinder <c> <R> <H>` | Crea un cilindro con radio `R` y altura `H` alineado con el eje $Z$. |
+| | `sphere <s> <R>` | Crea una esfera de radio `R` centrada en el origen. |
+| | `cone <co> <R1> <R2> <H>` | Crea un cono truncado de radio inferior `R1`, superior `R2` y altura `H`. |
+| | `torus <t> <R1> <R2>` | Crea un toroide de radio mayor `R1` y radio de sección `R2`. |
+| **Operaciones Booleanas** | `bcut <resultado> <solidoA> <solidoB>` | **Resta Booleana (Diferencia):** Sustrae el sólido B del sólido A. |
+| | `bfuse <resultado> <solidoA> <solidoB>` | **Unión Booleana:** Fusiona el sólido A y el sólido B en un único cuerpo estanco. |
+| | `bcommon <resultado> <solidoA> <solidoB>` | **Intersección Booleana:** Conserva únicamente el volumen compartido por ambos sólidos. |
+| **Transformaciones** | `ttranslate <solido> <dx> <dy> <dz>` | Traslada un sólido en el espacio 3D según el vector `(dx, dy, dz)`. |
+| | `trotate <solido> <x> <y> <z> <dx> <dy> <dz> <angulo>` | Rota un sólido alrededor de un eje determinado por un punto y un vector directriz. |
+| | `tcopy <original> <copia>` | Realiza una copia topológica idéntica del sólido. |
+| **Propiedades de Masa** | `vprops <solido>` | **Calcula el volumen exacto, el centroide $(X_G, Y_G, Z_G)$ y la matriz del tensor de inercia.** |
+| | `sprops <solido>` | Calcula el área superficial total del sólido. |
+| | `checkshape <solido>` | **Audita la integridad topológica:** certifica que el sólido sea cerrado, orientable y sin auto-intersecciones (`This shape seems to be valid`). |
+| **Exportación CAD** | `testwritestep <archivo.step> <solido>` | **Exporta el sólido al formato universal STEP (ISO 10303).** Compatible con Gmsh, FreeCAD, AutoCAD y SolidWorks. |
+| | `writebrep <solido> <archivo.brep>` | Exporta la geometría al formato nativo B-Rep de OpenCASCADE. |
+| | `writestl <solido> <archivo.stl>` | Exporta la superficie a formato STL para impresión 3D o visualizadores rápidos. |
+| **Lenguaje TCL** | `set variable valor` | Asigna una variable numérica o de texto. |
+| | `expr { $a * 2.5 }` | Evalúa expresiones matemáticas estándar. |
+| | `puts "mensaje"` | Imprime información en la consola de la terminal. |
+| | `exit` | Finaliza la ejecución del script y retorna el control a la terminal. |
 
 ---
 
@@ -427,6 +501,71 @@ $ cd /
 $ pwd
 /
 ```
+
+---
+
+### 🎯 Caso Práctico 4: Modelado CAD con Script TCL, Mallado en Gmsh y Cálculo FEA
+*Objetivo: Diseñar una pieza paramétrica en 3D mediante un script TCL, auditar su volumen e inercia, exportarla a STEP, discretizarla con Gmsh y prepararla para CalculiX íntegramente desde la consola del teléfono sin salir de la app.*
+
+1. **Crear el script TCL paramétrico directamente en la terminal con `echo`:**
+   ```bash
+   $ echo "pload ALL\nbox b 10 20 30\nputs [vprops b]\ntestwritestep biela.step b\nexit" > modelar.tcl
+   Written to modelar.tcl
+   ```
+
+2. **Verificar el script generado con `cat`:**
+   ```bash
+   $ cat modelar.tcl
+   pload ALL
+   box b 10 20 30
+   puts [vprops b]
+   testwritestep biela.step b
+   exit
+   ```
+
+3. **Ejecutar el kernel OpenCASCADE en modo batch con `draw`:**
+   ```bash
+   $ draw modelar.tcl
+   DRAW is running in batch mode
+   Mass :            6000
+   Center of gravity : 
+   X =               5
+   Y =              10
+   Z =              15
+   Step File Name : biela.step Write Done
+   ```
+   *(El motor CAD calcula analíticamente la masa y el volumen exacto $V = 6\,000\text{ mm}^3$ y exporta el archivo `biela.step` en formato universal STEP ISO 10303)*.
+
+4. **Discretizar el sólido STEP en tetraedros con Gmsh:**
+   ```bash
+   $ gmsh biela.step -3 -clmax 2.5 -format inp -o biela_malla.inp
+   Info    : Reading 'biela.step'...
+   Info    : Meshing 1D...
+   Info    : Meshing 2D...
+   Info    : Meshing 3D...
+   Info    : Writing 'biela_malla.inp'...
+   Info    : Done writing 'biela_malla.inp'
+   ```
+
+5. **Confirmar la presencia de la malla en el espacio de trabajo con `ls`:**
+   ```bash
+   $ ls
+         modelar.tcl
+         biela.step
+         biela_malla.inp
+   ```
+
+6. **Inspeccionar los elementos y nudos generados:**
+   ```bash
+   $ cat biela_malla.inp
+   *Heading
+    biela_malla.inp
+   *NODE
+   1, 0, 0, 0
+   ...
+   *ELEMENT, type=C3D4
+   ...
+   ```
 
 ---
 

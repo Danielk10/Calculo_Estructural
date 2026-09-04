@@ -154,7 +154,7 @@
 
     <!-- Terminal Module -->
     <string name="terminal_prompt">fea@system:~$</string>
-    <string name="terminal_hint">Command</string>
+    <string name="terminal_hint">Enter FEA command</string>
     <string name="terminal_cd_history_prev">Previous command</string>
     <string name="terminal_cd_history_next">Next command</string>
     <string name="terminal_cd_abort">Abort running process</string>
