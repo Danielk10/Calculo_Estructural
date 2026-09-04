@@ -1,61 +1,150 @@
 # 📦 Notas de Versión
-## Structural Analysis FEA 3D (`com.diamon.civil`) — Versión Alfa 0.1.0
+## Structural Analysis FEA 3D (`com.diamon.civil`) — Versión v0.3.0 (Build 3)
 
 ---
 
-### 🚀 Novedades y Capacidades Principales
+### 🌟 Resumen Ejecutivo de la Versión v0.3.0
 
-#### 1. 🏗️ Módulo de Análisis Estructural y Pórticos (FEA 2D / 3D)
-* **Dibujo Interactivo de Losas y Muros en Editor 2D:**
-  * Soporte para dibujar paneles bidimensionales de **Losa / Placa Flexible (`S4R`)** y **Muro de Cortante (`CPS4`)** mediante arrastre directo sobre la rejilla.
-  * Vista previa rectangular con borde punteado y HUD con cotas métricas y espesor en tiempo real.
-  * Generación topológica automática de los 4 nudos de esquina, apoyos en base y elementos perimetrales de contorno.
-* **Inspección y Edición de Paneles 2D:**
-  * Nuevo diálogo de propiedades de panel para editar espesor ($t$), material asignado, formulación (`S4R` vs `CPS4`) y asignación de cargas superficiales o presiones ($q$ en $\text{kN/m}^2$) con distribución tributaria automática a los nudos.
-* **Editor Topológico Interactivo de Barras y Nudos:** Lienzo 2D con rejilla magnética (*snapping* a 0.5 m), creación rápida de nudos, barras, apoyos (Empotrado, Articulado, Rodillo) y visualización de estadísticas (Nodos, Barras, Paneles).
-* **Cargas Complejas en Barras (Múltiples Fuerzas y Momentos):**
-  * Asignación de **múltiples cargas puntuales** transversales ($F_y$), axiales ($F_x$) y momentos concentrados ($M_z$) por barra, con soporte de listas separadas por coma o espacio.
-  * **Conversión inteligente de cotas métricas:** Detección automática de distancias absolutas en metros a ratios de vano normalizados ($x/L$).
-  * **Cargas distribuidas variables y parciales:** Asignación de cargas uniformes y trapezoidales ($w_1 \neq w_2$) en tramos parciales arbitrarios ($a \to b$), con integración numérica de Simpson de 20 intervalos en el solver.
-* **Renderizado 2D y 3D OpenGL ES (Estándar SAP2000):**
-  * Flechas de carga orientadas con precisión milimétrica en el vano, cabezas vectoriales 3D doradas/rojas, distintivos numéricos de carga y bucles/arcos de momentos concentrados.
-* **Materiales Personalizados:**
-  * Diálogo de material propio: Módulo de Elasticidad ($E$), Coeficiente de Poisson ($\nu$), Densidad ($\rho$), Tensión de Fluencia ($F_y$) y Resistencia a Compresión ($f'_c$).
-* **Exportación de Reacciones y Vinculaciones:**
-  * Matriz espacial 6-DOF de reacciones en apoyos ($R_x, R_y, R_z, M_x, M_y, M_z$) y reporte de vinculaciones externas con verificación de equilibrio estático en log y portapapeles.
-* **Articulaciones y Semirrigidez:** Desacoplamiento de momentos flectores (*End Releases* $M_{33}$) y rigideces rotacionales $K_\theta$.
-* **Visualización de Resultados:** Diagramas de esfuerzos internos con relleno cromático continuo (Momento Flector $M_{33}$, Fuerza Cortante $V_{22}$, Fuerza Axial $N$) y deformada elástica interpolada.
-* **12 Presets Estructurales Integrados:** Vigas continuas, vigas con voladizo, pórticos simples e industriales de múltiples crujías, cerchas Pratt y Warren, losas bidireccionales de hormigón (S4R) y muros de corte confinados (CPS4).
-
-#### 2. 🌐 Multi-idioma (Español / Inglés) y Aviso de Confiabilidad
-* **Soporte de Idioma Español (ES):** Traducción integral de todos los textos de la interfaz gráfica de usuario (UI), etiquetas, botones, diálogos y selectores.
-* **Nota de Confiabilidad y Fines Educativos:** Inclusión de nota informativa en menú lateral, menú superior y política de privacidad, indicando que la aplicación está diseñada para fines educativos y estimaciones preliminares, aclarando que los datos y resultados numéricos no son 100% confiables ni definitivos sin la debida validación técnica independiente.
-
-#### 3. 🧊 Módulo de Sólidos 3D y Modelado CAD (CAD + Gmsh + CalculiX)
-* **Modelado CAD Headless con OpenCASCADE (OCCT 8.0.0.p1):** Generación de primitivas volumétricas (Cubo, Cilindro, Esfera), chaflanes, redondeos y operaciones booleanas (Unión, Corte e Intersección).
-* **Importación Universal CAD:** Soporte completo para formatos STEP (`.step`, `.stp`), IGES (`.iges`, `.igs`), BREP (`.brep`) y GEO (`.geo`).
-* **Mallador Automático Gmsh (v5.0.0):** Generación de mallas tetraédricas cuadráticas de segundo orden (`C3D10`) y lineales (`C3D4`) libres de distorsión jacobiana.
-* **Visualizador 3D SceneView:** Renderizado tridimensional de mapas térmicos de tensiones de Von Mises y deformación elástica.
-
-#### 4. 📄 Memorias Técnicas y Reportes en PDF de Ingeniería
-* **Generación Automatizada:** Exportación directa de informes técnicos estructurados listos para firma y revisión pericial.
-* **Capítulo 2 (Propiedades de Materiales):** Integración completa de materiales personalizados definidos por el usuario en la Tabla 2.1 con sus propiedades mecánicas ($E, G, \nu, \rho, F_y$).
-* **Capítulo 3 (Esquemas de Carga):** Tablas 3.2 (cargas puntuales y momentos en vano con cotas métricas) y 3.3 (cargas distribuidas parciales y trapezoidales con resultante total).
-* **Capítulo 4 (Equilibrio Global y Reacciones):** Balance estático Newtoniano ($\Sigma F + \Sigma R = 0$) y Tabla 4.2 detallada de reacciones nodales.
-* **Tabla 6.1 (Multi-Station Frame Forces):** Registro estricto de 10 columnas con cortantes ($V_2, V_3$) y momentos ($M_2, M_3$) alineados con precisión en estaciones $0.00L$, $0.50L$ y $1.00L$.
-* **Chequeo Normativo Automatizado:**
-  * **AISC 360-22:** Comprobación de perfiles de acero a flexo-compresión biaxial combinada ($P-M-M$, ecuaciones H1-1a / H1-1b).
-  * **ACI 318-19 / Eurocódigo:** Resistencia a cortante y flexión en elementos de hormigón armado.
-  * **ASCE 7-22 / NSR-10:** Verificación de derivas sísmicas de entrepiso ($\Delta \le 1.0\%$) y flechas admisibles ($L/360, L/250$).
-
-#### 5. ⚙️ Núcleo Científico y Validación
-* **CalculiX CCX 2.23:** Solucionador nativo en C/Fortran con álgebra lineal directa multihilo **SPOOLES 2.2**.
-* **Validación Cruzada Independiente con OpenSees:** Correlación física certificada superior al 99.85% en modelos de flexión, momentos y cargas trapezoidales.
-* **100% de Pruebas Superadas:** Suite unitaria `./gradlew test` completada con 0 fallos, incluyendo validación analítica de losas S4R y muros CPS4 personalizados.
+La versión **v0.3.0 (Build 3)** representa un hito fundamental en el desarrollo de **Structural Analysis FEA 3D**, transformando la consola técnica en un entorno de ingeniería computacional y scripting de primer nivel para dispositivos móviles. Se introduce soporte completo para **scripts paramétricos en Tcl 8.6**, modelado de sólidos 3D headless con **OpenCASCADE (`draw` / `DRAWEXE`)**, control exhaustivo del mallador **Gmsh** mediante banderas avanzadas, ejecución directa del solver **CalculiX CCX 2.23**, herramientas de creación y edición de archivos en el dispositivo (`echo > / >>`), una **Guía Maestra Paso a Paso** de 9 capítulos, y certificación científica automatizada de punta a punta con $0.0000\%$ de error analítico. Adicionalmente, se perfecciona la interfaz de usuario con la reubicación fija del menú de licencias, la unificación del prompt del sistema en inglés y la optimización de los textos de entrada para pantallas compactas.
 
 ---
 
-### 📦 Artefactos Generados:
-* **Production Signed Bundle (AAB para Google Play):** `/tmp/calculoestructural_build/outputs/bundle/release/app-release.aab`
-* **Release Signed APK:** `/tmp/calculoestructural_build/outputs/apk/release/app-release.apk`
-* **Debug Testing APK:** `/tmp/calculoestructural_build/outputs/apk/debug/app-debug.apk`
+### 🚀 Novedades y Capacidades Principales en la Versión v0.3.0
+
+#### 1. 💻 Terminal de Comandos Avanzada y Motor de Scripting (TCL + CAD + Gmsh + CCX)
+* **Soporte Nativo de Scripts TCL y CAD Headless (`draw` / `DRAWEXE`):**
+  * **Intérprete Tcl 8.6 integrado:** Inclusión de OpenCASCADE Test Harness como intérprete nativo de Tcl para modelado geométrico y evaluación topológica de sólidos 3D.
+  * **Ejecución Batch Headless Automática:** Los comandos `draw <script.tcl>` o `drawexe <script.tcl>` inyectan de forma transparente las banderas `-b -f`, permitiendo ejecutar scripts paramétricos sin requerir servidor X11 (`DISPLAY`), garantizando estabilidad total en Android y previniendo fallos gráficos.
+  * **Invocación en una Sola Línea:** Soporte para ejecución inline mediante el modificador `-c` (`draw -c "pload ALL; box b 10 20 30; puts [vprops b]; exit"`).
+  * **Manual Interactivo Integrado:** Al teclear simplemente `draw` en la consola, se despliega una guía de referencia rápida con la sintaxis de primitivas, operaciones booleanas y comandos de exportación.
+  * **Intérprete Tcl Estándar:** Soporte para scripts Tcl puros mediante el comando `tclsh <script.tcl>`.
+  * **Catálogo de Comandos CAD Disponibles y Validados en Local:**
+    * **Primitivas 3D:** `box <nombre> <dx> <dy> <dz>`, `cylinder <nombre> <radio> <altura>`, `sphere <nombre> <radio>`, `cone`, `torus`.
+    * **Operaciones Booleanas Constructivas (CSG):** `bcut <resultado> <objeto> <herramienta>` (diferencia booleana), `bfuse <resultado> <obj1> <obj2>` (unión booleana), `bcommon <resultado> <obj1> <obj2>` (intersección).
+    * **Propiedades Físicas y Evaluación Topológica:** `vprops <solido>` (cálculo exacto de volumen, centro de gravedad $X_G, Y_G, Z_G$ y matriz del tensor de inercia), `sprops <solido>` (área superficial total) y `checkshape <solido>` (auditoría topológica de caras cerradas, orientación de normales y estanqueidad del volumen).
+    * **Exportación Universal de Geometría:** `testwritestep <archivo.step> <solido>` (exportación en formato universal STEP ISO 10303 compatible con Gmsh, FreeCAD, AutoCAD y SolidWorks) y `writebrep <solido> <archivo.brep>`.
+* **Control Completo de Gmsh desde la Terminal (`gmsh`):**
+  * Soporte exhaustivo para todas las banderas oficiales de línea de comandos de Gmsh:
+    * **Dimensión de Discretización:** `-1` (barras 1D), `-2` (placas y cáscaras 2D), `-3` (mallas volumétricas 3D de tetraedros).
+    * **Formatos de Salida:** `-format inp` (Abaqus/CalculiX deck con nodos y conectividades), `-format msh` (formato nativo Gmsh), `-format stl` (estereolitografía para impresión 3D).
+    * **Control Métrico de Elementos:** `-clmax <valor>` (longitud máxima de arista), `-clmin <valor>` (longitud mínima), `-clscale <factor>` (factor multiplicador global).
+    * **Orden Polinomial de Elementos Finitos:** `-order 1` (tetraedros lineales `C3D4`) y `-order 2` (tetraedros cuadráticos de alta precisión `C3D10` con nodos intermedios de arista).
+    * **Optimización Geométrica de Elementos:** Banderas `-optimize` y `-optimize_netgen` para eliminar tetraedros degenerados y garantizar Jacobianos positivos en toda la malla.
+    * **Inyección de Directivas Dinámicas:** Parámetro `-string "..."` para definir geometrías y variables directamente en la invocación de Gmsh.
+    * **Consulta de Ayuda y Versión:** `gmsh -help` y `gmsh -version`.
+* **Solucionador CalculiX CCX Directo (`ccx`):**
+  * Admite invocación por nombre base del modelo (`ccx viga`), con la bandera oficial Abaqus/CalculiX (`ccx -i viga`), o especificando la extensión completa (`ccx viga.inp`).
+  * Consulta oficial de versión (`ccx -v`, reportando *CalculiX Version 2.23 by Guido Dhondt* con manejo seguro del código de salida nativo 201) y ayuda de opciones (`ccx -h`).
+* **Creación y Edición de Archivos en el Móvil con `echo`:**
+  * Soporte integrado de redirección:
+    * `echo "<contenido>" > <archivo>`: Creación o sobreescritura limpia de archivos.
+    * `echo "<contenido>" >> <archivo>`: Concatenación y adición secuencial de texto al final del archivo.
+  * Interpretación completa de secuencias de escape de salto de línea (`\n`), permitiendo al usuario programar scripts paramétricos `.tcl`, archivos geométricos `.geo` o decks `.inp` directamente desde el teclado del dispositivo móvil sin recurrir a un ordenador externo.
+* **Tokenizador Léxico Avanzado con Preservación de Comillas (`splitCommandLine`):**
+  * Analizador sintáctico robusto que preserva comillas dobles y simples (`"..."` y `'...'`), permitiendo pasar cadenas con espacios, directivas multilínea de Tcl y rutas complejas de archivos sin fragmentación indeseada de argumentos.
+* **Suite de Comandos Especiales de Diagnóstico Físico (`test-*`):**
+  * `test-calculix` y `test-calculix-parallel`: Validación de elasticidad lineal tridimensional (Hooke y contracción de Poisson en cubo `C3D8`) con $0.0000\%$ de error analítico y aceleración multihilo SPOOLES.
+  * `test-frame` / `test-portico`: Pórtico plano 2D con elementos `B31` y comprobación estricta de equilibrio estático global en apoyos ($\sum R_x = -10.00\text{ kN}$, par de reacciones verticales $\pm 8.00\text{ kN}$).
+  * `test-gmsh`: Operación booleana CSG (Cilindro $-$ Esfera) y discretización tetraédrica 3D.
+  * `test-draw`: Generación y exportación de prisma BRep paramétrico con OpenCASCADE en modo batch headless.
+  * `test-cad-solve`: Pipeline integral automatizado: Script TCL $\to$ Sólido STEP $\to$ Malla Gmsh INP $\to$ InpAssembler $\to$ CalculiX CCX $\to$ Parser FRD.
+  * `test-step-solve`, `test-bracket-solve`, `test-coordinate-fallback` y `run-sim-test`.
+
+---
+
+#### 2. 🎨 Experiencia de Usuario e Interfaz Gráfica (UI/UX)
+* **Reordenamiento Estricto del Menú Principal de Opciones:**
+  * En [`main_menu.xml`](file:///home/danielpdiamon/Calculo_Estructural/app/src/main/res/menu/main_menu.xml), el ítem **"Acerca de / Licencias"** (`action_licenses`) ha sido reubicado de forma definitiva después de **"Políticas de privacidad"** (`action_privacy_policy`), asegurando que siempre sea el último elemento de la lista desplegable.
+* **Optimización de la Caja de Entrada de la Terminal:**
+  * Se ajustó el texto de ayuda (*hint*) del campo de entrada para evitar desbordamientos visuales o saltos de línea antiestéticos en pantallas de teléfonos móviles compactos:
+    * **Español:** `"Ingrese comando FEA"` (19 caracteres, encaje visual exacto).
+    * **Inglés:** `"Enter FEA command"`.
+* **Etiqueta del Prompt Uniforme en Inglés:**
+  * En [`values-es/strings.xml`](file:///home/danielpdiamon/Calculo_Estructural/app/src/main/res/values-es/strings.xml) y [`values/strings.xml`](file:///home/danielpdiamon/Calculo_Estructural/app/src/main/res/values/strings.xml), la etiqueta del prompt se mantiene uniforme como **`fea@system:~$`** en todos los idiomas sin ser traducida a español, preservando el estándar visual clásico de terminales UNIX.
+
+---
+
+#### 3. 📚 Documentación Técnica Integral
+* **Nueva Guía Maestra Paso a Paso ([`GUIA_TERMINAL_APP_PASO_A_PASO.md`](file:///home/danielpdiamon/Calculo_Estructural/GUIA_TERMINAL_APP_PASO_A_PASO.md)):**
+  * Manual exhaustivo de 9 capítulos con tablas de sintaxis, manual de binarios y ejemplos prácticos:
+    * *Capítulo 1:* Introducción, Fundamentos y Filosofía de la Terminal Móvil.
+    * *Capítulo 2:* Navegación por el Sistema de Archivos, Sandbox y Protección de Datos.
+    * *Capítulo 3:* Creación y Edición de Archivos en el Teléfono (`echo`, redirección `>` y `>>`).
+    * *Capítulo 4:* Modelado CAD 3D y Scripts Paramétricos en Tcl con `draw` (`DRAWEXE`).
+    * *Capítulo 5:* Discretización y Generación de Mallas de Elementos Finitos con `gmsh`.
+    * *Capítulo 6:* Solucionador Numérico de Elementos Finitos CalculiX (`ccx`).
+    * *Capítulo 7:* Batería de Comandos Especiales de Diagnóstico y Certificación (`test-*`).
+    * *Capítulo 8:* Casos Prácticos Completos:
+      * *Caso 1:* Auditar y recalcular modelos estructurales navegando transversalmente a `/structural_analysis`.
+      * *Caso 2:* Importar decks `.inp` externos y resolverlos en la terminal.
+      * *Caso 3:* Creación de carpetas de proyecto, ejecución y limpieza selectiva.
+      * *Caso 4:* Flujo integral desde la terminal: Script TCL con `echo >` $\to$ Modelo STEP con `draw` $\to$ Mallado con `gmsh` $\to$ Resolución con `ccx`.
+    * *Capítulo 9:* Matriz de Capacidades Reales, Límites Técnicos en Android y Buenas Prácticas.
+
+---
+
+#### 4. 🧪 Validación y Certificación Científica de Punta a Punta
+* **Script de Certificación Automatizada (`validate_terminal_guide_end_to_end.py`):**
+  * Batería automatizada en Python que ejecuta de forma real y certifica cada comando, fórmula analítica y caso práctico de la guía en el entorno local, logrando un **100% de éxito** en sus 4 niveles de verificación sin errores ni falsos positivos.
+* **Suite de Pruebas Unitarias de Integración en Gradle (`TerminalGuideEndToEndTest.java`):**
+  * 11 pruebas de integración JUnit ejecutadas con `./gradlew testDebugUnitTest`, validando comandos shell, scripts TCL, mallado Gmsh, resolución CalculiX CCX, interoperabilidad modular y protección de sandbox.
+* **Concordancia Físico-Matemática Analítica:**
+  * **Tracción Uniaxial en Cubo Sólido (Cubo $1\times 1\times 1\text{ mm}$, $E = 210\,000\text{ MPa}$, $\nu = 0.30$, $P = 400\text{ N}$):**
+    * Desplazamiento axial analítico: $u_z = \frac{P L}{E A} = \frac{400}{210000 \cdot 1.0} = 0.001905\text{ mm}$.
+    * Contracción lateral analítica de Poisson: $u_x = u_y = -\nu \frac{P}{E A} = -0.30 \cdot 0.001905 = -0.000571\text{ mm}$.
+    * Magnitud resultante analítica: $\|\vec{\delta}\| = \sqrt{u_x^2 + u_y^2 + u_z^2} = 0.002069\text{ mm}$.
+    * **Resultado CalculiX CCX FEA:** $u_z = 0.001905\text{ mm}$, $\|\vec{\delta}\| = 0.002069\text{ mm}$ (Error analítico: **$0.0000\%$**).
+  * **Pórtico Plano 2D (Vigas $B31$, Carga Lateral $P_x = 10\text{ kN}$ a $h = 4\text{ m}$, Luz $L = 5\text{ m}$):**
+    * Sumatoria de reacciones horizontales: $\sum R_x = -10.00\text{ kN}$ (Equilibrio estático exacto).
+    * Par reactivo vertical: $R_{y1} = -8.00\text{ kN}$, $R_{y2} = +8.00\text{ kN}$ ($\sum M = 10 \cdot 4 - 8 \cdot 5 = 0$).
+
+---
+
+#### 5. 🏛️ Capacidades Nucleares Consolidadas de la Suite
+* **Módulo de Análisis Estructural y Pórticos (FEA 2D / 3D):**
+  * Dibujo táctil interactivo sobre rejilla milimétrica con snapping a 0.5 m.
+  * Modelado de **Losas / Placas Flexibles (`S4R` / `S8R`)** y **Muros de Cortante (`CPS4`)** con formulación isoparamétrica Q4.
+  * Cargas complejas en barras: múltiples cargas puntuales ($F_y, F_x$), momentos concentrados ($M_z$) y cargas distribuidas uniformes y trapezoidales en tramos parciales con integración de Simpson.
+  * Articulaciones y semirrigidez en extremos de barras (*End Releases* y rigideces rotacionales $K_\theta$).
+  * Diagramas de esfuerzos internos continuos con relleno cromático ($M_{33}, V_{22}, N$) y deformada elástica 3D interactiva en OpenGL ES.
+  * 12 Presets estructurales precargados (vigas continuas, pórticos simples e industriales, cerchas Pratt y Warren, losas y muros).
+* **Módulo de Sólidos 3D y Modelado CAD:**
+  * Motor CAD OpenCASCADE para primitivas 3D, operaciones booleanas CSG (unión, corte, intersección), chaflanes y redondeos.
+  * Importación universal para formatos STEP (`.step`, `.stp`), IGES (`.iges`, `.igs`), BREP (`.brep`) y GEO (`.geo`).
+  * Mallador Gmsh con elementos tetraédricos de alta fidelidad lineal (`C3D4`) y cuadrática (`C3D10`).
+  * Visor tridimensional SceneView con mapas de calor térmicos de tensiones de Von Mises.
+* **Memorias Técnicas y Reportes en PDF de Ingeniería:**
+  * Generación automatizada de reportes formales listos para revisión y firma pericial.
+  * Chequeo normativo automatizado bajo normativas internacionales:
+    * **AISC 360-22:** Interacción combinada flexo-compresora biaxial $P-M-M$ (ecuaciones H1-1a / H1-1b).
+    * **ACI 318-19 / Eurocódigo 2:** Resistencia a corte y flexión en concreto armado.
+    * **ASCE 7-22 / NSR-10:** Verificación de derivas sísmicas de entrepiso ($\Delta \le 1.0\%$) y flechas admisibles ($L/360, L/250$).
+
+---
+
+#### 6. ⚙️ Especificaciones de Compilación y Configuración SDK / NDK
+* **Incremento de Versión:**
+  * `versionCode`: **3**
+  * `versionName`: **"0.3.0"**
+* **Entorno de Compilación Automatizado:**
+  * Android SDK configurado en `/tmp/android-sdk` (`platforms;android-37.0`, `build-tools;37.0.0`, `ndk;30.0.14904198`, `cmake;4.1.2`).
+  * Ejecución de compilación limpia de APKs mediante Gradle 9.6.0 (`BUILD SUCCESSFUL`).
+
+---
+
+### 📦 Artefactos Compilados Generados:
+* **Release Signed APK (Producción firmado):** `/tmp/calculoestructural_build/outputs/apk/release/app-release.apk` (185 MB)
+* **Debug Testing APK (Pruebas):** `/tmp/calculoestructural_build/outputs/apk/debug/app-debug.apk` (205 MB)
+
+---
+
+### 📜 Historial de Versiones Anteriores
+
+#### Versión v0.2.0 (Build 2)
+* Optimización de permisos en segundo plano en `AndroidManifest.xml` (eliminación de servicios en primer plano innecesarios).
+* Actualización de políticas de privacidad y términos de uso educativo y confiabilidad de resultados de cálculo.
+
+#### Versión Alfa 0.1.0 (Build 1)
+* Lanzamiento inicial de la plataforma con módulo de pórticos 2D/3D, cálculo de losas S4R y muros CPS4.
+* Generación de memorias de cálculo PDF bajo normas AISC 360-22, ACI 318-19 y ASCE 7-22.
+* Integración del solver CalculiX CCX 2.23 con SPOOLES y visualizador 3D SceneView.

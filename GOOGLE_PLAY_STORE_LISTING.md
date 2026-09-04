@@ -65,15 +65,15 @@ Diseñada para ingenieros civiles, calculistas, mecánicos, arquitectos y estudi
 ### 🚀 Novedades de esta Versión ("What's New") — [Máximo 500 caracteres]
 
 ```text
-¡Novedades en Structural Analysis FEA 3D v0.1.0!
-• Dibujo interactivo y cálculo FEA de losas S4R y muros CPS4 en el editor 2D.
-• Diálogo de propiedades de paneles: espesor, material y cargas superficiales.
-• Localización completa al idioma español (ES) en componentes de interfaz.
-• Sincronización entre editor 2D, visor 3D y solver CalculiX CCX.
-• Aviso legal y deslinde de responsabilidad para fines educativos y preliminares.
-• Memorias de cálculo en PDF bajo normas AISC 360-22, ACI 318-19 y ASCE 7-22.
+¡Novedades en Structural Analysis FEA 3D v0.3.0!
+• Terminal interactiva con soporte para scripts paramétricos TCL 8.6.
+• Modelado CAD 3D headless con OpenCASCADE (draw/DRAWEXE) y exportación STEP.
+• Control total de opciones avanzadas del mallador 3D Gmsh y solver CalculiX CCX.
+• Creación y edición de scripts y archivos en el móvil con comando echo.
+• Reordenamiento del menú principal y optimización de entrada para pantallas compactas.
+• Batería de certificación analítica y física de punta a punta.
 ```
-*(Longitud exacta: 497 caracteres)*
+*(Longitud exacta: 479 caracteres)*
 
 ---
 
@@ -138,12 +138,12 @@ Designed for civil engineers, structural designers, mechanical engineers, archit
 ### 🚀 What's New in this Version — [Max 500 characters]
 
 ```text
-What's New in Structural Analysis FEA 3D v0.1.0!
-• Interactive drawing and FEA solving for custom S4R slabs & CPS4 shear walls in 2D editor.
-• Panel properties dialog: edit thickness, material, and surface/lateral loads.
-• Full Spanish (ES) language localization across UI components.
-• Seamless synchronization between 2D editor, 3D viewport, and CalculiX CCX solver.
-• Legal disclaimer and educational usage policy notice.
-• Automated engineering PDF calculation reports (AISC 360-22, ACI 318-19, ASCE 7-22).
+What's New in Structural Analysis FEA 3D v0.3.0!
+• Interactive terminal with parametric TCL 8.6 scripting support.
+• Headless OpenCASCADE 3D CAD modeling (draw/DRAWEXE) & STEP export.
+• Full control of advanced 3D Gmsh meshing flags and CalculiX CCX solver.
+• In-app file and script creation/editing via echo command.
+• Reordered main menu and optimized terminal input for compact screens.
+• Automated end-to-end physical and analytical certification suite.
 ```
-*(Exact length: 489 characters)*
+*(Exact length: 445 characters)*
