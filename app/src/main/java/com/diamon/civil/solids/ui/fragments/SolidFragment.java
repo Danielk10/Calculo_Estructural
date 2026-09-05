@@ -315,7 +315,7 @@ public class SolidFragment extends Fragment {
     private void loadDefaultTestCase() {
         if (binding == null) return;
         binding.seekbarMeshDensity.setProgress(2); // Level 3 / 5 (Medium - ~20mm)
-        binding.spinnerElementType.setSelection(0); // 1st-Order C3D4 default
+        binding.spinnerElementType.setSelection(4); // 2nd-Order C3D10 Quadratic default (físicamente exacto para flexión sin shear locking)
         if (materialDatabase != null && !materialDatabase.getMaterials().isEmpty()) {
             binding.spinnerMaterialSolid.setSelection(0);
             MaterialDatabase.Material defaultMat = materialDatabase.getMaterials().get(0);
@@ -397,7 +397,9 @@ public class SolidFragment extends Fragment {
             if (!benchFile.exists()) {
                 benchFile = new File(workDir, "cantilever_benchmark.geo");
             }
-            if (benchFile.exists()) {
+            boolean isCantileverActive = activeSimulationGeometry != null &&
+                    activeSimulationGeometry.getName().toLowerCase(java.util.Locale.US).startsWith("cantilever");
+            if (benchFile.exists() || isCantileverActive) {
                 availableGeometries.add(benchFile);
                 displayNames.add(getString(R.string.geo_item_benchmark));
             }
@@ -407,7 +409,7 @@ public class SolidFragment extends Fragment {
                 if (files != null) {
                     for (File f : files) {
                         String name = f.getName().toLowerCase(java.util.Locale.US);
-                        if (name.equals("cantilever.geo") || name.equals("cantilever_benchmark.geo") || name.equals("gmsh_cad_driver.geo")) continue;
+                        if (name.startsWith("cantilever") || name.equals("gmsh_cad_driver.geo")) continue;
                         if (isSupportedCadFormat(name)) {
                             availableGeometries.add(f);
                             if (name.equals("box.brep")) displayNames.add(getString(R.string.geo_item_box));
@@ -425,9 +427,19 @@ public class SolidFragment extends Fragment {
                 }
             }
 
-            if (selectFile != null && isSupportedCadFormat(selectFile.getName()) && !availableGeometries.contains(selectFile)) {
-                availableGeometries.add(selectFile);
-                displayNames.add("📥 " + selectFile.getName());
+            if (selectFile != null && isSupportedCadFormat(selectFile.getName())) {
+                boolean alreadyContains = false;
+                for (File g : availableGeometries) {
+                    if (g.getAbsolutePath().equals(selectFile.getAbsolutePath()) ||
+                        g.getName().equalsIgnoreCase(selectFile.getName())) {
+                        alreadyContains = true;
+                        break;
+                    }
+                }
+                if (!alreadyContains && !selectFile.getName().toLowerCase(java.util.Locale.US).startsWith("cantilever")) {
+                    availableGeometries.add(selectFile);
+                    displayNames.add("📥 " + selectFile.getName());
+                }
             }
 
             isProgrammaticGeometrySelection = true;
@@ -437,10 +449,16 @@ public class SolidFragment extends Fragment {
 
             int selectedIndex = 0;
             if (selectFile != null && isSupportedCadFormat(selectFile.getName())) {
-                for (int i = 0; i < availableGeometries.size(); i++) {
-                    if (availableGeometries.get(i).getAbsolutePath().equals(selectFile.getAbsolutePath())) {
-                        selectedIndex = i;
-                        break;
+                String selectName = selectFile.getName().toLowerCase(java.util.Locale.US);
+                if (selectName.startsWith("cantilever")) {
+                    selectedIndex = 0;
+                } else {
+                    for (int i = 0; i < availableGeometries.size(); i++) {
+                        if (availableGeometries.get(i).getAbsolutePath().equals(selectFile.getAbsolutePath()) ||
+                            availableGeometries.get(i).getName().equalsIgnoreCase(selectFile.getName())) {
+                            selectedIndex = i;
+                            break;
+                        }
                     }
                 }
             }
@@ -1232,7 +1250,7 @@ public class SolidFragment extends Fragment {
             "temporaryrestartfile", "sew_iges.tcl", "gmsh_cad_driver.geo",
             "gmsh_cad_driver.geo_unrolled", "job_solid.cvg", "job_solid.sta",
             "job_solid.12d", "job_solid.fcv", "job_solid.cel", "job_solid.eig",
-            "job_solid.rout", "job_solid.nam"
+            "job_solid.rout", "job_solid.nam", "cantilever_wedge.geo"
         };
         for (String inName : intermediateNames) {
             deleteFileThoroughly(new File(targetDir, inName));

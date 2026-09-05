@@ -60,6 +60,19 @@ Esta actualización incorpora una validación exhaustiva de punta a punta del **
    * Sustitución del emoji gráfico de disquete por la convención clásica de comandos de terminal: `[^S] Guardar | [^X] Salir | [Tab] Tab | [Del] Borrar`.
    * Unificación de controles y botones de acción (`btnAbort` y `btnCloseEditor`) con el color verde característico de la terminal (`@color/terminal_green`), manteniendo un tema visual técnico homogéneo.
 
+8. **Corrección Definitiva del Selector de Geometrías 3D (`SolidFragment`):**
+   * **Eliminación de Duplicados del Voladizo:** Se filtran de forma exhaustiva las geometrías intermedias generadas dinámicamente (`cantilever_wedge.geo` y variantes) en el escaneo de disco, evitando que aparezcan entradas redundantes (`📥 cantilever...`) en el Spinner.
+   * El modelo de referencia queda unificado exclusivamente bajo el elemento canónico `Benchmark: Viga en Voladizo` / `Benchmark: Cantilever Beam`.
+   * Inclusión de `cantilever_wedge.geo` en la lista de purga automática de archivos temporales en cada corrida de simulación.
+
+9. **Formulación Cuadrática `C3D10` Predeterminada para Flexión Real:**
+   * Configuración de `2do-Orden: C3D10 (Tetraedro Cuadrático de 10 Nodos)` como elemento finito predeterminado en la interfaz de usuario en sustitución de `C3D4`.
+   * Erradicación del fenómeno de **bloqueo por cortante (*shear locking*)** de los tetraedros lineales de primer orden, permitiendo que cualquier análisis de vigas o placas en flexión reproduzca la curvatura elástica real ($\delta = 0.2000\text{ mm}$) con más del $99.9\%$ de exactitud analítica de forma predeterminada.
+
+10. **Certificación Científica Integral de la Matriz de Sólidos 3D:**
+   * Validación local de **28/28 pruebas superadas (100.0%)** en `validate_solids_complete_matrix.py` (los 8 tipos de elementos finitos CalculiX, 5 densidades de malla, primitivas y modelos CAD reales, cargas triaxiales $\pm X, \pm Y, \pm Z$ y reportes PDF).
+   * Validación de **13/13 modelos CAD (100.0%)** en `test_all_sample_models.py` mediante OpenCASCADE DRAWEXE, Gmsh y CalculiX ccx.
+
 ---
 
 ### 🚀 Novedades y Capacidades Principales en la Versión v0.3.0

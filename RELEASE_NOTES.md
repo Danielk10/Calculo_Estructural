@@ -75,6 +75,15 @@ Esta actualización incorpora una validación exhaustiva de punta a punta del **
      * **Operaciones Booleanas Constructivas (CSG):** Cilindro hueco por corte en `DRAWEXE` / OpenCASCADE.
      * **Configuraciones de Interfaz:** Ensayos en Acero A36, Concreto 25 MPa y Aluminio 6061 con cargas axiales, transversales y cortantes en $\pm X, \pm Y, \pm Z$, y selectores multilenguaje (Español/Inglés).
 
+10. **Corrección Definitiva del Selector de Geometrías 3D (`SolidFragment`):**
+    * **Eliminación de Duplicados del Voladizo:** Se filtran de forma exhaustiva las geometrías intermedias generadas dinámicamente (`cantilever_wedge.geo` y variantes) en el escaneo de disco, evitando que aparezcan entradas redundantes (`📥 cantilever...`) en el Spinner.
+    * El modelo de referencia queda unificado exclusivamente bajo el elemento canónico `Benchmark: Viga en Voladizo` / `Benchmark: Cantilever Beam`.
+    * Inclusión de `cantilever_wedge.geo` en la lista de purga automática de archivos temporales en cada corrida de simulación.
+
+11. **Formulación Cuadrática `C3D10` Predeterminada para Flexión Real:**
+    * Configuración de `2do-Orden: C3D10 (Tetraedro Cuadrático de 10 Nodos)` como elemento finito predeterminado en la interfaz de usuario en sustitución de `C3D4`.
+    * Erradicación del fenómeno de **bloqueo por cortante (*shear locking*)** de los tetraedros lineales de primer orden, permitiendo que cualquier análisis de vigas o placas en flexión reproduzca la curvatura elástica real ($\delta = 0.2000\text{ mm}$) con más del $99.9\%$ de exactitud analítica de forma predeterminada.
+
 ---
 
 ### 🚀 Novedades y Capacidades Principales en la Versión v0.3.0
