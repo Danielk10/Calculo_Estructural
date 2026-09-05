@@ -97,11 +97,11 @@
     <string name="density_medium">Medium - ~20mm</string>
     <string name="density_fine">Fine - ~10mm</string>
     <string name="density_ultra_fine">Ultra-Fine - ~5mm</string>
-    <string name="density_hyper_fine">Hyper-Fine - ~2.5mm (Mobile Maximum: Fewer Resources)</string>
-    <string name="density_hyper_fine_device_max">Hyper-Fine - ~2.5mm (Maximum for this device: Fewer Resources)</string>
+    <string name="density_hyper_fine">Hyper-Fine - ~2.5mm (Mobile Maximum - High Demand)</string>
+    <string name="density_hyper_fine_device_max">Hyper-Fine - ~2.5mm (Maximum for this device - High Demand)</string>
     <string name="density_hyper_extreme">Hyper-Extreme - ~1.5mm (Absolute Maximum: Top Configuration ≥12GB)</string>
-    <string name="toast_hyper_extreme_unsupported">You are at the Maximum density for your device (Level 6: resource-optimized). Level 7 is the Absolute Maximum in full configuration, exclusive to flagship devices with ≥12 GB of RAM.</string>
-    <string name="toast_hyper_device_info_standard">Standard/mid-range device: Level 6 is the Maximum density optimized for efficient memory use.</string>
+    <string name="toast_hyper_extreme_unsupported">You are at Level 6: Maximum density for this device (High-demand mode). Level 7 is the Absolute Maximum, exclusive to hardware with ≥12 GB of RAM.</string>
+    <string name="toast_hyper_device_info_standard">Standard/mid-range device: Level 6 is the Maximum free density. Requires high RAM.</string>
     <string name="toast_hyper_device_info_flagship">High-performance hardware detected (≥12 GB RAM): Level 7 (Absolute Maximum) is available.</string>
     <string name="label_young_modulus_short">E (MPa)</string>
     <string name="label_fixed_support_region">Fixed Support Region (SPC 1-3):</string>

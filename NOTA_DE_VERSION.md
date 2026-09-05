@@ -18,7 +18,7 @@ La versión **v0.3.0** consolida el análisis estructural avanzado en dispositiv
 * **Convergencia Asintótica y Malla Multinivel (7 Niveles):**
   * Verificación y calibración de 7 niveles de refinamiento métrico con Gmsh:
     * **Niveles 1 al 5:** Mallas continuas y balanceadas (~50mm a ~5mm) optimizadas para cualquier dispositivo móvil.
-    * **Nivel 6 (Hiper Fina - ~2.5mm | Máxima Móvil Optimizada en Recursos):** Máxima densidad recomendada para smartphones estándar y gama media/alta (< 12 GB RAM). Proporciona la mayor resolución geométrica y precisión física adaptada al presupuesto de memoria del teléfono, evitando el cierre por falta de memoria.
+    * **Nivel 6 (Hiper Fina - ~2.5mm | Máxima Móvil - Totalmente Libre / Alta Exigencia):** Refinamiento denso (`MeshSizeFactor = 0.25`, ~64,000 elementos C3D10) totalmente libre y disponible para cualquier dispositivo móvil sin restricciones de hardware. En modelos de gran volumen exige alta memoria RAM física (si el teléfono agota su memoria y se cierra, se comporta como en las versiones anteriores sin limitar la libertad del usuario).
     * **Nivel 7 (Hiper Extremo - ~1.5mm | Máxima Absoluta en Configuración Máxima):** Refinamiento ultra-denso sin restricciones (`MeshSizeFactor = 0.18`, ~174,000 elementos C3D10, ~700,000 DOFs y `OMP_STACKSIZE=128M`), reservado exclusivamente para los terminales más potentes del mercado (flagships con ≥12 GB de RAM física, como Red Magic, ROG Phone, etc.).
     * **Diferenciación Dinámica y Transparente en la Interfaz (UI):**
       * El usuario en un teléfono estándar visualiza explícitamente: `Nivel 6 / 7 (Hiper Fina - ~2.5mm (Máxima para este dispositivo: Menos Recursos))`, sabiendo con total transparencia que está en el tope de su hardware.
