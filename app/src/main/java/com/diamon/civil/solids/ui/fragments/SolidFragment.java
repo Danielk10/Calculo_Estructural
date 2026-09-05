@@ -285,6 +285,9 @@ public class SolidFragment extends Fragment {
             case 5:
                 desc = getString(R.string.density_ultra_fine);
                 break;
+            case 6:
+                desc = getString(R.string.density_hyper_fine);
+                break;
             default:
                 desc = "";
                 break;
@@ -314,7 +317,7 @@ public class SolidFragment extends Fragment {
 
     private void loadDefaultTestCase() {
         if (binding == null) return;
-        binding.seekbarMeshDensity.setProgress(2); // Level 3 / 5 (Medium - ~20mm)
+        binding.seekbarMeshDensity.setProgress(2); // Level 3 / 6 (Medium - ~20mm)
         binding.spinnerElementType.setSelection(4); // 2nd-Order C3D10 Quadratic default (físicamente exacto para flexión sin shear locking)
         if (materialDatabase != null && !materialDatabase.getMaterials().isEmpty()) {
             binding.spinnerMaterialSolid.setSelection(0);

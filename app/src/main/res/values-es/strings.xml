@@ -90,13 +90,14 @@
     <string name="btn_boolean_cut">Corte ∖</string>
     <string name="btn_boolean_intersect">Intersección ∩</string>
     <string name="btn_import_cad">📁 Importar CAD (STEP, IGES, BREP)</string>
-    <string name="label_mesh_density">Densidad de Malla: Nivel 3 / 5 (Media - ~20mm)</string>
-    <string name="mesh_density_format">Densidad de Malla: Nivel %1$d / 5 (%2$s)</string>
+    <string name="label_mesh_density">Densidad de Malla: Nivel 3 / 6 (Media - ~20mm)</string>
+    <string name="mesh_density_format">Densidad de Malla: Nivel %1$d / 6 (%2$s)</string>
     <string name="density_coarse">Gruesa - ~50mm</string>
     <string name="density_medium_coarse">Media-Gruesa - ~30mm</string>
     <string name="density_medium">Media - ~20mm</string>
     <string name="density_fine">Fina - ~10mm</string>
     <string name="density_ultra_fine">Ultra-Fina - ~5mm</string>
+    <string name="density_hyper_fine">Hiper fina - ~2.5mm</string>
     <string name="label_young_modulus_short">E (MPa)</string>
     <string name="label_fixed_support_region">Región de Apoyo Fijo (SPC 1-3):</string>
     <string name="label_load_application_region">Región de Aplicación de Carga (Cara Cargada):</string>

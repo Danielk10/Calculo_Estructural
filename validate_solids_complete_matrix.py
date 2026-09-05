@@ -45,8 +45,8 @@ MULTICORE_ENV = dict(
     CCX_NPROC_EQUATION_SOLVER=CPU_CORES
 )
 
-CLMAX_VALUES = [50.0, 25.0, 15.0, 8.0, 5.0]
-SIZE_FACTORS = [2.0, 1.5, 1.0, 0.75, 0.55]
+CLMAX_VALUES = [50.0, 25.0, 15.0, 8.0, 5.0, 5.0]
+SIZE_FACTORS = [2.0, 1.5, 1.0, 0.75, 0.55, 0.25]
 
 all_tests = []
 
@@ -198,10 +198,10 @@ public class RunElem {{
 # FASE 2: VALIDACIÓN DE TODAS LAS DENSIDADES DE MALLA (Slider 0 a 4)
 # ==============================================================================
 print("\n" + "=" * 85)
-print("🔹 FASE 2: TODAS LAS DENSIDADES DE MALLA (Slider Niveles 0, 1, 2, 3, 4)")
+print("🔹 FASE 2: TODAS LAS DENSIDADES DE MALLA (Slider Niveles 0, 1, 2, 3, 4, 5)")
 print("=" * 85)
 
-density_names = ["0 (Muy Gruesa)", "1 (Gruesa)", "2 (Media)", "3 (Fina)", "4 (Muy Fina)"]
+density_names = ["0 (Muy Gruesa)", "1 (Gruesa)", "2 (Media)", "3 (Fina)", "4 (Muy Fina)", "5 (Hiper Fina)"]
 for idx, d_name in enumerate(density_names):
     clmax = CLMAX_VALUES[idx]
     factor = SIZE_FACTORS[idx]
@@ -262,7 +262,7 @@ public class RunDens {{
                         except: pass
 
         deflection = abs(max_uy)
-        passed = (0.18 <= deflection <= 0.22) and (30 <= element_count <= 8000)
+        passed = (0.18 <= deflection <= 0.22) and (30 <= element_count <= 80000)
         record("Densidad de Malla", f"Nivel {d_name}", passed,
                f"clmax={clmax}mm, factor={factor} -> {element_count} elementos C3D10, δy={deflection:.4f} mm (Convergencia suave)")
 
@@ -688,7 +688,7 @@ print(f"RESULTADO: {passed_count}/{total} pruebas superadas exitosamente ({(pass
 if failed_count == 0:
     print("🏆 CERTIFICACIÓN TOTAL: El módulo de sólidos 3D es 100% matemáticamente y físicamente correcto.")
     print(f"   Ejecutado con motor multi-núcleo ({CPU_CORES} hilos SPOOLES MT).")
-    print("   Cumple con todas las primitivas, los 8 elementos finitos, las 5 densidades y los reportes PDF.")
+    print("   Cumple con todas las primitivas, los 8 elementos finitos, las 6 densidades y los reportes PDF.")
 else:
     print(f"⚠️ ATENCIÓN: {failed_count} pruebas no pasaron.")
 print("=" * 85)

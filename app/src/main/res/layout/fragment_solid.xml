@@ -358,7 +358,7 @@
                             android:id="@+id/seekbarMeshDensity"
                             android:layout_width="match_parent"
                             android:layout_height="24dp"
-                            android:max="4"
+                            android:max="5"
                             android:progress="2" />
                     </LinearLayout>
                 </LinearLayout>
