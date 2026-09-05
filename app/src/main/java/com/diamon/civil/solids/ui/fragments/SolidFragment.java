@@ -250,23 +250,63 @@ public class SolidFragment extends Fragment {
         }
     }
 
-    public boolean isHyperExtremeSupported() {
-        if (getContext() == null) return false;
+    public enum HardwareTier {
+        STANDARD, FLAGSHIP, EXTREME
+    }
+
+    public HardwareTier getHardwareTier() {
+        if (getContext() == null) return HardwareTier.STANDARD;
         try {
             android.app.ActivityManager am = (android.app.ActivityManager) getContext().getSystemService(android.content.Context.ACTIVITY_SERVICE);
-            if (am == null) return false;
+            if (am == null) return HardwareTier.STANDARD;
             android.app.ActivityManager.MemoryInfo mi = new android.app.ActivityManager.MemoryInfo();
             am.getMemoryInfo(mi);
-            // 10 GB threshold qualifies high-end devices with 12 GB, 16 GB, or 24 GB of physical RAM
-            return mi.totalMem >= 10L * 1024L * 1024L * 1024L;
+            long gb10 = 10L * 1024L * 1024L * 1024L;
+            long gb15 = 15L * 1024L * 1024L * 1024L;
+            if (mi.totalMem >= gb15) {
+                return HardwareTier.EXTREME;
+            } else if (mi.totalMem >= gb10) {
+                return HardwareTier.FLAGSHIP;
+            } else {
+                return HardwareTier.STANDARD;
+            }
         } catch (Throwable e) {
-            return false;
+            return HardwareTier.STANDARD;
+        }
+    }
+
+    public boolean isHyperExtremeSupported() {
+        return getHardwareTier() != HardwareTier.STANDARD;
+    }
+
+    private void updateHardwareProfileBadge() {
+        if (binding == null || getContext() == null) return;
+        try {
+            android.app.ActivityManager am = (android.app.ActivityManager) getContext().getSystemService(android.content.Context.ACTIVITY_SERVICE);
+            android.app.ActivityManager.MemoryInfo mi = new android.app.ActivityManager.MemoryInfo();
+            if (am != null) am.getMemoryInfo(mi);
+            double totalGb = mi.totalMem / (1024.0 * 1024.0 * 1024.0);
+            int cpuThreads = Runtime.getRuntime().availableProcessors();
+            HardwareTier tier = getHardwareTier();
+            String profileText;
+            if (tier == HardwareTier.EXTREME) {
+                profileText = getString(R.string.hardware_profile_extreme, totalGb, cpuThreads);
+            } else if (tier == HardwareTier.FLAGSHIP) {
+                profileText = getString(R.string.hardware_profile_flagship, totalGb, cpuThreads);
+            } else {
+                profileText = getString(R.string.hardware_profile_standard, totalGb, cpuThreads);
+            }
+            binding.tvHardwareProfile.setText(profileText);
+            binding.tvHardwareProfile.setVisibility(View.VISIBLE);
+        } catch (Throwable e) {
+            binding.tvHardwareProfile.setVisibility(View.GONE);
         }
     }
 
     private void setupMeshDensitySlider() {
         if (binding == null) return;
         updateMeshDensityLabel(binding.seekbarMeshDensity.getProgress());
+        updateHardwareProfileBadge();
         binding.seekbarMeshDensity.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
@@ -284,10 +324,24 @@ public class SolidFragment extends Fragment {
         });
 
         binding.tvMeshDensityLabel.setOnClickListener(v -> {
-            if (isHyperExtremeSupported()) {
-                Toast.makeText(getContext(), R.string.toast_hyper_device_info_flagship, Toast.LENGTH_SHORT).show();
+            HardwareTier tier = getHardwareTier();
+            if (tier == HardwareTier.EXTREME) {
+                Toast.makeText(getContext(), R.string.toast_hardware_info_extreme, Toast.LENGTH_LONG).show();
+            } else if (tier == HardwareTier.FLAGSHIP) {
+                Toast.makeText(getContext(), R.string.toast_hardware_info_flagship, Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(getContext(), R.string.toast_hyper_device_info_standard, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.toast_hardware_info_standard, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        binding.tvHardwareProfile.setOnClickListener(v -> {
+            HardwareTier tier = getHardwareTier();
+            if (tier == HardwareTier.EXTREME) {
+                Toast.makeText(getContext(), R.string.toast_hardware_info_extreme, Toast.LENGTH_LONG).show();
+            } else if (tier == HardwareTier.FLAGSHIP) {
+                Toast.makeText(getContext(), R.string.toast_hardware_info_flagship, Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getContext(), R.string.toast_hardware_info_standard, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -316,7 +370,11 @@ public class SolidFragment extends Fragment {
                 desc = isHyperExtremeSupported() ? getString(R.string.density_hyper_fine) : getString(R.string.density_hyper_fine_device_max);
                 break;
             case 7:
-                desc = getString(R.string.density_hyper_extreme);
+                if (getHardwareTier() == HardwareTier.EXTREME) {
+                    desc = getString(R.string.density_hyper_extreme_max_power);
+                } else {
+                    desc = getString(R.string.density_hyper_extreme_flagship);
+                }
                 break;
             default:
                 desc = "";
@@ -1085,6 +1143,9 @@ public class SolidFragment extends Fragment {
         final double finalNu = nu;
         
         logger.info("Starting Pipeline for Finite Element: " + elemType + " (" + rawElemStr + ") | Material: " + finalMaterialName + " (E=" + E + " MPa, nu=" + finalNu + ") | Fixed: " + fixedRegion + " | Load: " + loadRegion + " (" + finalLoadMagnitude + " N, DOF " + loadDof + ")");
+        if (binding.tvHardwareProfile != null && binding.tvHardwareProfile.getText() != null) {
+            logger.info("System Profile: " + binding.tvHardwareProfile.getText().toString());
+        }
 
         // Synchronize active simulation geometry with the active spinner selection to avoid desync
         int selectedGeoPos = binding.spinnerActiveGeometry.getSelectedItemPosition();
