@@ -48,9 +48,10 @@ Esta actualización incorpora una validación exhaustiva de punta a punta del **
      2. Módulo de Sólidos 3D: `SolidPDFReportGenerator` (`3D SOLID ANALYSIS REPORT`).
      3. Módulo de Terminal: `TerminalPDFReportGenerator` (`TERMINAL EXECUTION & ANALYSIS REPORT`).
 
-5. **Aceleración Multi-Núcleo Real en CalculiX (`OMP_NUM_THREADS` y `CCX_NPROC_EQUATION_SOLVER`):**
-   * Configuración dinámica que asigna automáticamente todos los núcleos de procesador disponibles en el dispositivo móvil (`Runtime.getRuntime().availableProcessors()`), habilitando paralelismo completo en la descomposición de matrices y cálculo de tensiones de SPOOLES.
-   * Asignación de pila extendida `OMP_STACKSIZE=64M` para garantizar estabilidad ante matrices rígidas extensas.
+5. **Aceleración Multi-Núcleo Integral (CalculiX CCX y Gmsh Runner):**
+   * **CalculiX:** Configuración dinámica que asigna automáticamente todos los núcleos de procesador disponibles en el dispositivo móvil (`Runtime.getRuntime().availableProcessors()`), habilitando paralelismo completo en la descomposición de matrices de rigidez y cálculo de tensiones mediante el solucionador sparse multihilo SPOOLES (`CCX_NPROC_EQUATION_SOLVER` y `OMP_NUM_THREADS`).
+   * **Gmsh:** Inyección automática del número de hilos de procesamiento (`-nt <cores>`) y entorno OpenMP (`OMP_NUM_THREADS`, `OMP_STACKSIZE=64M`) en el generador de mallas volumétricas 3D, con fallback inteligente a monohilo si la geometría importada presenta singularidades o auto-intersecciones complejas.
+   * **Estabilidad de Pila:** Asignación de pila extendida `OMP_STACKSIZE=64M` para erradicar fallos de desbordamiento en mallas de alta densidad.
 
 6. **Prevención Total de Corrupción de Datos y Purga Sistemática de Temporales:**
    * Eliminación exhaustiva antes y después de cada análisis numérico de archivos residuales del solucionador (`spooles.out`, `spooles.log`, `intpoints.out`, `slavintmortar.out`, `temporaryrestartfile`, `.cvg`, `.sta`, `.12d`, `.fcv`, `.cel`, `.eig`, `.rout`, `.nam`, `.dat`, `.frd`), garantizando 100% de determinismo e independencia entre corridas consecutivas y erradicando inconsistencias numéricas cruzadas.
@@ -59,6 +60,20 @@ Esta actualización incorpora una validación exhaustiva de punta a punta del **
 7. **Consistencia Visual en la Terminal y Editor de Código FEA:**
    * Sustitución del emoji gráfico de disquete por la convención clásica de comandos de terminal: `[^S] Guardar | [^X] Salir | [Tab] Tab | [Del] Borrar`.
    * Unificación de controles y botones de acción (`btnAbort` y `btnCloseEditor`) con el color verde característico de la terminal (`@color/terminal_green`), manteniendo un tema visual técnico homogéneo.
+
+8. **Extracción y Ordenamiento Robusto de Resultados en el Reporte PDF (`SolidPDFReportGenerator`):**
+   * **Flexibilización de Cabeceras:** El analizador léxico de CalculiX ahora detecta de forma resiliente cualquier variante de salida para tensiones en puntos de Gauss (`stresses (elem, integ.pnt`), asegurando compatibilidad con todas las versiones y compilaciones de CalculiX CCX.
+   * **Ordenamiento por Magnitud Euclidiana:** Clasificación automática descendente de desplazamientos nodales ($|U| = \sqrt{U_x^2 + U_y^2 + U_z^2}$) y tensiones de Von Mises ($\sigma_{\text{vm}}$) para destacar de inmediato los puntos críticos y elementos con mayor concentración de esfuerzos.
+   * **Eliminación Total de Logs Crudos:** Los reportes de sólidos 3D ahora presentan exclusivamente tablas de ingeniería limpias y formateadas profesionalmente para formato A4, con membretes y metadatos periciales.
+
+9. **Certificación Científica Integral Automatizada (`validate_solids_complete_matrix.py`):**
+   * Suite completa de pruebas locales que valida de punta a punta **28/28 casos con 100.0% de éxito**:
+     * **8 Familias de Elementos Finitos:** `C3D4`, `C3D8`, `C3D8R`, `C3D6`, `C3D10`, `C3D20`, `C3D20R` y `C3D15`.
+     * **5 Niveles de Densidad de Malla:** De Muy Gruesa a Muy Fina (hasta 7,428 elementos `C3D10`), comprobando convergencia monotónica hacia la solución exacta de Timoshenko ($0.2016\text{ mm}$, error $< 0.8\%$).
+     * **3 Primitivas CAD BRep:** Caja, Cilindro y Esfera.
+     * **4 Modelos CAD Industriales Reales:** Ménsula estructural con taladros (`bracket_simple.step`), perno roscado (`screw.step`), brazo de biela (`CrankArm.brep`) y tapa de bomba hidráulica (`Pump_TopCover.brep`).
+     * **Operaciones Booleanas Constructivas (CSG):** Cilindro hueco por corte en `DRAWEXE` / OpenCASCADE.
+     * **Configuraciones de Interfaz:** Ensayos en Acero A36, Concreto 25 MPa y Aluminio 6061 con cargas axiales, transversales y cortantes en $\pm X, \pm Y, \pm Z$, y selectores multilenguaje (Español/Inglés).
 
 ---
 
