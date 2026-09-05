@@ -183,10 +183,13 @@ public class SolidInpAssembler {
                     continue;
                 } else if (u.contains("TYPE=HEXA8") || u.contains("TYPE=C3D8") || u.contains("TYPE=HEX8")) {
                     String outType = (targetElemType != null && targetElemType.equals("C3D8R")) ? "C3D8R" : "C3D8";
+                    if (targetElemType != null && targetElemType.startsWith("C3D6")) {
+                        outType = "C3D6";
+                    }
                     elementLines.add("*ELEMENT, TYPE=" + outType + ", ELSET=Eall");
                     inElementBlock = true;
                     skipCurrentBlock = false;
-                    current3DType = "C3D8";
+                    current3DType = "C3D6".equals(outType) ? "C3D8_TO_C3D6" : "C3D8";
                     continue;
                 } else if (u.contains("TYPE=HEXA20R") || u.contains("TYPE=C3D20R") || u.contains("TYPE=HEX20R")) {
                     String outType = (targetElemType != null && targetElemType.equals("C3D20")) ? "C3D20" : "C3D20R";
@@ -243,7 +246,17 @@ public class SolidInpAssembler {
             } else if (inElementBlock && line.contains(",")) {
                 String formattedLine = line;
                 String[] parts = line.trim().split(",");
-                if ("C3D20".equals(current3DType) || "C3D20R".equals(current3DType)) {
+                if ("C3D8_TO_C3D6".equals(current3DType)) {
+                    if (parts.length >= 9) {
+                        String n1 = parts[1].trim(), n2 = parts[2].trim(), n3 = parts[3].trim(), n4 = parts[4].trim();
+                        String n5 = parts[5].trim(), n6 = parts[6].trim(), n7 = parts[7].trim(), n8 = parts[8].trim();
+                        elementCount++;
+                        elementLines.add(elementCount + ", " + n1 + ", " + n2 + ", " + n3 + ", " + n5 + ", " + n6 + ", " + n7);
+                        elementCount++;
+                        elementLines.add(elementCount + ", " + n1 + ", " + n3 + ", " + n4 + ", " + n5 + ", " + n7 + ", " + n8);
+                        continue;
+                    }
+                } else if ("C3D20".equals(current3DType) || "C3D20R".equals(current3DType)) {
                     // Truncate C3D27 (27 nodes) to standard serendipity CalculiX C3D20 (20 nodes)
                     if (parts.length > 21) {
                         StringBuilder sb = new StringBuilder();
@@ -342,22 +355,22 @@ public class SolidInpAssembler {
         }
 
         String reg = regionName.toUpperCase(Locale.US);
-        if (reg.contains("X-") || reg.contains("X_MIN") || reg.contains("LEFT")) {
+        if (reg.contains("X-") || reg.contains("X_MIN") || reg.contains("LEFT") || reg.contains("IZQUIERD")) {
             return extractSpatialFaceNodes(nodeCoords, "X_MIN");
         }
-        if (reg.contains("X+") || reg.contains("X_MAX") || reg.contains("RIGHT")) {
+        if (reg.contains("X+") || reg.contains("X_MAX") || reg.contains("RIGHT") || reg.contains("DERECH")) {
             return extractSpatialFaceNodes(nodeCoords, "X_MAX");
         }
-        if (reg.contains("Y-") || reg.contains("Y_MIN") || reg.contains("BOTTOM") || reg.contains("BASE")) {
+        if (reg.contains("Y-") || reg.contains("Y_MIN") || reg.contains("BOTTOM") || reg.contains("BASE") || reg.contains("INFERIOR")) {
             return extractSpatialFaceNodes(nodeCoords, "Y_MIN");
         }
-        if (reg.contains("Y+") || reg.contains("Y_MAX") || reg.contains("TOP") || reg.contains("ROOF")) {
+        if (reg.contains("Y+") || reg.contains("Y_MAX") || reg.contains("TOP") || reg.contains("ROOF") || reg.contains("SUPERIOR") || reg.contains("TECHO")) {
             return extractSpatialFaceNodes(nodeCoords, "Y_MAX");
         }
-        if (reg.contains("Z-") || reg.contains("Z_MIN") || reg.contains("BACK")) {
+        if (reg.contains("Z-") || reg.contains("Z_MIN") || reg.contains("BACK") || reg.contains("POSTERIOR") || reg.contains("FONDO")) {
             return extractSpatialFaceNodes(nodeCoords, "Z_MIN");
         }
-        if (reg.contains("Z+") || reg.contains("Z_MAX") || reg.contains("FRONT")) {
+        if (reg.contains("Z+") || reg.contains("Z_MAX") || reg.contains("FRONT") || reg.contains("FRONTAL")) {
             return extractSpatialFaceNodes(nodeCoords, "Z_MAX");
         }
 

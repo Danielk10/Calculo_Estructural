@@ -34,6 +34,10 @@ DRAWEXE_BIN = "/usr/bin/DRAWEXE"
 ASSETS_DIR = "/home/danielpdiamon/Calculo_Estructural/app/src/main/assets"
 STEP_ASSETS_DIR = os.path.join(ASSETS_DIR, "data/data/com.diamon.civil/files/usr/share/opencascade/data/step")
 
+JAVA_CLASSES_DIR = "/tmp/calculoestructural_build/intermediates/javac/debug/compileDebugJavaWithJavac/classes"
+if not os.path.exists(JAVA_CLASSES_DIR):
+    JAVA_CLASSES_DIR = "/tmp/test_fix"
+
 # Try to import OpenSees
 try:
     import openseespy.opensees as ops
@@ -294,8 +298,8 @@ public class RunAsm {{
 """
     with open(os.path.join(work_dir, "RunAsm.java"), "w") as f:
         f.write(run_assembler)
-    subprocess.run(["javac", "-cp", "/tmp/test_fix", "-d", work_dir, os.path.join(work_dir, "RunAsm.java")], check=True)
-    subprocess.run(["java", "-cp", f"{work_dir}:/tmp/test_fix", "RunAsm"], check=True)
+    subprocess.run(["javac", "-cp", JAVA_CLASSES_DIR, "-d", work_dir, os.path.join(work_dir, "RunAsm.java")], check=True)
+    subprocess.run(["java", "-cp", f"{work_dir}:{JAVA_CLASSES_DIR}", "RunAsm"], check=True)
     
     subprocess.run([CCX_BIN, "fallback_test"], cwd=work_dir, capture_output=True, text=True,
                    env=dict(os.environ, OMP_NUM_THREADS="4"))
@@ -340,8 +344,8 @@ public class RunAsm2 {{
 """
     with open(os.path.join(work_dir, "RunAsm2.java"), "w") as f:
         f.write(run_asm2)
-    subprocess.run(["javac", "-cp", "/tmp/test_fix", "-d", work_dir, os.path.join(work_dir, "RunAsm2.java")], check=True)
-    subprocess.run(["java", "-cp", f"{work_dir}:/tmp/test_fix", "RunAsm2"], check=True)
+    subprocess.run(["javac", "-cp", JAVA_CLASSES_DIR, "-d", work_dir, os.path.join(work_dir, "RunAsm2.java")], check=True)
+    subprocess.run(["java", "-cp", f"{work_dir}:{JAVA_CLASSES_DIR}", "RunAsm2"], check=True)
     
     subprocess.run([CCX_BIN, "linkrods"], cwd=work_dir, capture_output=True, text=True,
                    env=dict(os.environ, OMP_NUM_THREADS="4"))
@@ -386,8 +390,8 @@ public class RunAsmBr {{
 """
     with open(os.path.join(work_dir, "RunAsmBr.java"), "w") as f:
         f.write(run_asm_br)
-    subprocess.run(["javac", "-cp", "/tmp/test_fix", "-d", work_dir, os.path.join(work_dir, "RunAsmBr.java")], check=True)
-    subprocess.run(["java", "-cp", f"{work_dir}:/tmp/test_fix", "RunAsmBr"], check=True)
+    subprocess.run(["javac", "-cp", JAVA_CLASSES_DIR, "-d", work_dir, os.path.join(work_dir, "RunAsmBr.java")], check=True)
+    subprocess.run(["java", "-cp", f"{work_dir}:{JAVA_CLASSES_DIR}", "RunAsmBr"], check=True)
     
     subprocess.run([CCX_BIN, "bracket"], cwd=work_dir, capture_output=True, text=True,
                    env=dict(os.environ, OMP_NUM_THREADS="4"))
@@ -422,8 +426,8 @@ public class RunAsmCad {{
 """
     with open(os.path.join(work_dir, "RunAsmCad.java"), "w") as f:
         f.write(run_asm_cad)
-    subprocess.run(["javac", "-cp", "/tmp/test_fix", "-d", work_dir, os.path.join(work_dir, "RunAsmCad.java")], check=True)
-    subprocess.run(["java", "-cp", f"{work_dir}:/tmp/test_fix", "RunAsmCad"], check=True)
+    subprocess.run(["javac", "-cp", JAVA_CLASSES_DIR, "-d", work_dir, os.path.join(work_dir, "RunAsmCad.java")], check=True)
+    subprocess.run(["java", "-cp", f"{work_dir}:{JAVA_CLASSES_DIR}", "RunAsmCad"], check=True)
     
     subprocess.run([CCX_BIN, "bar"], cwd=work_dir, capture_output=True, text=True,
                    env=dict(os.environ, OMP_NUM_THREADS="4"))
@@ -459,8 +463,8 @@ public class RunAsmSim {{
 """
     with open(os.path.join(work_dir, "RunAsmSim.java"), "w") as f:
         f.write(run_asm_sim)
-    subprocess.run(["javac", "-cp", "/tmp/test_fix", "-d", work_dir, os.path.join(work_dir, "RunAsmSim.java")], check=True)
-    subprocess.run(["java", "-cp", f"{work_dir}:/tmp/test_fix", "RunAsmSim"], check=True)
+    subprocess.run(["javac", "-cp", JAVA_CLASSES_DIR, "-d", work_dir, os.path.join(work_dir, "RunAsmSim.java")], check=True)
+    subprocess.run(["java", "-cp", f"{work_dir}:{JAVA_CLASSES_DIR}", "RunAsmSim"], check=True)
     
     subprocess.run([CCX_BIN, "cantilever"], cwd=work_dir, capture_output=True, text=True,
                    env=dict(os.environ, OMP_NUM_THREADS="4"))

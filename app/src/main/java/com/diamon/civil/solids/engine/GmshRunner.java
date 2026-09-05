@@ -20,8 +20,8 @@ public class GmshRunner {
 
     private static final String TAG = "GmshRunner";
 
-    /** Density slider mapping: 1 (coarse) to 5 (fine). */
-    private static final double[] CLMAX_VALUES = {50.0, 30.0, 20.0, 10.0, 5.0};
+    /** Density slider mapping: 1 (coarse) to 5 (fine). Calibrated for stable mobile FEA and monotonic refinement. */
+    private static final double[] CLMAX_VALUES = {50.0, 25.0, 15.0, 8.0, 5.0};
 
     private final File workDir;
     private final File nativeLibDir;
@@ -99,7 +99,7 @@ public class GmshRunner {
         }
 
         double clmax = CLMAX_VALUES[Math.max(0, Math.min(4, meshDensity - 1))];
-        double[] sizeFactors = {2.0, 1.5, 1.0, 0.5, 0.25};
+        double[] sizeFactors = {2.0, 1.5, 1.0, 0.75, 0.55};
         double meshFactor = sizeFactors[Math.max(0, Math.min(4, meshDensity - 1))];
 
         boolean is2ndOrder = elementType != null && (elementType.contains("C3D10") || elementType.contains("C3D20") || elementType.contains("C3D15") || elementType.contains("2nd-Order") || elementType.contains("2do-Orden") || elementType.contains("Quadratic") || elementType.contains("Cuadrático"));
@@ -108,6 +108,19 @@ public class GmshRunner {
 
         File targetInput = inputFile;
         String nameLower = inputFile.getName().toLowerCase(java.util.Locale.US);
+
+        // If wedge formulation is requested and active model is cantilever benchmark, ensure we use the extruded wedge definition
+        if (isWedge && (nameLower.startsWith("cantilever") || nameLower.equals("cantilever.geo") || nameLower.equals("cantilever_benchmark.geo"))) {
+            try {
+                targetInput = SampleSimulationCase.createCantileverWedgeGeo(workDir);
+                nameLower = targetInput.getName().toLowerCase(java.util.Locale.US);
+            } catch (Exception e) {
+                logW(TAG, "Could not create cantilever wedge geo: " + e.getMessage());
+            }
+        } else if (!isWedge && nameLower.equals("cantilever_wedge.geo")) {
+            targetInput = new File(workDir, "cantilever.geo");
+            nameLower = targetInput.getName().toLowerCase(java.util.Locale.US);
+        }
 
         // If input is an IGES file, sew unstitched trimmed NURBS surfaces into a closed 3D solid BRep using OCCT/DRAWEXE
         if (nameLower.endsWith(".iges") || nameLower.endsWith(".igs")) {
@@ -200,7 +213,11 @@ public class GmshRunner {
         if (isHex) {
             meshOpts.append(" Mesh.Recombine3DAll=1; Mesh.Algorithm=6; Mesh.SubdivisionAlgorithm=2; Mesh.Recombine3DLevel=2; Mesh.Algorithm3D=1;");
         } else if (isWedge) {
-            meshOpts.append(" Mesh.SubdivisionAlgorithm=1; Mesh.Algorithm3D=1;");
+            if (targetInput.getName().contains("wedge")) {
+                meshOpts.append(" Mesh.Algorithm3D=1;");
+            } else {
+                meshOpts.append(" Mesh.Recombine3DAll=1; Mesh.Algorithm=6; Mesh.SubdivisionAlgorithm=2; Mesh.Recombine3DLevel=2; Mesh.Algorithm3D=1;");
+            }
         } else {
             meshOpts.append(" Mesh.Algorithm3D=1; Mesh.Recombine3DAll=0;");
         }

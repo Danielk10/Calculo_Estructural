@@ -25,8 +25,8 @@ sudo apt-get install -y liblapack-dev libopenmpi-dev tcl-dev tk-dev libeigen3-de
 ENV_DIR="$HOME/opensees-env"
 echo "🐍 Paso 2: Configurando entorno virtual en $ENV_DIR..."
 
-if [ ! -d "$ENV_DIR" ]; then
-    python3.11 -m venv "$ENV_DIR"
+if [ ! -d "$ENV_DIR" ] || [ ! -x "$ENV_DIR/bin/python" ]; then
+    python3.11 -m venv --clear "$ENV_DIR"
 fi
 
 # Activar entorno e instalar paquetes

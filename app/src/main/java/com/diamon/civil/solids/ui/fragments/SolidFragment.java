@@ -164,7 +164,7 @@ public class SolidFragment extends Fragment {
         setupMaterialSpinner();
         setupMeshDensitySlider();
         setupGeometrySpinner();
-        refreshGeometrySpinner(activeSimulationGeometry);
+        loadDefaultTestCase();
 
         executor.execute(() -> {
             try {
@@ -172,7 +172,9 @@ public class SolidFragment extends Fragment {
                 NativeFeaCore.loadLibraries();
                 gmshRunner = new GmshRunner(workDir, nativeLibDir);
                 calculixExecutor = new CalculixExecutor(appContext, workDir);
-                activeSimulationGeometry = SampleSimulationCase.createCantileverGeo(workDir);
+                if (activeSimulationGeometry == null || !activeSimulationGeometry.exists()) {
+                    activeSimulationGeometry = SampleSimulationCase.createCantileverGeo(workDir);
+                }
                 
                 android.app.Activity activity = getActivity();
                 if (activity != null) {
@@ -181,7 +183,7 @@ public class SolidFragment extends Fragment {
                             engineReady = true;
                             binding.btnRunSolidAnalysis.setEnabled(true);
                             logger.info("Native engines initialized successfully");
-                            loadDefaultTestCase();
+                            refreshGeometrySpinner(activeSimulationGeometry);
                         }
                     });
                 }
@@ -587,6 +589,31 @@ public class SolidFragment extends Fragment {
         });
     }
 
+    private String resolveCanonicalElementType(String displayString, int position) {
+        if (displayString != null) {
+            String u = displayString.toUpperCase(java.util.Locale.US);
+            if (u.contains("C3D8R")) return "C3D8R";
+            if (u.contains("C3D8")) return "C3D8";
+            if (u.contains("C3D20R")) return "C3D20R";
+            if (u.contains("C3D20")) return "C3D20";
+            if (u.contains("C3D10")) return "C3D10";
+            if (u.contains("C3D4")) return "C3D4";
+            if (u.contains("C3D15")) return "C3D15";
+            if (u.contains("C3D6")) return "C3D6";
+        }
+        switch (position) {
+            case 0: return "C3D4";
+            case 1: return "C3D8";
+            case 2: return "C3D8R";
+            case 3: return "C3D6";
+            case 4: return "C3D10";
+            case 5: return "C3D20";
+            case 6: return "C3D20R";
+            case 7: return "C3D15";
+            default: return "C3D10";
+        }
+    }
+
     public void onInpImported(File inpFile) {
         if (inpFile == null || !inpFile.exists()) return;
         final android.content.Context ctx = getContext();
@@ -601,7 +628,7 @@ public class SolidFragment extends Fragment {
         final String loadRegion = (binding != null && binding.spinnerLoadRegion.getSelectedItem() != null)
                 ? binding.spinnerLoadRegion.getSelectedItem().toString() : "AUTO";
         final String elemType = (binding != null && binding.spinnerElementType.getSelectedItem() != null)
-                ? binding.spinnerElementType.getSelectedItem().toString() : "C3D10";
+                ? resolveCanonicalElementType(binding.spinnerElementType.getSelectedItem().toString(), binding.spinnerElementType.getSelectedItemPosition()) : "C3D10";
         final int loadDirPos = (binding != null) ? binding.spinnerLoadDirection.getSelectedItemPosition() : 0;
         final int loadDof = (loadDirPos == 1) ? 1 : (loadDirPos == 2) ? 3 : 2;
 
@@ -962,7 +989,8 @@ public class SolidFragment extends Fragment {
 
         // Capture ALL UI values on main thread to avoid crashes
         final int density = binding.seekbarMeshDensity.getProgress() + 1;
-        final String elemType = binding.spinnerElementType.getSelectedItem().toString();
+        final String rawElemStr = binding.spinnerElementType.getSelectedItem().toString();
+        final String elemType = resolveCanonicalElementType(rawElemStr, binding.spinnerElementType.getSelectedItemPosition());
         final String modulusStr = binding.etSolidModulus.getText().toString().trim();
         final String fixedRegion = binding.spinnerFixedRegion.getSelectedItem() != null ? binding.spinnerFixedRegion.getSelectedItem().toString() : "AUTO";
         final String loadRegion = binding.spinnerLoadRegion.getSelectedItem() != null ? binding.spinnerLoadRegion.getSelectedItem().toString() : "AUTO";
@@ -974,7 +1002,7 @@ public class SolidFragment extends Fragment {
         try {
             if (!loadMagStr.isEmpty()) parsedLoad = Double.parseDouble(loadMagStr);
         } catch (NumberFormatException e) {
-            logger.error("Invalid load magnitude, defaulting to -100.0 N");
+            logger.error("Invalid load magnitude format, defaulting to -100.0 N");
         }
         final double finalLoadMagnitude = parsedLoad;
         
@@ -990,15 +1018,22 @@ public class SolidFragment extends Fragment {
         double youngModulusTemp = (materialDatabase != null && matPos >= 0 && matPos < materialDatabase.getMaterials().size())
                 ? materialDatabase.getMaterials().get(matPos).E : 200000.0;
         try {
-            if (!modulusStr.isEmpty()) youngModulusTemp = Double.parseDouble(modulusStr);
+            if (!modulusStr.isEmpty()) {
+                double val = Double.parseDouble(modulusStr);
+                if (val > 0.0) {
+                    youngModulusTemp = val;
+                } else {
+                    logger.warn("Young's modulus must be > 0. Using default " + youngModulusTemp + " MPa");
+                }
+            }
         } catch (NumberFormatException e) {
-            logger.error("Invalid modulus, using default " + youngModulusTemp + " MPa");
+            logger.error("Invalid modulus format, using default " + youngModulusTemp + " MPa");
         }
         final double E = youngModulusTemp;
         final String finalMaterialName = materialName;
         final double finalNu = nu;
         
-        logger.info("Starting Pipeline for Finite Element: " + elemType + " | Material: " + finalMaterialName + " (E=" + E + " MPa, nu=" + finalNu + ") | Fixed: " + fixedRegion + " | Load: " + loadRegion + " (" + finalLoadMagnitude + " N, DOF " + loadDof + ")");
+        logger.info("Starting Pipeline for Finite Element: " + elemType + " (" + rawElemStr + ") | Material: " + finalMaterialName + " (E=" + E + " MPa, nu=" + finalNu + ") | Fixed: " + fixedRegion + " | Load: " + loadRegion + " (" + finalLoadMagnitude + " N, DOF " + loadDof + ")");
 
         // Synchronize active simulation geometry with the active spinner selection to avoid desync
         int selectedGeoPos = binding.spinnerActiveGeometry.getSelectedItemPosition();
