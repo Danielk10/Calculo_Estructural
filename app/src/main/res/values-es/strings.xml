@@ -105,9 +105,9 @@
     <string name="toast_hyper_extreme_unsupported">Estás en el Nivel 6: Máxima densidad para este dispositivo (Cálculo libre de alta exigencia). El Nivel 7 es la Máxima Absoluta, exclusiva para hardware con ≥12 GB de RAM.</string>
     <string name="toast_hyper_device_info_standard">Dispositivo estándar/medio: El Nivel 6 es la Máxima densidad libre. Requiere alta memoria RAM.</string>
     <string name="toast_hyper_device_info_flagship">Hardware de alta potencia detectado (≥12 GB RAM): El Nivel 7 (Máxima Absoluta) está disponible.</string>
-    <string name="hardware_profile_standard">📱 %1$.1f GB RAM (%2$d hilos) • Modo Estándar [NO es la variante más potente]</string>
-    <string name="hardware_profile_flagship">⚡ %1$.1f GB RAM (%2$d hilos) • Nivel 7 Flagship 12GB [NO es la más potente]</string>
-    <string name="hardware_profile_extreme">🔥 %1$.1f GB RAM (%2$d hilos) • Nivel 7: [SÍ, ES LA VARIANTE MÁS POTENTE]</string>
+    <string name="hardware_profile_standard">Hardware: %1$.1f GB RAM (%2$d hilos) • Modo Estándar [NO es la variante más potente]</string>
+    <string name="hardware_profile_flagship">Hardware: %1$.1f GB RAM (%2$d hilos) • Nivel 7: Flagship 12GB [NO es la más potente]</string>
+    <string name="hardware_profile_extreme">Hardware: %1$.1f GB RAM (%2$d hilos) • Nivel 7: [SÍ, ES LA VARIANTE MÁS POTENTE]</string>
     <string name="toast_hardware_info_standard">Perfil Estándar (NO es la más potente): El Nivel 6 es tu tope óptimo. La variante más potente requiere hardware extremo con ≥16 GB de RAM.</string>
     <string name="toast_hardware_info_flagship">Nivel 7 Flagship 12GB (NO es la variante más potente): Tu equipo procesa el modelo completo, pero en cálculos largos regulará la velocidad por temperatura. La variante más potente requiere ≥16 GB de RAM.</string>
     <string name="toast_hardware_info_extreme">¡SÍ, ES LA VARIANTE MÁS POTENTE! Tu equipo cuenta con hardware extremo (≥16 GB RAM) para ejecutar el Nivel 7 a máxima potencia sostenida sin caídas de rendimiento.</string>

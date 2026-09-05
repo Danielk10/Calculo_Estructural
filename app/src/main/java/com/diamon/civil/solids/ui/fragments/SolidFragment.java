@@ -48,6 +48,8 @@ public class SolidFragment extends Fragment {
     private volatile String selectedLoadId = "Loaded";
     private final List<File> availableGeometries = new ArrayList<>();
     private boolean isProgrammaticGeometrySelection = false;
+    private Toast mActiveToast = null;
+    private long mLastToastTimestamp = 0;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -303,6 +305,22 @@ public class SolidFragment extends Fragment {
         }
     }
 
+    private void showDebouncedToast(int stringResId, int duration) {
+        if (getContext() == null || !isAdded()) return;
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - mLastToastTimestamp < 2500) {
+            return;
+        }
+        mLastToastTimestamp = currentTime;
+        if (mActiveToast != null) {
+            try {
+                mActiveToast.cancel();
+            } catch (Exception ignore) {}
+        }
+        mActiveToast = Toast.makeText(getContext().getApplicationContext(), stringResId, duration);
+        mActiveToast.show();
+    }
+
     private void setupMeshDensitySlider() {
         if (binding == null) return;
         updateMeshDensityLabel(binding.seekbarMeshDensity.getProgress());
@@ -312,7 +330,7 @@ public class SolidFragment extends Fragment {
             public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
                 if (progress >= 6 && fromUser && !isHyperExtremeSupported()) {
                     seekBar.setProgress(5);
-                    Toast.makeText(getContext(), R.string.toast_hyper_extreme_unsupported, Toast.LENGTH_LONG).show();
+                    showDebouncedToast(R.string.toast_hyper_extreme_unsupported, Toast.LENGTH_SHORT);
                     return;
                 }
                 updateMeshDensityLabel(progress);
@@ -326,22 +344,22 @@ public class SolidFragment extends Fragment {
         binding.tvMeshDensityLabel.setOnClickListener(v -> {
             HardwareTier tier = getHardwareTier();
             if (tier == HardwareTier.EXTREME) {
-                Toast.makeText(getContext(), R.string.toast_hardware_info_extreme, Toast.LENGTH_LONG).show();
+                showDebouncedToast(R.string.toast_hardware_info_extreme, Toast.LENGTH_SHORT);
             } else if (tier == HardwareTier.FLAGSHIP) {
-                Toast.makeText(getContext(), R.string.toast_hardware_info_flagship, Toast.LENGTH_LONG).show();
+                showDebouncedToast(R.string.toast_hardware_info_flagship, Toast.LENGTH_SHORT);
             } else {
-                Toast.makeText(getContext(), R.string.toast_hardware_info_standard, Toast.LENGTH_LONG).show();
+                showDebouncedToast(R.string.toast_hardware_info_standard, Toast.LENGTH_SHORT);
             }
         });
 
         binding.tvHardwareProfile.setOnClickListener(v -> {
             HardwareTier tier = getHardwareTier();
             if (tier == HardwareTier.EXTREME) {
-                Toast.makeText(getContext(), R.string.toast_hardware_info_extreme, Toast.LENGTH_LONG).show();
+                showDebouncedToast(R.string.toast_hardware_info_extreme, Toast.LENGTH_SHORT);
             } else if (tier == HardwareTier.FLAGSHIP) {
-                Toast.makeText(getContext(), R.string.toast_hardware_info_flagship, Toast.LENGTH_LONG).show();
+                showDebouncedToast(R.string.toast_hardware_info_flagship, Toast.LENGTH_SHORT);
             } else {
-                Toast.makeText(getContext(), R.string.toast_hardware_info_standard, Toast.LENGTH_LONG).show();
+                showDebouncedToast(R.string.toast_hardware_info_standard, Toast.LENGTH_SHORT);
             }
         });
     }

@@ -105,9 +105,9 @@
     <string name="toast_hyper_extreme_unsupported">You are at Level 6: Maximum density for this device (High-demand mode). Level 7 is the Absolute Maximum, exclusive to hardware with ≥12 GB of RAM.</string>
     <string name="toast_hyper_device_info_standard">Standard/mid-range device: Level 6 is the Maximum free density. Requires high RAM.</string>
     <string name="toast_hyper_device_info_flagship">High-performance hardware detected (≥12 GB RAM): Level 7 (Absolute Maximum) is available.</string>
-    <string name="hardware_profile_standard">📱 %1$.1f GB RAM (%2$d threads) • Standard Mode [NOT the most powerful variant]</string>
-    <string name="hardware_profile_flagship">⚡ %1$.1f GB RAM (%2$d threads) • Level 7 Flagship 12GB [NOT the most powerful variant]</string>
-    <string name="hardware_profile_extreme">🔥 %1$.1f GB RAM (%2$d threads) • Level 7: [YES, THIS IS THE MOST POWERFUL VARIANT]</string>
+    <string name="hardware_profile_standard">Hardware: %1$.1f GB RAM (%2$d threads) • Standard Mode [NOT the most powerful variant]</string>
+    <string name="hardware_profile_flagship">Hardware: %1$.1f GB RAM (%2$d threads) • Level 7: Flagship 12GB [NOT the most powerful variant]</string>
+    <string name="hardware_profile_extreme">Hardware: %1$.1f GB RAM (%2$d threads) • Level 7: [YES, THIS IS THE MOST POWERFUL VARIANT]</string>
     <string name="toast_hardware_info_standard">Standard Profile (NOT the most powerful): Level 6 is your optimal limit. The most powerful variant requires extreme hardware with ≥16 GB RAM.</string>
     <string name="toast_hardware_info_flagship">Level 7 Flagship 12GB (NOT the most powerful): Your device runs the full model, but will throttle under sustained loads. The most powerful variant requires ≥16 GB RAM with active cooling.</string>
     <string name="toast_hardware_info_extreme">YES, THIS IS THE MOST POWERFUL VARIANT! Your device has extreme hardware (≥16 GB RAM) to run Level 7 at 100% sustained peak performance.</string>
