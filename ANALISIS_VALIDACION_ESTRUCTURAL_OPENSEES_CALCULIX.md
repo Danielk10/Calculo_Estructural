@@ -204,19 +204,33 @@ Para validar que los resultados volumétricos de CalculiX corresponden exactamen
   $$\theta = \frac{P L^2}{2 E I} = \frac{100 \times 10\,000}{2 \times 200\,000 \times 833.333} = 0.003\text{ rad}$$
   $$U_x = \pm y \cdot \theta = \pm 5\text{ mm} \times 0.003\text{ rad} = \pm 0.0150\text{ mm}$$
 
-#### 3. Comparativa entre Teoría Analítica y Modelos de Elementos Finitos
+#### 3. Comparativa entre Teoría Analítica y Reportes de Simulación (Tanda de Validación)
 
-| Formulación / Modelo FEA | Tipo de Elemento | Desplazamiento Máx ($\delta$) | Tensión Von Mises Máx | Diagnóstico Técnico |
-|---|---|---|---|---|
-| **Teoría Analítica Clásica** | Viga Euler-Bernoulli / Timoshenko | **$0.2000\text{ – }0.2016\text{ mm}$** | **$60.00\text{ MPa}$** (superficie externa) | **Referencia física exacta** |
-| **FEA Lineal (C3D4)** | Tetraedro 4 nodos (1er orden) | $0.1000\text{ mm}$ | $32.01\text{ – }38.66\text{ mm}$ | ❌ **Shear Locking:** rigidez artificial al doble por deformación angular parásita |
-| **FEA Cuadrático Concentrado (C3D10)** | Tetraedro 10 nodos (carga puntual) | $0.1868\text{ mm}$ | $14\,090.74\text{ MPa}$ | ❌ **Singularidad Matemática:** carga en nodo puntual ($\sigma \to \infty$) sin sentido físico |
-| **FEA Cuadrático Distribuido (C3D10)** | Tetraedro 10 nodos (2do orden) | **$0.2000\text{ mm}$** ($U_y = -0.1995\text{ mm}$) | **$53.81\text{ MPa}$** (puntos Gauss) | ✅ **Físicamente Correcto:** concordancia $< 0.1\%$ con Euler ($U_x = \pm 0.0149\text{ mm}$) |
+| Reporte / Modelo FEA | Elemento / Malla | Flecha Máx ($U_y$) | Giro Extremo ($U_x$) | Von Mises Máx | Evaluación Física y Diagnóstico |
+|---|---|---|---|---|---|
+| **Teoría Analítica Clásica** | Viga Euler-Bernoulli / Timoshenko | **$-0.2000\text{ a }-0.2016\text{ mm}$** | **$\pm 0.0150\text{ mm}$** | **$60.00\text{ MPa}$** (superficie externa) | **Referencia física exacta** ($\delta_{\text{flex}} = 0.2000\text{ mm}$, $\delta_{\text{shear}} = 0.0016\text{ mm}$) |
+| **FEA Lineal C3D4** | Tetraedro 4 nodos (1er orden) | $-0.0824\text{ a }-0.1000\text{ mm}$ | $\pm 0.0075\text{ mm}$ | $32.01\text{ – }38.66\text{ MPa}$ | ❌ **Shear Locking:** rigidez espuria al doble por incapacidad de curvar caras lineales. |
+| **Reportes 2, (1)_2, (2)_2** | C3D10 (Densidad Media 3) | **$-0.1989\text{ mm}$** | **$\pm 0.0149\text{ mm}$** | **$\approx 50.05\text{ MPa}$** (puntos Gauss) | ✅ **Físicamente correcto:** error cinemático $< 1.3\%$. Tensión interior consistente con Gauss. |
+| **Reporte (3)_2** | C3D10 (Densidad Fina 4) | **$-0.1995\text{ mm}$** | **$\pm 0.0149\text{ mm}$** | **$53.85\text{ MPa}$** (puntos Gauss) | ✅ **Físicamente correcto:** convergencia monótona hacia Euler ($< 1.0\%$ error). $S_{xx} = -52.80\text{ MPa}$. |
+| **Reporte (4)_2** | C3D20 (Hexaedros 20 nodos) | **$-0.2000\text{ mm}$** ($U_{\text{mag}} = 0.2005$) | **$\pm 0.0149\text{ mm}$** | $503.75\text{ MPa}$ (singularidad 3D) | ✅ **Cinemática perfecta:** entre Euler ($0.2000$) y Timoshenko ($0.2016$). Pico por Poisson en arista empotrada. |
+| **Reporte (5)** | Desalineación de Ejes | $-0.0020\text{ mm}$ ($U_z = -0.1443$) | $\pm 0.0118\text{ mm}$ | $1075.20\text{ MPa}$ | ⚠️ **Desvío de Grado de Libertad:** carga/apoyo orientados en eje lateral $Z$ (DOF 3) en vez de $Y$ (DOF 2). |
 
-#### 4. Justificación de C3D10 como Predeterminado
-1. Los tetraedros de 4 nodos (`C3D4`) tienen campos de deformación constante y sufren de **bloqueo por cortante** (*shear locking*), absorbiendo energía de corte espuria que reduce la deflexión a la mitad ($0.10\text{ mm}$ vs $0.20\text{ mm}$).
-2. Los tetraedros cuadráticos de 10 nodos (`C3D10`) integran funciones de interpolación parabólicas con deformación lineal a través del espesor, eliminando por completo el bloqueo por cortante y reproduciendo la curvatura natural de flexión.
-3. La tensión en los puntos de integración de Gauss internos ($53.81\text{ MPa}$) es consistente con la interpolación numérica respecto a la fibra extrema teórica ($60.00\text{ MPa}$). Por esta razón, `C3D10` se establece como la formulación predeterminada en el módulo de sólidos.
+#### 4. Diagnóstico Físico-Mecánico Detallado
+
+1. **Cinemática y Convergencia de Tetraedros Cuadráticos (C3D10):**
+   * Capturan la flexión pura libre de bloqueo numérico (*shear locking*).
+   * La flecha vertical converge monótonamente desde $-0.1989\text{ mm}$ (densidad 3) hasta $-0.1995\text{ mm}$ (densidad 4), virtualmente coincidente con la teoría clásica.
+   * **Puntos de Integración Numérica (Gauss):** Los valores de $50.05\text{ a }53.85\text{ MPa}$ reportados por CalculiX CCX corresponden a los puntos de Gauss internos ($y \approx 4.2\text{ a }4.5\text{ mm}$ en vez de la fibra externa de $5.0\text{ mm}$). La tensión flectora teórica a esa profundidad es:
+     $$\sigma(y = 4.4\text{ mm}) = 60.00 \times \left(\frac{4.4}{5.0}\right) = 52.80\text{ MPa}$$
+     Lo cual coincide de forma idéntica con el valor $S_{xx} = -52.80\text{ MPa}$ registrado en el Reporte (3)_2.
+
+2. **Precisión Cinemática y Singularidad de Empotramiento 3D en Hexaedros (C3D20):**
+   * Con $7\,455$ nodos y $1\,512$ hexaedros cuadráticos, la deflexión total registrada es de $0.2005\text{ mm}$ ($U_y = -0.19997\text{ mm}$), situándose con exactitud milimétrica entre la predicción de Euler-Bernoulli ($0.2000\text{ mm}$) y la elástica de Timoshenko ($0.2016\text{ mm}$).
+   * **Pico Tensional de $503.75\text{ MPa}$ (Efecto de Poisson y Restricción Rígida):** No representa una falla física de la viga sino una singularidad matemática clásica en mecánica de medios continuos 3D. Al restringir $U_x = U_y = U_z = 0$ rígidamente en la cara plana empotrada, se bloquea la contracción transversal natural por efecto Poisson ($\nu = 0.3$). En elementos hexaédricos de 20 nodos, esto genera un estado triaxial extremo en esquinas y aristas ($S_{xx} = 303.94\text{ MPa}, S_{yy} = -208.19\text{ MPa}$). Conforme establece el **Principio de Saint-Venant**, a una distancia $x \ge h/2 = 5\text{ mm}$ del empotramiento, el campo tensional recupera uniformemente el valor nominal de $60.00\text{ MPa}$.
+
+3. **Criterio de Ingeniería para el Reporte PDF:**
+   * Para dimensionamiento por tensiones en mallas de segundo orden, se debe considerar el valor medio o linealizado a una distancia equivalente a la semialtura de la viga ($x \ge 5\text{ mm}$) para descartar singularidades de borde en apoyos totalmente rígidos.
+   * `C3D10` se mantiene como la formulación de elección por defecto gracias a su excelente balance entre exactitud cinemática, robustez ante singularidades de contorno y velocidad de mallado automático.
 
 ---
 
