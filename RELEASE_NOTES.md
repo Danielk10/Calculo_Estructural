@@ -1,11 +1,11 @@
 # 📦 Notas de Versión
-## Structural Analysis FEA 3D (`com.diamon.civil`) — Versión v0.3.0 (Build 3)
+## Structural Analysis FEA 3D (`com.diamon.civil`) — Versión Alfa 0.3.0 (Build 3)
 
 ---
 
-### 🌟 Resumen Ejecutivo de la Versión v0.3.0
+### 🌟 Resumen Ejecutivo de la Versión Alfa 0.3.0
 
-La versión **v0.3.0 (Build 3)** representa un hito fundamental en el desarrollo de **Structural Analysis FEA 3D**, transformando la consola técnica en un entorno de ingeniería computacional y scripting de primer nivel para dispositivos móviles. Se introduce soporte completo para **scripts paramétricos en Tcl 8.6**, modelado de sólidos 3D headless con **OpenCASCADE (`draw` / `DRAWEXE`)**, control exhaustivo del mallador **Gmsh** mediante banderas avanzadas, ejecución directa del solver **CalculiX CCX 2.23**, herramientas de creación y edición de archivos en el dispositivo (`echo > / >>`), una **Guía Maestra Paso a Paso** de 9 capítulos, y certificación científica automatizada de punta a punta con $0.0000\%$ de error analítico. Adicionalmente, se perfecciona la interfaz de usuario con la reubicación fija del menú de licencias, la unificación del prompt del sistema en inglés y la optimización de los textos de entrada para pantallas compactas.
+La versión **Alfa 0.3.0 (Build 3)** representa un hito fundamental en el desarrollo de **Structural Analysis FEA 3D**, transformando la consola técnica en un entorno de ingeniería computacional y scripting de primer nivel para dispositivos móviles. Se introduce soporte completo para **scripts paramétricos en Tcl 8.6**, modelado de sólidos 3D headless con **OpenCASCADE (`draw` / `DRAWEXE`)**, control exhaustivo del mallador **Gmsh** mediante banderas avanzadas, ejecución directa del solver **CalculiX CCX 2.23**, herramientas de creación y edición de archivos en el dispositivo (`echo > / >>`), una **Guía Maestra Paso a Paso** de 9 capítulos, y certificación científica automatizada de punta a punta con $0.0000\%$ de error analítico. Adicionalmente, se perfecciona la interfaz de usuario con la reubicación fija del menú de licencias, la unificación del prompt del sistema en inglés y la optimización de los textos de entrada para pantallas compactas.
 
 ---
 
