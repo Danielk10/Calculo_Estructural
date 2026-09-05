@@ -250,12 +250,31 @@ public class SolidFragment extends Fragment {
         }
     }
 
+    public boolean isHyperExtremeSupported() {
+        if (getContext() == null) return false;
+        try {
+            android.app.ActivityManager am = (android.app.ActivityManager) getContext().getSystemService(android.content.Context.ACTIVITY_SERVICE);
+            if (am == null) return false;
+            android.app.ActivityManager.MemoryInfo mi = new android.app.ActivityManager.MemoryInfo();
+            am.getMemoryInfo(mi);
+            // 10 GB threshold qualifies high-end devices with 12 GB, 16 GB, or 24 GB of physical RAM
+            return mi.totalMem >= 10L * 1024L * 1024L * 1024L;
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+
     private void setupMeshDensitySlider() {
         if (binding == null) return;
         updateMeshDensityLabel(binding.seekbarMeshDensity.getProgress());
         binding.seekbarMeshDensity.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
+                if (progress >= 6 && fromUser && !isHyperExtremeSupported()) {
+                    seekBar.setProgress(5);
+                    Toast.makeText(getContext(), R.string.toast_hyper_extreme_unsupported, Toast.LENGTH_LONG).show();
+                    return;
+                }
                 updateMeshDensityLabel(progress);
             }
             @Override
@@ -288,6 +307,9 @@ public class SolidFragment extends Fragment {
             case 6:
                 desc = getString(R.string.density_hyper_fine);
                 break;
+            case 7:
+                desc = getString(R.string.density_hyper_extreme);
+                break;
             default:
                 desc = "";
                 break;
@@ -317,7 +339,7 @@ public class SolidFragment extends Fragment {
 
     private void loadDefaultTestCase() {
         if (binding == null) return;
-        binding.seekbarMeshDensity.setProgress(2); // Level 3 / 6 (Medium - ~20mm)
+        binding.seekbarMeshDensity.setProgress(2); // Level 3 / 7 (Medium - ~20mm)
         binding.spinnerElementType.setSelection(4); // 2nd-Order C3D10 Quadratic default (físicamente exacto para flexión sin shear locking)
         if (materialDatabase != null && !materialDatabase.getMaterials().isEmpty()) {
             binding.spinnerMaterialSolid.setSelection(0);

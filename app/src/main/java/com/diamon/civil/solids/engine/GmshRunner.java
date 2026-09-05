@@ -20,8 +20,8 @@ public class GmshRunner {
 
     private static final String TAG = "GmshRunner";
 
-    /** Density slider mapping: 1 (coarse) to 6 (hyper-fine). Calibrated for stable mobile FEA and monotonic refinement. */
-    private static final double[] CLMAX_VALUES = {50.0, 25.0, 15.0, 8.0, 5.0, 5.0};
+    /** Density slider mapping: 1 (coarse) to 7 (hyper-extreme). Calibrated for stable mobile FEA and monotonic refinement. */
+    private static final double[] CLMAX_VALUES = {50.0, 25.0, 15.0, 8.0, 5.0, 5.0, 5.0};
 
     private final File workDir;
     private final File nativeLibDir;
@@ -43,7 +43,7 @@ public class GmshRunner {
      * Meshes an input CAD file asynchronously.
      *
      * @param inputFile  Source CAD file (STL / STEP / IGES / GEO)
-     * @param meshDensity 1–6: 1 = coarse (~50 mm), 6 = hyper-fine (~2.5 mm)
+     * @param meshDensity 1–7: 1 = coarse (~50 mm), 7 = hyper-extreme (~1.5 mm, absolute precision)
      * @param callback   Called on the calling thread pool when done
      */
     public void meshAsync(File inputFile, int meshDensity, GmshCallback callback) {
@@ -98,9 +98,9 @@ public class GmshRunner {
             return "Error: Gmsh binary not found in " + nativeLibDir.getAbsolutePath();
         }
 
-        double clmax = CLMAX_VALUES[Math.max(0, Math.min(5, meshDensity - 1))];
-        double[] sizeFactors = {2.0, 1.5, 1.0, 0.75, 0.55, 0.25};
-        double meshFactor = sizeFactors[Math.max(0, Math.min(5, meshDensity - 1))];
+        double clmax = CLMAX_VALUES[Math.max(0, Math.min(6, meshDensity - 1))];
+        double[] sizeFactors = {2.0, 1.5, 1.0, 0.75, 0.55, 0.25, 0.18};
+        double meshFactor = sizeFactors[Math.max(0, Math.min(6, meshDensity - 1))];
 
         boolean is2ndOrder = elementType != null && (elementType.contains("C3D10") || elementType.contains("C3D20") || elementType.contains("C3D15") || elementType.contains("2nd-Order") || elementType.contains("2do-Orden") || elementType.contains("Quadratic") || elementType.contains("Cuadrático"));
         boolean isHex = elementType != null && (elementType.contains("C3D8") || elementType.contains("C3D20") || elementType.contains("Hexahedron") || elementType.contains("Hexaedro"));
@@ -332,7 +332,7 @@ public class GmshRunner {
         int availableCores = Runtime.getRuntime().availableProcessors();
         String threadsStr = String.valueOf(availableCores);
         env.put("OMP_NUM_THREADS", threadsStr);
-        env.put("OMP_STACKSIZE", "64M");
+        env.put("OMP_STACKSIZE", "128M");
 
         File usrLib = filesDir != null ? new File(filesDir, "usr/lib") : null;
         File usrBin = filesDir != null ? new File(filesDir, "usr/bin") : null;

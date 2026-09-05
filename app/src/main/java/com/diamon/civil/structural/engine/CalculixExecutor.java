@@ -178,7 +178,7 @@ public class CalculixExecutor {
             String threadsStr = String.valueOf(threadsToUse);
 
             env.put("OMP_NUM_THREADS", threadsStr);
-            env.put("OMP_STACKSIZE", "64M");
+            env.put("OMP_STACKSIZE", "128M");
             env.put("CCX_NPROC_EQUATION_SOLVER", threadsStr);
 
             File usrLib = filesDir != null ? new File(filesDir, "usr/lib") : null;

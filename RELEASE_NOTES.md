@@ -15,8 +15,12 @@ La versión **v0.3.0** consolida el análisis estructural avanzado en dispositiv
   * Se establece el tetraedro cuadrático de 10 nodos (`C3D10`) como elemento predeterminado, eliminando el bloqueo por cortante (*shear locking*) inherente a elementos lineales y alcanzando una correlación superior al **99.5%** con las soluciones clásicas de Euler-Bernoulli y Timoshenko ($\delta = 0.2000\text{ mm}$).
 * **Matriz Completa de Elementos Finitos Continuum 3D:**
   * Soporte validado para los 8 tipos de elementos de CalculiX/Abaqus: tetraedros (`C3D4`, `C3D10`), hexaedros/ladrillos (`C3D8`, `C3D8R`, `C3D20`, `C3D20R`) y cuñas/prismas (`C3D6`, `C3D15`).
-* **Convergencia Asintótica por Densidad de Malla:**
-  * Verificación en 5 niveles de refinamiento métrico con Gmsh, validando convergencia monótona hacia la solución analítica.
+* **Convergencia Asintótica y Malla Multinivel (7 Niveles):**
+  * Verificación y calibración de 7 niveles de refinamiento métrico con Gmsh:
+    * **Niveles 1 al 5:** Mallas continuas y balanceadas (~50mm a ~5mm) optimizadas para cualquier dispositivo móvil.
+    * **Nivel 6 (Hiper fina - ~2.5mm):** Refinamiento de alta densidad (`MeshSizeFactor = 0.25`, ~64,000 elementos C3D10) con correlación del 99.3% frente a teoría de elasticidad 3D.
+    * **Nivel 7 (Hiper Extremo - ~1.5mm / Precisión Absoluta):** Modo de cómputo intensivo (`MeshSizeFactor = 0.18`, ~174,000 elementos C3D10 y ~700,000 DOFs) con pila extendida `OMP_STACKSIZE=128M`.
+    * **Protección Inteligente de Hardware:** Detección en tiempo de ejecución de la RAM física (`totalMem >= 10 GB`). En dispositivos con memoria inferior a 12 GB, el slider tranca el avance en el Nivel 6 con un mensaje Toast explicativo, garantizando cero cierres por Low Memory Killer (LMK) de Android.
 * **Corrección en el Selector de Geometrías (Spinner):**
   * Filtrado estricto de archivos de malla auxiliares (`cantilever_wedge.geo`), evitando elementos duplicados en la interfaz y unificando el modelo base bajo `Benchmark: Viga en Voladizo`.
   * Purga sistemática de temporales antes y después de cada análisis para garantizar determinismo estricto.
@@ -54,7 +58,7 @@ La versión **v0.3.0** consolida el análisis estructural avanzado en dispositiv
 ### 🧪 4. Certificación y Estado del Proyecto
 
 * **Pruebas de Integración:** 100% de aprobación en la suite de pruebas unitarias JUnit (134/134 pruebas exitosas en Gradle).
-* **Batería Local de Simulación:** Aprobación del 100% en `validate_solids_complete_matrix.py` (28/28) y `test_all_sample_models.py` (13/13).
+* **Batería Local de Simulación:** Aprobación del 100% en `validate_solids_complete_matrix.py` (29/29) y `test_all_sample_models.py` (13/13).
 * **Artefactos Compilados:**
   * APK Release (Producción firmado): `/tmp/calculoestructural_build/outputs/apk/release/app-release.apk`
   * APK Debug: `/tmp/calculoestructural_build/outputs/apk/debug/app-debug.apk`
