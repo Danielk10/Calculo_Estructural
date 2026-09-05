@@ -224,6 +224,9 @@ public class GmshRunner {
         meshOpts.append(" Mesh.SaveGroupsOfNodes=1; Mesh.SaveGroupsOfElements=1;");
         
         command.add(meshOpts.toString());
+        int availableCores = Runtime.getRuntime().availableProcessors();
+        command.add("-nt");
+        command.add(String.valueOf(availableCores));
         command.add("-3");                         // 3D mesh
         command.add("-clmax");
         command.add(String.valueOf(clmax));
@@ -326,6 +329,11 @@ public class GmshRunner {
     }
 
     private void setupEnvironment(Map<String, String> env) {
+        int availableCores = Runtime.getRuntime().availableProcessors();
+        String threadsStr = String.valueOf(availableCores);
+        env.put("OMP_NUM_THREADS", threadsStr);
+        env.put("OMP_STACKSIZE", "64M");
+
         File usrLib = filesDir != null ? new File(filesDir, "usr/lib") : null;
         File usrBin = filesDir != null ? new File(filesDir, "usr/bin") : null;
 

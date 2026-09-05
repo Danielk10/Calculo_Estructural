@@ -288,7 +288,7 @@ public class SolidPDFReportGenerator {
                             inStress = false;
                             continue;
                         }
-                        if (lower.contains("stresses (elem, integ.pnt.,sxx,syy,szz,sxy,sxz,syz)")) {
+                        if (lower.contains("stresses (elem, integ.pnt")) {
                             inStress = true;
                             inDisp = false;
                             continue;
