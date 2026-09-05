@@ -33,7 +33,7 @@ public class SolidInpAssembler {
         }
 
         // 1. Parse all node coordinates
-        Map<Integer, double[]> nodeCoords = new HashMap<>();
+        Map<Integer, double[]> nodeCoords = new TreeMap<>();
         boolean inNodeBlock = false;
         for (String line : lines) {
             String u = line.trim().toUpperCase(Locale.US);
@@ -475,7 +475,9 @@ public class SolidInpAssembler {
             sorted.sort((e1, e2) -> {
                 double v1 = e1.getValue()[chosenAxis];
                 double v2 = e2.getValue()[chosenAxis];
-                return wantMin ? Double.compare(v1, v2) : Double.compare(v2, v1);
+                int cmp = wantMin ? Double.compare(v1, v2) : Double.compare(v2, v1);
+                if (cmp != 0) return cmp;
+                return Integer.compare(e1.getKey(), e2.getKey());
             });
             int count = Math.min(4, Math.max(1, sorted.size() / 2));
             for (int i = 0; i < count; i++) {

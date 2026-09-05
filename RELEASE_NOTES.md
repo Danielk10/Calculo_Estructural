@@ -1,39 +1,4 @@
 # 📦 Notas de Versión
-## Structural Analysis FEA 3D (`com.diamon.civil`) — Versión v0.4.0 (Build 4)
-
----
-
-### 🌟 Resumen Ejecutivo de la Versión v0.4.0
-
-La versión **v0.4.0 (Build 4)** incorpora dos grandes avances en la suite de ingeniería de **Structural Analysis FEA 3D**:
-1. **Estabilidad y Consistencia Determinista en el Módulo de Sólidos 3D:** Se erradicó por completo la incoherencia en cálculos de corridas consecutivas sobre mallas finas, resolviendo la fuga de estado por apertura acumulativa en `spooles.out` del solver SPOOLES de CalculiX y eliminando el sesgo de colinealidad de nodos en el algoritmo de fijación cinemática de `SolidInpAssembler`.
-2. **Nuevo Editor de Texto de Consola `featext` en la Terminal:** Incorporación de un editor de texto interactivo para consola inspirado en Nano, con **resaltado de sintaxis en tiempo real** para decks Abaqus/CalculiX (`.inp`), scripts CAD OpenCASCADE/Tcl (`.tcl`) y mallas Gmsh (`.geo`). El texto cuenta con ajuste automático de línea (Word Wrap) para evitar el corte horizontal en pantallas táctiles, barra de estado de posición/guardado, y una **barra de herramientas rediseñada con `HorizontalScrollView`** y botones uniformes de navegación, portapapeles, edición y guardado directo.
-
----
-
-### 🛠️ Correcciones y Novedades de la Versión v0.4.0
-
-#### 1. 🔬 Determinismo Matemático y Limpieza Exhaustiva en Sólidos 3D
-* **Purga Automática de Residuos del Solver SPOOLES:** Se detectó que el solver de ecuaciones lineales abre `spooles.out` en modo append (`"a"`). Si no se limpiaba entre corridas, acumulaba factores simbólicos y de permutación de análisis previos. Se introdujo una limpieza exhaustiva previa y posterior a la ejecución en `CalculixExecutor` y `SolidFragment` que elimina `spooles.out`, `spooles.log`, `intpoints.out`, `temporaryrestartfile`, `*.geo_unrolled` y opciones temporales de Gmsh, protegiendo estrictamente las fuentes CAD de usuario, reportes PDF y el archivo GLB visualizado activamente.
-* **Muestreo Cinemático Estratificado en Mallas Finas:** En mallas tetraédricas densas, Gmsh numera primero los nodos de aristas de contorno antes que los nodos interiores de las caras. El algoritmo anterior tomaba los primeros 20 nodos consecutivos de un `TreeSet`, los cuales resultaban colineales sobre una sola arista; esto provocaba que el ensanchamiento adaptativo de tolerancia capturara nodos internos de la pieza, hiperrestringiéndola artificialmente y alterando las deformaciones. Se rediseñó el muestreo estratificado a lo largo de todo el conjunto con detección del par de máxima distancia euclidiana.
-* **Soporte Robusto de Geometrías Curvas y Primitivas (Esferas y Cilindros):** Asignación adaptativa de anillos de soporte no colineales para vértices curvos sin aristas filosas, garantizando que tanto los apoyos fijos como las cargas conserven nodos independientes válidos sin fallar en el ensamble.
-
-#### 2. 📝 Editor de Texto de Consola `featext` Integrado
-* **Comando Nativo en la Terminal:** Invocable desde la línea de comandos (`featext [archivo.inp]`) o mediante el botón dedicado en la barra de herramientas.
-* **Resaltado de Sintaxis Dinámico:**
-  * **CalculiX / Abaqus (`.inp`):** Resaltado en cian brillante para palabras clave (`*NODE`, `*ELEMENT`, `*STEP`, `*MATERIAL`), amarillo para parámetros (`TYPE=`, `NSET=`), pizarra para comentarios (`**`) y lila para valores numéricos.
-  * **OpenCASCADE DRAWEXE & Tcl (`.tcl`):** Resaltado de directivas de control (`proc`, `set`, `if`), primitivas y booleanas CAD (`pload`, `box`, `cylinder`, `bcut`, `writebrep`), variables (`$var`), cadenas y comentarios (`#`).
-  * **Gmsh Geometry Scripts (`.geo`):** Identificación de entidades (`Point`, `Line`, `Volume`, `SetFactory`), opciones métricas de malla y comentarios (`//`, `/* */`).
-* **Ajuste de Línea Visual sin Ocultamiento Horizontal:** El búfer de texto ajusta automáticamente las líneas al ancho del dispositivo sin requerir desplazamiento horizontal, facilitando la lectura y edición en pantallas móviles.
-* **Interfaz Nano:** Encabezado con nombre de archivo y estado (`[Guardado]` / `[Modificado]`), pie de página con indicador de cursor (`Ln X, Col Y`) y atajos rápidos.
-
-#### 3. 🧰 Barra de Herramientas de la Terminal Mejorada
-* **Desplazamiento Horizontal Continuo:** Implementación de un `HorizontalScrollView` sin barras visibles idéntico al editor 2D del módulo de cálculo estructural.
-* **Dimensiones y Estilo Homogéneo:** Botones uniformes de `38dp` x `38dp` con iconos vectoriales de Material Design y padding de `7dp`.
-* **Conjunto Coherente de Acciones:** Guardar archivo / exportar reporte (`btnSave`), Alternar editor (`btnEditor`), Copiar (`btnCopyLog`), Pegar (`btnPaste`), Borrar carácter (`btnDelete`), Tabulación de 4 espacios (`btnTab`), Flechas de navegación (Izquierda, Derecha, Arriba, Abajo), Abortar proceso (`btnAbort`) y Cerrar editor (`btnCloseEditor`).
-
----
-
 ## Structural Analysis FEA 3D (`com.diamon.civil`) — Versión v0.3.0 (Build 3)
 
 ---
@@ -82,6 +47,18 @@ Esta actualización incorpora una validación exhaustiva de punta a punta del **
      1. Módulo Estructural: `PDFReportGenerator` (`STRUCTURAL CALCULATION REPORT`).
      2. Módulo de Sólidos 3D: `SolidPDFReportGenerator` (`3D SOLID ANALYSIS REPORT`).
      3. Módulo de Terminal: `TerminalPDFReportGenerator` (`TERMINAL EXECUTION & ANALYSIS REPORT`).
+
+5. **Aceleración Multi-Núcleo Real en CalculiX (`OMP_NUM_THREADS` y `CCX_NPROC_EQUATION_SOLVER`):**
+   * Configuración dinámica que asigna automáticamente todos los núcleos de procesador disponibles en el dispositivo móvil (`Runtime.getRuntime().availableProcessors()`), habilitando paralelismo completo en la descomposición de matrices y cálculo de tensiones de SPOOLES.
+   * Asignación de pila extendida `OMP_STACKSIZE=64M` para garantizar estabilidad ante matrices rígidas extensas.
+
+6. **Prevención Total de Corrupción de Datos y Purga Sistemática de Temporales:**
+   * Eliminación exhaustiva antes y después de cada análisis numérico de archivos residuales del solucionador (`spooles.out`, `spooles.log`, `intpoints.out`, `slavintmortar.out`, `temporaryrestartfile`, `.cvg`, `.sta`, `.12d`, `.fcv`, `.cel`, `.eig`, `.rout`, `.nam`, `.dat`, `.frd`), garantizando 100% de determinismo e independencia entre corridas consecutivas y erradicando inconsistencias numéricas cruzadas.
+   * Preservación estricta de geometrías CAD de entrada (`.step`, `.stp`, `.geo`, `.iges`, `.igs`, `.brep`), decks `.inp` y reportes PDF.
+
+7. **Consistencia Visual en la Terminal y Editor de Código FEA:**
+   * Sustitución del emoji gráfico de disquete por la convención clásica de comandos de terminal: `[^S] Guardar | [^X] Salir | [Tab] Tab | [Del] Borrar`.
+   * Unificación de controles y botones de acción (`btnAbort` y `btnCloseEditor`) con el color verde característico de la terminal (`@color/terminal_green`), manteniendo un tema visual técnico homogéneo.
 
 ---
 
@@ -211,16 +188,3 @@ Esta actualización incorpora una validación exhaustiva de punta a punta del **
 ### 📦 Artefactos Compilados Generados:
 * **Release Signed APK (Producción firmado):** `/tmp/calculoestructural_build/outputs/apk/release/app-release.apk` (185 MB)
 * **Debug Testing APK (Pruebas):** `/tmp/calculoestructural_build/outputs/apk/debug/app-debug.apk` (205 MB)
-
----
-
-### 📜 Historial de Versiones Anteriores
-
-#### Versión v0.2.0 (Build 2)
-* Optimización de permisos en segundo plano en `AndroidManifest.xml` (eliminación de servicios en primer plano innecesarios).
-* Actualización de políticas de privacidad y términos de uso educativo y confiabilidad de resultados de cálculo.
-
-#### Versión Alfa 0.1.0 (Build 1)
-* Lanzamiento inicial de la plataforma con módulo de pórticos 2D/3D, cálculo de losas S4R y muros CPS4.
-* Generación de memorias de cálculo PDF bajo normas AISC 360-22, ACI 318-19 y ASCE 7-22.
-* Integración del solver CalculiX CCX 2.23 con SPOOLES y visualizador 3D SceneView.

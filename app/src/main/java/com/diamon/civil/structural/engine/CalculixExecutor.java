@@ -95,10 +95,22 @@ public class CalculixExecutor {
                 : jobName;
         File inputBase = new File(workDir, baseName);
         if (workDir != null) {
-            File spoolesOut = new File(workDir, "spooles.out");
-            if (spoolesOut.exists()) spoolesOut.delete();
-            File spoolesLog = new File(workDir, "spooles.log");
-            if (spoolesLog.exists()) spoolesLog.delete();
+            String[] staleExtensions = {
+                ".dat", ".frd", ".sta", ".cvg", ".12d", ".fcv", ".cel",
+                ".eig", ".rout", ".nam"
+            };
+            for (String ext : staleExtensions) {
+                File f = new File(workDir, baseName + ext);
+                if (f.exists()) deleteFileThoroughly(f);
+            }
+            String[] staleSolverFiles = {
+                "spooles.out", "spooles.log", "intpoints.out",
+                "slavintmortar.out", "temporaryrestartfile"
+            };
+            for (String sName : staleSolverFiles) {
+                File f = new File(workDir, sName);
+                if (f.exists()) deleteFileThoroughly(f);
+            }
         }
         return executeBinaryWithStreaming("ccx", listener, null, numThreads, "-i", inputBase.getAbsolutePath());
     }
@@ -278,5 +290,18 @@ public class CalculixExecutor {
 
     public static boolean wasSuccessful(String output) {
         return output != null && output.contains("Exit Code: 0");
+    }
+
+    public static void deleteFileThoroughly(File f) {
+        if (f == null || !f.exists()) return;
+        boolean deleted = f.delete();
+        if (!deleted && f.exists()) {
+            try {
+                try (java.io.FileOutputStream fos = new java.io.FileOutputStream(f, false)) {
+                    fos.flush();
+                }
+                f.delete();
+            } catch (Exception ignored) {}
+        }
     }
 }

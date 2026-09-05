@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.Locale;
 import com.diamon.civil.solids.engine.SolidDisplacementFrdParser;
+import com.diamon.civil.structural.engine.CalculixExecutor;
 
 public class SolidInpAssemblerTest {
 
@@ -109,19 +110,10 @@ public class SolidInpAssemblerTest {
         // 4. Assemble the CalculiX input using SolidInpAssembler (will trigger coordinate fallback!)
         SolidInpAssembler.assemble(workDir, "linkrods", "Steel", 210000.0, 0.3, -200.0, "nonexistent_fixed", "nonexistent_load");
 
-        // 5. Execute local system CalculiX solver
-        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "linkrods");
-        pbCcx.directory(workDir);
-        pbCcx.redirectErrorStream(true);
-        Process pCcx = pbCcx.start();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println("CCX OUT: " + line);
-            }
-        }
-        int codeCcx = pCcx.waitFor();
-        assertEquals("CalculiX should exit with 0", 0, codeCcx);
+        // 5. Execute local system CalculiX solver via app's multi-core CalculixExecutor
+        CalculixExecutor executor = new CalculixExecutor(workDir, null, workDir);
+        String ccxResult = executor.executeCalculix("linkrods");
+        assertTrue("CalculiX should exit with 0", CalculixExecutor.wasSuccessful(ccxResult));
 
         // 6. Verify that the results file .frd exists and parses successfully
         File frdFile = new File(workDir, "linkrods.frd");
@@ -169,19 +161,10 @@ public class SolidInpAssemblerTest {
         // 4. Assemble the CalculiX input using SolidInpAssembler (will trigger coordinate fallback!)
         SolidInpAssembler.assemble(workDir, "bracket", "Steel", 210000.0, 0.3, -150.0, "nonexistent_fixed", "nonexistent_load");
 
-        // 5. Execute local system CalculiX solver
-        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "-i", "bracket");
-        pbCcx.directory(workDir);
-        pbCcx.redirectErrorStream(true);
-        Process pCcx = pbCcx.start();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println("CCX BRACKET: " + line);
-            }
-        }
-        int codeCcx = pCcx.waitFor();
-        assertEquals("CalculiX should exit with 0", 0, codeCcx);
+        // 5. Execute local system CalculiX solver via app's multi-core CalculixExecutor
+        CalculixExecutor executor = new CalculixExecutor(workDir, null, workDir);
+        String ccxResult = executor.executeCalculix("bracket");
+        assertTrue("CalculiX should exit with 0", CalculixExecutor.wasSuccessful(ccxResult));
 
         // 6. Verify that the results file .frd exists and parses successfully
         File frdFile = new File(workDir, "bracket.frd");
@@ -257,19 +240,10 @@ public class SolidInpAssemblerTest {
         // 4. Assemble the CalculiX input using SolidInpAssembler (triggers coordinate fallback!)
         SolidInpAssembler.assemble(workDir, "bar", "Steel", 210000.0, 0.3, -300.0, "nonexistent_fixed", "nonexistent_load");
 
-        // 5. Run CalculiX Solver ccx
-        ProcessBuilder pbCcx = new ProcessBuilder("/home/danielpdiamon/.local/bin/ccx", "bar");
-        pbCcx.directory(workDir);
-        pbCcx.redirectErrorStream(true);
-        Process pCcx = pbCcx.start();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println("CCX OUT: " + line);
-            }
-        }
-        int codeCcx = pCcx.waitFor();
-        assertEquals("CalculiX should exit with 0", 0, codeCcx);
+        // 5. Run CalculiX Solver ccx via app's multi-core CalculixExecutor
+        CalculixExecutor executor = new CalculixExecutor(workDir, null, workDir);
+        String ccxResult = executor.executeCalculix("bar");
+        assertTrue("CalculiX should exit with 0", CalculixExecutor.wasSuccessful(ccxResult));
 
         // 6. Verify .frd exists and parse results
         File frdFile = new File(workDir, "bar.frd");
@@ -468,28 +442,69 @@ public class SolidInpAssemblerTest {
         assertTrue("Clean INP should exist for " + elemType, cleanInp.exists());
         assertTrue("Final INP should exist for " + elemType, finalInp.exists());
         
-        // 4. Solve with CalculiX
-        File ccxBin = new File("/home/danielpdiamon/.local/bin/ccx");
-        if (!ccxBin.exists()) ccxBin = new File("/usr/bin/ccx");
-        ProcessBuilder pbCcx = new ProcessBuilder(ccxBin.getAbsolutePath(), "job");
-        pbCcx.directory(workDir);
-        pbCcx.redirectErrorStream(true);
-        Process pCcx = pbCcx.start();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
-            while (reader.readLine() != null) {}
-        }
-        int codeCcx = pCcx.waitFor();
-        assertEquals("CalculiX solving for " + elemType + " should succeed with code 0", 0, codeCcx);
+        // 4. Solve with the app's CalculixExecutor (verifies multi-core execution with all CPU cores and automatic stale file cleanup)
+        CalculixExecutor executor = new CalculixExecutor(workDir, null, workDir);
+        int cores = Runtime.getRuntime().availableProcessors();
+        String ccxResult = executor.executeCalculix("job");
+        System.out.println("Multi-Core CalculiX (" + cores + " cores) Output for " + elemType + ":\n" + ccxResult);
+        assertTrue("CalculiX solving for " + elemType + " with " + cores + " cores should succeed (Exit Code 0)",
+                   CalculixExecutor.wasSuccessful(ccxResult));
         
         // 5. Verify results .frd and .dat
         File frdFile = new File(workDir, "job.frd");
         File datFile = new File(workDir, "job.dat");
-        assertTrue(".frd file should exist for " + elemType, frdFile.exists());
-        assertTrue(".dat file should exist for " + elemType, datFile.exists());
+        assertTrue(".frd file should exist for " + elemType, frdFile.exists() && frdFile.length() > 0);
+        assertTrue(".dat file should exist for " + elemType, datFile.exists() && datFile.length() > 0);
         
         String summary = SolidDisplacementFrdParser.parseAndSummarize(frdFile);
         assertNotNull("FRD summary should not be null for " + elemType, summary);
         assertTrue("Displacements should be extracted for " + elemType, summary.contains("Nodes with displacement"));
+
+        // 6. Verify physical realism from .dat file (non-zero, non-NaN displacement and stress)
+        double maxUy = 0.0;
+        double maxStress = 0.0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(datFile))) {
+            String line;
+            boolean inDisp = false;
+            boolean inStress = false;
+            while ((line = reader.readLine()) != null) {
+                String trimmed = line.trim();
+                if (trimmed.isEmpty()) continue;
+                String lower = trimmed.toLowerCase(Locale.US);
+                if (lower.contains("displacements (vx,vy,vz)")) {
+                    inDisp = true; inStress = false; continue;
+                }
+                if (lower.contains("stresses (elem, integ.pnt.")) {
+                    inStress = true; inDisp = false; continue;
+                }
+                if (inDisp) {
+                    String[] parts = trimmed.split("\\s+");
+                    if (parts.length >= 4 && Character.isDigit(parts[0].charAt(0))) {
+                        try {
+                            double uy = Double.parseDouble(parts[2].replace('D', 'E'));
+                            if (Math.abs(uy) > Math.abs(maxUy)) maxUy = uy;
+                        } catch (NumberFormatException ignore) {}
+                    }
+                } else if (inStress) {
+                    String[] parts = trimmed.split("\\s+");
+                    if (parts.length >= 8 && Character.isDigit(parts[0].charAt(0))) {
+                        try {
+                            double sxx = Double.parseDouble(parts[2].replace('D', 'E'));
+                            double syy = Double.parseDouble(parts[3].replace('D', 'E'));
+                            double szz = Double.parseDouble(parts[4].replace('D', 'E'));
+                            double sxy = Double.parseDouble(parts[5].replace('D', 'E'));
+                            double sxz = Double.parseDouble(parts[6].replace('D', 'E'));
+                            double syz = Double.parseDouble(parts[7].replace('D', 'E'));
+                            double vm = Math.sqrt(0.5 * (Math.pow(sxx-syy, 2) + Math.pow(syy-szz, 2) + Math.pow(szz-sxx, 2) + 6*(sxy*sxy + syz*syz + sxz*sxz)));
+                            if (vm > maxStress) maxStress = vm;
+                        } catch (NumberFormatException ignore) {}
+                    }
+                }
+            }
+        }
+        System.out.println("[" + elemType + "] Solved Max Deflection: " + Math.abs(maxUy) + " mm | Max von Mises Stress: " + maxStress + " MPa");
+        assertTrue("Max displacement must be non-zero and non-NaN for " + elemType, Math.abs(maxUy) > 0.0 && !Double.isNaN(maxUy));
+        assertTrue("Max stress must be non-zero and non-NaN for " + elemType, maxStress > 0.0 && !Double.isNaN(maxStress));
     }
 
     @Test
@@ -554,14 +569,9 @@ public class SolidInpAssemblerTest {
 
         SolidInpAssembler.assemble(workDir, "job", "Structural Steel A36", 200000.0, 0.3, -100.0, 2, "Fixed", "Loaded", "C3D10");
 
-        File ccxBin = new File("/home/danielpdiamon/.local/bin/ccx");
-        if (!ccxBin.exists()) ccxBin = new File("/usr/bin/ccx");
-        ProcessBuilder pbCcx = new ProcessBuilder(ccxBin.getAbsolutePath(), "job");
-        pbCcx.directory(workDir);
-        pbCcx.redirectErrorStream(true);
-        Process pCcx = pbCcx.start();
-        int codeCcx = pCcx.waitFor();
-        assertEquals("CalculiX solving should succeed with code 0", 0, codeCcx);
+        CalculixExecutor executor = new CalculixExecutor(workDir, null, workDir);
+        String ccxResult = executor.executeCalculix("job");
+        assertTrue("CalculiX solving should succeed with code 0", CalculixExecutor.wasSuccessful(ccxResult));
 
         File datFile = new File(workDir, "job.dat");
         assertTrue("job.dat should exist", datFile.exists());
@@ -712,23 +722,9 @@ public class SolidInpAssemblerTest {
             // Test coordinate fallback selection on fine mesh (Left End Face / Right End Face)
             SolidInpAssembler.assemble(workDir, "job_solid", "Structural Steel A36", 200000.0, 0.3, -100.0, 2, "Left End Face (X- Min)", "Right End Face (X+ Max)", "2nd-Order: C3D10 (10-Node Quadratic Tetrahedron)");
 
-            File ccxBin = new File("/home/danielpdiamon/.local/bin/ccx");
-            if (!ccxBin.exists()) ccxBin = new File("/usr/bin/ccx");
-            ProcessBuilder pbCcx = new ProcessBuilder(ccxBin.getAbsolutePath(), "job_solid");
-            pbCcx.directory(workDir);
-            pbCcx.redirectErrorStream(true);
-            Map<String, String> env = pbCcx.environment();
-            int cores = Runtime.getRuntime().availableProcessors();
-            env.put("OMP_NUM_THREADS", String.valueOf(cores));
-            env.put("OMP_STACKSIZE", "64M");
-            env.put("CCX_NPROC_EQUATION_SOLVER", String.valueOf(cores));
-
-            Process pCcx = pbCcx.start();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
-                while (reader.readLine() != null) {}
-            }
-            int codeCcx = pCcx.waitFor();
-            assertEquals("CalculiX solving should succeed on run " + run, 0, codeCcx);
+            CalculixExecutor executor = new CalculixExecutor(workDir, null, workDir);
+            String ccxResult = executor.executeCalculix("job_solid");
+            assertTrue("CalculiX multi-core solve should succeed on run " + run, CalculixExecutor.wasSuccessful(ccxResult));
 
             File datFile = new File(workDir, "job_solid.dat");
             assertTrue("job_solid.dat should exist on run " + run, datFile.exists());
@@ -795,21 +791,268 @@ public class SolidInpAssemblerTest {
         File nsetsInp = new File(workDir, "nsets.inp");
         assertTrue("nsets.inp should exist", nsetsInp.exists());
 
-        // Solve with CalculiX
-        File ccxBin = new File("/home/danielpdiamon/.local/bin/ccx");
-        if (!ccxBin.exists()) ccxBin = new File("/usr/bin/ccx");
-        ProcessBuilder pbCcx = new ProcessBuilder(ccxBin.getAbsolutePath(), "job_solid");
-        pbCcx.directory(workDir);
-        pbCcx.redirectErrorStream(true);
-        Process pCcx = pbCcx.start();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(pCcx.getInputStream()))) {
-            while (reader.readLine() != null) {}
-        }
-        int codeCcx = pCcx.waitFor();
-        assertEquals("CalculiX solving for sphere should succeed with code 0", 0, codeCcx);
+        // Solve with app's multi-core CalculixExecutor
+        CalculixExecutor executor = new CalculixExecutor(workDir, null, workDir);
+        String ccxResult = executor.executeCalculix("job_solid");
+        assertTrue("CalculiX solving for sphere should succeed with code 0", CalculixExecutor.wasSuccessful(ccxResult));
 
         File frdFile = new File(workDir, "job_solid.frd");
         assertTrue("Results .frd file should exist for sphere", frdFile.exists() && frdFile.length() > 0);
+    }
+
+    @Test
+    public void testConsecutiveRunsAlternatingGeometriesDeterminism() throws Exception {
+        File workDir = tempFolder.newFolder("work_alternating");
+        File cantGeo = SampleSimulationCase.createCantileverGeo(workDir);
+
+        File sphereGeo = new File(workDir, "sphere.geo");
+        try (PrintWriter pw = new PrintWriter(new FileWriter(sphereGeo))) {
+            pw.write("SetFactory(\"OpenCASCADE\");\nSphere(1) = {0, 0, 0, 5};\nPhysical Volume(\"SOLID_VOLUME\", 1) = {1};\n");
+        }
+
+        File boxGeo = new File(workDir, "box.geo");
+        try (PrintWriter pw = new PrintWriter(new FileWriter(boxGeo))) {
+            pw.write("SetFactory(\"OpenCASCADE\");\nBox(1) = {0, 0, 0, 10, 10, 10};\nPhysical Volume(\"SOLID_VOLUME\", 1) = {1};\n");
+        }
+
+        CalculixExecutor executor = new CalculixExecutor(workDir, null, workDir);
+        File[] geos = {cantGeo, sphereGeo, boxGeo, cantGeo, sphereGeo};
+        double firstCantileverUy = 0.0;
+
+        for (int i = 0; i < geos.length; i++) {
+            File activeGeo = geos[i];
+            String geoName = activeGeo.getName();
+
+            // Perform workspace cleanup matching SolidFragment
+            File[] files = workDir.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    if (f.isDirectory()) continue;
+                    String lower = f.getName().toLowerCase(Locale.US);
+                    boolean isSourceCad = (lower.endsWith(".step") || lower.endsWith(".stp") ||
+                            (lower.endsWith(".geo") && !lower.endsWith(".geo_unrolled") && !lower.equals("gmsh_cad_driver.geo")) ||
+                            lower.endsWith(".iges") || lower.endsWith(".igs") ||
+                            (lower.endsWith(".brep") && !lower.endsWith("_sewn.brep")) ||
+                            (lower.endsWith(".inp") && !lower.startsWith("job_solid") && !lower.startsWith("nsets")));
+                    if (isSourceCad || lower.endsWith(".pdf")) continue;
+                    CalculixExecutor.deleteFileThoroughly(f);
+                }
+            }
+
+            File rawInp = new File(workDir, "job_solid_raw.inp");
+            ProcessBuilder pbGmsh = new ProcessBuilder(
+                    "gmsh", activeGeo.getAbsolutePath(),
+                    "-3", "-clmax", "15.0",
+                    "-o", rawInp.getAbsolutePath(),
+                    "-format", "inp",
+                    "-v", "0"
+            );
+            pbGmsh.directory(workDir);
+            pbGmsh.redirectErrorStream(true);
+            Process pGmsh = pbGmsh.start();
+            int codeGmsh = pGmsh.waitFor();
+            assertEquals("Gmsh meshing should succeed for " + geoName + " (iteration " + i + ")", 0, codeGmsh);
+
+            SolidInpAssembler.assemble(workDir, "job_solid", "Structural Steel A36", 200000.0, 0.3, -100.0, 2, "AUTO", "AUTO", "C3D4");
+
+            // Solve using CalculixExecutor with cleanup & deterministic solver settings
+            String ccxResult = executor.executeCalculix("job_solid");
+            assertTrue("CalculiX must succeed for " + geoName + " (iteration " + i + ")", CalculixExecutor.wasSuccessful(ccxResult));
+
+            File datFile = new File(workDir, "job_solid.dat");
+            File frdFile = new File(workDir, "job_solid.frd");
+            assertTrue("dat file must exist for " + geoName + " (iteration " + i + ")", datFile.exists() && datFile.length() > 0);
+            assertTrue("frd file must exist for " + geoName + " (iteration " + i + ")", frdFile.exists() && frdFile.length() > 0);
+
+            // Read maximum displacement
+            double maxUy = 0.0;
+            try (BufferedReader reader = new BufferedReader(new FileReader(datFile))) {
+                String line;
+                boolean inDisp = false;
+                while ((line = reader.readLine()) != null) {
+                    String trimmed = line.trim();
+                    if (trimmed.toLowerCase(Locale.US).contains("displacements (vx,vy,vz)")) {
+                        inDisp = true; continue;
+                    }
+                    if (trimmed.toLowerCase(Locale.US).contains("stresses (elem, integ.pnt.")) {
+                        inDisp = false; continue;
+                    }
+                    if (inDisp) {
+                        String[] parts = trimmed.split("\\s+");
+                        if (parts.length >= 4 && Character.isDigit(parts[0].charAt(0))) {
+                            try {
+                                double uy = Double.parseDouble(parts[2].replace('D', 'E'));
+                                if (Math.abs(uy) > Math.abs(maxUy)) maxUy = uy;
+                            } catch (NumberFormatException ignore) {}
+                        }
+                    }
+                }
+            }
+
+            assertTrue("Max Uy must be non-zero and non-NaN for " + geoName + " (iteration " + i + ")", Math.abs(maxUy) > 0.0 && !Double.isNaN(maxUy));
+            System.out.println("Iteration " + i + " (" + geoName + ") Max Uy: " + maxUy);
+
+            if (i == 0) {
+                firstCantileverUy = maxUy;
+            } else if (i == 3) {
+                assertEquals("Cantilever run 2 must match cantilever run 1 exactly", firstCantileverUy, maxUy, 1e-6);
+            }
+        }
+    }
+
+    @Test
+    public void testAllSupportedElementsSequentialMultiCoreDeterministic() throws Exception {
+        File workDir = tempFolder.newFolder("work_all_elements_multi_core");
+
+        // Prepare standard cantilever geometry
+        File cantGeo = SampleSimulationCase.createCantileverGeo(workDir);
+
+        // Prepare wedge geometry
+        File wedgeGeo = new File(workDir, "cantilever_wedge.geo");
+        String wedgeScript = "Point(1) = {0, 0, 0, 5.0};\n" +
+                "Point(2) = {0, 10, 0, 5.0};\n" +
+                "Point(3) = {0, 10, 10, 5.0};\n" +
+                "Point(4) = {0, 0, 10, 5.0};\n" +
+                "Line(1) = {1, 2};\n" +
+                "Line(2) = {2, 3};\n" +
+                "Line(3) = {3, 1};\n" +
+                "Line(4) = {1, 3};\n" +
+                "Line(5) = {3, 4};\n" +
+                "Line(6) = {4, 1};\n" +
+                "Line Loop(1) = {1, 2, 3};\n" +
+                "Plane Surface(1) = {1};\n" +
+                "Line Loop(2) = {-3, 5, 6};\n" +
+                "Plane Surface(2) = {2};\n" +
+                "ext1[] = Extrude {100, 0, 0} { Surface{1}; Layers{10}; Recombine; };\n" +
+                "ext2[] = Extrude {100, 0, 0} { Surface{2}; Layers{10}; Recombine; };\n" +
+                "Physical Surface(\"Fixed\") = {1, 2};\n" +
+                "Physical Surface(\"Loaded\") = {ext1[0], ext2[0]};\n" +
+                "Physical Volume(\"Steel\") = {ext1[1], ext2[1]};\n";
+        try (PrintWriter pw = new PrintWriter(new FileWriter(wedgeGeo))) {
+            pw.write(wedgeScript);
+        }
+
+        GmshRunner gmshRunner = new GmshRunner(workDir, workDir);
+        CalculixExecutor executor = new CalculixExecutor(workDir, null, workDir);
+        int availableCores = Runtime.getRuntime().availableProcessors();
+        System.out.println("Running testAllSupportedElementsSequentialMultiCoreDeterministic with " + availableCores + " cores");
+
+        // The 8 official supported solid elements using real localized UI strings plus repeated C3D10 to test determinism
+        String[] elementsToTest = {
+                "1er-Orden: C3D4 (Tetraedro Lineal de 4 Nodos)",
+                "2do-Orden: C3D10 (Tetraedro Cuadrático de 10 Nodos)",
+                "1er-Orden: C3D8 (Hexaedro / Ladrillo Lineal de 8 Nodos)",
+                "1er-Orden: C3D8R (Hexaedro de Integración Reducida de 8 Nodos)",
+                "2do-Orden: C3D20 (Hexaedro / Ladrillo Cuadrático de 20 Nodos)",
+                "2do-Orden: C3D20R (Hexaedro de Integración Reducida de 20 Nodos)",
+                "1er-Orden: C3D6 (Cuña / Prisma Lineal de 6 Nodos)",
+                "2do-Orden: C3D15 (Cuña / Prisma Cuadrático de 15 Nodos)",
+                "2do-Orden: C3D10 (Tetraedro Cuadrático de 10 Nodos)" // Run again after all transitions to assert repeatability
+        };
+
+        double firstC3D10Uy = 0.0;
+        double secondC3D10Uy = 0.0;
+
+        for (int step = 0; step < elementsToTest.length; step++) {
+            String elemType = elementsToTest[step];
+            boolean isWedge = elemType.contains("6") || elemType.contains("15") || elemType.contains("Cuña") || elemType.contains("Prisma");
+            File targetGeo = isWedge ? wedgeGeo : cantGeo;
+
+            // 1. Clean workspace intermediate/stale simulation files (exact logic from SolidFragment)
+            File[] files = workDir.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    if (f.isDirectory()) continue;
+                    String lower = f.getName().toLowerCase(Locale.US);
+                    boolean isSourceCad = (lower.endsWith(".step") || lower.endsWith(".stp") ||
+                            (lower.endsWith(".geo") && !lower.endsWith(".geo_unrolled") && !lower.equals("gmsh_cad_driver.geo")) ||
+                            lower.endsWith(".iges") || lower.endsWith(".igs") ||
+                            (lower.endsWith(".brep") && !lower.endsWith("_sewn.brep")) ||
+                            (lower.endsWith(".inp") && !lower.startsWith("job_solid") && !lower.startsWith("nsets")));
+                    if (isSourceCad || lower.endsWith(".pdf")) continue;
+                    CalculixExecutor.deleteFileThoroughly(f);
+                }
+            }
+
+            // 2. Gmsh meshing via GmshRunner (exact class used by SolidFragment, density 2 default)
+            File rawInp = new File(workDir, "job_solid_raw.inp");
+            String gmshResult = gmshRunner.runGmsh(targetGeo, rawInp, 2, elemType);
+            assertTrue("Gmsh meshing for " + elemType + " (step " + step + ") should succeed",
+                    gmshResult != null && gmshResult.contains("Exit Code: 0") && rawInp.exists() && rawInp.length() > 0);
+
+            // 3. Assemble deck with SolidInpAssembler (exact call from SolidFragment)
+            SolidInpAssembler.assemble(workDir, "job_solid", "Structural Steel A36", 200000.0, 0.3, -100.0, 2, "Auto / Superficie Física (Fija / Eje Mayor)", "Auto / Superficie Física (Cargada / Eje Mayor)", elemType);
+
+            // 4. Solve with CalculixExecutor in multi-core (all available CPU cores)
+            String ccxResult = executor.executeCalculix("job_solid");
+            assertTrue("CalculiX multi-core solve for " + elemType + " (step " + step + ") must succeed with Exit Code 0",
+                    CalculixExecutor.wasSuccessful(ccxResult));
+
+            // 5. Verify .dat and .frd results
+            File frdFile = new File(workDir, "job_solid.frd");
+            File datFile = new File(workDir, "job_solid.dat");
+            assertTrue("FRD file must exist for " + elemType + " (step " + step + ")", frdFile.exists() && frdFile.length() > 0);
+            assertTrue("DAT file must exist for " + elemType + " (step " + step + ")", datFile.exists() && datFile.length() > 0);
+
+            String summary = SolidDisplacementFrdParser.parseAndSummarize(frdFile);
+            assertNotNull(summary);
+            assertTrue(summary.contains("Nodes with displacement"));
+
+            // 6. Extract deflection and von Mises stress
+            double maxUy = 0.0;
+            double maxStress = 0.0;
+            try (BufferedReader reader = new BufferedReader(new FileReader(datFile))) {
+                String line;
+                boolean inDisp = false;
+                boolean inStress = false;
+                while ((line = reader.readLine()) != null) {
+                    String trimmed = line.trim();
+                    if (trimmed.isEmpty()) continue;
+                    String lower = trimmed.toLowerCase(Locale.US);
+                    if (lower.contains("displacements (vx,vy,vz)")) {
+                        inDisp = true; inStress = false; continue;
+                    }
+                    if (lower.contains("stresses (elem, integ.pnt.")) {
+                        inStress = true; inDisp = false; continue;
+                    }
+                    if (inDisp) {
+                        String[] parts = trimmed.split("\\s+");
+                        if (parts.length >= 4 && Character.isDigit(parts[0].charAt(0))) {
+                            try {
+                                double uy = Double.parseDouble(parts[2].replace('D', 'E'));
+                                if (Math.abs(uy) > Math.abs(maxUy)) maxUy = uy;
+                            } catch (NumberFormatException ignore) {}
+                        }
+                    } else if (inStress) {
+                        String[] parts = trimmed.split("\\s+");
+                        if (parts.length >= 8 && Character.isDigit(parts[0].charAt(0))) {
+                            try {
+                                double sxx = Double.parseDouble(parts[2].replace('D', 'E'));
+                                double syy = Double.parseDouble(parts[3].replace('D', 'E'));
+                                double szz = Double.parseDouble(parts[4].replace('D', 'E'));
+                                double sxy = Double.parseDouble(parts[5].replace('D', 'E'));
+                                double sxz = Double.parseDouble(parts[6].replace('D', 'E'));
+                                double syz = Double.parseDouble(parts[7].replace('D', 'E'));
+                                double vm = Math.sqrt(0.5 * (Math.pow(sxx-syy, 2) + Math.pow(syy-szz, 2) + Math.pow(szz-sxx, 2) + 6*(sxy*sxy + syz*syz + sxz*sxz)));
+                                if (vm > maxStress) maxStress = vm;
+                            } catch (NumberFormatException ignore) {}
+                        }
+                    }
+                }
+            }
+
+            System.out.println("Step " + step + " [" + elemType + "] Deflection: " + Math.abs(maxUy) + " mm, Stress: " + maxStress + " MPa");
+            assertTrue("Deflection must be non-zero and non-NaN for " + elemType, Math.abs(maxUy) > 0.0 && !Double.isNaN(maxUy));
+            assertTrue("Stress must be non-zero and non-NaN for " + elemType, maxStress > 0.0 && !Double.isNaN(maxStress));
+
+            if (step == 1) { // First C3D10 run
+                firstC3D10Uy = maxUy;
+            } else if (step == 8) { // Second C3D10 run (after all other elements)
+                secondC3D10Uy = maxUy;
+                assertEquals("C3D10 deflection must be 100% deterministic after sequential runs of all other elements",
+                        firstC3D10Uy, secondC3D10Uy, 1e-6);
+            }
+        }
     }
 }
 

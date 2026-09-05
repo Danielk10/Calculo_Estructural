@@ -1000,6 +1000,12 @@ public class SolidFragment extends Fragment {
         
         logger.info("Starting Pipeline for Finite Element: " + elemType + " | Material: " + finalMaterialName + " (E=" + E + " MPa, nu=" + finalNu + ") | Fixed: " + fixedRegion + " | Load: " + loadRegion + " (" + finalLoadMagnitude + " N, DOF " + loadDof + ")");
 
+        // Synchronize active simulation geometry with the active spinner selection to avoid desync
+        int selectedGeoPos = binding.spinnerActiveGeometry.getSelectedItemPosition();
+        if (selectedGeoPos >= 0 && selectedGeoPos < availableGeometries.size()) {
+            activeSimulationGeometry = availableGeometries.get(selectedGeoPos);
+        }
+
         final File workDir = new File(getContext().getFilesDir(), "3d_solid_analysis");
         if (!workDir.exists()) workDir.mkdirs();
 
@@ -1153,11 +1159,11 @@ public class SolidFragment extends Fragment {
             String name = f.getName();
             String lower = name.toLowerCase(java.util.Locale.US);
 
-            // 1. Preserve source CAD models, primitives, and user-imported INP meshes
+            // 1. Preserve source CAD models, primitives, operations, booleans, and user-imported INP meshes
             boolean isSourceCad = (lower.endsWith(".step") || lower.endsWith(".stp") ||
-                                   (lower.endsWith(".geo") && !lower.endsWith(".geo_unrolled")) ||
+                                   (lower.endsWith(".geo") && !lower.endsWith(".geo_unrolled") && !name.equals("gmsh_cad_driver.geo")) ||
                                    lower.endsWith(".iges") || lower.endsWith(".igs") ||
-                                   (lower.endsWith(".brep") && !lower.endsWith("_sewn.brep") && !lower.startsWith("operated_") && !lower.endsWith("_result.brep")) ||
+                                   (lower.endsWith(".brep") && !lower.endsWith("_sewn.brep")) ||
                                    (lower.endsWith(".inp") && !lower.startsWith("job_solid") && !lower.startsWith("nsets")));
             if (isSourceCad) {
                 continue;
@@ -1189,7 +1195,9 @@ public class SolidFragment extends Fragment {
             "job_solid_raw.inp", "job_solid_clean.inp", "nsets.inp",
             "spooles.out", "spooles.log", "intpoints.out", "slavintmortar.out",
             "temporaryrestartfile", "sew_iges.tcl", "gmsh_cad_driver.geo",
-            "gmsh_cad_driver.geo_unrolled"
+            "gmsh_cad_driver.geo_unrolled", "job_solid.cvg", "job_solid.sta",
+            "job_solid.12d", "job_solid.fcv", "job_solid.cel", "job_solid.eig",
+            "job_solid.rout", "job_solid.nam"
         };
         for (String inName : intermediateNames) {
             deleteFileThoroughly(new File(targetDir, inName));

@@ -184,7 +184,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/terminal_cd_abort"
                 android:visibility="gone"
-                app:tint="#FF5252"
+                app:tint="@color/terminal_green"
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="4dp" />
 
@@ -200,7 +200,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/terminal_cd_close_editor"
                 android:visibility="gone"
-                app:tint="#FF5252"
+                app:tint="@color/terminal_green"
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="2dp" />
         </LinearLayout>
@@ -380,7 +380,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="end"
-                    android:text="[💾] Guardar | [✕] Salir | [⇥] Tab | [⌫] Borrar"
+                    android:text="[^S] Guardar | [^X] Salir | [Tab] Tab | [Del] Borrar"
                     android:textColor="#80CBC4"
                     android:textSize="10sp"
                     android:fontFamily="monospace" />
