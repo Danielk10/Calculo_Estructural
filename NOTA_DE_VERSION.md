@@ -18,9 +18,12 @@ La versión **v0.3.0** consolida el análisis estructural avanzado en dispositiv
 * **Convergencia Asintótica y Malla Multinivel (7 Niveles):**
   * Verificación y calibración de 7 niveles de refinamiento métrico con Gmsh:
     * **Niveles 1 al 5:** Mallas continuas y balanceadas (~50mm a ~5mm) optimizadas para cualquier dispositivo móvil.
-    * **Nivel 6 (Hiper fina - ~2.5mm):** Refinamiento de alta densidad (`MeshSizeFactor = 0.25`, ~64,000 elementos C3D10) con correlación del 99.3% frente a teoría de elasticidad 3D.
-    * **Nivel 7 (Hiper Extremo - ~1.5mm / Precisión Absoluta):** Modo de cómputo intensivo (`MeshSizeFactor = 0.18`, ~174,000 elementos C3D10 y ~700,000 DOFs) con pila extendida `OMP_STACKSIZE=128M`.
-    * **Protección Inteligente de Hardware:** Detección en tiempo de ejecución de la RAM física (`totalMem >= 10 GB`). En dispositivos con memoria inferior a 12 GB, el slider tranca el avance en el Nivel 6 con un mensaje Toast explicativo, garantizando cero cierres por Low Memory Killer (LMK) de Android.
+    * **Nivel 6 (Hiper Fina - ~2.5mm | Máxima Móvil Optimizada en Recursos):** Máxima densidad recomendada para smartphones estándar y gama media/alta (< 12 GB RAM). Proporciona la mayor resolución geométrica y precisión física adaptada al presupuesto de memoria del teléfono, evitando el cierre por falta de memoria.
+    * **Nivel 7 (Hiper Extremo - ~1.5mm | Máxima Absoluta en Configuración Máxima):** Refinamiento ultra-denso sin restricciones (`MeshSizeFactor = 0.18`, ~174,000 elementos C3D10, ~700,000 DOFs y `OMP_STACKSIZE=128M`), reservado exclusivamente para los terminales más potentes del mercado (flagships con ≥12 GB de RAM física, como Red Magic, ROG Phone, etc.).
+    * **Diferenciación Dinámica y Transparente en la Interfaz (UI):**
+      * El usuario en un teléfono estándar visualiza explícitamente: `Nivel 6 / 7 (Hiper Fina - ~2.5mm (Máxima para este dispositivo: Menos Recursos))`, sabiendo con total transparencia que está en el tope de su hardware.
+      * Al tocar o intentar deslizar al Nivel 7, el slider se tranca en el Nivel 6 con un mensaje Toast claro: *"Estás en la densidad Máxima para tu dispositivo (Nivel 6: optimizada con menos recursos). El Nivel 7 es la Máxima Absoluta en configuración máxima, exclusiva para flagships con ≥12 GB de RAM."*
+      * Solo los dispositivos con hardware certificado de ≥12 GB desbloquean el acceso al Nivel 7 (*Máxima Absoluta*).
 * **Corrección en el Selector de Geometrías (Spinner):**
   * Filtrado estricto de archivos de malla auxiliares (`cantilever_wedge.geo`), evitando elementos duplicados en la interfaz y unificando el modelo base bajo `Benchmark: Viga en Voladizo`.
   * Purga sistemática de temporales antes y después de cada análisis para garantizar determinismo estricto.

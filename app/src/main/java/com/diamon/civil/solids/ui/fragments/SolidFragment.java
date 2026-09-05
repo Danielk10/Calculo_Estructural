@@ -282,6 +282,14 @@ public class SolidFragment extends Fragment {
             @Override
             public void onStopTrackingTouch(android.widget.SeekBar seekBar) {}
         });
+
+        binding.tvMeshDensityLabel.setOnClickListener(v -> {
+            if (isHyperExtremeSupported()) {
+                Toast.makeText(getContext(), R.string.toast_hyper_device_info_flagship, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), R.string.toast_hyper_device_info_standard, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void updateMeshDensityLabel(int progress) {
@@ -305,7 +313,7 @@ public class SolidFragment extends Fragment {
                 desc = getString(R.string.density_ultra_fine);
                 break;
             case 6:
-                desc = getString(R.string.density_hyper_fine);
+                desc = isHyperExtremeSupported() ? getString(R.string.density_hyper_fine) : getString(R.string.density_hyper_fine_device_max);
                 break;
             case 7:
                 desc = getString(R.string.density_hyper_extreme);
