@@ -391,8 +391,24 @@ public class SolidPDFReportGenerator {
             return;
         }
 
+        SimulationSetup setup = parseSimulationSetup(workDir);
+
         ctx.ensureSpace(this, 120f);
-        ctx.canvas.drawText("1. Peak Response Extremes", MARGIN_LEFT, ctx.y, subHeaderPaint);
+        ctx.canvas.drawText("1. Simulation & Boundary Condition Parameters", MARGIN_LEFT, ctx.y, subHeaderPaint);
+        ctx.y += 14f;
+
+        String[] paramHeaders = {"Configuration Item", "Parameter Specification"};
+        float[] paramColWidths = {180f, 330f}; // Sum = 510f
+        ctx.y = drawTableHeader(ctx, paramHeaders, paramColWidths);
+
+        ctx.y = drawTableRow(ctx, new String[]{"Finite Element Formulation", setup.elementType}, paramColWidths);
+        ctx.y = drawTableRow(ctx, new String[]{"Constitutive Material", setup.material}, paramColWidths);
+        ctx.y = drawTableRow(ctx, new String[]{"Applied Mechanical Load", setup.loadDesc}, paramColWidths);
+        ctx.y = drawTableRow(ctx, new String[]{"Kinematic Boundary Restraints", setup.fixedDesc}, paramColWidths);
+        ctx.y += 16f;
+
+        ctx.ensureSpace(this, 120f);
+        ctx.canvas.drawText("2. Peak Response Extremes", MARGIN_LEFT, ctx.y, subHeaderPaint);
         ctx.y += 14f;
 
         String[] peakHeaders = {"Response Quantity", "Peak Value", "Location in Mesh"};
@@ -418,7 +434,7 @@ public class SolidPDFReportGenerator {
             int count = Math.min(dispList.size(), 8);
 
             ctx.ensureSpace(this, 35f);
-            ctx.canvas.drawText("2. Critical Displacement Concentrations (Top Nodes)", MARGIN_LEFT, ctx.y, subHeaderPaint);
+            ctx.canvas.drawText("3. Critical Displacement Concentrations (Top Nodes)", MARGIN_LEFT, ctx.y, subHeaderPaint);
             ctx.y += 14f;
 
             String[] dispHeaders = {"Node ID", "Ux (mm)", "Uy (mm)", "Uz (mm)", "Total |U| (mm)"};
@@ -446,7 +462,7 @@ public class SolidPDFReportGenerator {
             int count = Math.min(stressList.size(), 8);
 
             ctx.ensureSpace(this, 35f);
-            ctx.canvas.drawText("3. Critical Von Mises Stress Concentrations (Top Elements)", MARGIN_LEFT, ctx.y, subHeaderPaint);
+            ctx.canvas.drawText("4. Critical Von Mises Stress Concentrations (Top Elements)", MARGIN_LEFT, ctx.y, subHeaderPaint);
             ctx.y += 14f;
 
             String[] stressHeaders = {"Elem ID", "Int. Pt", "S_xx (MPa)", "S_yy (MPa)", "S_zz (MPa)", "Von Mises (MPa)"};
@@ -469,12 +485,154 @@ public class SolidPDFReportGenerator {
             ctx.y += 16f;
         }
 
-        ctx.ensureSpace(this, 75f);
-        ctx.canvas.drawText("Engineering Interpretation & Yield Criterion:", MARGIN_LEFT, ctx.y, subHeaderPaint);
+        ctx.ensureSpace(this, 120f);
+        ctx.canvas.drawText("5. Engineering Interpretation & Continuum Mechanics Criteria:", MARGIN_LEFT, ctx.y, subHeaderPaint);
         ctx.y += 14f;
-        ctx.y = drawWrappedText(ctx, "• Von Mises Equivalent Stress evaluates yielding in ductile materials under multi-axial state of stress per Huber-Mises-Hencky theory.", MARGIN_LEFT, USABLE_WIDTH, 12f, bodyPaint);
-        ctx.y = drawWrappedText(ctx, "• Displacements and deformations can be visualized in full 3D interactive color contour in the 3D Viewer module.", MARGIN_LEFT, USABLE_WIDTH, 12f, bodyPaint);
-        ctx.y = drawWrappedText(ctx, "• High stress concentrations near sharp geometric features should be evaluated for notch fatigue or local yielding.", MARGIN_LEFT, USABLE_WIDTH, 12f, bodyPaint);
+        ctx.y = drawWrappedText(ctx, "• Yield Criterion (Huber-Mises-Hencky): Von Mises equivalent stress evaluates yielding in ductile materials under multi-axial states of stress per octahedral shear stress theory.", MARGIN_LEFT, USABLE_WIDTH, 12f, bodyPaint);
+        ctx.y = drawWrappedText(ctx, "• Numerical Gauss Points vs Surface: Stresses are sampled directly at internal Gauss integration points; in flexure, internal Gauss stresses are lower than theoretical extreme surface fibers (e.g., in a 10 mm depth beam, Gauss points at y ≈ 4.4 mm yield ~53 MPa vs 60 MPa surface).", MARGIN_LEFT, USABLE_WIDTH, 12f, bodyPaint);
+        ctx.y = drawWrappedText(ctx, "• Poisson Clamping Singularity (3D Continuum): Fully fixed boundary surfaces (Ux=Uy=Uz=0) restrain natural lateral Poisson contraction (nu = 0.3), inducing artificial localized stress concentrations at clamped corners/edges in high-order elements (C3D20). Per Saint-Venant's principle, nominal member stresses should be evaluated at a distance x >= h/2 from the constraint.", MARGIN_LEFT, USABLE_WIDTH, 12f, bodyPaint);
+        ctx.y = drawWrappedText(ctx, "• Load Direction Alignment: Total deflections are aligned with the applied force vector. Verify that the selected load axis (DOF 1: Axial X, DOF 2: Vertical Y, DOF 3: Lateral Z) conforms to the primary bending axis of the structural component.", MARGIN_LEFT, USABLE_WIDTH, 12f, bodyPaint);
+        ctx.y = drawWrappedText(ctx, "• 3D Interactive Visualization: Full three-dimensional continuous chromatic stress and deformed shape fields can be inspected in the app's 3D Scene Viewer.", MARGIN_LEFT, USABLE_WIDTH, 12f, bodyPaint);
+    }
+
+    public static class SimulationSetup {
+        public String elementType = "C3D10 (2nd-Order 10-Node Quadratic Tetrahedron)";
+        public String material = "Structural Steel A36 (E = 200,000 MPa, nu = 0.30)";
+        public String loadDesc = "-100.00 N (Direction: Vertical Y / Transverse DOF 2)";
+        public String fixedDesc = "Fixed Support Region (Full Dirichlet: Ux=Uy=Uz=0)";
+    }
+
+    public static SimulationSetup parseSimulationSetup(File workDir) {
+        SimulationSetup setup = new SimulationSetup();
+        if (workDir == null || !workDir.exists()) return setup;
+
+        File inpFile = new File(workDir, "job_solid.inp");
+        if (!inpFile.exists()) return setup;
+
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(inpFile))) {
+            String line;
+            String foundElem = null;
+            String foundMat = null;
+            String foundE = null, foundNu = null;
+            String foundLoad = null;
+            String foundBoundary = null;
+            int foundDof = 2;
+            double foundTotalLoad = -100.0;
+            boolean inElastic = false;
+            boolean inCload = false;
+
+            while ((line = reader.readLine()) != null) {
+                String trimmed = line.trim();
+                if (trimmed.startsWith("** ELEMENT_TYPE:")) {
+                    foundElem = trimmed.substring(16).trim();
+                } else if (trimmed.startsWith("** MATERIAL:")) {
+                    foundMat = trimmed.substring(12).trim();
+                } else if (trimmed.startsWith("** TOTAL_LOAD:")) {
+                    foundLoad = trimmed.substring(14).trim();
+                } else if (trimmed.startsWith("** BOUNDARY:")) {
+                    foundBoundary = trimmed.substring(12).trim();
+                }
+
+                String upper = trimmed.toUpperCase(Locale.US);
+                if (upper.contains("*ELEMENT") && upper.contains("TYPE=")) {
+                    int idx = upper.indexOf("TYPE=");
+                    int endIdx = upper.indexOf(",", idx);
+                    if (endIdx == -1) endIdx = upper.length();
+                    String rawType = upper.substring(idx + 5, endIdx).trim();
+                    if (foundElem == null) foundElem = rawType;
+                } else if (upper.startsWith("*MATERIAL")) {
+                    int idx = upper.indexOf("NAME=");
+                    if (idx != -1) {
+                        String mName = trimmed.substring(idx + 5).trim();
+                        if (foundMat == null) foundMat = mName;
+                    }
+                } else if (upper.startsWith("*ELASTIC")) {
+                    inElastic = true;
+                    continue;
+                } else if (inElastic && !upper.startsWith("*")) {
+                    String[] parts = trimmed.split(",");
+                    if (parts.length >= 2) {
+                        foundE = parts[0].trim();
+                        foundNu = parts[1].trim();
+                    }
+                    inElastic = false;
+                } else if (upper.startsWith("*CLOAD")) {
+                    inCload = true;
+                    continue;
+                } else if (inCload && !upper.startsWith("*")) {
+                    String[] parts = trimmed.split(",");
+                    if (parts.length >= 3) {
+                        try {
+                            foundDof = Integer.parseInt(parts[1].trim());
+                            foundTotalLoad = Double.parseDouble(parts[2].trim().replace('D', 'E'));
+                        } catch (Exception ignore) {}
+                    }
+                    inCload = false;
+                }
+            }
+
+            if (foundElem != null) {
+                setup.elementType = formatElementTypeReadable(foundElem);
+            }
+            if (foundMat != null) {
+                if (!foundMat.contains("(E=") && !foundMat.contains("(E =") && foundE != null && foundNu != null) {
+                    try {
+                        double eVal = Double.parseDouble(foundE);
+                        double nuVal = Double.parseDouble(foundNu);
+                        setup.material = String.format(Locale.US, "%s (E = %,.0f MPa, nu = %.2f)", foundMat, eVal, nuVal);
+                    } catch (Exception e) {
+                        setup.material = foundMat + " (E=" + foundE + ", nu=" + foundNu + ")";
+                    }
+                } else {
+                    setup.material = foundMat;
+                }
+            }
+            if (foundLoad != null) {
+                setup.loadDesc = formatLoadDescription(foundLoad);
+            } else {
+                String dirName = (foundDof == 1) ? "Horizontal X / Axial DOF 1"
+                               : (foundDof == 3) ? "Lateral Depth Z / Lateral DOF 3"
+                               : "Vertical Y / Transverse DOF 2";
+                setup.loadDesc = String.format(Locale.US, "%.2f N (Direction: %s)", foundTotalLoad, dirName);
+            }
+            if (foundBoundary != null) {
+                String fixFace = foundBoundary.contains("->") ? foundBoundary.split("->")[0].trim() : foundBoundary;
+                setup.fixedDesc = fixFace + " (Full Dirichlet: Ux=Uy=Uz=0)";
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Error parsing simulation setup from inp: " + e.getMessage());
+        }
+
+        return setup;
+    }
+
+    private static String formatElementTypeReadable(String raw) {
+        String u = raw.toUpperCase(Locale.US).trim();
+        if (u.contains("C3D10")) return "C3D10 (2nd-Order 10-Node Quadratic Tetrahedron)";
+        if (u.contains("C3D20R")) return "C3D20R (2nd-Order 20-Node Reduced-Integration Hexahedron)";
+        if (u.contains("C3D20")) return "C3D20 (2nd-Order 20-Node Quadratic Hexahedron)";
+        if (u.contains("C3D4")) return "C3D4 (1st-Order 4-Node Linear Tetrahedron)";
+        if (u.contains("C3D8R")) return "C3D8R (1st-Order 8-Node Reduced-Integration Hexahedron)";
+        if (u.contains("C3D8")) return "C3D8 (1st-Order 8-Node Linear Hexahedron / Brick)";
+        if (u.contains("C3D15")) return "C3D15 (2nd-Order 15-Node Quadratic Wedge / Prism)";
+        if (u.contains("C3D6")) return "C3D6 (1st-Order 6-Node Linear Wedge / Prism)";
+        return raw;
+    }
+
+    private static String formatLoadDescription(String rawComment) {
+        try {
+            int dof = 2;
+            if (rawComment.contains("DOF=1")) dof = 1;
+            else if (rawComment.contains("DOF=3")) dof = 3;
+            String dir = (dof == 1) ? "Horizontal X / Axial DOF 1"
+                       : (dof == 3) ? "Lateral Depth Z / Lateral DOF 3"
+                       : "Vertical Y / Transverse DOF 2";
+            String res = rawComment.replace("DOF=" + dof, "Direction: " + dir);
+            res = res.replaceAll("NODES=(\\d+)", "$1 nodes");
+            return res;
+        } catch (Exception e) {
+            return rawComment;
+        }
     }
 
 

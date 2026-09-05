@@ -296,6 +296,14 @@ public class SolidInpAssembler {
 
         // 3. Assemble final INP with professional engineering logic
         try (PrintWriter pw = new PrintWriter(new FileWriter(finalInp))) {
+            String resolvedElem = (targetElemType != null) ? targetElemType : (current3DType != null ? current3DType : "C3D10");
+            pw.println("** ========================================================");
+            pw.println("** CALCULIX 3D SOLID MODEL SETUP");
+            pw.println("** ELEMENT_TYPE: " + resolvedElem);
+            pw.println("** MATERIAL: " + (materialName != null ? materialName : "Structural Steel A36"));
+            pw.println("** TOTAL_LOAD: " + totalLoadValue + " N (DOF=" + loadDof + ", NODES=" + loadedNodes.size() + ")");
+            pw.println("** BOUNDARY: " + (fixedRegion != null ? fixedRegion : "Fixed") + " -> " + (loadRegion != null ? loadRegion : "Loaded"));
+            pw.println("** ========================================================");
             pw.println("*INCLUDE, INPUT=" + cleanInp.getName());
             pw.println("*INCLUDE, INPUT=" + nsetsInp.getName());
             String safeMaterialName = (materialName != null && !materialName.trim().isEmpty())
