@@ -41,7 +41,7 @@ public class ModuleLogger {
         "  clear                  - Clear terminal screen\n" +
         "  help                   - Show this help message\n\n" +
         "Solvers, CAD & Scripting Binaries:\n" +
-        "  ccx <jobname>          - Run CalculiX CCX solver directly on <jobname>.inp (-i, -v)\n" +
+        "  ccx <jobname>          - Run CalculiX CCX solver directly on <jobname>.inp (-i)\n" +
         "  gmsh <args>            - Run Gmsh 3D mesh generator directly (-3, -order, -clmax, -format)\n" +
         "  draw [script.tcl|-c]   - Run OpenCASCADE DRAWEXE TCL CAD engine in headless mode\n" +
         "  tclsh <script.tcl>     - Execute Tcl 8.6 script interpreter\n";

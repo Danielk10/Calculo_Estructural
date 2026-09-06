@@ -4,13 +4,15 @@ Este documento describe la configuración del SDK de Android, compilación, firm
 
 ---
 
-## 1. Instalación del SDK y NDK (Requisito Previo Obligatorio)
+## ⚠️ 1. REGLA OBLIGATORIA: Instalar SDK de Android SIEMPRE Primero con `setup-sdk.sh`
 
-Antes de compilar, si el SDK no está configurado en el entorno o no existe `/tmp/android-sdk` / `local.properties`, es **obligatorio** ejecutar el script de configuración:
+Antes de realizar cualquier compilación, ejecutar tests en Gradle (`./gradlew`) o cualquier tarea de desarrollo, es **ESTRICTAMENTE OBLIGATORIO** instalar y configurar el SDK ejecutando **siempre primero** el script:
 
 ```bash
 bash setup-sdk.sh
 ```
+
+**NUNCA** ejecutes `./gradlew` sin haber ejecutado primero `bash setup-sdk.sh` si `/tmp/android-sdk` no existe en el entorno.
 
 Este script descarga e instala automáticamente el Android SDK, NDK, CMake, build-tools y genera el archivo `local.properties`.
 

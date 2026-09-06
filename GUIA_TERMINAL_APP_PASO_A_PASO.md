@@ -281,25 +281,25 @@ Si ingresas un comando que no coincide con los comandos internos de shell ni con
 
 ### 5.1 Ejecutar CalculiX Directamente (`ccx`)
 
-CalculiX CCX es el solucionador FEA principal de la aplicación. Puede invocarse tanto en modo estándar como con sus banderas de control:
+CalculiX CCX es el solucionador FEA principal de la aplicación. El solucionador opera única y exclusivamente mediante sus comandos nativos reales especificando el nombre del trabajo (*jobname*):
 
-#### Formas de Invocación Válidas:
-```bash
-# 1. Por nombre base del archivo (CalculiX añade automáticamente la extensión .inp)
-ccx mi_viga
+#### 🔹 Comandos Nativos Soportados por CalculiX:
+* **`ccx <jobname>`**: Ejecuta el análisis sobre el archivo `<jobname>.inp`. CalculiX añade automáticamente la extensión `.inp`.
+  ```bash
+  ccx mi_viga
+  ```
+* **`ccx -i <jobname>`**: Bandera estándar nativa de CalculiX para especificar el archivo de entrada.
+  ```bash
+  ccx -i mi_viga
+  ```
+* **Con extensión explícita (`ccx mi_viga.inp`):** La terminal limpia automáticamente `.inp` para que CalculiX resuelva el archivo sin duplicar extensiones.
+* **Consulta de sintaxis (`ccx`):** Al escribir `ccx` sin argumentos se muestra el uso oficial de comandos soportados.
 
-# 2. Con la bandera estándar de entrada de CalculiX (-i)
-ccx -i mi_viga
-
-# 3. Incluyendo la extensión .inp (la terminal la limpia automáticamente para CalculiX)
-ccx mi_viga.inp
-
-# 4. Consultar la versión y compilación del motor nativo
-ccx -v
-
-# 5. Consultar sintaxis de uso
-ccx -h
-```
+> [!IMPORTANT]
+> **Comandos No Válidos:** CalculiX no admite banderas ni parámetros adicionales de tipo GNU (como `-v`, `--version`, `-h`, etc.). Si se ingresa una opción no válida (por ejemplo `ccx -v`), la terminal emitirá directamente el mensaje estándar de comando inválido:
+> ```
+> Invalid command: ccx -v
+> ```
 
 #### Archivos Generados por CalculiX tras el Cálculo:
 * `job.dat`: Archivo de texto plano con los resultados nodales solicitados en `*NODE PRINT` (desplazamientos, reacciones en apoyos) y seccionales en `*EL PRINT` / `*SECTION PRINT` (fuerzas axiales $N$, cortantes $V$, momentos flectores $M$).

@@ -545,19 +545,16 @@ public class TerminalFragment extends Fragment {
                             result = calculixExecutor.executeBinary("gmsh", args);
                         }
                     } else if (binary.equalsIgnoreCase("ccx")) {
-                        if (args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("--help")) {
+                        if (args.length == 0) {
                             result = "CalculiX CCX Usage:\n" +
                                      "  ccx <jobname>       - Run analysis on <jobname>.inp\n" +
-                                     "  ccx -i <jobname>    - Standard CalculiX input flag\n" +
-                                     "  ccx -v              - Print CalculiX version and build date\n";
-                        } else if (args.length == 1 && (args[0].equalsIgnoreCase("-v") || args[0].equalsIgnoreCase("--version"))) {
-                            result = calculixExecutor.executeBinary("ccx", "-v");
+                                     "  ccx -i <jobname>    - Standard CalculiX input flag\n";
                         } else if (args.length == 1 && !args[0].startsWith("-")) {
                             result = calculixExecutor.executeCalculix(args[0]);
-                        } else if (args.length == 2 && args[0].equalsIgnoreCase("-i")) {
+                        } else if (args.length == 2 && args[0].equalsIgnoreCase("-i") && !args[1].startsWith("-")) {
                             result = calculixExecutor.executeCalculix(args[1]);
                         } else {
-                            result = calculixExecutor.executeBinary("ccx", args);
+                            result = "Invalid command: " + input;
                         }
                     } else if (binary.equalsIgnoreCase("drawexe") || binary.equalsIgnoreCase("draw")) {
                         if (args.length == 0) {
