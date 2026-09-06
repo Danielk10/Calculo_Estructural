@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import com.diamon.civil.core.util.WakeLockHelper;
 
 
 public class StructuralFragment extends Fragment {
@@ -40,6 +41,7 @@ public class StructuralFragment extends Fragment {
     private FragmentStructuralBinding binding;
     private final ModuleLogger logger = new ModuleLogger("Structural");
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private WakeLockHelper wakeLockHelper;
     private CalculixExecutor calculixExecutor;
     private StructuralBeamDatParser datParser;
     
@@ -83,6 +85,7 @@ public class StructuralFragment extends Fragment {
         });
         datParser = new StructuralBeamDatParser();
         logger.attachToTextView(binding.tvStructuralLog);
+        wakeLockHelper = new WakeLockHelper(requireContext(), "StructuralAnalysis");
 
         setupTabs();
         setupButtons();
@@ -1318,6 +1321,10 @@ public class StructuralFragment extends Fragment {
         }
         final double loadValue = loadVal;
 
+        if (wakeLockHelper != null) {
+            wakeLockHelper.acquire();
+        }
+
         executor.execute(() -> {
             NativeFeaCore core = new NativeFeaCore();
             long modelPtr = 0;
@@ -1404,6 +1411,9 @@ public class StructuralFragment extends Fragment {
                     });
                 }
             } finally {
+                if (wakeLockHelper != null) {
+                    wakeLockHelper.release();
+                }
                 if (modelPtr != 0) {
                     try {
                         core.deleteModel(modelPtr);
@@ -2399,6 +2409,9 @@ public class StructuralFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (wakeLockHelper != null) {
+            wakeLockHelper.release();
+        }
         executor.shutdownNow();
         super.onDestroyView();
         binding = null;

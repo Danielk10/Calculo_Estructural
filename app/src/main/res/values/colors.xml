@@ -13,4 +13,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey_background">#F5F5F5</color>
+
+    <!-- Tab Navigation Colors -->
+    <color name="tab_background">#FFFFFF</color>
+    <color name="tab_text_selected">#1976D2</color>
+    <color name="tab_text_unselected">#475569</color>
+    <color name="tab_indicator">#1976D2</color>
+    <color name="tab_ripple">#1A1976D2</color>
 </resources>

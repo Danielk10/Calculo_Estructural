@@ -14,5 +14,25 @@
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
         <!-- Customize your theme here. -->
+        <item name="tabStyle">@style/Widget.App.TabLayout</item>
+    </style>
+
+    <!-- Custom TabLayout Style to enforce high contrast on all devices and themes -->
+    <style name="Widget.App.TabLayout" parent="Widget.MaterialComponents.TabLayout">
+        <item name="tabBackground">@color/tab_background</item>
+        <item name="tabIndicatorColor">@color/tab_indicator</item>
+        <item name="tabIndicatorHeight">3dp</item>
+        <item name="tabSelectedTextColor">@color/tab_text_selected</item>
+        <item name="tabTextColor">@color/tab_text_color_selector</item>
+        <item name="tabRippleColor">@color/tab_ripple</item>
+        <item name="tabMode">fixed</item>
+        <item name="tabGravity">fill</item>
+        <item name="tabTextAppearance">@style/Widget.App.TabTextAppearance</item>
+    </style>
+
+    <style name="Widget.App.TabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="textAllCaps">false</item>
     </style>
 </resources>

@@ -19,6 +19,7 @@ import com.diamon.civil.structural.engine.NativeFeaCore;
 import com.diamon.civil.solids.engine.SampleSimulationCase;
 import com.diamon.civil.core.ui.MainActivity;
 import com.diamon.civil.solids.ui.SceneViewBridgeKt;
+import com.diamon.civil.core.util.WakeLockHelper;
 import com.diamon.civil.core.util.logging.ModuleLogger;
 import com.google.android.material.tabs.TabLayout;
 import java.io.File;
@@ -35,6 +36,7 @@ public class SolidFragment extends Fragment {
     private FragmentSolidBinding binding;
     private final ModuleLogger logger = new ModuleLogger("Solid");
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private WakeLockHelper wakeLockHelper;
     private GmshRunner gmshRunner;
     private CalculixExecutor calculixExecutor;
     private MaterialDatabase materialDatabase;
@@ -132,6 +134,7 @@ public class SolidFragment extends Fragment {
         }
 
         logger.attachToTextView(binding.tvSolidLog);
+        wakeLockHelper = new WakeLockHelper(requireContext(), "SolidAnalysis");
         setupTabs();
         setupButtons();
         
@@ -385,14 +388,10 @@ public class SolidFragment extends Fragment {
                 desc = getString(R.string.density_ultra_fine);
                 break;
             case 6:
-                desc = isHyperExtremeSupported() ? getString(R.string.density_hyper_fine) : getString(R.string.density_hyper_fine_device_max);
+                desc = getString(R.string.density_hyper_fine);
                 break;
             case 7:
-                if (getHardwareTier() == HardwareTier.EXTREME) {
-                    desc = getString(R.string.density_hyper_extreme_max_power);
-                } else {
-                    desc = getString(R.string.density_hyper_extreme_flagship);
-                }
+                desc = getString(R.string.density_hyper_extreme);
                 break;
             default:
                 desc = "";
@@ -793,6 +792,10 @@ public class SolidFragment extends Fragment {
             });
         }
 
+        if (wakeLockHelper != null) {
+            wakeLockHelper.acquire();
+        }
+
         executor.execute(() -> {
             try {
                 if (calculixExecutor == null) {
@@ -872,6 +875,10 @@ public class SolidFragment extends Fragment {
                             Toast.makeText(appContext, getString(R.string.toast_inp_error, e.getMessage()), Toast.LENGTH_LONG).show();
                         }
                     });
+                }
+            } finally {
+                if (wakeLockHelper != null) {
+                    wakeLockHelper.release();
                 }
             }
         });
@@ -1202,6 +1209,9 @@ public class SolidFragment extends Fragment {
         }
 
         logger.info("Step 1: Generating Mesh with Gmsh (" + elemType + ", Density: " + density + ")...");
+        if (wakeLockHelper != null) {
+            wakeLockHelper.acquire();
+        }
         
         gmshRunner.meshAsync(cadFile, density, "job_solid", elemType, new GmshRunner.GmshCallback() {
             @Override
@@ -1291,12 +1301,19 @@ public class SolidFragment extends Fragment {
                                 }
                             });
                         }
+                    } finally {
+                        if (wakeLockHelper != null) {
+                            wakeLockHelper.release();
+                        }
                     }
                 });
             }
 
             @Override
             public void onError(String message) {
+                if (wakeLockHelper != null) {
+                    wakeLockHelper.release();
+                }
                 cleanIntermediateSimulationFiles(workDir);
                 logger.error("Meshing Failed: " + message);
                 android.app.Activity activity = getActivity();
@@ -1430,6 +1447,9 @@ public class SolidFragment extends Fragment {
     @Override
     public void onDestroyView() {
         engineReady = false;
+        if (wakeLockHelper != null) {
+            wakeLockHelper.release();
+        }
         if (binding != null) {
             binding.solidSceneViewContainer.disposeComposition();
         }

@@ -4,13 +4,15 @@ Este documento describe la configuración del SDK de Android, compilación, firm
 
 ---
 
-## 1. Instalación del SDK y NDK
+## 1. Instalación del SDK y NDK (Requisito Previo Obligatorio)
 
-El SDK y herramientas necesarias se instalan automáticamente en `/tmp/android-sdk` ejecutando:
+Antes de compilar, si el SDK no está configurado en el entorno o no existe `/tmp/android-sdk` / `local.properties`, es **obligatorio** ejecutar el script de configuración:
 
 ```bash
 bash setup-sdk.sh
 ```
+
+Este script descarga e instala automáticamente el Android SDK, NDK, CMake, build-tools y genera el archivo `local.properties`.
 
 - **Ubicación del SDK:** `/tmp/android-sdk`
 - **Ubicación de Build Outputs:** `/tmp/calculoestructural_build`
@@ -88,9 +90,9 @@ Cuando se solicite hacer un pre-lanzamiento, **DEBES** seguir estrictamente esta
 4. **Comando de creación de release:** Si el desarrollador te da el "Ok", debes ejecutar el siguiente comando (sustituyendo la versión correspondiente y las notas reales):
 
 ```bash
-gh release create v0.1.0 /tmp/calculoestructural_build/outputs/apk/debug/app-debug.apk --title "Version Alfa 0.1.0" --notes "Mensaje claro de lo que se hizo" --prerelease
+gh release create v0.1.0 /tmp/calculoestructural_build/outputs/apk/release/app-release.apk --title "Version Alfa 0.1.0" --notes "Mensaje claro de lo que se hizo" --prerelease
 ```
 
 **⚠️ REGLAS CRÍTICAS DEL COMANDO:**
-- La ruta del APK **siempre** es `/tmp/calculoestructural_build/outputs/apk/debug/app-debug.apk`.
+- La ruta del APK **siempre** es el APK de lanzamiento (Release): `/tmp/calculoestructural_build/outputs/apk/release/app-release.apk`.
 - Debes incluir el flag `--prerelease`.
