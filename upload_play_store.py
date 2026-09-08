@@ -1,5 +1,8 @@
 import argparse
+import socket
 import sys
+
+socket.setdefaulttimeout(600)
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -26,12 +29,17 @@ def main():
 
     try:
         print(f"Uploading AAB {args.aab_path}...")
-        media = MediaFileUpload(args.aab_path, mimetype='application/octet-stream', resumable=True)
-        bundle_response = service.edits().bundles().upload(
+        media = MediaFileUpload(args.aab_path, mimetype='application/octet-stream', chunksize=10 * 1024 * 1024, resumable=True)
+        upload_request = service.edits().bundles().upload(
             editId=edit_id,
             packageName=args.package_name,
             media_body=media
-        ).execute()
+        )
+        bundle_response = None
+        while bundle_response is None:
+            status, bundle_response = upload_request.next_chunk()
+            if status:
+                print(f"Upload progress: {int(status.progress() * 100)}%")
 
         version_code = bundle_response['versionCode']
         print(f"Successfully uploaded AAB with version code: {version_code}")
