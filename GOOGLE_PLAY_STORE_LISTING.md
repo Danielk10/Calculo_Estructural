@@ -65,15 +65,13 @@ Diseñada para ingenieros civiles, calculistas, mecánicos, arquitectos y estudi
 ### 🚀 Novedades de esta Versión ("What's New") — [Máximo 500 caracteres]
 
 ```text
-¡Novedades en Structural Analysis FEA 3D v0.3.0!
-• Terminal interactiva con soporte para scripts paramétricos TCL 8.6.
-• Modelado CAD 3D headless con OpenCASCADE (draw/DRAWEXE) y exportación STEP.
-• Control total de opciones avanzadas del mallador 3D Gmsh y solver CalculiX CCX.
-• Creación y edición de scripts y archivos en el móvil con comando echo.
-• Reordenamiento del menú principal y optimización de entrada para pantallas compactas.
-• Batería de certificación analítica y física de punta a punta.
+- Sólidos 3D: elemento cuadrático de 10 nodos por defecto y matriz completa de elementos volumétricos.
+- 7 niveles de densidad de malla con detección de memoria RAM física y perfil de hardware.
+- Reporte pericial en PDF con trazabilidad de parámetros y criterios de mecánica continua.
+- Consola técnica con modelado geométrico paramétrico, scripting y cálculo multinúcleo.
+- Optimización de interfaz en modo oscuro y prevención de suspensión durante análisis prolongados.
 ```
-*(Longitud exacta: 479 caracteres)*
+*(Longitud exacta: 470 caracteres)*
 
 ---
 
@@ -138,12 +136,10 @@ Designed for civil engineers, structural designers, mechanical engineers, archit
 ### 🚀 What's New in this Version — [Max 500 characters]
 
 ```text
-What's New in Structural Analysis FEA 3D v0.3.0!
-• Interactive terminal with parametric TCL 8.6 scripting support.
-• Headless OpenCASCADE 3D CAD modeling (draw/DRAWEXE) & STEP export.
-• Full control of advanced 3D Gmsh meshing flags and CalculiX CCX solver.
-• In-app file and script creation/editing via echo command.
-• Reordered main menu and optimized terminal input for compact screens.
-• Automated end-to-end physical and analytical certification suite.
+- 3D Solids: default 10-node quadratic formulation and full continuum volumetric element matrix.
+- 7 mesh density levels with automatic physical RAM and hardware profile detection.
+- Engineering PDF report with input parameter traceability and continuum mechanics criteria.
+- Technical console featuring parametric 3D modeling, scripting, and multi-core calculation.
+- Improved dark mode tab contrast and sleep prevention during long simulations.
 ```
-*(Exact length: 445 characters)*
+*(Exact length: 448 characters)*
