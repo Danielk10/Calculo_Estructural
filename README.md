@@ -75,7 +75,6 @@ El proyecto integra las siguientes librerías científicas de código abierto:
 | **RapidJSON** | **1.1.0** | Serialización y deserialización JSON de alto rendimiento | **MIT** | [https://rapidjson.org](https://rapidjson.org) |
 | **SceneView / Filament** | **4.18.0** | Visor 3D PBR/Unlit con control táctil interactivo | **Apache 2.0** | [https://github.com/SceneView/sceneview-android](https://github.com/SceneView/sceneview-android) |
 | **iText 7 Core** | **7.2.5** | Generación de memorias de cálculo en PDF | **AGPL v3.0 / Commercial** | [https://itextpdf.com](https://itextpdf.com) |
-| **GCC Fortran Runtime** | - | Runtime de Fortran (`libgfortran5`) | **GNU GPL v3.0+** | [https://gcc.gnu.org](https://gcc.gnu.org) |
 | **Código Android** | **v0.3.0** | Aplicación Android (Java, Kotlin, C++ JNI) | **GNU GPL v3.0** | [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html) |
 
 ---
