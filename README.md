@@ -60,7 +60,6 @@ El proyecto integra las siguientes librerías científicas de código abierto:
 | **CalculiX (CCX)** | **2.23** | Motor físico y solucionador FEA estructural/volumétrico | **GNU GPL v2.0+** | [https://www.calculix.de](https://www.calculix.de) |
 | **OpenCASCADE (OCCT)** | **8.0.0.p1** | Núcleo CAD 3D, operaciones BRep, STEP/IGES, glTF y DRAWEXE | **GNU LGPL v2.1** | [https://www.opencascade.com](https://www.opencascade.com) |
 | **Gmsh** | **5.0.0** | Generador de mallas 3D (C3D10, C3D8, C3D4, etc.) | **GNU GPL v2.0+** | [https://gmsh.info](https://gmsh.info) |
-| **OpenSees (OpenSeesPy)** | **3.5+** | Validador independiente de análisis estructural | **BSD-like** | [https://openseespydoc.readthedocs.io](https://openseespydoc.readthedocs.io) |
 | **SPOOLES** | **2.2 MT** | Solución matricial dispersa multihilo (Multi-Threaded) | **Dominio Público** | [https://netlib.org/linalg/spooles/spooles.2.2.html](https://netlib.org/linalg/spooles/spooles.2.2.html) |
 | **ARPACK** | **arpack-ng** | Solucionador de autovalores y frecuencias modales | **Permisiva (BSD-like)** | [https://github.com/opencollab/arpack-ng](https://github.com/opencollab/arpack-ng) |
 | **OpenBLAS / LAPACK** | **r0.3.34.dev** | Álgebra lineal optimizada multihilo para ARM64 | **BSD 3-Clause** | [https://www.openblas.net](https://www.openblas.net) |
@@ -157,7 +156,7 @@ the Free Software Foundation; see gpl.htm.
   - Diagrama de Momento Flector ($M_{33}$) con relleno cromático y detección exacta de puntos de inflexión (*Zero-Crossing*).
   - Diagrama de Fuerza Cortante ($V_{22}$) y Diagrama de Fuerza Axial ($N$).
   - Comprobación de derivas sísmicas de entrepiso según normativas internacionales (**NSR-10** $\le 1.0\%$ y **ASCE 7-22** $\le 1.5\%$).
-- **Validador Independiente:** Contrastación cruzada y certificación mediante **OpenSees (`openseespy`)** en Python 3.11.
+- **Verificación Independiente:** Certificación y contrastación física de equilibrio estático y soluciones analíticas en todos los presets.
 
 ---
 
@@ -233,7 +232,6 @@ the Free Software Foundation; see gpl.htm.
 | **Compresión 3D** | **Google Draco 1.5.7** (`draco_decoder` / `draco_encoder`) |
 | **Datos Científicos y Matrices** | **HDF5 2.3.0** / **MEDfile 6.0.1** |
 | **Álgebra Lineal Optimizada** | **OpenBLAS r0.3.34.dev** multihilo (ARM64) |
-| **Validador Independiente** | **OpenSeesPy** (Python 3.11 en entorno aislado `~/opensees-env`) |
 | **Motor de Renderizado 3D** | **SceneView 4.18.0** / Google Filament PBR &amp; Unlit |
 | **Generador de Reportes PDF** | **iText 7 Core 7.2.5** / Android Graphics PdfDocument |
 
