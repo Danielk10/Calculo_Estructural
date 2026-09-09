@@ -1,0 +1,7 @@
+#!/bin/bash
+export APP_PREFIX="/data/data/com.diamon.civil/files/usr"
+export LD_LIBRARY_PATH="/data/data/com.diamon.civil/files/usr/lib:$LD_LIBRARY_PATH"
+export TCL_LIBRARY="/data/data/com.diamon.civil/files/usr/lib/tcl8.6"
+export TK_LIBRARY="/data/data/com.diamon.civil/files/usr/lib/tk8.6"
+export TCLLIBPATH="/data/data/com.diamon.civil/files/usr/lib /data/data/com.diamon.civil/files/usr/lib/tcl8.6 /data/data/com.diamon.civil/files/usr/lib/tk8.6"
+exec "/data/data/com.diamon.civil/files/usr/bin/DRAWEXE" "$@"

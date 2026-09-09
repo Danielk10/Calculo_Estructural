@@ -53,6 +53,23 @@ public class NativeLoader {
         LIBRARY_MAP.put("GLESv2", "GLESv2_v2");
         LIBRARY_MAP.put("GLdispatch", "GLdispatch_v0");
         LIBRARY_MAP.put("freetype", "freetype_v6");
+        LIBRARY_MAP.put("expat", "expat_v1");
+        LIBRARY_MAP.put("fontconfig", "fontconfig");
+
+        // New libraries and modules from commits 78b78f4 and b90ea65
+        LIBRARY_MAP.put("tbb", "tbb");
+        LIBRARY_MAP.put("tbbmalloc", "tbbmalloc");
+        LIBRARY_MAP.put("tbbmalloc_proxy", "tbbmalloc_proxy");
+        LIBRARY_MAP.put("draco", "draco");
+        LIBRARY_MAP.put("aec", "aec");
+        LIBRARY_MAP.put("sz", "sz");
+        LIBRARY_MAP.put("TKDEGLTF", "TKDEGLTF");
+        LIBRARY_MAP.put("TKXSDRAWGLTF", "TKXSDRAWGLTF");
+        LIBRARY_MAP.put("hdf5_cpp", "hdf5_cpp_v1000");
+        LIBRARY_MAP.put("hdf5_tools", "hdf5_tools_v1000");
+        LIBRARY_MAP.put("hdf5_hl_cpp", "hdf5_hl_cpp_v1000");
+        LIBRARY_MAP.put("hdf5_fortran", "hdf5_fortran_v1000");
+        LIBRARY_MAP.put("hdf5_hl_fortran", "hdf5_hl_fortran_v1000");
     }
 
     private static String filesDirPath = "/data/data/com.diamon.civil/files";

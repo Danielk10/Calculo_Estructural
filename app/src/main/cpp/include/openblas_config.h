@@ -24,7 +24,7 @@
 #define OPENBLAS_CORE_ARMV8 
 #define OPENBLAS_CHAR_CORENAME "ARMV8"
 #define OPENBLAS_GEMM_MULTITHREAD_THRESHOLD 4
-#define OPENBLAS_VERSION " OpenBLAS 0.3.33.dev "
+#define OPENBLAS_VERSION " OpenBLAS 0.3.34.dev "
 /*This is only for "make install" target.*/
 
 #if defined(OPENBLAS_OS_WINNT) || defined(OPENBLAS_OS_CYGWIN_NT) || defined(OPENBLAS_OS_INTERIX)

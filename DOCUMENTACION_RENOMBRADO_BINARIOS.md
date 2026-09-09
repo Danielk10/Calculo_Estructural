@@ -5,7 +5,31 @@
 | DRAWEXE | libDRAWEXE.so | Añadido prefijo lib y .so |
 | DRAWEXE-8.0.0 | libDRAWEXE_8.0.0.so | Añadido prefijo lib y .so |
 | ccx | libccx.so | Añadido prefijo lib y .so |
+| draco_decoder | libdraco_decoder.so | Añadido prefijo lib y .so |
+| draco_decoder-1.5.7 | libdraco_decoder_1.5.7.so | Añadido prefijo lib y .so |
+| draco_encoder | libdraco_encoder.so | Añadido prefijo lib y .so |
+| draco_encoder-1.5.7 | libdraco_encoder_1.5.7.so | Añadido prefijo lib y .so |
+| drawenv | libdrawenv.so | Añadido prefijo lib y .so |
 | gmsh | libgmsh.so | Añadido prefijo lib y .so |
+| h5cc | libh5cc.so | Añadido prefijo lib y .so |
+| h5clear | libh5clear.so | Añadido prefijo lib y .so |
+| h5copy | libh5copy.so | Añadido prefijo lib y .so |
+| h5debug | libh5debug.so | Añadido prefijo lib y .so |
+| h5delete | libh5delete.so | Añadido prefijo lib y .so |
+| h5diff | libh5diff.so | Añadido prefijo lib y .so |
+| h5dump | libh5dump.so | Añadido prefijo lib y .so |
+| h5fc | libh5fc.so | Añadido prefijo lib y .so |
+| h5format_convert | libh5format_convert.so | Añadido prefijo lib y .so |
+| h5import | libh5import.so | Añadido prefijo lib y .so |
+| h5jam | libh5jam.so | Añadido prefijo lib y .so |
+| h5ls | libh5ls.so | Añadido prefijo lib y .so |
+| h5mkgrp | libh5mkgrp.so | Añadido prefijo lib y .so |
+| h5perf_serial | libh5perf_serial.so | Añadido prefijo lib y .so |
+| h5repack | libh5repack.so | Añadido prefijo lib y .so |
+| h5repart | libh5repart.so | Añadido prefijo lib y .so |
+| h5stat | libh5stat.so | Añadido prefijo lib y .so |
+| h5unjam | libh5unjam.so | Añadido prefijo lib y .so |
+| h5watch | libh5watch.so | Añadido prefijo lib y .so |
 | libEGL.so.1 | libEGL_v1.so | Normalizada versión 1 en el nombre |
 | libGLESv2.so.2 | libGLESv2_v2.so | Normalizada versión 2 en el nombre |
 | libGLdispatch.so.0 | libGLdispatch_v0.so | Normalizada versión 0 en el nombre |
@@ -45,6 +69,9 @@
 | libTKDECascade.so | libTKDECascade.so | Ya cumple |
 | libTKDECascade.so. | libTKDECascade.so_dot.so | Reemplazado punto final por _dot.so |
 | libTKDECascade.so.8.0.0 | libTKDECascade_v8_0_0.so | Normalizada versión 8.0.0 en el nombre |
+| libTKDEGLTF.so | libTKDEGLTF.so | Ya cumple |
+| libTKDEGLTF.so. | libTKDEGLTF.so_dot.so | Reemplazado punto final por _dot.so |
+| libTKDEGLTF.so.8.0.0 | libTKDEGLTF_v8_0_0.so | Normalizada versión 8.0.0 en el nombre |
 | libTKDEIGES.so | libTKDEIGES.so | Ya cumple |
 | libTKDEIGES.so. | libTKDEIGES.so_dot.so | Reemplazado punto final por _dot.so |
 | libTKDEIGES.so.8.0.0 | libTKDEIGES_v8_0_0.so | Normalizada versión 8.0.0 en el nombre |
@@ -174,6 +201,9 @@
 | libTKXSDRAWDE.so | libTKXSDRAWDE.so | Ya cumple |
 | libTKXSDRAWDE.so. | libTKXSDRAWDE.so_dot.so | Reemplazado punto final por _dot.so |
 | libTKXSDRAWDE.so.8.0.0 | libTKXSDRAWDE_v8_0_0.so | Normalizada versión 8.0.0 en el nombre |
+| libTKXSDRAWGLTF.so | libTKXSDRAWGLTF.so | Ya cumple |
+| libTKXSDRAWGLTF.so. | libTKXSDRAWGLTF.so_dot.so | Reemplazado punto final por _dot.so |
+| libTKXSDRAWGLTF.so.8.0.0 | libTKXSDRAWGLTF_v8_0_0.so | Normalizada versión 8.0.0 en el nombre |
 | libTKXSDRAWIGES.so | libTKXSDRAWIGES.so | Ya cumple |
 | libTKXSDRAWIGES.so. | libTKXSDRAWIGES.so_dot.so | Reemplazado punto final por _dot.so |
 | libTKXSDRAWIGES.so.8.0.0 | libTKXSDRAWIGES_v8_0_0.so | Normalizada versión 8.0.0 en el nombre |
@@ -214,26 +244,53 @@
 | libXft.so | libXft.so | Ya cumple |
 | libXrender.so | libXrender.so | Ya cumple |
 | libXss.so | libXss.so | Ya cumple |
+| libaec.so | libaec.so | Ya cumple |
+| libaec.so.0 | libaec_v0.so | Normalizada versión 0 en el nombre |
+| libaec.so.0.1.7 | libaec_v0_1_7.so | Normalizada versión 0.1.7 en el nombre |
 | libandroid-support.so | libandroid-support.so | Ya cumple |
 | libbrotlicommon.so | libbrotlicommon.so | Ya cumple |
 | libbrotlidec.so | libbrotlidec.so | Ya cumple |
 | libbz2.so.1.0 | libbz2_v1_0.so | Normalizada versión 1.0 en el nombre |
 | libc++_shared.so | libc++_shared.so | Ya cumple |
+| libdraco.so | libdraco.so | Ya cumple |
+| libdraco.so.9 | libdraco_v9.so | Normalizada versión 9 en el nombre |
+| libdraco.so.9.0.0 | libdraco_v9_0_0.so | Normalizada versión 9.0.0 en el nombre |
 | libexpat.so.1 | libexpat_v1.so | Normalizada versión 1 en el nombre |
 | libfontconfig.so | libfontconfig.so | Ya cumple |
 | libfreeimage.so.3 | libfreeimage_v3.so | Normalizada versión 3 en el nombre |
 | libfreetype.so | libfreetype.so | Ya cumple |
 | libfreetype.so.6 | libfreetype_v6.so | Normalizada versión 6 en el nombre |
 | libgmp.so | libgmp.so | Ya cumple |
-| libgmsh.so | libgmsh.so | Ya cumple |
+| libgmsh.so | libgmsh_v5_0.so | Vinculado a libgmsh_v5_0.so para evitar colisión con el ejecutable gmsh |
 | libgmsh.so.5.0 | libgmsh_v5_0.so | Normalizada versión 5.0 en el nombre |
 | libgmsh.so.5.0.0 | libgmsh_v5_0_0.so | Normalizada versión 5.0.0 en el nombre |
 | libhdf5.so | libhdf5.so | Ya cumple |
 | libhdf5.so.1000 | libhdf5_v1000.so | Normalizada versión 1000 en el nombre |
 | libhdf5.so.1000.0.0 | libhdf5_v1000_0_0.so | Normalizada versión 1000.0.0 en el nombre |
+| libhdf5_cpp.so | libhdf5_cpp.so | Ya cumple |
+| libhdf5_cpp.so.1000 | libhdf5_cpp_v1000.so | Normalizada versión 1000 en el nombre |
+| libhdf5_cpp.so.1000.0.0 | libhdf5_cpp_v1000_0_0.so | Normalizada versión 1000.0.0 en el nombre |
+| libhdf5_f90cstub.so | libhdf5_f90cstub.so | Ya cumple |
+| libhdf5_f90cstub.so.1000 | libhdf5_f90cstub_v1000.so | Normalizada versión 1000 en el nombre |
+| libhdf5_f90cstub.so.1000.0.0 | libhdf5_f90cstub_v1000_0_0.so | Normalizada versión 1000.0.0 en el nombre |
+| libhdf5_fortran.so | libhdf5_fortran.so | Ya cumple |
+| libhdf5_fortran.so.1000 | libhdf5_fortran_v1000.so | Normalizada versión 1000 en el nombre |
+| libhdf5_fortran.so.1000.0.0 | libhdf5_fortran_v1000_0_0.so | Normalizada versión 1000.0.0 en el nombre |
 | libhdf5_hl.so | libhdf5_hl.so | Ya cumple |
 | libhdf5_hl.so.1000 | libhdf5_hl_v1000.so | Normalizada versión 1000 en el nombre |
 | libhdf5_hl.so.1000.0.0 | libhdf5_hl_v1000_0_0.so | Normalizada versión 1000.0.0 en el nombre |
+| libhdf5_hl_cpp.so | libhdf5_hl_cpp.so | Ya cumple |
+| libhdf5_hl_cpp.so.1000 | libhdf5_hl_cpp_v1000.so | Normalizada versión 1000 en el nombre |
+| libhdf5_hl_cpp.so.1000.0.0 | libhdf5_hl_cpp_v1000_0_0.so | Normalizada versión 1000.0.0 en el nombre |
+| libhdf5_hl_f90cstub.so | libhdf5_hl_f90cstub.so | Ya cumple |
+| libhdf5_hl_f90cstub.so.1000 | libhdf5_hl_f90cstub_v1000.so | Normalizada versión 1000 en el nombre |
+| libhdf5_hl_f90cstub.so.1000.0.0 | libhdf5_hl_f90cstub_v1000_0_0.so | Normalizada versión 1000.0.0 en el nombre |
+| libhdf5_hl_fortran.so | libhdf5_hl_fortran.so | Ya cumple |
+| libhdf5_hl_fortran.so.1000 | libhdf5_hl_fortran_v1000.so | Normalizada versión 1000 en el nombre |
+| libhdf5_hl_fortran.so.1000.0.0 | libhdf5_hl_fortran_v1000_0_0.so | Normalizada versión 1000.0.0 en el nombre |
+| libhdf5_tools.so | libhdf5_tools.so | Ya cumple |
+| libhdf5_tools.so.1000 | libhdf5_tools_v1000.so | Normalizada versión 1000 en el nombre |
+| libhdf5_tools.so.1000.0.0 | libhdf5_tools_v1000_0_0.so | Normalizada versión 1000.0.0 en el nombre |
 | libmed.so | libmed.so | Ya cumple |
 | libmed.so.14 | libmed_v14.so | Normalizada versión 14 en el nombre |
 | libmed.so.14.0.1 | libmed_v14_0_1.so | Normalizada versión 14.0.1 en el nombre |
@@ -243,13 +300,26 @@
 | libmedfwrap.so | libmedfwrap.so | Ya cumple |
 | libmedfwrap.so.14 | libmedfwrap_v14.so | Normalizada versión 14 en el nombre |
 | libmedfwrap.so.14.0.1 | libmedfwrap_v14_0_1.so | Normalizada versión 14.0.1 en el nombre |
-| libmedimport.so | libmedimport.so | Ya cumple |
+| libmedimport.so | libmedimport_v0.so | Vinculado a libmedimport_v0.so para evitar colisión con el ejecutable medimport |
 | libmedimport.so.0 | libmedimport_v0.so | Normalizada versión 0 en el nombre |
 | libmedimport.so.0.4.3 | libmedimport_v0_4_3.so | Normalizada versión 0.4.3 en el nombre |
 | libopenblas.so | libopenblas.so | Ya cumple |
 | libopenblas.so.0 | libopenblas_v0.so | Normalizada versión 0 en el nombre |
 | libopenblasp-r0.3.33.dev.so | libopenblasp-r0.3.33.dev.so | Ya cumple |
+| libopenblasp-r0.3.34.dev.so | libopenblasp-r0.3.34.dev.so | Ya cumple |
 | libpng16.so | libpng16.so | Ya cumple |
+| libsz.so | libsz.so | Ya cumple |
+| libsz.so.2 | libsz_v2.so | Normalizada versión 2 en el nombre |
+| libsz.so.2.0.1 | libsz_v2_0_1.so | Normalizada versión 2.0.1 en el nombre |
+| libtbb.so | libtbb.so | Ya cumple |
+| libtbb.so.12 | libtbb_v12.so | Normalizada versión 12 en el nombre |
+| libtbb.so.12.13 | libtbb_v12_13.so | Normalizada versión 12.13 en el nombre |
+| libtbbmalloc.so | libtbbmalloc.so | Ya cumple |
+| libtbbmalloc.so.2 | libtbbmalloc_v2.so | Normalizada versión 2 en el nombre |
+| libtbbmalloc.so.2.13 | libtbbmalloc_v2_13.so | Normalizada versión 2.13 en el nombre |
+| libtbbmalloc_proxy.so | libtbbmalloc_proxy.so | Ya cumple |
+| libtbbmalloc_proxy.so.2 | libtbbmalloc_proxy_v2.so | Normalizada versión 2 en el nombre |
+| libtbbmalloc_proxy.so.2.13 | libtbbmalloc_proxy_v2_13.so | Normalizada versión 2.13 en el nombre |
 | libtcl8.6.so | libtcl8.6.so | Ya cumple |
 | libtk8.6.so | libtk8.6.so | Ya cumple |
 | libxcb.so | libxcb.so | Ya cumple |

@@ -42,22 +42,22 @@
 
 /* Define to a macro mangling the given C identifier (in lower and upper
    case), which must not contain underscores, for linking with Fortran. */
-#define H5_FC_FUNC(name,NAME) name ## _
+#define H5_FC_FUNC(name,NAME) name##_
 
 /* Same as H5_FC_FUNC, but for C identifiers containing underscores. */
-#define H5_FC_FUNC_(name,NAME) name ## _
+#define H5_FC_FUNC_(name,NAME) name##_
 
 /* Define if Fortran C_BOOL is different from default LOGICAL */
 /* #undef H5_FORTRAN_C_BOOL_IS_UNIQUE */
 
 /* Define if we have Fortran intrinsic C_SIZEOF */
-/* #undef H5_FORTRAN_HAVE_C_SIZEOF */
+#define H5_FORTRAN_HAVE_C_SIZEOF 1
 
 /* Define if we have Fortran intrinsic SIZEOF */
-/* #undef H5_FORTRAN_HAVE_SIZEOF */
+#define H5_FORTRAN_HAVE_SIZEOF 1
 
 /* Define if we have Fortran intrinsic STORAGE_SIZE */
-/* #undef H5_FORTRAN_HAVE_STORAGE_SIZE */
+#define H5_FORTRAN_HAVE_STORAGE_SIZE 1
 
 /* Define if Fortran supports allocatable character */
 /* #undef H5_FORTRAN_HAVE_CHAR_ALLOC */
@@ -132,10 +132,10 @@
 #define H5_HAVE_FILTER_DEFLATE 1
 
 /* Define if support for szip filter is enabled */
-/* #undef H5_HAVE_FILTER_SZIP */
+#define H5_HAVE_FILTER_SZIP 1
 
 /* Determine if _Float16 is available */
-/* #undef H5_HAVE__FLOAT16 */
+#define H5_HAVE__FLOAT16 1
 
 /* Determine if __float128 will be used in the Fortran wrappers */
 /* #undef H5_HAVE_FLOAT128 */
@@ -202,7 +202,7 @@
 /* #undef H5_HAVE_LIBPTHREAD */
 
 /* Define to 1 if you have the `sz' library (-lsz). */
-/* #undef H5_HAVE_LIBSZ */
+#define H5_HAVE_LIBSZ 1
 
 /* Define to 1 if you have the `ws2_32' library (-lws2_32). */
 /* #undef H5_HAVE_LIBWS2_32 */
@@ -308,7 +308,7 @@
 #define H5_HAVE_SYS_TIME_H 1
 
 /* Define to 1 if you have the <szlib.h> header file. */
-/* #undef H5_HAVE_SZLIB_H */
+#define H5_HAVE_SZLIB_H 1
 
 /* Define if we have thread support */
 # define H5_HAVE_THREADS 1
@@ -384,7 +384,7 @@
 /* #undef H5_DIMENSION_SCALES_WITH_NEW_REF */
 
 /* Define if your system can convert long double to _Float16 values correctly. */
-/* #undef H5_LDOUBLE_TO_FLOAT16_CORRECT */
+#define H5_LDOUBLE_TO_FLOAT16_CORRECT 1
 
 /* Define if your system can convert long double to (unsigned) long long
    values correctly. */
@@ -418,7 +418,7 @@
 #define H5_PACKAGE_NAME "HDF5"
 
 /* Define to the full name and version of this package. */
-#define H5_PACKAGE_STRING "HDF5 2.2.0"
+#define H5_PACKAGE_STRING "HDF5 2.3.0"
 
 /* Define to the one symbol short name of this package. */
 #define H5_PACKAGE_TARNAME "hdf5"
@@ -427,13 +427,13 @@
 #define H5_PACKAGE_URL "https://www.hdfgroup.org"
 
 /* Define to the version of this package. */
-#define H5_PACKAGE_VERSION "2.2.0"
+#define H5_PACKAGE_VERSION "2.3.0"
 
 /* Determine the maximum decimal precision in C */
-#define H5_PAC_C_MAX_REAL_PRECISION 
+#define H5_PAC_C_MAX_REAL_PRECISION 36
 
 /* Define Fortran Maximum Real Decimal Precision */
-#define H5_PAC_FC_MAX_REAL_PRECISION 
+#define H5_PAC_FC_MAX_REAL_PRECISION 33
 
 /* The size of `bool', as computed by sizeof. */
 #define H5_SIZEOF_BOOL 1
@@ -630,7 +630,7 @@
 /* #undef H5_USING_MEMCHECKER */
 
 /* Version number of package */
-#define H5_VERSION "2.2.0"
+#define H5_VERSION "2.3.0"
 
 /* Data accuracy is preferred to speed during data conversions */
 #define H5_WANT_DATA_ACCURACY 1
