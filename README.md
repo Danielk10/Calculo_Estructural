@@ -216,10 +216,11 @@ the Free Software Foundation; see gpl.htm.
 | **Nombre de la Aplicación** | Structural Analysis FEA 3D |
 | **ID de Paquete (Package Name)** | `com.diamon.civil` |
 | **Versión de la Aplicación** | `v0.3.0` (VersionCode: `4`) |
-| **SDK de Compilación (Compile SDK)** | **API 37** (Android 15 / 16 Preview) |
-| **SDK Objetivo (Target SDK)** | **API 37** |
+| **SDK de Compilación (Compile SDK)** | **API 37** (Android 17) |
+| **SDK Objetivo (Target SDK)** | **API 37** (Android 17) |
 | **SDK Mínimo (Min SDK)** | **API 24** (Android 7.0 Nougat o superior) |
 | **Arquitectura de Procesador (ABI)** | **`arm64-v8a`** (ARM 64-bit exclusivo, 330 binarios nativos) |
+| **Versión de Build-Tools** | `37.0.0` (Platform-Tools: `37.0.1`) |
 | **Versión del NDK** | `30.0.14904198` (Android NDK r30) |
 | **Versión de CMake** | `4.1.2` |
 | **Versión de Gradle** | `9.6.0` (con Android Gradle Plugin `9.2.1`) |
