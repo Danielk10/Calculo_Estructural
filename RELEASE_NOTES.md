@@ -15,12 +15,12 @@ La versión **v0.3.0** representa una evolución mayor en la infraestructura com
   * Integración de `libtbb.so` y el asignador de memoria concurrente `libtbbmalloc.so` para optimizar operaciones booleanas y mallado intensivo en procesadores multinúcleo ARM64.
 * **Google Draco 1.5.7:**
   * Incorporación de `libdraco.so` y los ejecutables nativos `draco_encoder` y `draco_decoder` para comprimir mallas de resultados y nubes de puntos hasta en un 95%, reduciendo drásticamente la huella de memoria RAM.
-* **Suite HDF5 1.14.3 & Formato MED:**
+* **Suite HDF5 2.3.0 & MEDfile 6.0.1:**
   * Soporte completo para persistencia jerárquica de matrices y mallas con compresión SZIP (`libsz.so`) y codificación de entropía adaptativa (`libaec.so`).
   * Integración de herramientas CLI (`h5dump`, `h5ls`, `h5diff`, `h5repack`, `h5copy`, `h5stat`, `h5clear`) operables directamente desde la terminal.
 * **OpenCASCADE glTF (`TKDEGLTF` & `TKXSDRAWGLTF`):**
   * Soporte nativo para exportar e importar modelos CAD en formato glTF/GLB estándar.
-* **OpenBLAS r0.3.34:**
+* **OpenBLAS r0.3.34.dev:**
   * Núcleo de álgebra lineal multihilo de alto rendimiento actualizado para ARM64.
 
 ---

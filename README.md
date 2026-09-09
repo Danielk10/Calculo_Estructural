@@ -8,7 +8,7 @@
 [![Gmsh](https://img.shields.io/badge/Gmsh-v5.0.0-red)](https://gmsh.info)
 [![oneTBB](https://img.shields.io/badge/oneTBB-v2021.13.0-blue)](https://github.com/uxlfoundation/oneTBB)
 [![Draco](https://img.shields.io/badge/Google%20Draco-v1.5.7-green)](https://github.com/google/draco)
-[![HDF5](https://img.shields.io/badge/HDF5-v1.14.3-purple)](https://www.hdfgroup.org)
+[![HDF5](https://img.shields.io/badge/HDF5-v2.3.0-purple)](https://www.hdfgroup.org)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Gradle](https://img.shields.io/badge/Gradle-9.6.0-02303A?logo=gradle&logoColor=white)](https://gradle.org)
 [![AGP](https://img.shields.io/badge/AGP-9.2.1-green)](https://developer.android.com/build)
@@ -62,18 +62,18 @@ El proyecto integra las siguientes librerías científicas de código abierto:
 | **Gmsh** | **5.0.0** | Generador de mallas 3D (C3D10, C3D8, C3D4, etc.) | **GNU GPL v2.0+** | [https://gmsh.info](https://gmsh.info) |
 | **OpenSees (OpenSeesPy)** | **3.5+** | Validador independiente de análisis estructural | **BSD-like** | [https://openseespydoc.readthedocs.io](https://openseespydoc.readthedocs.io) |
 | **SPOOLES** | **2.2 MT** | Solución matricial dispersa multihilo (Multi-Threaded) | **Dominio Público** | [https://netlib.org/linalg/spooles/spooles.2.2.html](https://netlib.org/linalg/spooles/spooles.2.2.html) |
-| **ARPACK** | - | Solucionador de autovalores y frecuencias modales | **Permisiva (BSD-like)** | [https://www.netlib.org/arpack/](https://www.netlib.org/arpack/) |
-| **OpenBLAS / LAPACK** | **r0.3.34** | Álgebra lineal optimizada multihilo para ARM64 | **BSD 3-Clause** | [https://www.openblas.net](https://www.openblas.net) |
+| **ARPACK** | **arpack-ng** | Solucionador de autovalores y frecuencias modales | **Permisiva (BSD-like)** | [https://github.com/opencollab/arpack-ng](https://github.com/opencollab/arpack-ng) |
+| **OpenBLAS / LAPACK** | **r0.3.34.dev** | Álgebra lineal optimizada multihilo para ARM64 | **BSD 3-Clause** | [https://www.openblas.net](https://www.openblas.net) |
 | **BLAS (Netlib)** | - | Álgebra lineal básica | **Reference BLAS** | [https://www.netlib.org/blas/](https://www.netlib.org/blas/) |
 | **oneAPI TBB (oneTBB)** | **2021.13.0** | Planificador de tareas y paralelismo para OpenCASCADE (`libtbb`, `libtbbmalloc`) | **Apache 2.0** | [https://github.com/uxlfoundation/oneTBB](https://github.com/uxlfoundation/oneTBB) |
 | **Google Draco** | **1.5.7** | Compresión y descompresión ultrarrápida de mallas 3D | **Apache 2.0** | [https://github.com/google/draco](https://github.com/google/draco) |
-| **HDF5 (C, C++, Fortran, Tools)** | **1.14.3** | Almacenamiento jerárquico de matrices y datos científicos masivos | **BSD-style** | [https://www.hdfgroup.org](https://www.hdfgroup.org) |
-| **MED / MED-fichier** | **4.1 (v14)** | Formato estándar de intercambio de mallas y campos FEA | **GNU LGPL v3.0** | [https://www.salome-platform.org](https://www.salome-platform.org) |
+| **HDF5 (C, C++, Fortran, Tools)** | **2.3.0** | Almacenamiento jerárquico de matrices y datos científicos masivos | **BSD-style** | [https://www.hdfgroup.org](https://www.hdfgroup.org) |
+| **MEDfile (MED-fichier)** | **6.0.1** | Formato estándar de intercambio de mallas y campos FEA (port CMake Salome) | **GNU LGPL v3.0** | [https://github.com/chennes/med](https://github.com/chennes/med) |
 | **SZIP / libsz** | **2.1.1** | Algoritmo de compresión científica sin pérdidas para HDF5 | **BSD-like** | [https://www.hdfgroup.org](https://www.hdfgroup.org) |
 | **libaec** | **1.0.6** | Codificación de entropía adaptativa (Adaptive Entropy Coding) | **BSD 2-Clause** | [https://gitlab.dkrz.de/k202009/libaec](https://gitlab.dkrz.de/k202009/libaec) |
 | **Tcl / Tk** | **8.6** | Intérprete y entorno de scripting para DRAWEXE | **BSD-like** | [https://www.tcl.tk](https://www.tcl.tk) |
 | **FreeType / FreeImage** | - | Renderizado de fuentes y texturas CAD | **FTL / GPL / FIPL** | [https://freetype.org](https://freetype.org) |
-| **RapidJSON** | - | Serialización y deserialización JSON de alto rendimiento | **MIT** | [https://rapidjson.org](https://rapidjson.org) |
+| **RapidJSON** | **1.1.0** | Serialización y deserialización JSON de alto rendimiento | **MIT** | [https://rapidjson.org](https://rapidjson.org) |
 | **SceneView / Filament** | **4.18.0** | Visor 3D PBR/Unlit con control táctil interactivo | **Apache 2.0** | [https://github.com/SceneView/sceneview-android](https://github.com/SceneView/sceneview-android) |
 | **iText 7 Core** | **7.2.5** | Generación de memorias de cálculo en PDF | **AGPL v3.0 / Commercial** | [https://itextpdf.com](https://itextpdf.com) |
 | **GCC Fortran Runtime** | - | Runtime de Fortran (`libgfortran5`) | **GNU GPL v3.0+** | [https://gcc.gnu.org](https://gcc.gnu.org) |
@@ -201,7 +201,7 @@ the Free Software Foundation; see gpl.htm.
   - Motor de tareas concurrentes y asignador de memoria de alto desempeño que acelera los algoritmos de modelado B-Rep y operaciones booleanas pesadas de OpenCASCADE 8.0.0.
 - **Compresión Geométrica 3D Ultrarrápida (Google Draco 1.5.7):**
   - Módulos nativos (`draco_decoder`, `draco_encoder`) para compactar y descomprimir mallas 3D complejas con reducciones superiores al 90%, garantizando máxima fluidez en el visor 3D interactivo para dispositivos móviles.
-- **Almacenamiento Científico Jerárquico (HDF5 1.14.3 & Formato MED):**
+- **Almacenamiento Científico Jerárquico (HDF5 2.3.0 & MEDfile 6.0.1):**
   - Ecosistema completo para gestión de matrices de rigidez, historias temporales y grandes mallas de elementos finitos con compresión sin pérdidas vía SZIP (`libsz.so`) y codificación de entropía adaptativa (`libaec.so`).
   - Suite de utilidades de consola (`h5dump`, `h5ls`, `h5diff`, `h5repack`, `h5copy`, `h5stat`, `h5clear`) operables directamente desde la terminal interna.
 - **Intercambio CAD Moderno (OpenCASCADE glTF):**
@@ -231,8 +231,8 @@ the Free Software Foundation; see gpl.htm.
 | **Generador de Malla 3D** | **Gmsh 5.0.0** |
 | **Concurrencia y Paralelismo** | **oneAPI TBB 2021.13.0** (`tbb` / `tbbmalloc`) |
 | **Compresión 3D** | **Google Draco 1.5.7** (`draco_decoder` / `draco_encoder`) |
-| **Datos Científicos y Matrices** | **HDF5 1.14.3** / **MED-fichier 4.1 (v14)** |
-| **Álgebra Lineal Optimizada** | **OpenBLAS r0.3.34** multihilo (ARM64) |
+| **Datos Científicos y Matrices** | **HDF5 2.3.0** / **MEDfile 6.0.1** |
+| **Álgebra Lineal Optimizada** | **OpenBLAS r0.3.34.dev** multihilo (ARM64) |
 | **Validador Independiente** | **OpenSeesPy** (Python 3.11 en entorno aislado `~/opensees-env`) |
 | **Motor de Renderizado 3D** | **SceneView 4.18.0** / Google Filament PBR &amp; Unlit |
 | **Generador de Reportes PDF** | **iText 7 Core 7.2.5** / Android Graphics PdfDocument |
