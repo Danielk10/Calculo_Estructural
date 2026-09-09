@@ -1,10 +1,14 @@
 # Structural Analysis FEA 3D
 
+[![Release](https://img.shields.io/badge/Release-v0.3.0-brightgreen.svg)](https://github.com/Danielk10/Calculo_Estructural/releases/tag/v0.3.0)
 [![Android](https://img.shields.io/badge/Android-7.0%2B%20(API%2024--37)-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
-[![Architecture](https://img.shields.io/badge/Architecture-ARM64--v8a-blue?logo=arm&logoColor=white)](https://developer.android.com/ndk)
+[![Architecture](https://img.shields.io/badge/Architecture-ARM64--v8a%20(330%20Binaries)-blue?logo=arm&logoColor=white)](https://developer.android.com/ndk)
 [![CalculiX](https://img.shields.io/badge/CalculiX%20FEA-v2.23%20MT-darkgreen)](https://www.calculix.de)
-[![OpenCASCADE](https://img.shields.io/badge/OpenCASCADE-v8.0.0.p1-orange)](https://www.opencascade.com)
+[![OpenCASCADE](https://img.shields.io/badge/OpenCASCADE-v8.0.0.p1%20glTF-orange)](https://www.opencascade.com)
 [![Gmsh](https://img.shields.io/badge/Gmsh-v5.0.0-red)](https://gmsh.info)
+[![oneTBB](https://img.shields.io/badge/oneTBB-v2021.13.0-blue)](https://github.com/uxlfoundation/oneTBB)
+[![Draco](https://img.shields.io/badge/Google%20Draco-v1.5.7-green)](https://github.com/google/draco)
+[![HDF5](https://img.shields.io/badge/HDF5-v1.14.3-purple)](https://www.hdfgroup.org)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Gradle](https://img.shields.io/badge/Gradle-9.6.0-02303A?logo=gradle&logoColor=white)](https://gradle.org)
 [![AGP](https://img.shields.io/badge/AGP-9.2.1-green)](https://developer.android.com/build)
@@ -53,23 +57,27 @@ El proyecto integra las siguientes librerías científicas de código abierto:
 
 | Componente / Librería | Versión | Propósito en la Aplicación | Licencia | Página Oficial |
 | :--- | :--- | :--- | :--- | :--- |
-| **CalculiX (CCX)** | **2.23** | Motor físico y solucionador FEA estructural/volumétrico | **GNU GPL** | [https://www.calculix.de](https://www.calculix.de) |
-| **CalculiX CCX Manual** | 2.21 | Manual de referencia del solver CCX | **GPL v2.0** | [http://www.dhondt.de/ccx_2.21.pdf](http://www.dhondt.de/ccx_2.21.pdf) |
-| **CalculiX CGX Manual** | 2.19 | Manual de pre/post-procesamiento CGX | **GPL v2.0** | [http://www.dhondt.de/cgx_2.19.pdf](http://www.dhondt.de/cgx_2.19.pdf) |
-| **OpenCASCADE (OCCT)** | **8.0.0.p1** | Núcleo CAD 3D, operaciones BRep, STEP/IGES y DRAWEXE | **GNU LGPL v2.1** | [https://www.opencascade.com](https://www.opencascade.com) |
+| **CalculiX (CCX)** | **2.23** | Motor físico y solucionador FEA estructural/volumétrico | **GNU GPL v2.0+** | [https://www.calculix.de](https://www.calculix.de) |
+| **OpenCASCADE (OCCT)** | **8.0.0.p1** | Núcleo CAD 3D, operaciones BRep, STEP/IGES, glTF y DRAWEXE | **GNU LGPL v2.1** | [https://www.opencascade.com](https://www.opencascade.com) |
 | **Gmsh** | **5.0.0** | Generador de mallas 3D (C3D10, C3D8, C3D4, etc.) | **GNU GPL v2.0+** | [https://gmsh.info](https://gmsh.info) |
 | **OpenSees (OpenSeesPy)** | **3.5+** | Validador independiente de análisis estructural | **BSD-like** | [https://openseespydoc.readthedocs.io](https://openseespydoc.readthedocs.io) |
 | **SPOOLES** | **2.2 MT** | Solución matricial dispersa multihilo (Multi-Threaded) | **Dominio Público** | [https://netlib.org/linalg/spooles/spooles.2.2.html](https://netlib.org/linalg/spooles/spooles.2.2.html) |
 | **ARPACK** | - | Solucionador de autovalores y frecuencias modales | **Permisiva (BSD-like)** | [https://www.netlib.org/arpack/](https://www.netlib.org/arpack/) |
-| **OpenBLAS / LAPACK** | - | Álgebra lineal optimizada de alto rendimiento | **BSD 3-Clause** | [https://www.openblas.net](https://www.openblas.net) |
+| **OpenBLAS / LAPACK** | **r0.3.34** | Álgebra lineal optimizada multihilo para ARM64 | **BSD 3-Clause** | [https://www.openblas.net](https://www.openblas.net) |
 | **BLAS (Netlib)** | - | Álgebra lineal básica | **Reference BLAS** | [https://www.netlib.org/blas/](https://www.netlib.org/blas/) |
+| **oneAPI TBB (oneTBB)** | **2021.13.0** | Planificador de tareas y paralelismo para OpenCASCADE (`libtbb`, `libtbbmalloc`) | **Apache 2.0** | [https://github.com/uxlfoundation/oneTBB](https://github.com/uxlfoundation/oneTBB) |
+| **Google Draco** | **1.5.7** | Compresión y descompresión ultrarrápida de mallas 3D | **Apache 2.0** | [https://github.com/google/draco](https://github.com/google/draco) |
+| **HDF5 (C, C++, Fortran, Tools)** | **1.14.3** | Almacenamiento jerárquico de matrices y datos científicos masivos | **BSD-style** | [https://www.hdfgroup.org](https://www.hdfgroup.org) |
+| **MED / MED-fichier** | **4.1 (v14)** | Formato estándar de intercambio de mallas y campos FEA | **GNU LGPL v3.0** | [https://www.salome-platform.org](https://www.salome-platform.org) |
+| **SZIP / libsz** | **2.1.1** | Algoritmo de compresión científica sin pérdidas para HDF5 | **BSD-like** | [https://www.hdfgroup.org](https://www.hdfgroup.org) |
+| **libaec** | **1.0.6** | Codificación de entropía adaptativa (Adaptive Entropy Coding) | **BSD 2-Clause** | [https://gitlab.dkrz.de/k202009/libaec](https://gitlab.dkrz.de/k202009/libaec) |
 | **Tcl / Tk** | **8.6** | Intérprete y entorno de scripting para DRAWEXE | **BSD-like** | [https://www.tcl.tk](https://www.tcl.tk) |
 | **FreeType / FreeImage** | - | Renderizado de fuentes y texturas CAD | **FTL / GPL / FIPL** | [https://freetype.org](https://freetype.org) |
-| **oneTBB / Draco / RapidJSON** | - | Paralelismo, compresión geométrica y serialización JSON | **Apache 2.0 / MIT** | [https://github.com](https://github.com) |
+| **RapidJSON** | - | Serialización y deserialización JSON de alto rendimiento | **MIT** | [https://rapidjson.org](https://rapidjson.org) |
 | **SceneView / Filament** | **4.18.0** | Visor 3D PBR/Unlit con control táctil interactivo | **Apache 2.0** | [https://github.com/SceneView/sceneview-android](https://github.com/SceneView/sceneview-android) |
 | **iText 7 Core** | **7.2.5** | Generación de memorias de cálculo en PDF | **AGPL v3.0 / Commercial** | [https://itextpdf.com](https://itextpdf.com) |
 | **GCC Fortran Runtime** | - | Runtime de Fortran (`libgfortran5`) | **GNU GPL v3.0+** | [https://gcc.gnu.org](https://gcc.gnu.org) |
-| **Código Android** | **v0.2.0** | Aplicación Android (Java, Kotlin, C++ JNI) | **GNU GPL v3.0** | [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html) |
+| **Código Android** | **v0.3.0** | Aplicación Android (Java, Kotlin, C++ JNI) | **GNU GPL v3.0** | [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html) |
 
 ---
 
@@ -188,24 +196,43 @@ the Free Software Foundation; see gpl.htm.
 
 ---
 
+### 5. ⚡ Ecosistema Científico Nativo ARM64-v8a (oneTBB, Google Draco & Suite HDF5)
+- **Paralelismo Multihilo con oneTBB (`libtbb.so`, `libtbbmalloc.so`):**
+  - Motor de tareas concurrentes y asignador de memoria de alto desempeño que acelera los algoritmos de modelado B-Rep y operaciones booleanas pesadas de OpenCASCADE 8.0.0.
+- **Compresión Geométrica 3D Ultrarrápida (Google Draco 1.5.7):**
+  - Módulos nativos (`draco_decoder`, `draco_encoder`) para compactar y descomprimir mallas 3D complejas con reducciones superiores al 90%, garantizando máxima fluidez en el visor 3D interactivo para dispositivos móviles.
+- **Almacenamiento Científico Jerárquico (HDF5 1.14.3 & Formato MED):**
+  - Ecosistema completo para gestión de matrices de rigidez, historias temporales y grandes mallas de elementos finitos con compresión sin pérdidas vía SZIP (`libsz.so`) y codificación de entropía adaptativa (`libaec.so`).
+  - Suite de utilidades de consola (`h5dump`, `h5ls`, `h5diff`, `h5repack`, `h5copy`, `h5stat`, `h5clear`) operables directamente desde la terminal interna.
+- **Intercambio CAD Moderno (OpenCASCADE glTF):**
+  - Módulos `TKDEGLTF` y `TKXSDRAWGLTF` integrados para exportación de modelos paramétricos a estándares glTF/GLB web y móviles.
+- **Infraestructura Nativa Cerrada y Segura:**
+  - Ecosistema de **330 binarios** empaquetados en `app/src/main/jniLibs/arm64-v8a/` con **0 dependencias faltantes**, **0 RPATH/RUNPATH residuales** y 332 enlaces simbólicos sincronizados en tiempo de ejecución.
+
+---
+
 ## 🛠️ Especificaciones Técnicas del Proyecto
 
 | Parámetro | Configuración / Versión |
 | :--- | :--- |
 | **Nombre de la Aplicación** | Structural Analysis FEA 3D |
 | **ID de Paquete (Package Name)** | `com.diamon.civil` |
-| **Versión de la Aplicación** | `v0.2.0` (VersionCode: `3`) |
+| **Versión de la Aplicación** | `v0.3.0` (VersionCode: `4`) |
 | **SDK de Compilación (Compile SDK)** | **API 37** (Android 15 / 16 Preview) |
 | **SDK Objetivo (Target SDK)** | **API 37** |
 | **SDK Mínimo (Min SDK)** | **API 24** (Android 7.0 Nougat o superior) |
-| **Arquitectura de Procesador (ABI)** | **`arm64-v8a`** (ARM 64-bit exclusivo) |
+| **Arquitectura de Procesador (ABI)** | **`arm64-v8a`** (ARM 64-bit exclusivo, 330 binarios nativos) |
 | **Versión del NDK** | `30.0.14904198` (Android NDK r30) |
 | **Versión de CMake** | `4.1.2` |
 | **Versión de Gradle** | `9.6.0` (con Android Gradle Plugin `9.2.1`) |
 | **Compatibilidad Java / Kotlin** | **Java 11** (`JavaVersion.VERSION_11`), Kotlin `2.2.10`, Compose BOM `2025.05.00` |
 | **Solucionador FEA Principal** | **CalculiX CCX 2.23** (SPOOLES 2.2 MT + OpenMP) |
-| **Modelador CAD** | **OpenCASCADE Technology (OCCT 8.0.0.p1)** |
+| **Modelador CAD** | **OpenCASCADE Technology (OCCT 8.0.0.p1 con glTF)** |
 | **Generador de Malla 3D** | **Gmsh 5.0.0** |
+| **Concurrencia y Paralelismo** | **oneAPI TBB 2021.13.0** (`tbb` / `tbbmalloc`) |
+| **Compresión 3D** | **Google Draco 1.5.7** (`draco_decoder` / `draco_encoder`) |
+| **Datos Científicos y Matrices** | **HDF5 1.14.3** / **MED-fichier 4.1 (v14)** |
+| **Álgebra Lineal Optimizada** | **OpenBLAS r0.3.34** multihilo (ARM64) |
 | **Validador Independiente** | **OpenSeesPy** (Python 3.11 en entorno aislado `~/opensees-env`) |
 | **Motor de Renderizado 3D** | **SceneView 4.18.0** / Google Filament PBR &amp; Unlit |
 | **Generador de Reportes PDF** | **iText 7 Core 7.2.5** / Android Graphics PdfDocument |
@@ -284,7 +311,22 @@ chmod +x setup-sdk.sh
 - **[MANUAL_USUARIO.md](MANUAL_USUARIO.md)**: Manual de uso completo y guía funcional paso a paso.
 - **[RELEASE_NOTES.md](RELEASE_NOTES.md)**: Registro histórico de versiones y características añadidas.
 - **[DOCUMENTACION_FDSAN_DRAWEXE.md](DOCUMENTACION_FDSAN_DRAWEXE.md)**: Documentación de compatibilidad con fdsan para DRAWEXE en Android 11+.
-- **[DOCUMENTACION_RENOMBRADO_BINARIOS.md](DOCUMENTACION_RENOMBRADO_BINARIOS.md)**: Especificación de librerías dinámicas compartidas y nombres normalizados.
+- **[DOCUMENTACION_RENOMBRADO_BINARIOS.md](DOCUMENTACION_RENOMBRADO_BINARIOS.md)**: Especificación de librerías dinámicas compartidas y nombres normalizados (332 entradas).
+- **[REPORTE_ANALISIS_DEPENDENCIAS.md](REPORTE_ANALISIS_DEPENDENCIAS.md)**: Auditoría y resolución de dependencias dinámicas ELF de los 330 binarios en ARM64-v8a.
+- **[REPORTE_CRITICO_RUTAS.md](REPORTE_CRITICO_RUTAS.md)**: Protocolo de saneamiento de RPATH/RUNPATH y purga total de rutas de Termux.
+- **[REPORTE_LIMPIEZA_ASSETS.md](REPORTE_LIMPIEZA_ASSETS.md)**: Criterios de limpieza y sincronización selectiva de assets del sistema.
+
+---
+
+### 📖 Manuales de Referencia y Documentación Oficial de Solvers
+
+- **Manual Oficial CalculiX CrunchiX (CCX):** Documentación técnica de teoría de elementos finitos, formulación matemática de elementos, tarjetas de análisis `.inp` y casos de validación: [Manual Oficial CCX 2.23 (PDF)](http://www.dhondt.de/ccx_2.23.pdf) / [Sitio Oficial de CalculiX](https://www.calculix.de).
+- **Manual Oficial CalculiX GraphiX (CGX):** Guía completa de pre y post-procesamiento, generación de mallas y visualización de resultados: [Manual Oficial CGX 2.22 (PDF)](http://www.dhondt.de/cgx_2.22.pdf) / [Sitio Oficial](http://www.dhondt.de).
+- **Manual Oficial de Usuario Gmsh:** Referencia técnica del generador de mallas 1D/2D/3D y especificación de scripts `.geo`: [https://gmsh.info/doc/texinfo/gmsh.html](https://gmsh.info/doc/texinfo/gmsh.html).
+- **Documentación OpenCASCADE Technology (OCCT 8.0.0.p1):** Manual de modelado B-Rep, arquitectura geométrica y DRAW Test Harness: [https://dev.opencascade.org/doc/overview/html/](https://dev.opencascade.org/doc/overview/html/).
+- **Documentación The HDF Group (HDF5):** Especificaciones del formato de persistencia científica jerárquica y herramientas de análisis: [https://www.hdfgroup.org](https://www.hdfgroup.org).
+- **Documentación Google Draco:** Especificación de algoritmos de compresión geométrica 3D: [https://google.github.io/draco/](https://google.github.io/draco/).
+- **Documentación oneAPI Threading Building Blocks (oneTBB):** Guía de arquitectura concurrente y paralelismo de memoria: [https://uxlfoundation.github.io/oneTBB/](https://uxlfoundation.github.io/oneTBB/).
 
 ---
 
