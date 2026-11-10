@@ -1,6 +1,6 @@
 # Structural Analysis FEA 3D
 
-[![Release](https://img.shields.io/badge/Release-v0.3.0-brightgreen.svg)](https://github.com/Danielk10/Calculo_Estructural/releases/tag/v0.3.0)
+[![Release](https://img.shields.io/badge/Release-v0.4.0-brightgreen.svg)](https://github.com/Danielk10/Calculo_Estructural/releases/tag/v0.4.0)
 [![Android](https://img.shields.io/badge/Android-7.0%2B%20(API%2024--37)-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
 [![Architecture](https://img.shields.io/badge/Architecture-ARM64--v8a%20(330%20Binaries)-blue?logo=arm&logoColor=white)](https://developer.android.com/ndk)
 [![CalculiX](https://img.shields.io/badge/CalculiX%20FEA-v2.23%20MT-darkgreen)](https://www.calculix.de)
@@ -22,7 +22,7 @@
 ### Proyecto basado en CalculiX 2.23 - Cumplimiento Copyleft GPL
 Este repositorio contiene el código Android de la aplicación y el núcleo integrado de **CalculiX Version 2.23** como solucionador por elementos finitos (FEA). Todo el proyecto conjunto está licenciado bajo **GNU General Public License v3.0 (GPLv3)** para cumplir estrictamente con las obligaciones copyleft de CalculiX.
 
-Este proyecto está destinado a su publicación en **GitHub** y **Google Play Store**, con **monetización mediante anuncios y compras internas (In-App Purchases)** para funcionalidades avanzadas.
+Este proyecto se publica en **GitHub** y **Google Play Store**. La aplicación es **completamente gratuita**, sin compras internas ni suscripciones, y se financia únicamente con **anuncios de Google AdMob**.
 
 ---
 
@@ -34,7 +34,7 @@ Se declara explícitamente que:
 2. El ejecutable y librerías nativas fueron compilados el **Sun Oct 19 18:23:34 CEST 2025**.
 3. **Copyright:** Guido Dhondt, 1998-2025.
 4. Todo el proyecto conjunto se licencia bajo **GNU GPL v3.0**.
-5. **Se publican versiones y APKs en GitHub y Google Play** (con monetización por anuncios y compras internas).
+5. **Se publican versiones y APKs en GitHub y Google Play** (con monetización únicamente por anuncios).
 6. **Se cumplen todas las obligaciones de distribución GPL**:
    - ✅ Incluir el **texto completo de la licencia GPL v3.0**.
    - ✅ Incluir los **avisos de copyright de CalculiX 2.23**.
@@ -45,7 +45,7 @@ Se declara explícitamente que:
 *Fundamento legal GPL:*
 - La GPL **permite el uso comercial, venta y monetización**.
 - La GPL **permite la redistribución** de binarios y paquetes (.apk, .aab) siempre que el código fuente esté disponible.
-- La GPL **no prohíbe anuncios ni compras integradas**, exigiendo la disponibilidad del código fuente y la preservación de las 4 libertades del software libre.
+- La GPL **no prohíbe los anuncios**, exigiendo la disponibilidad del código fuente y la preservación de las 4 libertades del software libre.
 
 **Fuente oficial de CalculiX:** [https://www.calculix.de](https://www.calculix.de)
 
@@ -75,7 +75,7 @@ El proyecto integra las siguientes librerías científicas de código abierto:
 | **RapidJSON** | **1.1.0** | Serialización y deserialización JSON de alto rendimiento | **MIT** | [https://rapidjson.org](https://rapidjson.org) |
 | **SceneView / Filament** | **4.18.0** | Visor 3D PBR/Unlit con control táctil interactivo | **Apache 2.0** | [https://github.com/SceneView/sceneview-android](https://github.com/SceneView/sceneview-android) |
 | **iText 7 Core** | **7.2.5** | Generación de memorias de cálculo en PDF | **AGPL v3.0 / Commercial** | [https://itextpdf.com](https://itextpdf.com) |
-| **Código Android** | **v0.3.0** | Aplicación Android (Java, Kotlin, C++ JNI) | **GNU GPL v3.0** | [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html) |
+| **Código Android** | **v0.4.0** | Aplicación Android (Java, Kotlin, C++ JNI) | **GNU GPL v3.0** | [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html) |
 
 ---
 
@@ -215,7 +215,7 @@ the Free Software Foundation; see gpl.htm.
 | :--- | :--- |
 | **Nombre de la Aplicación** | Structural Analysis FEA 3D |
 | **ID de Paquete (Package Name)** | `com.diamon.civil` |
-| **Versión de la Aplicación** | `v0.3.0` (VersionCode: `4`) |
+| **Versión de la Aplicación** | `v0.4.0` (VersionCode: `5`) |
 | **SDK de Compilación (Compile SDK)** | **API 37** (Android 17) |
 | **SDK Objetivo (Target SDK)** | **API 37** (Android 17) |
 | **SDK Mínimo (Min SDK)** | **API 24** (Android 7.0 Nougat o superior) |

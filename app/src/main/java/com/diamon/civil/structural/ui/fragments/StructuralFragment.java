@@ -1394,6 +1394,9 @@ public class StructuralFragment extends Fragment {
                             binding.btnSolveStructural.setEnabled(true);
                             binding.btnSolveStructural.setText(R.string.btn_run_fea_solver);
                             Toast.makeText(appContext, R.string.toast_simulation_complete, Toast.LENGTH_SHORT).show();
+                            if (activity instanceof com.diamon.civil.core.ui.MainActivity) {
+                                ((com.diamon.civil.core.ui.MainActivity) activity).maybeShowInterstitial();
+                            }
                         }
                     });
                 }

@@ -7,6 +7,7 @@ import com.diamon.civil.solids.ui.OnHitListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.diamon.civil.R;
 import com.diamon.civil.databinding.ActivityMainBinding;
+import com.diamon.civil.ads.AdsManager;
 import com.diamon.civil.solids.ui.fragments.SolidFragment;
 import com.diamon.civil.structural.ui.fragments.StructuralFragment;
 import com.diamon.civil.terminal.ui.fragments.TerminalFragment;
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private AssetHelper assetHelper;
     private com.diamon.civil.core.export.ProjectExporter projectExporter;
+    private AdsManager adsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        adsManager = new AdsManager(this, binding.adContainer);
+
         // Keep CPU & screen active during FEA simulations and 3D rendering (API 24 to API 37)
         getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -56,7 +61,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Insets navBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars() | WindowInsetsCompat.Type.ime());
 
             binding.appBarLayout.setPadding(0, statusBars.top, 0, 0);
-            binding.navHostFragment.setPadding(navBars.left, 0, navBars.right, navBars.bottom);
+            binding.navHostFragment.setPadding(navBars.left, 0, navBars.right, 0);
+            ViewGroup.MarginLayoutParams adParams =
+                    (ViewGroup.MarginLayoutParams) binding.adContainer.getLayoutParams();
+            adParams.bottomMargin = navBars.bottom;
+            binding.adContainer.setLayoutParams(adParams);
 
             return windowInsets;
         });
@@ -181,6 +190,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem privacyOptions = menu.findItem(R.id.action_privacy_options);
+        if (privacyOptions != null) {
+            privacyOptions.setVisible(adsManager != null
+                    && adsManager.isPrivacyOptionsRequired());
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_export_all) {
@@ -224,6 +243,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         } else if (id == R.id.action_privacy_policy) {
             startActivity(new Intent(this, PrivacyPolicyActivity.class));
+            return true;
+        } else if (id == R.id.action_privacy_options) {
+            if (adsManager != null) {
+                adsManager.showPrivacyOptions();
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -374,8 +398,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    /**
+     * Muestra un intersticial si ya hay uno cargado y ha pasado el tiempo
+     * mínimo desde el último. Lo invocan los fragmentos al terminar un cálculo.
+     */
+    public void maybeShowInterstitial() {
+        if (adsManager != null) {
+            adsManager.maybeShowInterstitial();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (adsManager != null) {
+            adsManager.onResume();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (adsManager != null) {
+            adsManager.onPause();
+        }
+        super.onPause();
+    }
+
     @Override
     protected void onDestroy() {
+        if (adsManager != null) {
+            adsManager.onDestroy();
+        }
         super.onDestroy();
         if (projectExporter != null) projectExporter.shutdown();
     }

@@ -24,8 +24,8 @@ android {
         applicationId "com.diamon.civil"
         minSdk 24
         targetSdk 37
-        versionCode 4
-        versionName "0.3.0"
+        versionCode 5
+        versionName "0.4.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndkVersion "30.0.14904198"
@@ -100,6 +100,13 @@ dependencies {
     implementation libs.material
     implementation libs.sceneview
     implementation libs.itext7.core
+    implementation libs.play.services.ads
+    // Consentimiento de privacidad (RGPD / normativas estatales de EE. UU.)
+    implementation libs.user.messaging.platform
+    // play-services-ads 25.5.0 arrastra hsdp 2.0.1, que lanza
+    // "targetPackageName is null" en HsdpShimActivity. 2.2.0 cierra la
+    // actividad limpiamente cuando el intent no trae los extras.
+    implementation libs.hsdp
     testImplementation libs.junit
     androidTestImplementation libs.espresso.core
     androidTestImplementation libs.ext.junit

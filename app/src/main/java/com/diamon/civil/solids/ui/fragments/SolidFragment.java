@@ -1285,6 +1285,9 @@ public class SolidFragment extends Fragment {
                                     binding.pbSolid.setVisibility(View.GONE);
                                     binding.btnRunSolidAnalysis.setEnabled(true);
                                     Toast.makeText(appContext, R.string.toast_simulation_complete, Toast.LENGTH_SHORT).show();
+                                    if (activity instanceof com.diamon.civil.core.ui.MainActivity) {
+                                        ((com.diamon.civil.core.ui.MainActivity) activity).maybeShowInterstitial();
+                                    }
                                 }
                             });
                         }
