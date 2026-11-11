@@ -1,6 +1,6 @@
 # Structural Analysis FEA 3D
 
-[![Release](https://img.shields.io/badge/Release-v0.4.1-brightgreen.svg)](https://github.com/Danielk10/Calculo_Estructural/releases/tag/v0.4.1)
+[![Release](https://img.shields.io/badge/Release-v0.4.2-brightgreen.svg)](https://github.com/Danielk10/Calculo_Estructural/releases/tag/v0.4.2)
 [![Android](https://img.shields.io/badge/Android-7.0%2B%20(API%2024--37)-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
 [![Architecture](https://img.shields.io/badge/Architecture-ARM64--v8a%20(330%20Binaries)-blue?logo=arm&logoColor=white)](https://developer.android.com/ndk)
 [![CalculiX](https://img.shields.io/badge/CalculiX%20FEA-v2.23%20MT-darkgreen)](https://www.calculix.de)
@@ -75,7 +75,7 @@ El proyecto integra las siguientes librerías científicas de código abierto:
 | **RapidJSON** | **1.1.0** | Serialización y deserialización JSON de alto rendimiento | **MIT** | [https://rapidjson.org](https://rapidjson.org) |
 | **SceneView / Filament** | **4.18.0** | Visor 3D PBR/Unlit con control táctil interactivo | **Apache 2.0** | [https://github.com/SceneView/sceneview-android](https://github.com/SceneView/sceneview-android) |
 | **iText 7 Core** | **7.2.5** | Generación de memorias de cálculo en PDF | **AGPL v3.0 / Commercial** | [https://itextpdf.com](https://itextpdf.com) |
-| **Código Android** | **v0.4.1** | Aplicación Android (Java, Kotlin, C++ JNI) | **GNU GPL v3.0** | [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html) |
+| **Código Android** | **v0.4.2** | Aplicación Android (Java, Kotlin, C++ JNI) | **GNU GPL v3.0** | [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html) |
 
 ---
 
@@ -215,7 +215,7 @@ the Free Software Foundation; see gpl.htm.
 | :--- | :--- |
 | **Nombre de la Aplicación** | Structural Analysis FEA 3D |
 | **ID de Paquete (Package Name)** | `com.diamon.civil` |
-| **Versión de la Aplicación** | `v0.4.1` (VersionCode: `6`) |
+| **Versión de la Aplicación** | `v0.4.2` (VersionCode: `7`) |
 | **SDK de Compilación (Compile SDK)** | **API 37** (Android 17) |
 | **SDK Objetivo (Target SDK)** | **API 37** (Android 17) |
 | **SDK Mínimo (Min SDK)** | **API 24** (Android 7.0 Nougat o superior) |

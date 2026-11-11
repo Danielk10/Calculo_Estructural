@@ -391,6 +391,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (!assetsOk) {
                     Toast.makeText(this, R.string.engine_failure_assets, Toast.LENGTH_LONG).show();
                 }
+                // El consentimiento UMP se pide solo cuando la carga inicial ha
+                // terminado, igual que en C-PIC, para no mostrarlo sobre el overlay.
+                if (adsManager != null && !isFinishing() && !isDestroyed()) {
+                    adsManager.start();
+                }
             });
         });
     }

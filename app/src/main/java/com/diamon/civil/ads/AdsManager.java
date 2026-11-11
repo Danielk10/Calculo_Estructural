@@ -66,6 +66,7 @@ public class AdsManager {
     private boolean destroyed = false;
     private boolean activityPaused = false;
     private boolean canRequestAds = false;
+    private boolean consentStarted = false;
 
     public AdsManager(Activity activity, FrameLayout bannerContainer) {
         this.activity = activity;
@@ -73,6 +74,18 @@ public class AdsManager {
         this.bannerContainer.setVisibility(View.GONE);
 
         createBanner();
+    }
+
+    /**
+     * Inicia el flujo de consentimiento UMP. Se llama cuando los recursos de la
+     * app ya están cargados y la pantalla de carga inicial se ha ocultado, para
+     * que el formulario no aparezca encima del proceso de arranque.
+     */
+    public void start() {
+        if (destroyed || consentStarted) {
+            return;
+        }
+        consentStarted = true;
 
         ConsentManager.requestConsent(activity, canRequest -> {
             if (destroyed) {
