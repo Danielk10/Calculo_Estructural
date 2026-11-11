@@ -54,6 +54,15 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/bottomInset"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Reserva el área de la barra de navegación aunque el banner no esté visible. -->
+        <View
+            android:id="@+id/bottomInset"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

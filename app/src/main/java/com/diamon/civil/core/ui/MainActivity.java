@@ -62,10 +62,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             binding.appBarLayout.setPadding(0, statusBars.top, 0, 0);
             binding.navHostFragment.setPadding(navBars.left, 0, navBars.right, 0);
-            ViewGroup.MarginLayoutParams adParams =
-                    (ViewGroup.MarginLayoutParams) binding.adContainer.getLayoutParams();
-            adParams.bottomMargin = navBars.bottom;
-            binding.adContainer.setLayoutParams(adParams);
+
+            // Reserva el hueco de la barra de navegación (o del teclado) siempre,
+            // incluso cuando el banner no está cargado. Así el contenido nunca
+            // queda debajo de los botones virtuales del sistema.
+            ViewGroup.LayoutParams insetParams = binding.bottomInset.getLayoutParams();
+            if (insetParams.height != navBars.bottom) {
+                insetParams.height = navBars.bottom;
+                binding.bottomInset.setLayoutParams(insetParams);
+            }
 
             return windowInsets;
         });
