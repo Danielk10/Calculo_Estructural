@@ -11,7 +11,7 @@
 [![HDF5](https://img.shields.io/badge/HDF5-v2.3.0-purple)](https://www.hdfgroup.org)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Gradle](https://img.shields.io/badge/Gradle-9.6.0-02303A?logo=gradle&logoColor=white)](https://gradle.org)
-[![AGP](https://img.shields.io/badge/AGP-9.2.1-green)](https://developer.android.com/build)
+[![AGP](https://img.shields.io/badge/AGP-9.5.1-green)](https://developer.android.com/build)
 
 **Structural Analysis FEA 3D** (`com.diamon.civil`) es una plataforma profesional de cálculo estructural y análisis por elementos finitos (FEA 3D) para Android. Integra de forma nativa los motores computacionales industriales **CalculiX (`ccx 2.23`)**, **OpenCASCADE Technology (`OCCT 8.0.0.p1`)** y **Gmsh** a través del **Android NDK (ARM64-v8a)** con enlaces de alto rendimiento en **Java, Kotlin y C++ (JNI)**.
 
@@ -223,8 +223,9 @@ the Free Software Foundation; see gpl.htm.
 | **Versión de Build-Tools** | `37.0.0` (Platform-Tools: `37.0.1`) |
 | **Versión del NDK** | `30.0.14904198` (Android NDK r30) |
 | **Versión de CMake** | `4.1.2` |
-| **Versión de Gradle** | `9.6.0` (con Android Gradle Plugin `9.2.1`) |
+| **Versión de Gradle** | `9.6.0` (con Android Gradle Plugin `9.5.1`) |
 | **Compatibilidad Java / Kotlin** | **Java 11** (`JavaVersion.VERSION_11`), Kotlin `2.2.10`, Compose BOM `2025.05.00` |
+| **Publicidad y Consentimiento** | Google AdMob `play-services-ads 25.5.0`, UMP `4.0.0`, `hsdp 2.2.0` |
 | **Solucionador FEA Principal** | **CalculiX CCX 2.23** (SPOOLES 2.2 MT + OpenMP) |
 | **Modelador CAD** | **OpenCASCADE Technology (OCCT 8.0.0.p1 con glTF)** |
 | **Generador de Malla 3D** | **Gmsh 5.0.0** |
