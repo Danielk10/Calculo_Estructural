@@ -175,12 +175,12 @@
     <header>
         <h1>Política de Privacidad</h1>
         <p>Structural Analysis FEA 3D</p>
-        <span class="badge">Última actualización: 29 de Agosto de 2026</span>
+        <span class="badge">Última actualización: 14 de noviembre de 2026</span>
     </header>
 
     <div class="content">
         <div class="highlight-box">
-            <p>🔒 <strong>Compromiso de Privacidad:</strong> La aplicación <strong>Structural Analysis FEA 3D</strong> procesa todas las simulaciones, modelos 3D y cálculos de ingeniería por elementos finitos (FEA) de forma 100% local en su dispositivo. Sus archivos de diseño (.inp, .step, .brep, .pdf) nunca se transfieren a servidores externos.</p>
+            <p>🔒 <strong>Compromiso de Privacidad:</strong> La aplicación <strong>Structural Analysis FEA 3D</strong> procesa todas las simulaciones, modelos 3D y cálculos de ingeniería por elementos finitos (FEA) de forma 100% local en su dispositivo. Sus archivos de diseño (.inp, .step, .brep, .pdf) y sus memorias de cálculo no se envían a servidores del desarrollador. La recogida de datos publicitarios la realizan los servicios de Google que se describen en la sección 5.</p>
         </div>
 
         <div class="warning-box">
@@ -189,14 +189,15 @@
 
         <section>
             <h2>1. Información General y Desarrollador</h2>
-            <p>Esta Política de Privacidad describe cómo la aplicación <strong>Structural Analysis FEA 3D</strong> (identificada con el nombre de paquete <code>com.diamon.civil</code>) recopila, utiliza y protege la información del usuario.</p>
+            <p>Esta Política de Privacidad describe cómo la aplicación <strong>Structural Analysis FEA 3D</strong> (identificada con el nombre de paquete <code>com.diamon.civil</code>) trata la información cuando se usa. El desarrollador no opera servidores propios que reciban modelos, mallas, resultados o memorias de cálculo; la aplicación se financia con anuncios de Google AdMob.</p>
             <div class="info-card">
                 <p><strong>Nombre de la Aplicación:</strong> Structural Analysis FEA 3D</p>
                 <p><strong>Desarrollador Responsable:</strong> Daniel Diamon</p>
                 <p><strong>Ubicación:</strong> Tinaquillo, Cojedes, Venezuela</p>
                 <p><strong>Licencia del Software:</strong> GNU General Public License v3.0 (GPLv3)</p>
                 <p><strong>Repositorio de Código Abierto:</strong> <a href="https://github.com/Danielk10/Calculo_Estructural" target="_blank">https://github.com/Danielk10/Calculo_Estructural</a></p>
-                <p><strong>Contacto:</strong> <a href="mailto:danieldiamon@gmail.com">danieldiamon@gmail.com</a></p>
+                <p><strong>Contacto:</strong> <a href="mailto:danielpdiamon@gmail.com">danielpdiamon@gmail.com</a></p>
+                <p><strong>Términos del Servicio:</strong> <a href="https://todoandroid.42web.io/terminos-servicio-calculo-estructural.html" target="_blank">https://todoandroid.42web.io/terminos-servicio-calculo-estructural.html</a></p>
             </div>
         </section>
 
@@ -226,7 +227,7 @@
 
         <section>
             <h2>4. Permisos Solicitados y su Uso</h2>
-            <p><strong>Structural Analysis FEA 3D</strong> requiere los siguientes permisos estrictamente necesarios para su funcionamiento técnico y computacional (compatible desde Android 7.0 / API 24 hasta Android 17 / API 37):</p>
+            <p><strong>Structural Analysis FEA 3D</strong> declara los siguientes permisos y accesos para su funcionamiento técnico (compatible desde Android 7.0 / API 24 hasta Android 17 / API 37). La app no solicita permisos de ubicación, cámara, micrófono, contactos, teléfono ni almacenamiento externo general:</p>
             <table>
                 <thead>
                     <tr>
@@ -237,56 +238,72 @@
                 <tbody>
                     <tr>
                         <td><code>android.permission.WAKE_LOCK</code></td>
-                        <td>Mantiene activo el procesador (CPU) del dispositivo durante el cómputo de elementos finitos y mallados volumétricos densos, evitando que el sistema operativo suspenda el cálculo matemático o apague la pantalla mientras se ejecutan solvers pesados de CalculiX y Gmsh.</td>
+                        <td>Mantiene activa la CPU durante el cálculo de elementos finitos y el mallado volumétrico, para que el sistema no suspenda el proceso. La app también mantiene la pantalla encendida mientras está abierta. El permiso se libera al terminar el cálculo o, como límite de seguridad, a los 15 minutos.</td>
                     </tr>
                     <tr>
                         <td><code>android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS</code></td>
-                        <td>Permite al usuario eximir opcionalmente a la aplicación de las restricciones agresivas de ahorro de energía (modo Doze), garantizando que cálculos de ingeniería de larga duración terminen sin truncamiento.</td>
+                        <td>Declarado en el manifiesto para que el usuario pueda eximir a la app de la optimización de batería si realiza cálculos muy largos. La versión actual no muestra una solicitud de exención ni la activa por su cuenta; solo tiene efecto si el usuario la concede manualmente desde los ajustes de Android.</td>
                     </tr>
                     <tr>
                         <td><code>android.permission.INTERNET</code></td>
-                        <td>Permite cargar la presente Política de Privacidad en línea, acceder a manuales teóricos de CalculiX/OpenCASCADE, gestionar anuncios de Google AdMob y compras dentro de la aplicación (Google Play In-App Billing).</td>
+                        <td>Permite cargar esta Política de Privacidad, abrir el manual de CalculiX en el navegador y solicitar anuncios a Google AdMob. No se usa para enviar modelos, mallas ni resultados a servidores del desarrollador. La aplicación no tiene compras internas ni suscripciones.</td>
                     </tr>
                     <tr>
                         <td><code>android.permission.ACCESS_NETWORK_STATE</code></td>
-                        <td>Verifica el estado de conectividad para optimizar la carga de páginas web y servicios de red.</td>
+                        <td>Comprueba el estado de la conexión antes de cargar la política y de solicitar anuncios a AdMob.</td>
                     </tr>
                     <tr>
-                        <td><code>Acceso al Almacenamiento / SAF (Storage Access Framework)</code></td>
-                        <td>Permite al usuario importar archivos de modelos (.inp, .step, .iges, .brep, .stl) y exportar reportes de cálculo en PDF y artefactos de simulación a la carpeta pública <em>Download/</em> sin requerir permisos invasivos de almacenamiento global.</td>
+                        <td><code>com.google.android.gms.permission.AD_ID</code></td>
+                        <td>Identificador de publicidad utilizado por Google AdMob para personalización, medición y prevención de fraude, según el consentimiento otorgado y la configuración del dispositivo.</td>
+                    </tr>
+                    <tr>
+                        <td><code>android.permission.VIBRATE</code></td>
+                        <td>Permiso técnico aportado por una biblioteca de terceros incluida en el APK. El código de la aplicación no utiliza la vibración; se documenta para que la lista coincida con la que muestra Google Play.</td>
+                    </tr>
+                    <tr>
+                        <td><code>Selector de archivos del sistema y MediaStore (sin permiso de almacenamiento)</code></td>
+                        <td>Permite al usuario elegir los archivos de modelo que quiere importar (.inp, .step, .iges, .brep, .stl) mediante el selector de Android (<code>ACTION_GET_CONTENT</code>) y guardar reportes PDF, mallas y exportaciones en <em>Download/</em> mediante <code>MediaStore</code>. La app no solicita acceso global al almacenamiento.</td>
                     </tr>
                 </tbody>
             </table>
+            <div class="info-card">
+                <p><strong>Permisos técnicos de bibliotecas:</strong> el APK también incluye permisos internos aportados por las bibliotecas de Google, como <code>ACCESS_ADSERVICES_AD_ID</code>, <code>ACCESS_ADSERVICES_ATTRIBUTION</code>, <code>ACCESS_ADSERVICES_TOPICS</code> y <code>FOREGROUND_SERVICE</code>. No son permisos peligrosos, no dan acceso a datos personales por sí mismos y no implican que el desarrollador reciba información del usuario.</p>
+            </div>
         </section>
 
         <section>
             <h2>5. Servicios de Terceros y Monetización</h2>
-            <p>Para financiar el desarrollo y mantenimiento del proyecto de código abierto, la aplicación puede utilizar servicios estándar de terceros que recopilan identificadores anónimos conforme a sus propias políticas de privacidad:</p>
-            <ul>
-                <li><strong>Google Play Services / Google In-App Purchases:</strong> Para la gestión segura de compras y licencias premium.</li>
-                <li><strong>Google AdMob:</strong> Para la visualización de publicidad contextual. AdMob puede utilizar identificadores de publicidad anónimos del dispositivo según las <a href="https://policies.google.com/technologies/ads" target="_blank">Políticas de Publicidad de Google</a>.</li>
-                <li><strong>Google Play Console / Crashlytics:</strong> Para la recepción de informes anónimos de fallos y métricas de rendimiento del sistema.</li>
-            </ul>
+            <p>Para financiar el desarrollo y mantenimiento del proyecto de código abierto, la aplicación muestra anuncios de <strong>Google AdMob</strong> (Google LLC): un banner adaptativo en la parte inferior y anuncios intersticiales con un límite de frecuencia de tres minutos. No se usan anuncios recompensados.</p>
+            <p>AdMob puede recopilar y procesar el identificador de publicidad de Android (AAID/GAID), la dirección IP y una ubicación aproximada (ciudad o país), el modelo de dispositivo, la versión de Android, el idioma, las interacciones con los anuncios y datos técnicos de diagnóstico y prevención de fraude, conforme a las <a href="https://policies.google.com/technologies/ads" target="_blank">Políticas de Publicidad de Google</a> y a la <a href="https://policies.google.com/privacy" target="_blank">Política de Privacidad de Google</a>.</p>
+            <p>Esta recopilación la realiza directamente Google, no el desarrollador. El desarrollador no recibe, almacena ni tiene acceso a esos datos publicitarios. La aplicación es <strong>completamente gratuita y no tiene compras internas ni suscripciones</strong>; la publicidad es su único mecanismo de financiación.</p>
+            <p>El usuario puede restablecer o eliminar su identificador de publicidad y limitar la personalización desde los ajustes de Android (<em>Privacidad &gt; Anuncios</em>) y desde la <a href="https://myadcenter.google.com" target="_blank">Configuración de anuncios de Google</a>.</p>
+            <h3>5.1. Consentimiento (UMP)</h3>
+            <p>La aplicación utiliza el SDK <strong>Google User Messaging Platform (UMP)</strong> para solicitar el consentimiento cuando la normativa lo exige (RGPD en el EEE, directivas del Reino Unido y leyes estatales de EE. UU.). Mientras no haya consentimiento, la app no solicita anuncios a AdMob. El consentimiento puede cambiarse o retirarse en cualquier momento desde <strong>Privacy Options / Opciones de privacidad</strong> en el menú de la aplicación, cuando UMP indique que la opción es obligatoria.</p>
         </section>
 
         <section>
             <h2>6. Protección y Seguridad de los Datos</h2>
-            <p>Implementamos las mejores prácticas de seguridad de Android:</p>
+            <p>La app aplica las siguientes medidas y flujos de tratamiento:</p>
             <ul>
-                <li>Uso de <em>Scoped Storage</em> y aislamiento de aplicaciones (Sandbox).</li>
-                <li>Ningún archivo de modelo estructural ni memoria de cálculo es transmitido o almacenado en servidores externos.</li>
-                <li>No se recopila información personal identificable (PII) como nombres, números de teléfono ni datos de ubicación geográfica.</li>
+                <li><strong>Aislamiento de Android (sandbox):</strong> los proyectos, preferencias y archivos internos viven en el espacio privado de la app. Las importaciones usan el selector del sistema y las exportaciones se guardan en <em>Download/</em> mediante <code>MediaStore</code>, sin permiso de almacenamiento global.</li>
+                <li><strong>Sin envío de modelos al desarrollador:</strong> los archivos de modelo, mallas, resultados y memorias de cálculo no se transmiten a servidores del desarrollador.</li>
+                <li><strong>Datos del desarrollador:</strong> no se recopilan nombres, correos, teléfonos, contactos, cuentas, ubicación precisa ni identificadores de usuario. No hay SDK de analítica, de informes de fallos ni de rastreo propios del desarrollador.</li>
+                <li><strong>Publicidad:</strong> Google AdMob puede procesar el ID de publicidad, la IP y una ubicación aproximada, como se explica en la sección 5. Esa recogida corresponde a Google, no al desarrollador.</li>
+                <li><strong>Copia de seguridad de Android:</strong> la app permite la copia de seguridad del sistema (<code>allowBackup="true"</code>). Si el usuario tiene activada la copia de seguridad de Google, Android puede respaldar los datos internos de la app (proyectos y preferencias) en su cuenta de Google. El desarrollador no accede a esa copia; se puede desactivar en los ajustes de Android.</li>
+                <li><strong>Política en línea:</strong> al abrir esta política, la app carga una página alojada en InfinityFree. El proveedor de alojamiento puede registrar la IP y datos técnicos de la conexión conforme a su propia <a href="https://www.infinityfree.com/privacy/" target="_blank">política de privacidad</a>. El manual de CalculiX se abre en el navegador del dispositivo.</li>
             </ul>
+            <h3>6.1. Conservación y eliminación</h3>
+            <p>Los modelos, mallas, archivos de entrada, resultados y reportes permanecen en el dispositivo hasta que el usuario los elimina o desinstala la app. El desarrollador no conserva copias en servidores propios. Al desinstalar, Android borra los datos del espacio privado de la app; los archivos exportados a <em>Download/</em> y las copias de seguridad del sistema deben eliminarse por separado. Los datos publicitarios los conserva Google conforme a sus propias políticas.</p>
         </section>
 
         <section>
             <h2>7. Privacidad de Menores (COPPA)</h2>
-            <p><strong>Structural Analysis FEA 3D</strong> es una herramienta profesional de ingeniería civil y cálculo de estructuras dirigida a estudiantes, ingenieros y profesionales. No recopilamos conscientemente datos de niños menores de 13 años.</p>
+            <p><strong>Structural Analysis FEA 3D</strong> es una herramienta profesional de ingeniería civil y cálculo de estructuras dirigida a estudiantes, ingenieros y profesionales. No está dirigida a menores de 13 años y no se recopilan conscientemente datos de niños. Si un menor utiliza la app, debe hacerlo con la supervisión de un adulto responsable.</p>
         </section>
 
         <section>
             <h2>8. Derechos del Usuario (GDPR y CCPA)</h2>
-            <p>Usted tiene derecho a utilizar la aplicación de forma anónima, desinstalarla en cualquier momento eliminando todos sus datos locales, o revocar los permisos otorgados desde la configuración del sistema Android.</p>
+            <p>Puede usar la aplicación sin crear una cuenta: el desarrollador no recibe su nombre, correo ni teléfono. Si reside en el EEE, el Reino Unido, Suiza, California o una jurisdicción con leyes similares, puede ejercer sus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a <a href="mailto:danielpdiamon@gmail.com">danielpdiamon@gmail.com</a>. El desarrollador no vende datos personales. Para los datos que procesa Google con fines publicitarios, puede usar las opciones de privacidad de la app y la <a href="https://myadcenter.google.com" target="_blank">Configuración de anuncios de Google</a>. También puede desinstalar la app para borrar sus datos locales; los archivos exportados a <em>Download/</em> deben borrarse manualmente.</p>
         </section>
 
         <section>
@@ -297,14 +314,14 @@
         <section>
             <h2>10. Contacto y Soporte</h2>
             <p>Si tiene preguntas, comentarios o inquietudes sobre esta Política de Privacidad o sobre el funcionamiento de la aplicación, puede ponerse en contacto con nosotros en:</p>
-            <p>📧 Correo electrónico: <a href="mailto:danieldiamon@gmail.com">danieldiamon@gmail.com</a></p>
+            <p>📧 Correo electrónico: <a href="mailto:danielpdiamon@gmail.com">danielpdiamon@gmail.com</a></p>
             <p>🌐 Web: <a href="https://todoandroid.42web.io" target="_blank">https://todoandroid.42web.io</a></p>
         </section>
     </div>
 
     <footer>
-        <p>&copy; 2026 Daniel Diamon. Todos los derechos reservados.</p>
-        <p>Structural Analysis FEA 3D está licenciado bajo GNU General Public License v3.0.</p>
+        <p>&copy; 2026 Daniel Diamon.</p>
+        <p>El código de Structural Analysis FEA 3D se distribuye bajo GNU General Public License v3.0.</p>
     </footer>
 </div>
 
