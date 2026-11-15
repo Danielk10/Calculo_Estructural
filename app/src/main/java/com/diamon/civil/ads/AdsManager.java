@@ -43,7 +43,7 @@ public class AdsManager {
     /** Los anuncios cargados se descartan a la hora. */
     private static final long AD_TTL_MS = 60 * 60 * 1000L;
     /** Si se pide un intersticial y aún no ha cargado, se espera como máximo esto. */
-    private static final long INTERSTITIAL_PENDING_TIMEOUT_MS = 20 * 1000L;
+    private static final long INTERSTITIAL_PENDING_TIMEOUT_MS = 3 * 1000L;
     /** Reintento del banner cuando AdMob no devuelve relleno. */
     private static final long BANNER_RETRY_MS = 60 * 1000L;
     private static final int BANNER_MAX_RETRIES = 3;
@@ -102,6 +102,7 @@ public class AdsManager {
             if (canRequest) {
                 initializeMobileAds();
                 loadBanner();
+                preloadInterstitial();
             } else {
                 hideBanner();
             }
@@ -205,9 +206,22 @@ public class AdsManager {
     // ------------------------------------------------------------------
 
     /**
+     * Precarga el intersticial sin mostrarlo. Se llama al resolver el
+     * consentimiento y después de cerrar un intersticial: así el anuncio está
+     * listo cuando el usuario pulsa "Calcular", en vez de pedirse en ese
+     * momento y aparecer unos segundos después sobre la pantalla de progreso.
+     */
+    public void preloadInterstitial() {
+        if (destroyed || !canRequestAds) {
+            return;
+        }
+        loadInterstitial();
+    }
+
+    /**
      * Muestra un intersticial si ya hay uno cargado y ha pasado el tiempo
      * mínimo desde el último. Si no hay ninguno, lo solicita y lo muestra en
-     * cuanto llegue (con un límite de espera de 20 segundos).
+     * cuanto llegue (con un límite de espera de 3 segundos).
      */
     public void maybeShowInterstitial() {
         if (destroyed || activityPaused || !canRequestAds) {
@@ -253,6 +267,9 @@ public class AdsManager {
                                     public void onAdDismissedFullScreenContent() {
                                         interstitialAd = null;
                                         interstitialLoadedAt = 0;
+                                        // Deja el siguiente anuncio listo para
+                                        // el próximo cálculo.
+                                        loadInterstitial();
                                     }
 
                                     @Override
@@ -262,6 +279,7 @@ public class AdsManager {
                                                 + adError.getMessage());
                                         interstitialAd = null;
                                         interstitialLoadedAt = 0;
+                                        loadInterstitial();
                                     }
                                 });
 
@@ -310,6 +328,7 @@ public class AdsManager {
             if (canRequestAds) {
                 initializeMobileAds();
                 loadBanner();
+                preloadInterstitial();
             } else {
                 hideBanner();
             }
@@ -327,6 +346,11 @@ public class AdsManager {
         }
         if (canRequestAds && !bannerLoaded) {
             loadBanner();
+        }
+        // Si el usuario vuelve a la app sin un intersticial fresco, se pide
+        // ahora para que esté listo en el próximo "Calcular".
+        if (canRequestAds) {
+            preloadInterstitial();
         }
     }
 
