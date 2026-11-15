@@ -1118,6 +1118,13 @@ public class SolidFragment extends Fragment {
             return;
         }
 
+        // Pausa natural: el usuario lanza el cálculo y va a esperar. Se muestra
+        // el intersticial aquí en vez de interrumpir la pantalla de resultados.
+        android.app.Activity hostActivity = getActivity();
+        if (hostActivity instanceof com.diamon.civil.core.ui.MainActivity) {
+            ((com.diamon.civil.core.ui.MainActivity) hostActivity).maybeShowInterstitial();
+        }
+
         binding.pbSolid.setVisibility(View.VISIBLE);
         binding.btnRunSolidAnalysis.setEnabled(false);
 
@@ -1285,9 +1292,6 @@ public class SolidFragment extends Fragment {
                                     binding.pbSolid.setVisibility(View.GONE);
                                     binding.btnRunSolidAnalysis.setEnabled(true);
                                     Toast.makeText(appContext, R.string.toast_simulation_complete, Toast.LENGTH_SHORT).show();
-                                    if (activity instanceof com.diamon.civil.core.ui.MainActivity) {
-                                        ((com.diamon.civil.core.ui.MainActivity) activity).maybeShowInterstitial();
-                                    }
                                 }
                             });
                         }

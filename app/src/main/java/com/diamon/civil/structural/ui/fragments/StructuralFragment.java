@@ -1302,6 +1302,13 @@ public class StructuralFragment extends Fragment {
             return;
         }
 
+        // Pausa natural: el usuario acaba de lanzar el cálculo y va a esperar.
+        // Mejor aquí que interrumpiendo la pantalla de resultados.
+        android.app.Activity hostActivity = getActivity();
+        if (hostActivity instanceof com.diamon.civil.core.ui.MainActivity) {
+            ((com.diamon.civil.core.ui.MainActivity) hostActivity).maybeShowInterstitial();
+        }
+
         binding.pbStructural.setVisibility(View.VISIBLE);
         binding.btnSolveStructural.setEnabled(false);
         binding.btnSolveStructural.setText(R.string.btn_solving_fea);
@@ -1394,9 +1401,6 @@ public class StructuralFragment extends Fragment {
                             binding.btnSolveStructural.setEnabled(true);
                             binding.btnSolveStructural.setText(R.string.btn_run_fea_solver);
                             Toast.makeText(appContext, R.string.toast_simulation_complete, Toast.LENGTH_SHORT).show();
-                            if (activity instanceof com.diamon.civil.core.ui.MainActivity) {
-                                ((com.diamon.civil.core.ui.MainActivity) activity).maybeShowInterstitial();
-                            }
                         }
                     });
                 }

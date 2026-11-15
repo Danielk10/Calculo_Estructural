@@ -44,6 +44,9 @@ public class AdsManager {
     private static final long AD_TTL_MS = 60 * 60 * 1000L;
     /** Si se pide un intersticial y aún no ha cargado, se espera como máximo esto. */
     private static final long INTERSTITIAL_PENDING_TIMEOUT_MS = 20 * 1000L;
+    /** Reintento del banner cuando AdMob no devuelve relleno. */
+    private static final long BANNER_RETRY_MS = 60 * 1000L;
+    private static final int BANNER_MAX_RETRIES = 3;
 
     private static volatile boolean mobileAdsInitialized = false;
 
@@ -55,6 +58,8 @@ public class AdsManager {
     private boolean bannerLoading = false;
     private boolean bannerLoaded = false;
     private long bannerLoadedAt = 0;
+    private int bannerRetries = 0;
+    private final Runnable bannerRetryRunnable = this::loadBanner;
 
     private InterstitialAd interstitialAd;
     private boolean interstitialLoading = false;
@@ -117,6 +122,7 @@ public class AdsManager {
                 bannerLoading = false;
                 bannerLoaded = true;
                 bannerLoadedAt = System.currentTimeMillis();
+                bannerRetries = 0;
                 if (!destroyed && bannerContainer != null) {
                     bannerContainer.setVisibility(View.VISIBLE);
                 }
@@ -129,6 +135,7 @@ public class AdsManager {
                 bannerLoaded = false;
                 Log.w(TAG, "Error cargando banner: código " + loadAdError.getCode()
                         + " - " + loadAdError.getMessage());
+                scheduleBannerRetry();
             }
         });
 
@@ -156,6 +163,22 @@ public class AdsManager {
         if (bannerContainer != null) {
             bannerContainer.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Reintenta el banner cuando no hubo relleno. En Structural el match rate
+     * ronda el 40%, así que sin reintento se pierden impresiones que sí se
+     * servirían unos segundos después.
+     */
+    private void scheduleBannerRetry() {
+        if (destroyed || !canRequestAds || bannerRetries >= BANNER_MAX_RETRIES) {
+            return;
+        }
+        bannerRetries++;
+        mainHandler.removeCallbacks(bannerRetryRunnable);
+        mainHandler.postDelayed(bannerRetryRunnable, BANNER_RETRY_MS * bannerRetries);
+        Log.d(TAG, "Reintento de banner programado (" + bannerRetries + "/"
+                + BANNER_MAX_RETRIES + ").");
     }
 
     @SuppressWarnings("deprecation")
