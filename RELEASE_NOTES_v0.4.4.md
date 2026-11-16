@@ -1,6 +1,6 @@
 # Version Alfa 0.4.4 (versionCode 9)
 
-Fecha: 15 de noviembre de 2026
+Fecha: 16 de noviembre de 2026
 
 Esta versión alfa (`v0.4.4`, código de versión `9`) corrige el anuncio intersticial para que esté listo cuando el usuario pulsa «Calcular» y no aparezca por sorpresa sobre la pantalla de resultados.
 
@@ -32,10 +32,10 @@ Esta versión alfa (`v0.4.4`, código de versión `9`) corrige el anuncio inters
 
 ## 📦 Artefactos
 
-• `app-release.apk` — 219164338 bytes
-  • SHA-256: `457b11c2249bde11b98a62dd76b0a2e170e4e4414695acd341acc2886207cff1`
-• `app-release.aab` — 218053543 bytes
-  • SHA-256: `51409e61a375ce1a83bb217865a0300febb41540f7f15533fc342230d9f68f51`
+• `app-release.apk` — 219164342 bytes
+  • SHA-256: `a17ddfbd0383905fed082a41b868df0255f1679ae637ab23e849b633a6000949`
+• `app-release.aab` — 218053548 bytes
+  • SHA-256: `2feb89357d2934feea3e22cb22bda7312a957cb550e4c7c8f1d02a2905911714`
 
 ---
 
