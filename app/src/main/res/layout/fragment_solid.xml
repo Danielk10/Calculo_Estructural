@@ -505,11 +505,20 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Flexible Space to fill single screen cleanly -->
+            <!-- Espacio flexible: se oculta cuando el anuncio nativo está visible -->
             <View
+                android:id="@+id/flexibleSpacer"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
+
+            <!-- Anuncio nativo AdMob grande (ocupa el espacio libre de la pantalla) -->
+            <FrameLayout
+                android:id="@+id/nativeAdContainer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone" />
 
             <!-- Calculation Progress Indicator (Positioned cleanly right above the Solve button) -->
             <com.google.android.material.progressindicator.LinearProgressIndicator

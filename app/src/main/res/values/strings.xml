@@ -2,6 +2,9 @@
     <!-- Application & General -->
     <string name="app_name">Structural Analysis FEA 3D</string>
     <string name="admob_app_id">ca-app-pub-5141499161332805~5700393084</string>
+    <!-- Native ad labels -->
+    <string name="ad_badge">Ad</string>
+    <string name="ad_icon_desc">Advertiser icon</string>
     <string name="menu_privacy_options">Privacy Options</string>
     <string name="loading_engine">Initializing FEA Solver Engine...</string>
     <string name="deploying_engine">Deploying FEM Runtime Assets...</string>

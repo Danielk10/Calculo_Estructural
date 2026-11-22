@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.diamon.civil.R;
+import com.diamon.civil.ads.NativeAdHelper;
 import com.diamon.civil.databinding.FragmentSolidBinding;
 import com.diamon.civil.structural.engine.CalculixExecutor;
 import com.diamon.civil.solids.engine.GmshRunner;
@@ -40,6 +41,7 @@ public class SolidFragment extends Fragment {
     private GmshRunner gmshRunner;
     private CalculixExecutor calculixExecutor;
     private MaterialDatabase materialDatabase;
+    private NativeAdHelper nativeAdHelper;
     private volatile boolean engineReady;
     private volatile File activeSimulationGeometry;
     private volatile String modelPath = "models/test_beam.glb";
@@ -206,6 +208,20 @@ public class SolidFragment extends Fragment {
                 }
             }
         });
+
+        nativeAdHelper = new NativeAdHelper(
+                binding.nativeAdContainer,
+                R.layout.layout_native_ad_large,
+                binding.flexibleSpacer);
+        nativeAdHelper.load();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (nativeAdHelper != null) {
+            nativeAdHelper.load();
+        }
     }
 
     /** Sets up the material spinner from the JSON database. Called once in onViewCreated. */
@@ -1454,6 +1470,10 @@ public class SolidFragment extends Fragment {
     @Override
     public void onDestroyView() {
         engineReady = false;
+        if (nativeAdHelper != null) {
+            nativeAdHelper.destroy();
+            nativeAdHelper = null;
+        }
         if (wakeLockHelper != null) {
             wakeLockHelper.release();
         }

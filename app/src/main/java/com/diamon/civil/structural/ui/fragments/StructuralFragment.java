@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.diamon.civil.R;
+import com.diamon.civil.ads.NativeAdHelper;
 import com.diamon.civil.databinding.FragmentStructuralBinding;
 import com.diamon.civil.structural.engine.CalculixExecutor;
 import com.diamon.civil.structural.engine.StructuralBeamDatParser;
@@ -48,6 +49,7 @@ public class StructuralFragment extends Fragment {
     private StructuralModel currentModel;
     private MaterialDatabase materialDatabase;
     private SectionLibrary sectionLibrary;
+    private NativeAdHelper nativeAdHelper;
 
     private StructuralBeamDatParser.ParseResult currentResult;
     private float currentDispScale = 1000f;
@@ -199,8 +201,19 @@ public class StructuralFragment extends Fragment {
             logger.error("Failed to load databases: " + e.getMessage());
         }
 
+        nativeAdHelper = new NativeAdHelper(binding.nativeAdContainer);
+        nativeAdHelper.load();
+
         loadDefaultTestCase();
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (nativeAdHelper != null) {
+            nativeAdHelper.load();
+        }
     }
 
     public void loadModel(StructuralModel model) {
@@ -2416,6 +2429,10 @@ public class StructuralFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (nativeAdHelper != null) {
+            nativeAdHelper.destroy();
+            nativeAdHelper = null;
+        }
         if (wakeLockHelper != null) {
             wakeLockHelper.release();
         }

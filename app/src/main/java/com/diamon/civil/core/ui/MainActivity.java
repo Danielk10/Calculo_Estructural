@@ -1,6 +1,7 @@
 package com.diamon.civil.core.ui;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import com.diamon.civil.solids.ui.OnHitListener;
@@ -19,7 +20,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.fragment.app.Fragment;
 
 import com.diamon.civil.R;
@@ -53,14 +56,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         adsManager = new AdsManager(this, binding.adContainer);
 
+        // Pantalla completa inmersiva, igual que el resto de las apps.
+        hideSystemBars();
+
         // Keep CPU & screen active during FEA simulations and 3D rendering (API 24 to API 37)
         getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.drawerLayout, (v, windowInsets) -> {
-            Insets statusBars = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout());
+            // Solo se usa statusBars para el borde superior: con el modo
+            // inmersivo vale 0 y el recorte de cámara (displayCutout) seguía
+            // dejando una franja vacía encima del título. El recorte solo se
+            // respeta en los laterales, como en PIC k150 y Lector de Memorias.
+            Insets statusBars = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars());
+            Insets cutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
             Insets navBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars() | WindowInsetsCompat.Type.ime());
 
-            binding.appBarLayout.setPadding(0, statusBars.top, 0, 0);
+            binding.appBarLayout.setPadding(
+                    Math.max(statusBars.left, cutout.left),
+                    statusBars.top,
+                    Math.max(statusBars.right, cutout.right),
+                    0);
             binding.navHostFragment.setPadding(navBars.left, 0, navBars.right, 0);
 
             // Reserva el hueco de la barra de navegación (o del teclado) siempre,
@@ -418,9 +433,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    /**
+     * Oculta las barras del sistema en modo inmersivo, igual que el resto de
+     * las apps (PIC k150, Lector de Memorias, C-PIC...). Se vuelve a aplicar
+     * al recuperar el foco para que los diálogos y el formulario de
+     * consentimiento no dejen las barras visibles.
+     */
+    private void hideSystemBars() {
+        WindowInsetsControllerCompat controller =
+                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        if (controller == null) {
+            return;
+        }
+        try {
+            controller.hide(WindowInsetsCompat.Type.systemBars());
+            controller.setSystemBarsBehavior(
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            controller.setAppearanceLightStatusBars(false);
+            controller.setAppearanceLightNavigationBars(false);
+        } catch (Throwable ignored) {
+            // Algunos fabricantes no implementan el controlador de insets.
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemBars();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // La actividad no se recrea (configChanges en el manifiesto), así que
+        // el banner adaptable hay que recalcularlo con el nuevo ancho.
+        if (adsManager != null) {
+            adsManager.onConfigurationChanged();
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        hideSystemBars();
         if (adsManager != null) {
             adsManager.onResume();
         }

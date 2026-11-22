@@ -52,7 +52,6 @@
             android:id="@+id/adContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@color/white"
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/bottomInset"
             app:layout_constraintStart_toStartOf="parent"

@@ -402,6 +402,13 @@
                     android:fontFamily="monospace" />
             </FrameLayout>
 
+            <!-- Anuncio nativo AdMob (oculto hasta que haya relleno) -->
+            <FrameLayout
+                android:id="@+id/nativeAdContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
             <!-- Calculation Progress Indicator (Positioned cleanly right above the Solve button) -->
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/pbStructural"

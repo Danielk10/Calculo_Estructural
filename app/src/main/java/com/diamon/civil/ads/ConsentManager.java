@@ -33,6 +33,7 @@ public final class ConsentManager {
     private static boolean privacyOptionsRequired = false;
     private static WeakReference<Activity> activityRef = new WeakReference<>(null);
     private static final List<ConsentCallback> pendingCallbacks = new ArrayList<>();
+    private static final List<Runnable> resolvedListeners = new ArrayList<>();
 
     public interface ConsentCallback {
         void onConsentReady(boolean canRequestAds);
@@ -113,6 +114,37 @@ public final class ConsentManager {
         if (activity != null && !activity.isFinishing() && !activity.isDestroyed()) {
             activity.invalidateOptionsMenu();
         }
+
+        // Avisa a quienes esperaban el consentimiento sin haberlo pedido ellos
+        // (por ejemplo, el anuncio nativo de cada pantalla).
+        List<Runnable> listeners = new ArrayList<>(resolvedListeners);
+        resolvedListeners.clear();
+        for (Runnable listener : listeners) {
+            try {
+                listener.run();
+            } catch (Exception e) {
+                Log.e(TAG, "Error en listener de consentimiento", e);
+            }
+        }
+    }
+
+    /**
+     * Registra un aviso para cuando el consentimiento esté resuelto, sin
+     * lanzar el flujo UMP por cuenta propia. Si ya está resuelto se ejecuta de
+     * inmediato.
+     */
+    public static void addOnConsentResolvedListener(@NonNull Runnable listener) {
+        if (resolved) {
+            listener.run();
+            return;
+        }
+        if (!resolvedListeners.contains(listener)) {
+            resolvedListeners.add(listener);
+        }
+    }
+
+    public static void removeOnConsentResolvedListener(@NonNull Runnable listener) {
+        resolvedListeners.remove(listener);
     }
 
     public static boolean isResolved() {

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Anuncio nativo compacto de AdMob.
+
+    Se usa el mismo patrón que en Lector de Memorias: icono, titular, cuerpo,
+    anunciante y botón CTA, con el distintivo "Ad" visible y el icono de
+    AdChoices que dibuja el propio SDK sobre el NativeAdView.
+-->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="2dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#E2E8F0"
+    app:strokeWidth="1dp">
+
+    <com.google.android.gms.ads.nativead.NativeAdView
+        android:id="@+id/nativeAdView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="6dp">
+
+            <!-- Icono del anunciante -->
+            <ImageView
+                android:id="@+id/ad_app_icon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="6dp"
+                android:contentDescription="@string/ad_icon_desc"
+                android:scaleType="fitCenter" />
+
+            <!-- Distintivo, titular, cuerpo y anunciante -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/badge_ad"
+                        android:paddingHorizontal="4dp"
+                        android:paddingVertical="1dp"
+                        android:text="@string/ad_badge"
+                        android:textColor="#FFFFFF"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/ad_headline"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="#1F2937"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/ad_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="#475569"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/ad_advertiser"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="#64748B"
+                    android:textSize="9sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Botón de llamada a la acción -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/ad_call_to_action"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="6dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="30dp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="0dp"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                app:backgroundTint="@color/primaryColor"
+                app:cornerRadius="6dp" />
+        </LinearLayout>
+    </com.google.android.gms.ads.nativead.NativeAdView>
+</com.google.android.material.card.MaterialCardView>

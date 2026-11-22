@@ -141,6 +141,7 @@ public class AdsManager {
         });
 
         if (bannerContainer != null) {
+            bannerContainer.removeAllViews();
             bannerContainer.addView(adView);
         }
     }
@@ -351,6 +352,34 @@ public class AdsManager {
         // ahora para que esté listo en el próximo "Calcular".
         if (canRequestAds) {
             preloadInterstitial();
+        }
+    }
+
+    /**
+     * Recalcula el banner adaptable cuando cambia la orientación. La actividad
+     * no se recrea (configChanges en el manifiesto), así que el AdView
+     * conservaría el ancho de la orientación anterior y dejaría franjas.
+     */
+    public void onConfigurationChanged() {
+        if (destroyed || bannerContainer == null) {
+            return;
+        }
+
+        mainHandler.removeCallbacks(bannerRetryRunnable);
+        if (adView != null) {
+            bannerContainer.removeView(adView);
+            adView.destroy();
+            adView = null;
+        }
+        bannerLoading = false;
+        bannerLoaded = false;
+        bannerLoadedAt = 0;
+        bannerRetries = 0;
+        bannerContainer.setVisibility(View.GONE);
+
+        createBanner();
+        if (canRequestAds) {
+            loadBanner();
         }
     }
 
